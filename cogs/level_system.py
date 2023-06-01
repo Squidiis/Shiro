@@ -332,9 +332,6 @@ class LevelSystem(commands.Cog):
         guild_id_insert = message.guild.id
         user_name_insert = message.author.name
 
-
-        insert_setup_guild = f"""INSERT INTO LevelSystemControl (guildId, control) VALUES (%s, %s)"""
-        setup_guild_values = [guild_id_insert, "on"]
         
         check_levelsystem_control = DatabaseStatusCheck._level_system_status(guild_id=guild_id_insert)
         
@@ -343,9 +340,7 @@ class LevelSystem(commands.Cog):
             return
         
         if check_levelsystem_control == None:
-            my_cursor.execute(insert_setup_guild, setup_guild_values)
-            connection_db_level.commit()
-            DatabaseSetup.db_close(cursor=my_cursor, db_connection=connection_db_level)
+            DatabaseUpdates._create_bot_settings(guild_id=guild_id_insert)
             return
                 
         # Blacklist check
@@ -1047,7 +1042,7 @@ class LevelSystem(commands.Cog):
             blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
 
             emb = discord.Embed(title=f"This role is not blacklisted {fail_emoji}", 
-                description=f"""{dot_emoji} The role: <#{role_id}> is not blacklisted.
+                description=f"""{dot_emoji} The role: <@&{role_id}> is not blacklisted.
                 The following roles are blacklisted:\n\n{blacklist[2]}""", color=error_red)
             await ctx.respond(embed=emb)
 
