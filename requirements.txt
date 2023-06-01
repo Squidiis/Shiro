@@ -8,3 +8,4 @@ python-dotenv==0.21.1
 requests==2.28.2
 ui==0.1.4
 aiofiles==22.1.0
+

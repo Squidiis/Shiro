@@ -5,7 +5,6 @@ from typing import Union
 from easy_pil import Editor, load_image_async, Font
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
-import numpy
 from check import *
 
 
