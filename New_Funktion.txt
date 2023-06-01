@@ -1,0 +1,18 @@
+Econumy 
+
+Status: on_message, on_work, on_all, off
+Noch hinzufügen das man den status gleich am anfang sieht 
+
+
+Auto reaction system 
+Den Table so anpassen das man die emojis mit einen komma trennt dann halt mehr space und nur 4 stück
+
+
+levelsystem: 
+
+Einzelne funktion für XP skalierug und übertragung
+XP bonus für rollen channel und einzelne user
+überarbeiten das ein Drop down mit allen level rollen kommt wo man die auswählen kann die weg soll
+
+
+

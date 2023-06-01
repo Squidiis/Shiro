@@ -1,0 +1,12 @@
+{
+    "anime_kiss": [
+        {
+            "no_mention": ["**{ctx.author.mention} kissed himself? ok**"]
+        },
+
+        {
+            "with_mention": ["**{ctx.author.mention} has kissed {user.mention}**"]
+        }
+    ]
+    
+}
