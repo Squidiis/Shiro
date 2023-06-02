@@ -312,7 +312,7 @@ class LevelSystem(commands.Cog):
         return xp
 
     @commands.Cog.listener()
-    async def on_message(self ,message):
+    async def on_message(self, message):
 
         connection_db_level = DatabaseSetup.db_connector()
         my_cursor = connection_db_level.cursor()
@@ -370,11 +370,13 @@ class LevelSystem(commands.Cog):
                         user_has_xp = user_xp + XP 
                                                                     
                         xp_need_next_level = 5 * (user_level ^ 2) + (50 * user_level) + 100 - user_xp
-                                              
-                        if user_xp >= xp_need_next_level:
+                        final_xp = xp_need_next_level + user_xp
+                        print(final_xp)
+                        print(user_has_xp)
+                        if user_has_xp >= final_xp:
                                                                         
                             new_level = user_level + 1
-                            xp_user = 0        
+                            xp_user = user_has_xp - final_xp       
 
                             try:
                                 # Updates the XP 
@@ -750,13 +752,11 @@ class LevelSystem(commands.Cog):
                             rank = count 
                             print(check_user)
             xp, level = check_user[3], check_user[2]
-            print(xp)
-            print(level)
+        
             xp_needed = 5 * (check_user[2] ^ 2) + (50 * check_user[2]) + 100 - check_user[3]
             final_xp = xp_needed + xp
-            print(xp_needed)
             xp_have = check_user[3]
-            print(xp_have)
+
             percentage = int(((xp_have * 100)/ final_xp))
 
             poppins = Font.poppins(size=70)
