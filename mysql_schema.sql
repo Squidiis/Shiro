@@ -52,6 +52,17 @@ CREATE TABLE LevelSystemSettings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+DROP TABLE IF EXISTS `ManageBlacklistTemp`;
+
+CREATE TABLE ManageBlacklistTemp (
+    guildId BIGINT UNSIGNED NOT NULL,
+    channelId BIGINT UNSIGNED NULL,
+    categoryId BIGINT UNSIGNED NULL,
+    userId BIGINT UNSIGNED NULL,
+    roleId BIGINT UNSIGNED NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 ------------- Table for the Marry system --------------
 
 DROP TABLE IF EXISTS `MarryStats`;

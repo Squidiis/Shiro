@@ -9,6 +9,36 @@ from check import *
 
 
 
+class BlacklistManagerButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Add to Blacklist", style=discord.ButtonStyle.blurple, custom_id="add_blacklist")
+    async def add_blacklist_manager_callback_button(self, button, interaction):
+
+        if interaction.user.guild_permissions.administrator:
+            
+            emb = discord.Embed(title=f"Hier kannst du auswählen was du auf die Blacklist setzen möchtest", 
+                description=f"""{dot_emoji} Mit den unteren select menüs kannst du auswählen was du auf die Blacklist setzen möchtest!
+                {dot_emoji} Du kannst dabei frei wählen was du möchtest du kannst aber nur maximal 10 elemente pro menü auswählen""", color=shiro_colour)
+            await interaction.response.edit_message(embed=emb, view=BlacklistManagerSelectAdd())
+
+        else:
+            await interaction.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+class BlacklistManagerSelectAdd(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.channel_select(placeholder="Wähle die channels aus die du auf die Blacklist setzen möchtest!", min_values=1, max_values=5, 
+        channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="add_channel_blacklist_select")
+    async def add_blacklist_channel_level_select(self, select, interaction: discord.Interaction):
+
+        mentions = [f"{channel.mention}" for channel in select.values]
+        role_list = ", ".join(mentions)
+        await interaction.response.send_message(f"Du hast folgende Rollen ausgewählt: {role_list}")
+
 #############################################  Level Systen Settings  #############################################
 
 
@@ -371,8 +401,7 @@ class LevelSystem(commands.Cog):
                                                                     
                         xp_need_next_level = 5 * (user_level ^ 2) + (50 * user_level) + 100 - user_xp
                         final_xp = xp_need_next_level + user_xp
-                        print(final_xp)
-                        print(user_has_xp)
+                        
                         if user_has_xp >= final_xp:
                                                                         
                             new_level = user_level + 1
@@ -1138,6 +1167,17 @@ class LevelSystem(commands.Cog):
                 {arrow_emoji} {add_blacklist_level_user}""", color=shiro_colour)
             await ctx.respond(embed=emb)
 
+
+    @commands.slash_command(name = "manage-level-blacklist")
+    async def manage_level_blacklist(self, ctx):
+
+        emb = discord.Embed(title=f"Wilkommen im blacklist manager {settings_emoji}", 
+            description=f"""{help_emoji} Mit den Beiden Buttons kannst du auswählen ob du etwas auf die Blacklist setzen möchtest oder etwas entfernen möchtest!
+            {dot_emoji} Sobalt du etwas ausgewählt hast werden dir select menüs angezeigt.
+            {dot_emoji} Mit diesen kannst du auswählen was du auf die blacklist setzen oder entfernen möchtest.""", color=shiro_colour)
+        await ctx.respond(embed=emb, view=BlacklistManagerButtons())
+
+
    
     @commands.slash_command(name = "show-level-blacklist", description = "Shows you everything that is blacklisted!")
     async def show_blacklist(self, ctx):
@@ -1374,7 +1414,7 @@ class LevelSystem(commands.Cog):
     @commands.slash_command()
     async def test(self, ctx, user:Option(discord.Member)):
 
-        level = 9
+        level = 999
         rank = 544
         final_xp = 1000
         xp = 400
@@ -1383,6 +1423,7 @@ class LevelSystem(commands.Cog):
         # Text fronts
         big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 55)
         medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 35)
+        rank_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 25)
         small_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 30)
         very_small_fron = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 20)
 
@@ -1415,10 +1456,10 @@ class LevelSystem(commands.Cog):
         bar = Image.new('RGBA', img.size, (255, 255, 255, 0))
         draw = ImageDraw.Draw(bar)
 
-        bar_offset_x = 200
-        bar_offset_y = 220
-        bar_offset_x_1 = 800
-        bar_offset_y_1 = 260
+        bar_offset_x = 210
+        bar_offset_y = 230
+        bar_offset_x_1 = 820
+        bar_offset_y_1 = 270
         circle_size = bar_offset_y_1 - bar_offset_y 
         circle_size = bar_offset_y_1 - bar_offset_y  # Diameter
 
@@ -1440,30 +1481,32 @@ class LevelSystem(commands.Cog):
         draw.ellipse((bar_offset_x_1 - circle_size // 2, bar_offset_y, bar_offset_x_1 + circle_size // 2, bar_offset_y_1), fill="#11ebf2")
 
         text_size = draw.textsize(f"/ {final_xp} XP", font=small_font)    
-        offset_x = 730 - text_size[0]
+        offset_x = 810 - text_size[0]
         offset_y = bar_offset_y - text_size[1] - 10
-
         draw.text((offset_x, offset_y), f"/ {final_xp:,} XP", font=small_font, fill="#727175")
+
         text_size = draw.textsize(f"{xp:,}", font=small_font)
         offset_x -= text_size[0] + 8
         draw.text((offset_x, offset_y), f"{xp:,}", font=small_font, fill="#fff")
 
 
-        # Blitting Name
-        text_size = draw.textsize(user_name, font=medium_font)
-        offset_x = bar_offset_x
-        offset_y = 100
-        draw.text((offset_x, offset_y), user_name, font=medium_font, fill="#fff")
+        text_size = draw.textsize(f"Rank:", font=rank_font)
+        offset_x = 205
+        draw.text((offset_x, offset_y + 5), f"Rank:", font=rank_font, fill="#fff")
+
+        text_size = draw.textsize(f"#{rank}", font=medium_font)
+        offset_x = 275
+        draw.text((offset_x, offset_y - 5), f"#{rank}", font=medium_font, fill="#fff")
 
         text_size = draw.textsize(str(level), font=big_font)
         if level <= 9:
-            offset_x = 144
+            offset_x = 205 - text_size[1]
         elif level <= 99:
-            offset_x = 110
+            offset_x = 174 - text_size[1]
         elif level <= 999:
-            offset_x = 75
-        offset_y = 205
-        draw.text((offset_x, offset_y + 4), str(level), font=big_font, fill="white")
+            offset_x = 141 - text_size[1]
+        offset_y = bar_offset_y - 10
+        draw.text((offset_x, offset_y), str(level), font=big_font, fill="white")
 
         text_size = draw.textsize("LVL", font=very_small_fron)
         if level <= 9:
@@ -1472,15 +1515,13 @@ class LevelSystem(commands.Cog):
             offset_x = 128
         elif level <= 999:
             offset_x = 108
-        draw.text((offset_x, offset_y - 10), "LVL", font=very_small_fron, fill="white")
-
-        text_size = draw.textsize(f"Rank:", font=medium_font)
-        offset_x = 195
-        offset_y = 173
-        draw.text((offset_x, offset_y), f"Rank:", font=medium_font, fill="#fff")
-
-        text_size = draw.textsize(f"#{rank}", font=medium_font)
-        draw.text((offset_x + 100, offset_y), f"#{rank}", font=medium_font, fill="#fff")
+        draw.text((offset_x, offset_y - 15), "LVL", font=very_small_fron, fill="white")
+        
+        # Blitting Name
+        text_size = draw.textsize(user_name, font=big_font)
+        offset_x = 200
+        offset_y = 80
+        draw.text((offset_x, offset_y), user_name, font=big_font, fill="#fff")
 
         bar_out = Image.alpha_composite(img, bar)
         img.paste(bar_out)
