@@ -56,10 +56,10 @@ DROP TABLE IF EXISTS `ManageBlacklistTemp`;
 
 CREATE TABLE ManageBlacklistTemp (
     guildId BIGINT UNSIGNED NOT NULL,
-    channelId BIGINT UNSIGNED NULL,
-    categoryId BIGINT UNSIGNED NULL,
-    userId BIGINT UNSIGNED NULL,
-    roleId BIGINT UNSIGNED NULL
+    channelId VARCHAR(500) NULL,
+    categoryId VARCHAR(500) NULL,
+    userId VARCHAR(500) NULL,
+    roleId VARCHAR(500) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
