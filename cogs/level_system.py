@@ -6,6 +6,7 @@ from easy_pil import Editor, load_image_async, Font
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from check import *
+import re
     
 class BlacklistManagerButtons(discord.ui.View):
     def __init__(self):
@@ -14,25 +15,36 @@ class BlacklistManagerButtons(discord.ui.View):
     @discord.ui.button(label="Add to Blacklist", style=discord.ButtonStyle.blurple, custom_id="add_blacklist")
     async def add_blacklist_manager_callback_button(self, button, interaction:discord.Interaction):
 
+        view = BlacklistManagerSelectAdd()
+        view.add_item(TempBlackklistLevelSaveButton())
+
         if interaction.user.guild_permissions.administrator:
-            
+
             emb = discord.Embed(title=f"Hier kannst du auswählen was du auf die Blacklist setzen möchtest", 
                 description=f"""{dot_emoji} Mit den unteren select menüs kannst du auswählen was du auf die Blacklist setzen möchtest!
                 {dot_emoji} Du kannst dabei frei wählen was du möchtest du kannst aber nur maximal 5 elemente pro menü auswählen""", color=shiro_colour)
-            await interaction.response.edit_message(embed=emb, view=BlacklistManagerSelectAdd())
+            await interaction.response.edit_message(embed=emb, view=view)
 
         else:
+
             await interaction.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
+    @discord.ui.button(label="Remove from blacklist", style=discord.ButtonStyle.blurple, custom_id="remove_blacklist")
+    async def remove_blacklist_manager_callback_button(self, button, interaction:discord.Interaction):
 
-class BlacklistManagerSelectAdd(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
+        if interaction.user.guild_permissions.administrator:
 
-    def check_items(self, guild_id, channels = None, categories = None, roles = None, users = None):
+            emb = discord.Embed(title=f"Hier kannst du auswählen was du von der Blacklist entfernen willst", 
+                description=f"""{dot_emoji} Mit den unseren selectmenüs kannst du auswählen was von der Blacklist enfernt werden soll 
+                {dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen""")
+            await interaction.response.send_message(embed=emb)
+
+class BlacklistManagerChecks():
+
+    def check_items_level(guild_id, channels = None, categories = None, roles = None, users = None):
         
         sorted_list = []
-        
+        print(roles)
         if channels != None:
             item_list = channels
         elif categories != None:
@@ -43,23 +55,26 @@ class BlacklistManagerSelectAdd(discord.ui.View):
             item_list = users
         
         for item in item_list:
-            
+            print(f"Item {item}")
             if channels != None:
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, channel=item.id)
-            elif categories != None:
+            if categories != None:
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, category=item.id)
-            elif roles != None:
+            if roles != None:
+                print(item.id)
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, role=item.id)
-            elif users != None:
+                print(1)
+            if users != None:
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, user=item.id)
 
-            if blacklist == None:
-
-                sorted_list.append(str(item.id))
-        
+            if blacklist == None or []:
+                print(9)
+                sorted_list.append(item.id)
+                print(f"list{sorted_list}")
+        print(f"list{sorted_list}")
         return sorted_list
     
-    def check_temp_blacklist_level(self, guild_id:int):
+    def check_temp_blacklist_level(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -71,136 +86,207 @@ class BlacklistManagerSelectAdd(discord.ui.View):
 
         return temp_blacklist
 
+    async def configure_temp_blacklist_level(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=guild_id)
+        print(role_id)
+        if channel_id != None:
+            item_list = channel_id
+        if category_id != None:
+            item_list = category_id
+        if role_id != None:
+            item_list = role_id
+        if user_id != None:
+            item_list = user_id
+        print(item_list)
+        if item_list != None:
+            
+            sorted_list = ", ".join(item_list)
+
+            if channel_id != None:
+                
+                if temp_blacklist:
+                    
+                    temp_blacklist_operation = "UPDATE ManageBlacklistTemp SET channelId = %s, operation = %s WHERE guildId = %s"
+                    temp_blacklist_operation_values = [sorted_list, operation, guild_id]
+
+                else:
+                    
+                    temp_blacklist_operation = "INSERT INTO ManageBlacklistTemp (guildId, channelId, operation) VALUES (%s, %s, %s)"
+                    temp_blacklist_operation_values = [guild_id, sorted_list, operation]
+
+            if category_id != None:
+
+                if temp_blacklist:
+
+                    temp_blacklist_operation = "UPDATE ManageBlacklistTemp SET categoryId = %s, operation = %s WHERE guildId = %s"
+                    temp_blacklist_operation_values = [sorted_list, operation, guild_id]
+                
+                else:
+
+                    temp_blacklist_operation = "INSERT INTO ManageBlacklistTemp (guildId, categoryId, operation) VALUES (%s, %s, %s)"
+                    temp_blacklist_operation_values = [guild_id, sorted_list, operation]
+
+            if role_id != None:
+                print(4)
+                if temp_blacklist:
+                    print("sollte")
+                    temp_blacklist_operation = "UPDATE ManageBlacklistTemp SET roleId = %s, operation = %s WHERE guildId = %s"
+                    temp_blacklist_operation_values = [sorted_list, operation, guild_id]
+
+                else:
+
+                    temp_blacklist_operation = "INSERT INTO ManageBlacklistTemp (guildId, roleId, operation) VALUES (%s, %s, %s)"
+                    temp_blacklist_operation_values = [guild_id, sorted_list, operation]
+
+            if user_id != None:
+                    
+                if temp_blacklist:
+
+                    temp_blacklist_operation = "UPDATE ManageBlacklistTemp SET userId = %s, operation = %s WHERE guildId = %s"
+                    temp_blacklist_operation_values = [sorted_list, operation, guild_id]
+
+                else:
+
+                    temp_blacklist_operation = "INSERT INTO ManageBlacklistTemp (guildId, userId, operation) VALUES (%s, %s, %s)"
+                    temp_blacklist_operation_values = [guild_id, sorted_list, operation]
+
+            cursor.execute(temp_blacklist_operation, temp_blacklist_operation_values)
+            db_connect.commit()
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+    def delete_temp_blacklist_level(guild_id:int):
+        
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        delete_temp_blacklist = "DELETE FROM ManageBlacklistTemp WHERE guildId = %s"
+        delete_temp_blacklist_values = [guild_id]
+        cursor.execute(delete_temp_blacklist, delete_temp_blacklist_values)
+        db_connect.commit()
+
+class BlacklistManagerSelectAdd(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
 
     @discord.ui.channel_select(placeholder="Wähle die channels aus die du auf die Blacklist setzen möchtest!", min_values=1, max_values=5, 
         channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="add_channel_blacklist_select")
     async def add_blacklist_channel_level_select(self, select, interaction:discord.Interaction):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        channel_list = self.check_items(guild_id=interaction.guild.id, channels=select.values)
-        temp_blacklist = self.check_temp_blacklist_level(guild_id=interaction.guild.id)
-
-        if channel_list != []:
-
-            sorted_channels = ", ".join(channel_list)
-
-            if temp_blacklist:
-                
-                update_temp_blacklist = "UPDATE ManageBlacklistTemp SET channelId = %s WHERE guildId = %s"
-                update_temp_blacklist_values = [sorted_channels, interaction.guild.id]
-                cursor.execute(update_temp_blacklist, update_temp_blacklist_values)
-                db_connect.commit()
-
-            else:
-                
-                insert_temp_blacklist = "INSERT INTO ManageBlacklistTemp (guildId, channelId) VALUES (%s, %s)"
-                insert_temp_blacklist_values = [interaction.guild.id, sorted_channels]
-                cursor.execute(insert_temp_blacklist, insert_temp_blacklist_values)
-                db_connect.commit()
+        channel_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, channels=select.values)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", channel_id=channel_list)
 
 
     @discord.ui.channel_select(placeholder="Wähle die Kategorien aus die du auf die Blacklist setzen möchtest!", min_values=1, max_values=5, 
         channel_types=[discord.ChannelType.category], custom_id="add_category_blacklist_select")
     async def add_blacklist_category_level_select(self, select, interaction:discord.Interaction):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        category_list = self.check_items(guild_id=interaction.guild.id, categories=select.values)
-        temp_blacklist = self.check_temp_blacklist_level(guild_id=interaction.guild.id)
-
-        if category_list != []:
-
-            sorted_categorys = ", ".join(category_list)
-
-            if temp_blacklist:
-                
-                update_temp_blacklist = "UPDATE ManageBlacklistTemp SET categoryId = %s WHERE guildId = %s"
-                update_temp_blacklist_values = [sorted_categorys, interaction.guild.id]
-                cursor.execute(update_temp_blacklist, update_temp_blacklist_values)
-                db_connect.commit()
-
-            else:
-                
-                insert_temp_blacklist = "INSERT INTO ManageBlacklistTemp (guildId, categoryId) VALUES (%s, %s)"
-                insert_temp_blacklist_values = [interaction.guild.id, sorted_categorys]
-                cursor.execute(insert_temp_blacklist, insert_temp_blacklist_values)
-                db_connect.commit()
-
+        category_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, categories=select.values)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", category_id=category_list)
 
     @discord.ui.role_select(placeholder="Wähle die rollen aus die du auf die Blacklist setzen möchtes!", min_values=1, max_values=5, custom_id="add_role_blacklist_select")
     async def add_blacklist_role_level_select(self, select, interaction:discord.Interaction):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        role_list = self.check_items(guild_id=interaction.guild.id, roles=select.values)
-        temp_blacklist = self.check_temp_blacklist_level(guild_id=interaction.guild.id)
-
-        if role_list != []:
-
-            sorted_users = ", ".join(role_list)
-
-            if temp_blacklist:
-                
-                update_temp_blacklist = "UPDATE ManageBlacklistTemp SET userId = %s WHERE guildId = %s"
-                update_temp_blacklist_values = [sorted_users, interaction.guild.id]
-                cursor.execute(update_temp_blacklist, update_temp_blacklist_values)
-                db_connect.commit()
-
-            else:
-                
-                insert_temp_blacklist = "INSERT INTO ManageBlacklistTemp (guildId, userId) VALUES (%s, %s)"
-                insert_temp_blacklist_values = [interaction.guild.id, sorted_users]
-                cursor.execute(insert_temp_blacklist, insert_temp_blacklist_values)
-                db_connect.commit()
+        role_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, roles=select.values)
+        print(role_list)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", role_id=role_list)
         
 
     @discord.ui.user_select(placeholder="Wähle die User aus die du auf die Blacklist setzen möchtest!", min_values=1, max_values=5, custom_id="add_user_blacklist_select")
     async def add_blacklist_user_level_select(self, select, interaction:discord.Interaction):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        user_list = self.check_items(guild_id=interaction.guild.id, users=select.values)
-        temp_blacklist = self.check_temp_blacklist_level(guild_id=interaction.guild.id)
-
-        if user_list != []:
-
-            sorted_roles = ", ".join(user_list)
-
-            if temp_blacklist:
-                
-                update_temp_blacklist = "UPDATE ManageBlacklistTemp SET roleId = %s WHERE guildId = %s"
-                update_temp_blacklist_values = [sorted_roles, interaction.guild.id]
-                cursor.execute(update_temp_blacklist, update_temp_blacklist_values)
-                db_connect.commit()
-
-            else:
-                
-                insert_temp_blacklist = "INSERT INTO ManageBlacklistTemp (guildId, roleId) VALUES (%s, %s)"
-                insert_temp_blacklist_values = [interaction.guild.id, sorted_roles]
-                cursor.execute(insert_temp_blacklist, insert_temp_blacklist_values)
-                db_connect.commit()
+        user_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, users=select.values)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", user_id=user_list)
 
 
-    @discord.ui.button(label="Press me to blacklist all selected items", style=discord.ButtonStyle.blurple, custom_id="blacklist_all_items")
-    async def blacklist_all_items_button(self, button, interaction:discord.Interaction):
+class TempBlackklistLevelSaveButton(discord.ui.Button):
+    def __init__(self):
+        super().__init__(
+            label="Press me to complete the blacklist configuration",  
+            style=discord.enums.ButtonStyle.blurple,  
+            custom_id="safe_configuration")
+    async def callback(self, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
             
-            temp_blacklist = self.check_temp_blacklist_level(guild_id=interaction.guild.id)
-            print(temp_blacklist)
-            for _, channels, categories, roles, users in temp_blacklist:
+            await interaction.response.defer()
 
-                print(channels)
-                print(categories)
-                print(roles)
-                print(users)
-            emb = discord.Embed(title="Alles wurde auf die blacklist gesetzt")
-            await interaction.response.edit_message(embed=emb, view=None)
+            temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=interaction.guild.id)
+            print(f"temp blacklist{temp_blacklist}")
+            if temp_blacklist:
+                channel_list, category_list, role_list, user_list = [], [], [], []
+                if temp_blacklist[1] != None:
+                    print(5)
+                    channel_list = (list(map(int, re.findall('\d+', temp_blacklist[1]))))
+                    print(channel_list)
+                if temp_blacklist[2] != None: 
+                    category_list = (list(map(int, re.findall('\d+', temp_blacklist[2]))))
+                if temp_blacklist[4] != None:
+                    role_list = (list(map(int, re.findall('\d+', temp_blacklist[4]))))
+                if temp_blacklist[3] != None:
+                    user_list = (list(map(int, re.findall('\d+', temp_blacklist[3]))))
+                operation = temp_blacklist[5]
+                
+                if channel_list != None:
+                    print(6)
+                    for channel in channel_list:
+
+                        if operation == "add":
+                            print(7)
+                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, channel_id=channel)
+
+                        else:
+
+                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], channel_id=channel)
+                
+                if category_list != None:
+
+                    for category in category_list:
+
+                        if operation == "add":
+
+                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, category_id=category)
+                        
+                        else:
+
+                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], category_id=category)
+
+                if role_list != None:
+
+                    for role in role_list:
+
+                        if operation == "add":
+
+                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, role_id=role)
+
+                        else:
+
+                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], role_id=role)
+
+                if user_list != None:
+
+                    for user in user_list:
+
+                        if operation == "add":
+
+                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, user_id=user)
+
+                        else:
+
+                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], user_id=user)
+
+                BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
+                emb = discord.Embed(title="Alles wurde auf die blacklist gesetzt")
+                await interaction.followup.edit_message(embed=emb, view=None)
+
+            else:
+
+                emb = discord.Embed(title="Es wurde nichts ausgewählt")
+                await interaction.followup.send(embed=emb, view=None)
 
 
 

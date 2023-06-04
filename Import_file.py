@@ -81,32 +81,12 @@ succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
         
 
 
-def get_prefix(bot, message):
-
-    setup_connector = mysql.connector.connect(host='localhost', user='root', password=os.getenv("sql_passwort"), database='setup')
-
-    setup_db = setup_connector
-    my_cursor = setup_db.cursor()
-
-    set_prefix_guild_id = message.guild.id
-    set_prefix_guild_id_str = set_prefix_guild_id
-    
-    guild_check = (f"SELECT * FROM slash_command_setup WHERE guild_id = %s")
-    guild_check_values = [set_prefix_guild_id_str]
-
-    my_cursor.execute(guild_check, guild_check_values)
-        
-    all_guilds = my_cursor.fetchone()
-
-    prefixes_first = all_guilds[1]
-
-    return prefixes_first
 
 #Intents
 intent = discord.Intents.default()
 intent.members = True
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=(get_prefix), intents=intents)
+bot = commands.Bot(command_prefix="$", intents=intents)
 
 
 bot.remove_command("help")
@@ -133,7 +113,7 @@ class Help_menu(discord.Cog):
 
         embed = discord.Embed(
         title= f"This is the Help menu from {bot.user.name}",
-        description= f"The help menu is divided into several sections **the Prifix is {get_prefix}**",
+        description= f"The help menu is divided into several sections **the Prifix is $**",
         color= discord.Colour.orange())
         embed.add_field(name="Funcommands", value=f"`lick` `idk` `fbi` `kiss` `hug` `puch` `marry`\n `dance` `gif` `aboutme ` `RPS` `coinflip` `surprise` `wink` `pat` `feed` `cuddle` `animememe`", inline=False)
         
