@@ -44,7 +44,7 @@ class BlacklistManagerChecks():
     def check_items_level(guild_id, channels = None, categories = None, roles = None, users = None):
         
         sorted_list = []
-        print(roles)
+        
         if channels != None:
             item_list = channels
         elif categories != None:
@@ -55,23 +55,18 @@ class BlacklistManagerChecks():
             item_list = users
         
         for item in item_list:
-            print(f"Item {item}")
+            
             if channels != None:
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, channel=item.id)
             if categories != None:
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, category=item.id)
             if roles != None:
-                print(item.id)
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, role=item.id)
-                print(1)
             if users != None:
                 blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, user=item.id)
-
-            if blacklist == None or []:
-                print(9)
-                sorted_list.append(item.id)
-                print(f"list{sorted_list}")
-        print(f"list{sorted_list}")
+            if blacklist == None or blacklist == []:
+                sorted_list.append(str(item.id))
+            
         return sorted_list
     
     def check_temp_blacklist_level(guild_id:int):
@@ -281,7 +276,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
 
                 BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
                 emb = discord.Embed(title="Alles wurde auf die blacklist gesetzt")
-                await interaction.followup.edit_message(embed=emb, view=None)
+                await interaction.edit_original_response(embed=emb, view=None)
 
             else:
 
