@@ -15,5 +15,3 @@ Einzelne funktion für XP skalierug und übertragung
 XP bonus für rollen channel und einzelne user
 überarbeiten das ein Drop down mit allen level rollen kommt wo man die auswählen kann die weg soll
 
-
-
