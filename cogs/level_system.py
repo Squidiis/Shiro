@@ -7,11 +7,17 @@ from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from check import *
 import re
-    
+
+
+
+##############################################  Black list manager  ##############################################
+
+
 class BlacklistManagerButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+    # Button for adding items to the Blacklist Manager
     @discord.ui.button(label="Add to Blacklist", style=discord.ButtonStyle.blurple, custom_id="add_blacklist")
     async def add_blacklist_manager_button(self, button, interaction:discord.Interaction):
 
@@ -33,6 +39,8 @@ class BlacklistManagerButtons(discord.ui.View):
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
+
+    # Button for removing items from the Blacklist Manager
     @discord.ui.button(label="Remove from blacklist", style=discord.ButtonStyle.blurple, custom_id="remove_blacklist")
     async def remove_blacklist_manager_button(self, button, interaction:discord.Interaction):
 
@@ -43,8 +51,11 @@ class BlacklistManagerButtons(discord.ui.View):
                 {dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen""")
             await interaction.response.send_message(embed=emb)
 
+
+# All functions for the blacklist manager
 class BlacklistManagerChecks():
 
+    # Checks each entry to see if any of them are blacklisted.
     def check_items_level(guild_id, channels = None, categories = None, roles = None, users = None):
         
         sorted_list = []
@@ -73,6 +84,8 @@ class BlacklistManagerChecks():
             
         return sorted_list
     
+    
+    # Checks the temp blacklist 
     def check_temp_blacklist_level(guild_id:int, system:str):
 
         db_connect = DatabaseSetup.db_connector()
@@ -86,6 +99,8 @@ class BlacklistManagerChecks():
 
         return temp_blacklist
 
+
+    # Update or insert elements into the temporary black list 
     async def configure_temp_blacklist_level(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
@@ -158,6 +173,8 @@ class BlacklistManagerChecks():
             db_connect.commit()
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
+
+    # Deletes the entire temporary blacklist after the transfer is complete
     def delete_temp_blacklist_level(guild_id:int):
         
         db_connect = DatabaseSetup.db_connector()
@@ -167,6 +184,7 @@ class BlacklistManagerChecks():
         delete_temp_blacklist_values = [guild_id]
         cursor.execute(delete_temp_blacklist, delete_temp_blacklist_values)
         db_connect.commit()
+
 
 class BlacklistManagerSelectAdd(discord.ui.View):
     def __init__(self):
