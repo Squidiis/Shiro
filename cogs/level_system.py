@@ -84,7 +84,7 @@ class BlacklistManagerChecks():
             
         return sorted_list
     
-    
+
     # Checks the temp blacklist 
     def check_temp_blacklist_level(guild_id:int, system:str):
 
@@ -354,7 +354,7 @@ class LevelSystemSettings(discord.ui.View):
                 await interaction.response.edit_message(embed=emb, view=None)
         
         else:
-            await interaction.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 
