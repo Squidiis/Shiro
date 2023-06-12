@@ -43,13 +43,17 @@ class BlacklistManagerButtons(discord.ui.View):
     # Button for removing items from the Blacklist Manager
     @discord.ui.button(label="Remove from blacklist", style=discord.ButtonStyle.blurple, custom_id="remove_blacklist")
     async def remove_blacklist_manager_button(self, button, interaction:discord.Interaction):
+        
+        view = BlacklistManagerSelectRemove()
+        view.add_item(TempBlackklistLevelSaveButton())
+        view.add_item(ShowBlacklistLevelSystemButton())
 
         if interaction.user.guild_permissions.administrator:
 
             emb = discord.Embed(title=f"Hier kannst du auswählen was du von der Blacklist entfernen willst", 
                 description=f"""{dot_emoji} Mit den unseren selectmenüs kannst du auswählen was von der Blacklist enfernt werden soll 
-                {dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen""")
-            await interaction.response.send_message(embed=emb)
+                {dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen""", color=shiro_colour)
+            await interaction.response.send_message(embed=emb, view=view)
 
 
 # All functions for the blacklist manager
@@ -221,6 +225,41 @@ class BlacklistManagerSelectAdd(discord.ui.View):
         await interaction.response.defer()
 
 
+class BlacklistManagerSelectRemove(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.channel_select(placeholder="Wähle die channels aus die du von der Blacklist entfernen möchtest!", min_values=1, max_values=5, 
+        channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="remove_channel_blacklist_select")
+    async def add_blacklist_channel_level_select(self, select, interaction:discord.Interaction):
+
+        channel_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, channels=select.values)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", channel_id=channel_list)
+        await interaction.response.defer()
+
+    @discord.ui.channel_select(placeholder="Wähle die Kategorien aus die du von der Blacklist entfernen möchtest!", min_values=1, max_values=5, 
+        channel_types=[discord.ChannelType.category], custom_id="remove_category_blacklist_select")
+    async def add_blacklist_category_level_select(self, select, interaction:discord.Interaction):
+
+        category_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, categories=select.values)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", category_id=category_list)
+        await interaction.response.defer()
+
+    @discord.ui.role_select(placeholder="Wähle die rollen aus die du von der Blacklist entfernen möchtes!", min_values=1, max_values=5, custom_id="remove_role_blacklist_select")
+    async def add_blacklist_role_level_select(self, select, interaction:discord.Interaction):
+
+        role_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, roles=select.values)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", role_id=role_list)
+        await interaction.response.defer()
+        
+    @discord.ui.user_select(placeholder="Wähle die User aus die du von der Blacklist entfernen möchtest!", min_values=1, max_values=5, custom_id="remove_user_blacklist_select")
+    async def add_blacklist_user_level_select(self, select, interaction:discord.Interaction):
+
+        user_list = BlacklistManagerChecks.check_items_level(guild_id=interaction.guild.id, users=select.values)
+        await BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", user_id=user_list)
+        await interaction.response.defer()
+
+
 class TempBlackklistLevelSaveButton(discord.ui.Button):
     def __init__(self):
         super().__init__(
@@ -294,11 +333,18 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                 BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
                 
                 mentions = "\n".join(mention)
-                emb = discord.Embed(title=f"Die ausgwählten elemente wurden auf die blacklist gesetzt {succesfully_emoji}", 
-                    description=f"""{dot_emoji} Es wurde alles auf die Blacklist gesetzt was du ausgewählt hattest.
-                    {dot_emoji} Hier sihst du noch mal alles was hinzugefügt wurde:\n\n{mentions}\n
-                    {help_emoji} Wenn etwas nicht aufgelistet ist ist es bereits auf der Blacklist {exclamation_mark_emoji}""", color=shiro_colour)
-                await interaction.edit_original_response(embed=emb, view=None)
+
+                if temp_blacklist[5] == "add":
+
+                    emb = discord.Embed(title=f"Die ausgwählten elemente wurden auf die blacklist gesetzt {succesfully_emoji}", 
+                        description=f"""{dot_emoji} Es wurde alles auf die Blacklist gesetzt was du ausgewählt hattest.
+                        {dot_emoji} Hier sihst du noch mal alles was hinzugefügt wurde:\n\n{mentions}\n
+                        {help_emoji} Wenn etwas nicht aufgelistet ist ist es bereits auf der Blacklist {exclamation_mark_emoji}""", color=shiro_colour)
+                    await interaction.edit_original_response(embed=emb, view=None)
+
+                if temp_blacklist[5] == "remove":
+
+                    emb = discord.Embed()
 
             else:
 
@@ -1010,7 +1056,6 @@ class LevelSystem(commands.Cog):
 
         count = 0
         rank = 0
-
         connection_to_db_level = DatabaseSetup.db_connector()
         my_cursor = connection_to_db_level.cursor()
 
@@ -1021,12 +1066,12 @@ class LevelSystem(commands.Cog):
         
         if check_user:
 
-            rank_show_infos_level = "SELECT * FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC"
+            rank_show_infos_level = "SELECT * FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC, userXp DESC"
             rank_show_infos_levels_values = [ctx.guild.id]
             my_cursor.execute(rank_show_infos_level, rank_show_infos_levels_values)
             all_info = my_cursor.fetchall()
           
-            for _, user_id_rank, user_level, user_xp, _, _ in all_info:
+            for _, user_id_rank, _, _, _, _ in all_info:
                     
                 if user.id == user_id_rank:
                 
@@ -1038,7 +1083,7 @@ class LevelSystem(commands.Cog):
 
                             rank = count 
                             print(check_user)
-            xp, level = check_user[3], check_user[2]
+            xp = check_user[3]
         
             xp_needed = 5 * (check_user[2] ^ 2) + (50 * check_user[2]) + 100 - check_user[3]
             final_xp = xp_needed + xp
@@ -1775,7 +1820,7 @@ class LevelSystem(commands.Cog):
         elif level <= 99:
             offset_x = 128
         elif level <= 999:
-            offset_x = 108
+            offset_x = 121
         draw.text((offset_x, offset_y - 15), "LVL", font=very_small_fron, fill="white")
         
         # Blitting Name

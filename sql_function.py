@@ -150,6 +150,7 @@ class DatabaseCheck():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+
         if channel != None:
 
             level_sys_blacklist = "SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND channelId = %s"
@@ -803,28 +804,22 @@ class DatabaseRemoveDatas():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+        database_infos = [
+            ("channelId", channel_id),
+            ("categoryId", category_id),
+            ("roleId", role_id),
+            ("userId", user_id)
+        ]
+
         try:
 
-            if category_id is None and role_id is None and user_id is None and channel_id is not None:
-                
-                remove_blacklist = "DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND channelId = %s"
-                remove_blacklist_values = [guild_id, channel_id]
+            if channel_id != None or category_id != None or role_id != None or user_id != None:
 
-            elif channel_id is None and role_id is None and user_id is None and category_id is not None:
-
-                remove_blacklist = "DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND categoryId = %s"
-                remove_blacklist_values = [guild_id, category_id]
-
-            elif channel_id is None and category_id is None and user_id is None and role_id is not None:
-
-                remove_blacklist = "DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND roleId = %s"
-                remove_blacklist_values = [guild_id, role_id]
-
-            elif channel_id is None and category_id is None and role_id is None and user_id is not None:
-
-                remove_blacklist = "DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND userId = %s"
-                remove_blacklist_values = [guild_id, user_id]
-
+                for column_name, id in database_infos:
+                  
+                    remove_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name} = %s"
+                    remove_blacklist_values = [guild_id, id]
+                         
             else:
                 
                 remove_blacklist = "DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
@@ -840,28 +835,6 @@ class DatabaseRemoveDatas():
             
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
             return True
-        
-    
-    def remove_level_system_level_roles(guild_id:int, role_id:int):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        try:
-
-            remove_level_role = "DELETE FROM LevelSystemRoles WHERE guildId = %s AND roleId = %s"
-            remove_level_role_values = [guild_id, role_id]
-            cursor.execute(remove_level_role, remove_level_role_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-        
-        finally:
-            
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
-            return True
-
 
 
 
@@ -875,27 +848,21 @@ class DatabaseRemoveDatas():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+        database_infos = [
+            ("channelId", channel_id),
+            ("categoryId", category_id),
+            ("roleId", role_id),
+            ("userId", user_id)
+        ]
+
         try:
 
-            if category_id is None and role_id is None and user_id is None and channel_id is not None:
+            if channel_id != None or category_id != None or role_id != None or user_id != None:
                 
-                remove_blacklist = "DELETE FROM EconomySystemBlacklist WHERE guildId = %s AND channelId = %s"
-                remove_blacklist_values = [guild_id, channel_id]
+                for column_name, id in database_infos:
 
-            elif channel_id is None and role_id is None and user_id is None and category_id is not None:
-
-                remove_blacklist = "DELETE FROM EconomySystemBlacklist WHERE guildId = %s AND categoryId = %s"
-                remove_blacklist_values = [guild_id, category_id]
-
-            elif channel_id is None and category_id is None and user_id is None and role_id is not None:
-
-                remove_blacklist = "DELETE FROM EconomySystemBlacklist WHERE guildId = %s AND roleId = %s"
-                remove_blacklist_values = [guild_id, role_id]
-
-            elif channel_id is None and category_id is None and role_id is None and user_id is not None:
-
-                remove_blacklist = "DELETE FROM EconomySystemBlacklist WHERE guildId = %s AND userId = %s"
-                remove_blacklist_values = [guild_id, user_id]
+                    remove_blacklist = f"DELETE FROM EconomySystemBlacklist WHERE guildId = %s AND {column_name} = %s"
+                    remove_blacklist_values = [guild_id, id]
 
             else:
 
