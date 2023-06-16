@@ -816,17 +816,18 @@ class DatabaseRemoveDatas():
             if channel_id != None or category_id != None or role_id != None or user_id != None:
 
                 for column_name, id in database_infos:
-                  
+            
                     remove_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name} = %s"
                     remove_blacklist_values = [guild_id, id]
+                    cursor.execute(remove_blacklist, remove_blacklist_values)
+                    db_connect.commit()
                          
             else:
                 
                 remove_blacklist = "DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
                 remove_blacklist_values = [guild_id]
-
-            cursor.execute(remove_blacklist, remove_blacklist_values)
-            db_connect.commit()
+                cursor.execute(remove_blacklist, remove_blacklist_values)
+                db_connect.commit()
         
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
