@@ -26,13 +26,15 @@ class DatabaseSetup():
 
 
 class DatabaseStatusCheck():
+    def __init__(self, guild_id):
+        self.guild_id = guild_id
 
     # Returns True if an element is on the blacklist.
-    def _blacklist_check_text(guild_id:int, message_check):
+    def _blacklist_check_text(self, message_check:discord.Message):
 
         if isinstance(message_check.channel, discord.TextChannel):
 
-            levelsystem_blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id)
+            levelsystem_blacklist = DatabaseCheck.check_level_system_blacklist(guild=self.guild_id)
 
             if levelsystem_blacklist:
 
@@ -60,9 +62,9 @@ class DatabaseStatusCheck():
             
     
     # Returns the value True if "on" in the database and False when not
-    def _level_system_status(guild_id):
+    def _level_system_status(self):
 
-        levelsystem_status = DatabaseCheck.check_bot_settings(guild=guild_id)
+        levelsystem_status = DatabaseCheck.check_bot_settings(guild=self.guild_id)
 
         if levelsystem_status:
 
@@ -76,11 +78,11 @@ class DatabaseStatusCheck():
             return None
         
 
-    def _economy_system_blacklist_check(guild_id:int, message_check):
+    def _economy_system_blacklist_check(self, message_check:discord.Message):
 
         if isinstance(message_check.channel, discord.TextChannel):
             
-            economy_system_blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id)
+            economy_system_blacklist = DatabaseCheck.check_economy_system_blacklist(guild=self.guild_id)
 
             if economy_system_blacklist:
                 
@@ -107,9 +109,9 @@ class DatabaseStatusCheck():
                 return None
 
 
-    def _economy_system_status(guild_id:int, text:int = None, voice:int = None, work:int = None):
+    def _economy_system_status(self, text:int = None, voice:int = None, work:int = None):
 
-        check_status = DatabaseCheck.check_bot_settings(guild=guild_id)
+        check_status = DatabaseCheck.check_bot_settings(guild=self.guild_id)
 
         if check_status:
 
@@ -139,46 +141,33 @@ class DatabaseStatusCheck():
 #######################  Database Statemants  ############################
 
 class DatabaseCheck():
-
+    def __init__(self, guild_id):
+        self.guild_id = guild_id
 
 #################################################  Checks Level System  ##############################################################
 
 
     # Checks the Blacklist from the level system
-    def check_level_system_blacklist(guild:int, channel:int = None, category:int = None, role:int = None, user:int = None):
+    def check_blacklist(self, table:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+        table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
+        column_name = ["channelId", "categoryId", "roleId", "userId"]
+        count = 0
 
-        if channel != None:
+        for item in channel_id, category_id, role_id, user_id:
+               
+            if item != None:
+                    
+                check_level_sys_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
+                check_level_sys_blacklist_values = [self.guild_id, item]
+                count = count + 1
 
-            level_sys_blacklist = "SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND channelId = %s"
-            level_sys_blacklist_values = [guild, channel]
+        cursor.execute(check_level_sys_blacklist, check_level_sys_blacklist_values)
 
-        elif category != None:
-
-            level_sys_blacklist = "SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND categoryId = %s"
-            level_sys_blacklist_values = [guild, category]
-
-        elif role != None:
-
-            level_sys_blacklist = "SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND roleId = %s"
-            level_sys_blacklist_values = [guild, role]
-
-        elif user != None:
-            
-            level_sys_blacklist = "SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND userId = %s"
-            level_sys_blacklist_values = [guild, user]
-
-        else:
-
-            level_sys_blacklist = "SELECT * FROM LevelSystemBlacklist WHERE guildId = %s"
-            level_sys_blacklist_values = [guild]
-
-        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-
-        if channel == None and category == None and user == None:
+        if all([channel_id, category_id, role_id, user_id]) == None:
             blacklist = cursor.fetchall()
         else:
             blacklist = cursor.fetchone()
@@ -331,48 +320,6 @@ class DatabaseCheck():
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return economy_system_stats
 
-
-    # Checks the blacklist from the economy system
-    def check_economy_system_blacklist(guild:int, channel:int = None, category:int = None, role:int = None, user:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        if channel != None:
-
-            economy_sys_blacklist = "SELECT * FROM EconomySystemBlacklist WHERE guildId = %s AND channelId = %s"
-            economy_sys_blacklist_values = [guild, channel]
-
-        elif category != None:
-
-            economy_sys_blacklist = "SELECT * FROM EconomySystemBlacklist WHERE guildId = %s AND categoryId = %s"
-            economy_sys_blacklist_values = [guild, category]
-
-        elif role != None:
-
-            economy_sys_blacklist = "SELECT * FROM EconomySystemBlacklist WHERE guildId = %s AND roleId = %s"
-            economy_sys_blacklist_values = [guild, role]
-
-        elif user != None:
-            
-            economy_sys_blacklist = "SELECT * FROM EconomySystemBlacklist WHERE guildId = %s AND userId = %s"
-            economy_sys_blacklist_values = [guild, user]
-
-        else:
-
-            economy_sys_blacklist = "SELECT * FROM EconomySystemBlacklist WHERE guildId = %s"
-            economy_sys_blacklist_values = [guild]
-
-        cursor.execute(economy_sys_blacklist, economy_sys_blacklist_values)
-
-        if channel == None and category == None and user == None and role == None:
-            blacklist = cursor.fetchall()
-        else:
-            blacklist = cursor.fetchone()
-
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        return blacklist
-    
 
 
 #####################################  Inserting and updating the database  ####################################

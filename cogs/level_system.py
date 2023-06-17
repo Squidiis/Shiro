@@ -672,7 +672,7 @@ class LevelSystem(commands.Cog):
         return xp
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message:discord.Message):
 
         connection_db_level = DatabaseSetup.db_connector()
         my_cursor = connection_db_level.cursor()
@@ -692,7 +692,7 @@ class LevelSystem(commands.Cog):
         guild_id_insert = message.guild.id
         user_name_insert = message.author.name
 
-        check_levelsystem_control = DatabaseStatusCheck._level_system_status(guild_id=guild_id_insert)
+        check_levelsystem_control = DatabaseStatusCheck(guild_id=message.guild.id)._level_system_status()
         
         if check_levelsystem_control == False:
             return
@@ -702,7 +702,7 @@ class LevelSystem(commands.Cog):
             return
                 
         # Blacklist check
-        check_blacklist = DatabaseStatusCheck._blacklist_check_text(guild_id=guild_id_insert, message_check=message)
+        check_blacklist = DatabaseStatusCheck(guild_id=guild_id_insert)._blacklist_check_text(message_check=message)
                         
         if isinstance(message.channel, discord.TextChannel):
                     
