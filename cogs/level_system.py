@@ -281,8 +281,8 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
             
             await interaction.response.defer()
             temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=interaction.guild.id, system="level")
-           
-            if temp_blacklist:  
+          
+            if all([None, "", []]) != any([temp_blacklist[1], temp_blacklist[2], temp_blacklist[3], temp_blacklist[4]]):  
                 mention = []
                 
                 if temp_blacklist[1] != None and temp_blacklist[6] == "level":

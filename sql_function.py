@@ -657,28 +657,19 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+        column_name = ["channelId", "categoryId", "roleId", "userId"]
+        count = 0
+
         try:
+
+            for item in channel_id, category_id, role_id, user_id:
+               
+                if item != None:
+                    
+                    insert_economy_sys_blacklist = f"INSERT INTO EconomySystemBlacklist (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
+                    insert_economy_sys_blacklist_values = [guild_id, guild_name, item]
+                count = count + 1
             
-            if category_id is None and role_id is None and user_id is None and channel_id is not None:
-                
-                insert_economy_sys_blacklist = "INSERT INTO EconomySystemBlacklist (guildId, guildName, channelId) VALUES (%s, %s, %s)"
-                insert_economy_sys_blacklist_values = [guild_id, guild_name, channel_id]
-                
-            elif channel_id is None and role_id is None and user_id is None and category_id is not None:
-
-                insert_economy_sys_blacklist = "INSERT INTO EconomySystemBlacklist (guildId, guildName, categoryId) VALUES (%s, %s, %s)"
-                insert_economy_sys_blacklist_values = [guild_id, guild_name, category_id]
-
-            elif channel_id is None and category_id is None and user_id is None and role_id is not None:
-
-                insert_economy_sys_blacklist = "INSERT INTO EconomySystemBlacklist (guildId, guildName, roleId) VALUES (%s, %s, %s)"
-                insert_economy_sys_blacklist_values = [guild_id, guild_name, role_id]
-
-            elif channel_id is None and category_id is None and role_id is None and user_id is not None:
-
-                insert_economy_sys_blacklist = "INSERT INTO EconomySystemBlacklist (guildId, guildName, userId) VALUES (%s, %s, %s)"
-                insert_economy_sys_blacklist_values = [guild_id, guild_name, user_id]
-
             cursor.execute(insert_economy_sys_blacklist, insert_economy_sys_blacklist_values)
             db_connect.commit()
 
@@ -742,17 +733,10 @@ class DatabaseRemoveDatas():
         cursor = db_connect.cursor()
 
         try:
+        
+            remove_stats = "DELETE FROM LevelSystemStats WHERE guildId = %s AND userId = %s" if user_id != None else "DELETE FROM LevelSystemStats WHERE guildId = %s"
+            remove_stats_values = [guild_id, user_id] if user_id != None else [guild_id]
             
-            if user_id != None:
-
-                remove_stats = "DELETE FROM LevelSystemStats WHERE guildId = %s AND userId = %s"
-                remove_stats_values = [guild_id, user_id]
-            
-            else:
-
-                remove_stats = "DELETE FROM LevelSystemStats WHERE guildId = %s"
-                remove_stats_values = [guild_id]
-
             cursor.execute(remove_stats, remove_stats_values)
             db_connect.commit()
 
@@ -770,22 +754,21 @@ class DatabaseRemoveDatas():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+        if role_id != None and role_level == None:
+            column_name, data = "roleId", role_id
+        elif role_level != None and role_id == None:
+            column_name, data = "roleLevel", role_level
+
         try:
 
-            if role_id != None and role_level == None:
-
-                remove_level_role = "DELETE FROM LevelSystemRoles WHERE guildId = %s AND roleId = %s"
-                remove_level_role_values = [guild, role_id]
-
-            elif role_level != None and role_id == None:
-                
-                remove_level_role = "DELETE FROM LevelSystemRoles WHERE guildId = %s AND roleLevel = %s"
-                remove_level_role_values = [guild, role_level]
+            if all([role_id, role_level]) == None:
+                remove_level_role = "DELETE FROM LevelSystemRoles WHERE guildId = %s"
+                remove_level_role_values = [guild]
 
             else:
 
-                remove_level_role = "DELETE FROM LevelSystemRoles WHERE guildId = %s"
-                remove_level_role_values = [guild]
+                remove_level_role = f"DELETE FROM LevelSystemRoles WHERE guildId = %s AND {column_name} = %s"
+                remove_level_role_values = [guild, data]
 
             cursor.execute(remove_level_role, remove_level_role_values)
             db_connect.commit()
@@ -858,7 +841,7 @@ class DatabaseRemoveDatas():
 
         try:
 
-            if channel_id != None or category_id != None or role_id != None or user_id != None:
+            if any([channel_id, category_id, role_id, user_id]) != None:
                 
                 for column_name, id in database_infos:
 
@@ -890,15 +873,8 @@ class DatabaseRemoveDatas():
 
         try:
 
-            if user_id != None:
-
-                remove_stats = "DELETE FROM EconomySystemStats WHERE guildId = %s AND userId = %s"
-                remove_stats_values = [guild_id, user_id]
-
-            else:
-
-                remove_stats = "DELETE FROM EconomySystemStats WHERE guildId = %s"
-                remove_stats_values = [guild_id]
+            remove_stats = "DELETE FROM EconomySystemStats WHERE guildId = %s AND userId = %s" if user_id != None else "DELETE FROM EconomySystemStats WHERE guildId = %s"              
+            remove_stats_values = [guild_id, user_id] if user_id != None else [guild_id]
 
             cursor.execute(remove_stats, remove_stats_values)
             db_connect.commit()
