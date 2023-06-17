@@ -294,7 +294,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                         mention.append(f"{dot_emoji} <#{channel}>")
                         if temp_blacklist[5] == "add":
                             
-                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, channel_id=channel)
+                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, channel_id=channel, table="level")
 
                         else:
                             
@@ -308,7 +308,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                         mention.append(f"{dot_emoji} <#{category}>")
                         if temp_blacklist[5] == "add":
 
-                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, category_id=category)
+                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, category_id=category, table="level")
                         
                         else:
 
@@ -322,7 +322,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                         mention.append(f"{dot_emoji} <@&{role}>")
                         if temp_blacklist[5] == "add":
 
-                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, role_id=role)
+                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, role_id=role, table="level")
 
                         else:
 
@@ -336,7 +336,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                         mention.append(f"{dot_emoji} <@{user}>")
                         if temp_blacklist[5] == "add":
 
-                            DatabaseUpdates._insert_level_system_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, user_id=user)
+                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, user_id=user, table="level")
 
                         else:
 
@@ -1241,7 +1241,7 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates._insert_level_system_blacklist(guild_id=guild_id, guild_name=guild_name, channel_id=channel_id)
+            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, channel_id=channel_id, table="level")
 
             emb = discord.Embed(title=f"This channel was successfully blacklisted {succesfully_emoji}", 
                 description=f"""{dot_emoji} The channel: <#{channel_id}> was successfully blacklisted.
@@ -1299,7 +1299,7 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates._insert_level_system_blacklist(guild_id=guild_id, guild_name=guild_name, category_id=category_id)
+            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, category_id=category_id, table="level")
             
             emb = discord.Embed(title=f"This category was successfully blacklisted {succesfully_emoji}", 
                 description=f"""{dot_emoji} The category: <#{category_id}> was successfully blacklisted.
@@ -1356,7 +1356,7 @@ class LevelSystem(commands.Cog):
         
         else:
             
-            DatabaseUpdates._insert_level_system_blacklist(guild_id=guild_id, guild_name=guild_name, role_id=role_id)
+            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, role_id=role_id, table="level")
             
             emb = discord.Embed(title=f"This role has been successfully blacklisted {succesfully_emoji}", 
                 description=f"""{dot_emoji} The role: <#{role_id}> has been successfully blacklisted.
@@ -1418,7 +1418,7 @@ class LevelSystem(commands.Cog):
 
             else:   
 
-                DatabaseUpdates._insert_level_system_blacklist(guild_id=guild_id, guild_name=guild_name, user_id=user_id)
+                DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, user_id=user_id, table="level")
 
                 emb = discord.Embed(title=f"This user was successfully blacklisted {succesfully_emoji}", 
                     description=f"""{dot_emoji} The user: <@{user_id}> was successfully blacklisted.
@@ -1597,7 +1597,7 @@ class LevelSystem(commands.Cog):
 
         if level_roles:
             
-            DatabaseRemoveDatas.remove_level_system_level_roles(guild_id=guild_id, role_id=role_id)
+            DatabaseRemoveDatas._remove_level_system_level_roles(guild_id=guild_id, role_id=role_id)
 
             emb = discord.Embed(f"This role has been removed as a level role {succesfully_emoji}", 
                 description=f"""{dot_emoji} The role <@&{role_id}> was successfully removed as a level role.

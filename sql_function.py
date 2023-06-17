@@ -449,34 +449,26 @@ class DatabaseUpdates():
         
 
     # Function that adds all specified data to the blacklist 
-    def _insert_level_system_blacklist(guild_id:int, guild_name:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def set_on_blacklist(guild_id:int, guild_name:str, table:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         
+        table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
+        column_name = ["channelId", "categoryId", "roleId", "userId"]
+        count = 0
+
         try:
 
-            if category_id is None and role_id is None and user_id is None and channel_id is not None:
-                
-                insert_level_sys_stats = "INSERT INTO LevelSystemBlacklist (guildId, guildName, channelId) VALUES (%s, %s, %s)"
-                insert_level_sys_stats_values = [guild_id, guild_name, channel_id]
-                
-            elif channel_id is None and role_id is None and user_id is None and category_id is not None:
-                
-                insert_level_sys_stats = "INSERT INTO LevelSystemBlacklist (guildId, guildName, categoryId) VALUES (%s, %s, %s)"
-                insert_level_sys_stats_values = [guild_id, guild_name, category_id]
+            for item in channel_id, category_id, role_id, user_id:
+               
+                if item != None:
+                    
+                    insert_level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
+                    insert_level_sys_blacklist_values = [guild_id, guild_name, item]
+                count = count + 1
 
-            elif channel_id is None and category_id is None and user_id is None and role_id is not None:
-                
-                insert_level_sys_stats = "INSERT INTO LevelSystemBlacklist (guildId, guildName, roleId) VALUES (%s, %s, %s)"
-                insert_level_sys_stats_values = [guild_id, guild_name, role_id]
-
-            elif channel_id is None and category_id is None and role_id is None and user_id is not None:
-            
-                insert_level_sys_stats = "INSERT INTO LevelSystemBlacklist (guildId, guildName, userId) VALUES (%s, %s, %s)"
-                insert_level_sys_stats_values = [guild_id, guild_name, user_id]
-
-            cursor.execute(insert_level_sys_stats, insert_level_sys_stats_values)
+            cursor.execute(insert_level_sys_blacklist, insert_level_sys_blacklist_values)
             db_connect.commit()
         
         except mysql.connector.Error as error:
@@ -649,37 +641,6 @@ class DatabaseUpdates():
         finally:
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-         
-
-    # Inserting items into the blacklist for the economic system
-    def _insert_economy_system_blacklist(guild_id:int, guild_name:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        column_name = ["channelId", "categoryId", "roleId", "userId"]
-        count = 0
-
-        try:
-
-            for item in channel_id, category_id, role_id, user_id:
-               
-                if item != None:
-                    
-                    insert_economy_sys_blacklist = f"INSERT INTO EconomySystemBlacklist (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
-                    insert_economy_sys_blacklist_values = [guild_id, guild_name, item]
-                count = count + 1
-            
-            cursor.execute(insert_economy_sys_blacklist, insert_economy_sys_blacklist_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-
-        finally:
-
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-
     
 
 

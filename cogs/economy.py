@@ -449,7 +449,7 @@ class EconomySystem(commands.Cog):
 
         else:
 
-            DatabaseUpdates._insert_economy_system_blacklist(guild_id=guild_id, guild_name=guild_name, channel_id=channel_id)
+            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, channel_id=channel_id, table="economy")
 
             emb = discord.Embed(title=f"Dieser Channel wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
                 description=f"""Der channel: <#{channel_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
@@ -510,7 +510,7 @@ class EconomySystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates._insert_economy_system_blacklist(guild_id=guild_id, guild_name=guild_name, category_id=category_id)
+            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, category_id=category_id, table="economy")
 
             emb = discord.Embed(title=f"Diese Category wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
                 description=f"""Die Category: <#{category_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
@@ -571,7 +571,7 @@ class EconomySystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates._insert_economy_system_blacklist(guild_id=guild_id, guild_name=guild_name, role_id=role_id)
+            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, role_id=role_id, table="economy")
 
             emb = discord.Embed(title=f"Diese rolle wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
                 description=f"""Die rolle: <@&{role_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
@@ -637,7 +637,7 @@ class EconomySystem(commands.Cog):
 
             else:
                 
-                DatabaseUpdates._insert_economy_system_blacklist(guild_id=guild_id, guild_name=guild_name, user_id=user_id)
+                DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, user_id=user_id, table="economy")
 
                 emb = discord.Embed(title=f"Dieser user wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
                     description=f"""Der user: <@{user_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
