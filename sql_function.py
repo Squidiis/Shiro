@@ -34,7 +34,7 @@ class DatabaseStatusCheck():
 
         if isinstance(message_check.channel, discord.TextChannel):
 
-            levelsystem_blacklist = DatabaseCheck.check_level_system_blacklist(guild=self.guild_id)
+            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild=self.guild_id, table="level")
 
             if levelsystem_blacklist:
 
@@ -82,7 +82,7 @@ class DatabaseStatusCheck():
 
         if isinstance(message_check.channel, discord.TextChannel):
             
-            economy_system_blacklist = DatabaseCheck.check_economy_system_blacklist(guild=self.guild_id)
+            economy_system_blacklist = DatabaseCheck.check_blacklist(guild=self.guild_id, table="economy")
 
             if economy_system_blacklist:
                 
@@ -141,43 +141,49 @@ class DatabaseStatusCheck():
 #######################  Database Statemants  ############################
 
 class DatabaseCheck():
-    def __init__(self, guild_id):
-        self.guild_id = guild_id
 
 #################################################  Checks Level System  ##############################################################
 
 
     # Checks the Blacklist from the level system
-    def check_blacklist(self, table:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def check_blacklist(guild_id:int, table:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
-
+        
         table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         count = 0
+        
+        if all(x is None for x in [channel_id, category_id, role_id, user_id]):
+            
+            check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s"
+            check_blacklist_values = [guild_id]
 
-        for item in channel_id, category_id, role_id, user_id:
-               
-            if item != None:
-                    
-                check_level_sys_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
-                check_level_sys_blacklist_values = [self.guild_id, item]
-                count = count + 1
+        else:
 
-        cursor.execute(check_level_sys_blacklist, check_level_sys_blacklist_values)
+            for item in channel_id, category_id, role_id, user_id:
+                
+                if item != None:
+                        
+                    check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
+                    check_blacklist_values = [guild_id, item]
+                    count = count + 1
 
-        if all([channel_id, category_id, role_id, user_id]) == None:
+        cursor.execute(check_blacklist, check_blacklist_values)
+        
+        if all(x is None for x in [channel_id, category_id, role_id, user_id]):
             blacklist = cursor.fetchall()
+        
         else:
             blacklist = cursor.fetchone()
-
+            
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return blacklist
  
     
     # Checks the stats from a user in the level system
-    def check_level_system_stats(guild:int, user:int = None):
+    def check_level_system_stats(guild_id:int, user:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -185,12 +191,12 @@ class DatabaseCheck():
         if user != None:
 
             levelsys_stats_check = "SELECT * FROM LevelSystemStats WHERE guildId = %s AND userId = %s"
-            levelsys_stats_check_values = [guild, user]
+            levelsys_stats_check_values = [guild_id, user]
 
         else:
 
             levelsys_stats_check = "SELECT * FROM LevelSystemStats WHERE guildId = %s"
-            levelsys_stats_check_values = [guild]
+            levelsys_stats_check_values = [guild_id]
 
         cursor.execute(levelsys_stats_check, levelsys_stats_check_values)
 

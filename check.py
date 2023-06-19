@@ -41,7 +41,7 @@ class ShowBlacklist():
 
     def _show_blacklist_economy(guild_id):
 
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="economy")
 
         if blacklist:
 
@@ -88,8 +88,8 @@ class ShowBlacklist():
 
     def _show_blacklist_level(guild_id):
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id)
-
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="level")
+        print(blacklist)
         if blacklist:
 
             all_channels, all_categories, all_roles, all_users = [], [], [], []

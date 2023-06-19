@@ -9,7 +9,6 @@ from check import *
 import re
 
 
-
 ##############################################  Black list manager  ##############################################
 
 
@@ -51,10 +50,15 @@ class BlacklistManagerButtons(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             emb = discord.Embed(title=f"Hier kannst du auswählen was du von der Blacklist entfernen willst", 
-                description=f"""{dot_emoji} Mit den unseren selectmenüs kannst du auswählen was von der Blacklist enfernt werden soll 
-                {dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen""", color=shiro_colour)
+                description=f"""{dot_emoji} Mit den unseren selectmenüs kannst du auswählen was von der Blacklist enfernt werden soll
+                {dot_emoji} Wenn du alles ausgewählt hast was du möchtest bestätige deine auswähl indem du auf den Safe configuaration button drückst 
+                {dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen
+                {help_emoji} Falls du etwas auswählen solltest nicht auf der blacklist ist wird es automatisch aussortiert {exclamation_mark_emoji}""", color=shiro_colour)
             await interaction.response.send_message(embed=emb, view=view)
 
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 # All functions for the blacklist manager
 class BlacklistManagerChecks():
@@ -64,25 +68,18 @@ class BlacklistManagerChecks():
         
         sorted_list = []
         
-        if channels != None:
-            item_list = channels
-        elif categories != None:
-            item_list = categories
-        elif roles != None:
-            item_list = roles
-        elif users != None:
-            item_list = users
+        item_list = channels or categories or roles or users
 
         for item in item_list:
                 
             if channels != None:
-                blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, channel=item.id)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=item.id)
             if categories != None:
-                blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, category=item.id)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=item.id)
             if roles != None:
-                blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, role=item.id)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role_id=item.id)
             if users != None:
-                blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, user=item.id)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user_id=item.id)
 
             if operation == "add":
 
@@ -123,14 +120,7 @@ class BlacklistManagerChecks():
 
         temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=guild_id, system="level")
         
-        if channel_id != None:
-            item_list = channel_id
-        if category_id != None:
-            item_list = category_id
-        if role_id != None:
-            item_list = role_id
-        if user_id != None:
-            item_list = user_id
+        item_list = channel_id, category_id, role_id, user_id
         
         if item_list != None:
             
