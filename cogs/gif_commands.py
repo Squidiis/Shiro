@@ -317,6 +317,7 @@ class API(commands.Cog):
         embed.set_image(url=url)
         embed.set_footer(text="Via Tenor")
         await ctx.send(embed=embed)
+
     
     
     @commands.slash_command()

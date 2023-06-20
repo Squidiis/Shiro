@@ -26,15 +26,13 @@ class DatabaseSetup():
 
 
 class DatabaseStatusCheck():
-    def __init__(self, guild_id):
-        self.guild_id = guild_id
 
     # Returns True if an element is on the blacklist.
-    def _blacklist_check_text(self, message_check:discord.Message):
+    def _blacklist_check_text(guild_id:int, message_check:discord.Message):
 
         if isinstance(message_check.channel, discord.TextChannel):
 
-            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild=self.guild_id, table="level")
+            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild=guild_id, table="level")
 
             if levelsystem_blacklist:
 
@@ -62,9 +60,9 @@ class DatabaseStatusCheck():
             
     
     # Returns the value True if "on" in the database and False when not
-    def _level_system_status(self):
+    def _level_system_status(guild_id:int):
 
-        levelsystem_status = DatabaseCheck.check_bot_settings(guild=self.guild_id)
+        levelsystem_status = DatabaseCheck.check_bot_settings(guild=guild_id)
 
         if levelsystem_status:
 
@@ -78,11 +76,11 @@ class DatabaseStatusCheck():
             return None
         
 
-    def _economy_system_blacklist_check(self, message_check:discord.Message):
+    def _economy_system_blacklist_check(guild_id:int, message_check:discord.Message):
 
         if isinstance(message_check.channel, discord.TextChannel):
             
-            economy_system_blacklist = DatabaseCheck.check_blacklist(guild=self.guild_id, table="economy")
+            economy_system_blacklist = DatabaseCheck.check_blacklist(guild=guild_id, table="economy")
 
             if economy_system_blacklist:
                 
@@ -109,9 +107,9 @@ class DatabaseStatusCheck():
                 return None
 
 
-    def _economy_system_status(self, text:int = None, voice:int = None, work:int = None):
+    def _economy_system_status(guild_id:int, text:int = None, voice:int = None, work:int = None):
 
-        check_status = DatabaseCheck.check_bot_settings(guild=self.guild_id)
+        check_status = DatabaseCheck.check_bot_settings(guild=guild_id)
 
         if check_status:
 
