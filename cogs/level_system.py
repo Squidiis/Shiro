@@ -341,12 +341,15 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                     emb = discord.Embed(title=f"Die ausgwählten elemente wurden auf die blacklist gesetzt {succesfully_emoji}", 
                         description=f"""{dot_emoji} Es wurde alles auf die Blacklist gesetzt was du ausgewählt hattest.
                         {dot_emoji} Hier sihst du noch mal alles was hinzugefügt wurde:\n\n{mentions}\n
-                        {help_emoji} Wenn etwas nicht aufgelistet ist ist es bereits auf der Blacklist {exclamation_mark_emoji}""", color=shiro_colour)
+                        {help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich bereits auf der Blacklist {exclamation_mark_emoji}""", color=shiro_colour)
                     await interaction.edit_original_response(embed=emb, view=None)
 
                 if temp_blacklist[5] == "remove":
 
-                    emb = discord.Embed(title="wurde entfernt")
+                    emb = discord.Embed(title=f"Die ausgewählten elemente wurden von der blacklist entfernt {succesfully_emoji}", 
+                        description=f"""{dot_emoji} Es wurde alles von der Blacklist entfernt was du ausgewählt hattest.
+                        {dot_emoji} Hier sihst du nochmal alles was entfernt wurde: \n\n{mentions}\n
+                        {help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich nicht auf der Blacklist {exclamation_mark_emoji}""", color=shiro_colour)
                     await interaction.edit_original_response(embed=emb, view=None)
 
             else:

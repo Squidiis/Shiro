@@ -119,7 +119,7 @@ class DatabaseStatusCheck():
 
                 if text != None:
 
-                    if check_status[4] == "on_all" or "on_message":
+                    if check_status[4] == "on_all" or check_status[4] == "on_message":
                         return True
                     
                     else:

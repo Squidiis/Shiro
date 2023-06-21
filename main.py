@@ -216,22 +216,32 @@ async def userinfo(ctx, member: discord.Member = None):
 class ApplicationButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-    
-    @discord.ui.button(label="Apply", style=discord.ButtonStyle.blurple, custom_id="aplly_button")
-    async def button_callback(self, button, interaction):
 
-        embed = discord.Embed(title="You have now been successfully placed in the waiting queue", 
-            description=f"Wait for an administrator to contact you.", color=0x09ebdf)
+    @discord.ui.select(placeholder="Choose what you want to apply as", min_values=1, max_values=1, custom_id="interaction:aplication", options = [
 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        discord.SelectOption(label="Moderator", description="Click here to apply as a moderator", value="moderator"),
+        discord.SelectOption(label="Developer", description="Click here to apply as a developer", value="developer"),
+        discord.SelectOption(label="Hentai Konzern", description="Click here to apply as a Hentai Group member", value="hentai_konzern"),
+        discord.SelectOption(label="Artist", description="Click here to apply as an artist", value="artist"),
+        discord.SelectOption(label="Assistant", description="Click here to apply as an assistant", value="sssistant"),
+    ])
 
-        channel_id = 1087450074579218522
-        channel = bot.get_channel(channel_id)
+    async def callback(self, select, interaction: discord.Interaction): 
 
-        embed1 = discord.Embed(title="Bewerbung", 
-            description=f"Der user <@{interaction.user.id}> hat sich beworben bitte melden sie sich bei im", color=0x09ebdf)
-        embed1.add_field(name="ID", value=f"User ID: {interaction.user.id}")
-        await channel.send(embed=embed1)
+        overwrites = {
+            interaction.user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+            interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        }
+        channels = await interaction.guild.create_text_channel(name="waiting room", overwrites=overwrites)
+
+        emb = discord.Embed(title=f"Wait here for a moment, an admin will contact you in a moment", 
+            description=f"An admin will get right back to you on this channel!", color=0x09ebdf)
+        emb.add_field(name=f"Infos {help_emoji}", 
+            value=f"{dot_emoji} user: {interaction.user.mention}\n{dot_emoji} Id: {interaction.user.id}\n{dot_emoji} Advertising as: {select.values[0]}")
+        emb.set_footer(icon_url=interaction.user.avatar.url, text=f"Applicant: {interaction.user.name}")
+        await channels.send(embed=emb)
+
+
 
 @bot.command()
 async def application(ctx):
