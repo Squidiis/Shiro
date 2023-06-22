@@ -32,7 +32,7 @@ class DatabaseStatusCheck():
 
         if isinstance(message_check.channel, discord.TextChannel):
 
-            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild=guild_id, table="level")
+            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="level")
 
             if levelsystem_blacklist:
 
@@ -80,7 +80,7 @@ class DatabaseStatusCheck():
 
         if isinstance(message_check.channel, discord.TextChannel):
             
-            economy_system_blacklist = DatabaseCheck.check_blacklist(guild=guild_id, table="economy")
+            economy_system_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="economy")
 
             if economy_system_blacklist:
                 
@@ -109,7 +109,7 @@ class DatabaseStatusCheck():
 
     def _economy_system_status(guild_id:int, text:int = None, voice:int = None, work:int = None):
 
-        check_status = DatabaseCheck.check_bot_settings(guild=guild_id)
+        check_status = DatabaseCheck.check_bot_settings(guild_id=guild_id)
 
         if check_status:
 

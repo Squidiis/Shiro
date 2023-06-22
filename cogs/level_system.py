@@ -1220,7 +1220,7 @@ class LevelSystem(commands.Cog):
         channel_id = channel.id
         guild_name = ctx.guild.name
         
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, channel=channel_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel=channel_id, table="level")
 
         if blacklist:
 
@@ -1249,7 +1249,7 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         channel_id = channel.id
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, channel=channel_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel=channel_id, table="level")
 
         if blacklist:
                 
@@ -1278,7 +1278,7 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         guild_name = ctx.guild.name
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, category=category_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category=category_id, table="level")
         
         if blacklist:
             
@@ -1307,7 +1307,7 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         category_id = category.id
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, category=category_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category=category_id, table="level")
 
         if blacklist:
             
@@ -1336,7 +1336,7 @@ class LevelSystem(commands.Cog):
         role_id = role.id
         guild_name = ctx.guild.name
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, role=role_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role=role_id, table="level")
 
         if blacklist:
      
@@ -1364,7 +1364,7 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         role_id = role.id
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, role=role_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role=role_id, table="level")
 
         if blacklist:
 
@@ -1393,7 +1393,7 @@ class LevelSystem(commands.Cog):
         user_id = user.id 
         guild_name = ctx.guild.name 
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, user=user_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user=user_id, table="level")
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb, view=None)
@@ -1426,7 +1426,7 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         user_id = user.id
         
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id, user=user_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user=user_id, table="level")
 
         if blacklist:
             
@@ -1453,7 +1453,7 @@ class LevelSystem(commands.Cog):
 
         guild_id = ctx.guild.id
 
-        blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="level")
 
         if blacklist:
 
