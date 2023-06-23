@@ -62,7 +62,7 @@ class DatabaseStatusCheck():
     # Returns the value True if "on" in the database and False when not
     def _level_system_status(guild_id:int):
 
-        levelsystem_status = DatabaseCheck.check_bot_settings(guild=guild_id)
+        levelsystem_status = DatabaseCheck.check_bot_settings(guild_id=guild_id)
 
         if levelsystem_status:
 
@@ -151,22 +151,21 @@ class DatabaseCheck():
         
         table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
         column_name = ["channelId", "categoryId", "roleId", "userId"]
-        count = 0
         
-        if all(x is None for x in [channel_id, category_id, role_id, user_id]):
+        all_items = [channel_id, category_id, role_id, user_id]
+
+        if all(x is None for x in all_items):
             
             check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s"
             check_blacklist_values = [guild_id]
 
         else:
 
-            for item in channel_id, category_id, role_id, user_id:
-                
-                if item != None:
+            for count in range(len(all_items)):
+                if all_items[count] != None:
                         
                     check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
-                    check_blacklist_values = [guild_id, item]
-                    count = count + 1
+                    check_blacklist_values = [guild_id, all_items[count]]
 
         cursor.execute(check_blacklist, check_blacklist_values)
         
@@ -177,6 +176,7 @@ class DatabaseCheck():
             blacklist = cursor.fetchone()
             
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        print(f"Orginale blacklist: {blacklist}")
         return blacklist
  
     
@@ -280,13 +280,13 @@ class DatabaseCheck():
 
 
     # Checks the bot settings 
-    def check_bot_settings(guild:int):
+    def check_bot_settings(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
         bot_settings_check = "SELECT * FROM BotSettings WHERE guildId = %s"
-        bot_settings_check_values = [guild]
+        bot_settings_check_values = [guild_id]
         cursor.execute(bot_settings_check, bot_settings_check_values)
         bot_settings = cursor.fetchone()
 
@@ -605,7 +605,7 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        check_bot_settings = DatabaseCheck.check_bot_settings(guild=guild_id)
+        check_bot_settings = DatabaseCheck.check_bot_settings(guild_id=guild_id)
 
         try:
 
