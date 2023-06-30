@@ -166,8 +166,6 @@ class DatabaseCheck():
                     
                     check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
                     check_blacklist_values = [guild_id, all_items[count]]
-                    print(check_blacklist)
-                    print(check_blacklist_values)
 
         cursor.execute(check_blacklist, check_blacklist_values)
         
@@ -409,20 +407,22 @@ class DatabaseUpdates():
         
         table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
         column_name = ["channelId", "categoryId", "roleId", "userId"]
-        count = 0
-
+        items = [channel_id, category_id, role_id, user_id]
+        print(f"items: {items}")
+        item = channel_id or category_id or role_id or user_id
+        
         try:
-
-            for item in channel_id, category_id, role_id, user_id:
-               
-                if item != None:
-                    
+                
+            for count in range(len(items)):
+                 
+                if items[count] != None:
+                        
                     insert_level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
-                    insert_level_sys_blacklist_values = [guild_id, guild_name, item]
-                count = count + 1
-
-            cursor.execute(insert_level_sys_blacklist, insert_level_sys_blacklist_values)
-            db_connect.commit()
+                    insert_level_sys_blacklist_values = [guild_id, guild_name, items[count]]
+                    count = 0
+                    
+                    cursor.execute(insert_level_sys_blacklist, insert_level_sys_blacklist_values)
+                    db_connect.commit()
         
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
