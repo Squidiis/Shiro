@@ -68,11 +68,12 @@ class BlacklistManagerChecks():
         
         sorted_list = []
         item_list = channels or categories or roles or users
-        
+        print(f"Kein bock mehr: {item_list}")
         for item in item_list:
                 
             if channels != None:
                 blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=item.id, table=table)
+                print(f"Blacklist: {blacklist}")
             if categories != None:
                 blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=item.id, table=table)
             if roles != None:
@@ -82,7 +83,7 @@ class BlacklistManagerChecks():
 
             if operation == "add":
 
-                if blacklist == None and blacklist == []:
+                if blacklist == None or blacklist == []:
                     sorted_list.append(str(item.id))
             
             else:
@@ -118,16 +119,18 @@ class BlacklistManagerChecks():
         cursor = db_connect.cursor()
 
         temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=guild_id, system="level")
-
-        all_items = [channel_id, category_id, role_id, user_id]
-
-        if channel_id != None or category_id != None or role_id != None or user_id != None:
+        print(f"1: {channel_id}, 2: {category_id}, 3: {role_id}, 4: {user_id}")
+        all_items = channel_id or category_id or role_id or user_id
+        print(all_items)
+        if channel_id != None and channel_id != [] or category_id != None and category_id != [] or role_id != None and role_id != [] or user_id != None and user_id != []:
 
             for count in range(len(all_items)):
 
                 if all_items[count] != None:
-            
-                    sorted_list = ", ".join(channel_id or category_id or role_id or user_id)
+                    
+                    list_items = channel_id or category_id or role_id or user_id
+                    
+                    sorted_list = ", ".join(list_items)
                     column_name = ["channelId", "categoryId", "roleId", "userId"]
                 
                     if temp_blacklist:
@@ -140,8 +143,8 @@ class BlacklistManagerChecks():
                         temp_blacklist_operation = f"INSERT INTO ManageBlacklistTemp (guildId, {column_name[count]}, operation, systemStatus) VALUES (%s, %s, %s, %s)"
                         temp_blacklist_operation_values = [guild_id, sorted_list, operation, 'level']
 
-        cursor.execute(temp_blacklist_operation, temp_blacklist_operation_values)
-        db_connect.commit()
+            cursor.execute(temp_blacklist_operation, temp_blacklist_operation_values)
+            db_connect.commit()
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
@@ -239,8 +242,8 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
             
             await interaction.response.defer()
             temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=interaction.guild.id, system="level")
-            
-            if any(i != None for i in [temp_blacklist[1], temp_blacklist[2], temp_blacklist[3], temp_blacklist[4]]):
+            print(f"Das ist der der Fehler: {temp_blacklist}")
+            if any(i != None for i in [temp_blacklist[1], temp_blacklist[2], temp_blacklist[3], temp_blacklist[4]]) and temp_blacklist != None:
                 mention = []
                 
                 if temp_blacklist[1] != None and temp_blacklist[6] == "level":

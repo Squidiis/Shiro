@@ -153,23 +153,25 @@ class DatabaseCheck():
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
         all_items = [channel_id, category_id, role_id, user_id]
-
+        
         if all(x is None for x in all_items):
             
             check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s"
             check_blacklist_values = [guild_id]
 
         else:
-
+            
             for count in range(len(all_items)):
                 if all_items[count] != None:
-                        
+                    
                     check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
                     check_blacklist_values = [guild_id, all_items[count]]
+                    print(check_blacklist)
+                    print(check_blacklist_values)
 
         cursor.execute(check_blacklist, check_blacklist_values)
         
-        if all(x is None for x in [channel_id, category_id, role_id, user_id]):
+        if all(x is None for x in all_items):
             blacklist = cursor.fetchall()
         
         else:
