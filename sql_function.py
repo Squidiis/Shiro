@@ -408,8 +408,6 @@ class DatabaseUpdates():
         table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
-        print(f"items: {items}")
-        item = channel_id or category_id or role_id or user_id
         
         try:
                 

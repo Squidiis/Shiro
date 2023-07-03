@@ -119,14 +119,13 @@ class BlacklistManagerChecks():
 
         temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=guild_id, system="level")
 
-        all_items = [channel_id, category_id, role_id, user_id]
         item = channel_id or category_id or role_id or user_id
         count = 0
 
         if channel_id != None and channel_id != [] or category_id != None and category_id != [] or role_id != None and role_id != [] or user_id != None and user_id != []:
 
             for item in channel_id, category_id, role_id, user_id:
-                print (f"count: {count}, all_items: {all_items}, item: {item}")
+        
                 column_name = ["channelId", "categoryId", "roleId", "userId"]
                 
                 if item != None:
@@ -241,22 +240,23 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
             await interaction.response.defer()
             temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=interaction.guild.id, system="level")
             
-            if any(i != None for i in [temp_blacklist[1], temp_blacklist[2], temp_blacklist[3], temp_blacklist[4]]) and temp_blacklist != None:
+            if temp_blacklist:
+                    
                 mention = []
-                
+                    
                 if temp_blacklist[1]:
-                   
+                    
                     channel_list = (list(map(int, re.findall('\d+', temp_blacklist[1]))))
-                   
+                    
                     for channel in channel_list:
-                        print(f"channel {channel}")
+                            
                         mention.append(f"{dot_emoji} <#{channel}>")
                         if temp_blacklist[5] == "add":
-                            
+                                
                             DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, channel_id=channel, table="level")
 
                         else:
-                            
+                                
                             DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], channel_id=channel)
 
                 if temp_blacklist[2]: 
@@ -268,16 +268,16 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                         if temp_blacklist[5] == "add":
 
                             DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, category_id=category, table="level")
-                        
+                            
                         else:
 
                             DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], category_id=category)
 
                 if temp_blacklist[3]:
-                    
+                        
                     role_list = (list(map(int, re.findall('\d+', temp_blacklist[3]))))
                     for role in role_list:
-                        print(f"role: {role}")
+                            
                         mention.append(f"{dot_emoji} <@&{role}>")
                         if temp_blacklist[5] == "add":
 
@@ -286,9 +286,9 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                         else:
 
                             DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], role_id=role)
-                            
+                                
                 if temp_blacklist[4]:
-                    
+                        
                     user_list = (list(map(int, re.findall('\d+', temp_blacklist[4]))))
                     for user in user_list:
 
@@ -302,7 +302,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                             DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], user_id=user)
 
                 BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
-                
+                    
                 mentions = "\n".join(mention)
 
                 if temp_blacklist[5] == "add":
