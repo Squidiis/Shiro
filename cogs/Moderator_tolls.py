@@ -343,7 +343,7 @@ class AutoReaction(commands.Cog):
 
         emb = discord.Embed(title="auto-reaction", 
             description=f"""Wählen sie aus nach welchen Parametern das Aoto Reaction system agieren soll.
-            Sie können zwischen wählen zwischen links, nachrichten, foren und Speziefischen nachrichten dort wird auf den Inhalt der nachricht geachtet.
+            Sie können wählen zwischen links, nachrichten, foren und Speziefischen nachrichten dort wird auf den Inhalt der nachricht geachtet.
             Wenn sie Speziefische nachrichten haben wollen müssen sie in das danach erscheinende Textfeld alles eingeben auf was geachtet werden soll trenne sie die wörter mit einen `,`
             aktueller status: {status}""", color=shiro_colour)
         await ctx.respond(embed=emb, view=DropdownAutoReaction())

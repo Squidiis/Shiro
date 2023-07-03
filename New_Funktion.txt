@@ -10,7 +10,6 @@ Den Table so anpassen das man die emojis mit einen komma trennt dann halt mehr s
 
 levelsystem: 
 
-Testen ob das mit dem Blacklist channel auch mit einem Forum geht oder ob dasumgeschrieben werden muss
 Einzelne funktion für XP skalierug und übertragung
 XP bonus für rollen channel und einzelne user
 überarbeiten das ein Drop down mit allen level rollen kommt wo man die auswählen kann die weg soll
