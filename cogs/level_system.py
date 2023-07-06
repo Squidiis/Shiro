@@ -369,7 +369,7 @@ class LevelSystemSettings(discord.ui.View):
                     new_status, status = "Eingeschalten", "on"
                     opposite_status = "Ausschalten"
 
-                DatabaseUpdates._update_status_level(guild_id=guild_id, status=status)
+                DatabaseUpdates.update_level_settings(guild_id=guild_id, level_status=status)
                         
                 emb = discord.Embed(title=f"Das Level system wurde {new_status}", 
                     description=f"""Sie haben das Level system erfolgreich {new_status}.
@@ -481,7 +481,7 @@ class LevelUpChannelButtons(discord.ui.View):
 
             else:
 
-                DatabaseUpdates.update_level_up_channel(guild_id=interaction.guild.id, channel_id=self.channel)
+                DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, levelup_channel=self.channel)
 
                 emb = discord.Embed(title=f"Der level up channel wurde erfolgreich überschrieben {succesfully_emoji}", 
                     description=f"""{dot_emoji} Der level up channel wurde erfolgreich überschrieben.
@@ -1631,7 +1631,7 @@ class LevelSystem(commands.Cog):
 
         if None == level_up_channel[3]:
        
-            DatabaseUpdates.update_level_up_channel(guild_id=guild_id, channel_id=channel_id)
+            DatabaseUpdates.update_level_settings(guild_id=guild_id, levelup_channel=channel_id)
 
             emb = discord.Embed(title=f"The level up channel was set successfully {succesfully_emoji}", 
                 description=f"""{dot_emoji} You have successfully set the channel <#{channel_id}> as a level up channel.

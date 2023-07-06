@@ -136,7 +136,7 @@ async def check_status_level(ctx):
 
     status = DatabaseCheck.check_bot_settings(guild=ctx.guild.id)
 
-    if "on" == status[2] or "on_text" == status == status[2]:
+    if "on" == status[2] or "on_text" == status[2]:
         return True
 
     else:

@@ -430,18 +430,23 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     
-    # Update the status from the level system
-    def _update_status_level(guild_id:int, status:str):
+    # Update the level system settings
+    def update_level_settings(guild_id:int, xp_rate:int = None, level_status:str = None, levelup_channel:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+        column_name = ["xpRate", "levelStatus", "levelUpChannel"]
+        items = [xp_rate, level_status, levelup_channel]
+
         try:
-            
-            update_level_status = f"UPDATE BotSettings SET levelStatus = %s WHERE guildId = %s"
-            update_level_status_values = (status, guild_id)
-            cursor.execute(update_level_status, update_level_status_values)
-            db_connect.commit()
+
+            for count in range(len(items)):
+
+                update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
+                update_settings_values = (items[count], guild_id)
+                cursor.execute(update_settings, update_settings_values)
+                db_connect.commit()
 
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
@@ -449,7 +454,7 @@ class DatabaseUpdates():
         finally:
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-    
+
 
     # Update the stats from users in the level system  
     def _update_user_stats_level(guild_id:int, user_id:int, level:int = None, xp:int = None):
@@ -507,22 +512,6 @@ class DatabaseUpdates():
         finally:
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-
-    
-    def update_level_up_channel(guild_id:int, channel_id:int):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        try:
-
-            update_level_up_channel = "UPDATE BotSettings SET levelUpChannel = %s WHERE guildId = %s"
-            update_level_up_channel_values = [channel_id, guild_id]
-            cursor.execute(update_level_up_channel, update_level_up_channel_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
 
 
 

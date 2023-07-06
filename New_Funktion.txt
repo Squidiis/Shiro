@@ -16,3 +16,5 @@ XP bonus für rollen channel und einzelne user
 
 Aktivster user Leaderbord 
 
+
+Level rollen mit einer Temp db machen 
