@@ -252,9 +252,21 @@ class DatabaseCheck():
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return levelsys_levelroles
-  
-
     
+
+    def check_level_settings(guild_id:int):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        level_settings_check = "SELECT * FROM LevelSystemSettings WHERE guildId = %s"
+        level_settings_check_values = [guild_id]
+        cursor.execute(level_settings_check, level_settings_check_values)
+        level_system_settings = db_connect.commit()
+
+        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return level_system_settings
+
 
 
 #######################################################  Checks the auto reaction system  ################################################
@@ -338,12 +350,16 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
+        sql_tables = ["BotSettings", "LevelSystemSettings"]
+
         try:
 
-            creat_bot_settings = "INSERT INTO BotSettings (guildId) VALUES (%s)"
-            creat_bot_settings_values = [guild_id]
-            cursor.execute(creat_bot_settings, creat_bot_settings_values)
-            db_connect.commit()
+            for table in sql_tables:
+
+                creat_bot_settings = f"INSERT INTO {table} (guildId) VALUES (%s)"
+                creat_bot_settings_values = [guild_id]
+                cursor.execute(creat_bot_settings, creat_bot_settings_values)
+                db_connect.commit()
 
         except mysql.connector.Error as error:
            print("parameterized query failed {}".format(error))

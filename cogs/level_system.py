@@ -345,7 +345,7 @@ class LevelSystemSettings(discord.ui.View):
 
         guild_id = interaction.guild.id
         
-        check_status = DatabaseCheck.check_bot_settings(guild=guild_id)
+        check_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
         if interaction.user.guild_permissions.administrator:
 
@@ -707,7 +707,7 @@ class LevelSystem(commands.Cog):
                             finally:   
 
                                 level_role_check = DatabaseCheck.check_level_system_levelroles(guild=guild_id_insert, needed_level=new_level)
-                                levelup_channel_check = DatabaseCheck.check_bot_settings(guild=guild_id_insert)
+                                levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=guild_id_insert)
 
                                 if level_role_check:
 
@@ -830,7 +830,7 @@ class LevelSystem(commands.Cog):
                         new_level = user_level + 1
                                             
                         DatabaseUpdates._update_user_stats_level(guild_id=guild_id, user_id=user_id, level=new_level)
-                        levelup_channel_check = DatabaseCheck.check_bot_settings(guild=guild_id)
+                        levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
                         if levelup_channel_check != None:
 
@@ -1155,7 +1155,7 @@ class LevelSystem(commands.Cog):
         level_sytem_conrtol_db = DatabaseSetup.db_connector()
         my_curser_control = level_sytem_conrtol_db.cursor()
 
-        level_settings = DatabaseCheck.check_bot_settings(guild=guild_id)
+        level_settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
         if level_settings:
 
@@ -1627,22 +1627,24 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         channel_id = channel.id
 
-        level_up_channel = DatabaseCheck.check_bot_settings(guild=guild_id)
+        level_up_channel = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
-        if None == level_up_channel[3]:
+        if level_up_channel[3]:
        
-            DatabaseUpdates.update_level_settings(guild_id=guild_id, levelup_channel=channel_id)
+            if channel_id == level_up_channel[3]:
 
-            emb = discord.Embed(title=f"The level up channel was set successfully {succesfully_emoji}", 
-                description=f"""{dot_emoji} You have successfully set the channel <#{channel_id}> as a level up channel.
-                {dot_emoji} From now on all level up notifications will be sent to this channel.""", color=shiro_colour)
-            await ctx.respond(embed=emb)
+                emb = discord.Embed(title=f"This channel is already assigned as level up channel {fail_emoji}", 
+                    description=f"{dot_emoji} This channel is already set as a level up channel if you want to remove it as a level up channel use the:\n{disable_level_up_channel} command {exclamation_mark_emoji}", color=error_red)
+                await ctx.respond(embed=emb)
 
-        elif channel_id == level_up_channel[3]:
+            else:
 
-            emb = discord.Embed(title=f"This channel is already assigned as level up channel {fail_emoji}", 
-                description=f"{dot_emoji} This channel is already set as a level up channel if you want to remove it as a level up channel use the:\n{disable_level_up_channel} command {exclamation_mark_emoji}", color=error_red)
-            await ctx.respond(embed=emb)
+                DatabaseUpdates.update_level_settings(guild_id=guild_id, levelup_channel=channel_id)
+
+                emb = discord.Embed(title=f"The level up channel was set successfully {succesfully_emoji}", 
+                    description=f"""{dot_emoji} You have successfully set the channel <#{channel_id}> as a level up channel.
+                    {dot_emoji} From now on all level up notifications will be sent to this channel.""", color=shiro_colour)
+                await ctx.respond(embed=emb)
 
         else:
 
@@ -1659,11 +1661,11 @@ class LevelSystem(commands.Cog):
 
         guild_id = ctx.guild.id
 
-        level_up_channel = DatabaseCheck.check_bot_settings(guild=guild_id)
+        level_up_channel = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
-        if level_up_channel[3] != None:
+        if level_up_channel[3]:
                 
-            DatabaseUpdates.update_level_up_channel(guild_id=guild_id, channel_id=None)
+            DatabaseUpdates.update_level_settings(guild_id=guild_id, levelup_channel=None)
 
             emb = discord.Embed(title=f"The level up channel was successfully removed {succesfully_emoji}", 
                 description=f"""{dot_emoji} From now on level up notifications will always be sent after level up.""", color=shiro_colour)
@@ -1679,9 +1681,9 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-level-up-channel", description = "Let them show the current level up channel!")
     async def show_levelup_channel(self, ctx):
 
-        level_up_channel = DatabaseCheck.check_bot_settings(guild=ctx.guild.id)
+        level_up_channel = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
         
-        if None != level_up_channel[3]:
+        if level_up_channel[3]:
         
             emb = discord.Embed(title=f"Here you can see the current level up channel {help_emoji}", 
                 description=f"""{dot_emoji} The current level up channel is <#{level_up_channel[3]}> all level up notifications are sent to this channel.""", color=shiro_colour)
