@@ -1818,7 +1818,41 @@ class LevelSystem(commands.Cog):
         await ctx.respond(file=dfile)
 
 
+    @commands.command()
+    async def test2(self, ctx, user:discord.User):
+        
+        background_color = (47, 155, 179)
+        rounded_rectangle_color = ()
 
+        background = round_rectangle((885, 303), 10, background_color)
+        
+        draw = ImageDraw.Draw(background)
+        draw.rounded_rectangle((876, 294), 10, fill=rounded_rectangle_color)
+        bytes = BytesIO()
+        background.save(bytes, format="PNG")
+        bytes.seek(0)
+        dfile = discord.File(bytes, filename="card.png")
+        await ctx.send(file=dfile)
+
+
+def round_corner(radius, fill):
+    """Draw a round corner"""
+    corner = Image.new('RGB', (radius, radius), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(corner)
+    draw.pieslice((0, 0, radius * 2, radius * 2), 180, 270, fill=fill)
+    return corner
+
+
+def round_rectangle(size, radius, fill):
+    """Draw a rounded rectangle"""
+    width, height = size
+    rectangle = Image.new('RGB', size, fill)
+    corner = round_corner(radius, fill)
+    rectangle.paste(corner, (0, 0))
+    rectangle.paste(corner.rotate(90), (0, height - radius))  # Rotate the corner and paste it
+    rectangle.paste(corner.rotate(180), (width - radius, height - radius))
+    rectangle.paste(corner.rotate(270), (width - radius, 0))
+    return rectangle
 
 
 ##################################################  Voice leveling  ####################################################

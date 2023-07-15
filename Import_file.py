@@ -64,6 +64,7 @@ show_blacklist_level = ""
 give_money = ""
 remove_money = ""
 
+# Emojis
 arrow_emoji = "<a:shiro_arrow:1092443788900831355>"
 load_emoji = "<a:shiro_load:1092862133181612133>"
 fail_emoji = "<a:shiro_failed:1092862110381383762>"
