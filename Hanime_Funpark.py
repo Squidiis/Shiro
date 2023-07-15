@@ -283,15 +283,6 @@ async def Hanime(ctx):
     await ctx.send(embed=emb)
 
 
-class Funpark(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.command()
-    async def Gaming(ctx):
-        emb = discord.Embed(title="Funpark Gaming", description="Play together with your friends and win! ", color=discord.Colour.green())
-        emb.set_image()
-
 @bot.command()
 async def hanimeinfo():
     emb = discord.Embed(title="Info", description=

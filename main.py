@@ -13,40 +13,7 @@ import calendar
 @bot.slash_command(description="Shows you the ping.")
 async def ping(ctx):
     await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
-    
-    
 
-
-class Update(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-    
-    @commands.command()
-    async def update(self, ctx):
-        emb = discord.Embed(
-            title="Update",
-            description=f"""
-            **Deutsch**
-
-            Hallo, wir haben eine neue änderung gemacht.
-            Wir freuen uns euch mitteilen zu düfen, dass wir eine neue Funktion haben.
-            Ihr könnt euch ab jetzt ganze hentais hier von discord aus ansehen, mit einer video auswahl.
-            Schaut doch mal in <#1081909438383915069> vorbei und gebt uns gerne feedback
-
-            **English**
-
-            Hello, we have made a new change.
-            We are happy to announce that we have a new feature.
-            You can now watch full hentais from discord. There is also a video selection.
-            Please check out <#1081909438383915069> and feel free to give us feedback.
-
-            <@865907711832227840>
-            """,
-            color= discord.Colour.purple()
-        )
-        await ctx.send(embed=emb)
-
-bot.add_cog(Update(bot))
 
 
 
