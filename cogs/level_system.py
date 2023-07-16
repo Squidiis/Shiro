@@ -1821,13 +1821,13 @@ class LevelSystem(commands.Cog):
     @commands.command()
     async def test2(self, ctx, user:discord.User):
         
-        background_color = (47, 155, 179)
-        rounded_rectangle_color = ()
+        background_color = (8, 120, 151)
+        rounded_rectangle_color = (31, 209, 79)
 
-        background = round_rectangle((885, 303), 10, background_color)
+        background = round_rectangle((885, 303), 35, background_color)
         
         draw = ImageDraw.Draw(background)
-        draw.rounded_rectangle((876, 294), 10, fill=rounded_rectangle_color)
+        draw.rounded_rectangle((9, 9, 875, 293), 35, fill=rounded_rectangle_color)
         bytes = BytesIO()
         background.save(bytes, format="PNG")
         bytes.seek(0)

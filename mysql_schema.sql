@@ -52,6 +52,13 @@ CREATE TABLE LevelSystemSettings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+DROP TABLE IF EXISTS `LevelRankCardSettings`;
+
+CREATE TABLE LevelRankCardSettings (
+    guildId BIGINT UNSIGNED NOT NULL,
+    backgroundColor VARCHAR(20) DEFAULT '8, 120, 151',
+)
+
 DROP TABLE IF EXISTS `ManageBlacklistTemp`;
 
 CREATE TABLE ManageBlacklistTemp (
