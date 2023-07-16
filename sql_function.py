@@ -416,7 +416,7 @@ class DatabaseUpdates():
         
 
     # Function that adds all specified data to the blacklist 
-    def set_on_blacklist(guild_id:int, guild_name:str, table:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def manage_blacklist(guild_id:int, guild_name:str, table:str, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -430,12 +430,19 @@ class DatabaseUpdates():
             for count in range(len(items)):
                  
                 if items[count] != None:
-                        
-                    insert_level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
-                    insert_level_sys_blacklist_values = [guild_id, guild_name, items[count]]
-                    count = 0
+
+                    if operation == "add":
+
+                        level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
+                        level_sys_blacklist_values = [guild_id, guild_name, items[count]]
+                        count = 0
                     
-                    cursor.execute(insert_level_sys_blacklist, insert_level_sys_blacklist_values)
+                    elif operation == "remove":
+
+                        level_sys_blacklist = f"DELETE FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
+                        level_sys_blacklist_values = [guild_id, items[count]]
+
+                    cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
                     db_connect.commit()
         
         except mysql.connector.Error as error:

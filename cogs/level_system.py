@@ -240,6 +240,8 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
             await interaction.response.defer()
             temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=interaction.guild.id, system="level")
             
+            operation = "add" if temp_blacklist[5] == "add" else "remove"
+
             if temp_blacklist:
                     
                 mention = []
@@ -251,13 +253,8 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                     for channel in channel_list:
                             
                         mention.append(f"{dot_emoji} <#{channel}>")
-                        if temp_blacklist[5] == "add":
-                                
-                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, channel_id=channel, table="level")
-
-                        else:
-                                
-                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], channel_id=channel)
+                        
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, channel_id=channel, table="level")
 
                 if temp_blacklist[2]: 
 
@@ -265,27 +262,17 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                     for category in category_list:
 
                         mention.append(f"{dot_emoji} <#{category}>")
-                        if temp_blacklist[5] == "add":
 
-                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, category_id=category, table="level")
-                            
-                        else:
-
-                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], category_id=category)
-
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, category_id=category, table="level")
+                      
                 if temp_blacklist[3]:
                         
                     role_list = (list(map(int, re.findall('\d+', temp_blacklist[3]))))
                     for role in role_list:
                             
                         mention.append(f"{dot_emoji} <@&{role}>")
-                        if temp_blacklist[5] == "add":
-
-                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, role_id=role, table="level")
-
-                        else:
-
-                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], role_id=role)
+                        
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, role_id=role, table="level")
                                 
                 if temp_blacklist[4]:
                         
@@ -293,13 +280,8 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                     for user in user_list:
 
                         mention.append(f"{dot_emoji} <@{user}>")
-                        if temp_blacklist[5] == "add":
-
-                            DatabaseUpdates.set_on_blacklist(guild_id=temp_blacklist[0], guild_name=interaction.guild.name, user_id=user, table="level")
-
-                        else:
-
-                            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=temp_blacklist[0], user_id=user)
+                        
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, user_id=user, table="level")
 
                 BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
                     
@@ -1823,11 +1805,12 @@ class LevelSystem(commands.Cog):
         
         background_color = (8, 120, 151)
         rounded_rectangle_color = (31, 209, 79)
-
+        #background = Image.new(mode='RGBA', size=(885, 303), color=(8, 120, 151, 0) )
         background = round_rectangle((885, 303), 35, background_color)
         
         draw = ImageDraw.Draw(background)
         draw.rounded_rectangle((9, 9, 875, 293), 35, fill=rounded_rectangle_color)
+
         bytes = BytesIO()
         background.save(bytes, format="PNG")
         bytes.seek(0)
