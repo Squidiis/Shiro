@@ -176,7 +176,6 @@ class DatabaseCheck():
             blacklist = cursor.fetchone()
             
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        print(f"Orginale blacklist: {blacklist}")
         return blacklist
  
     
@@ -416,7 +415,7 @@ class DatabaseUpdates():
         
 
     # Function that adds all specified data to the blacklist 
-    def manage_blacklist(guild_id:int, guild_name:str, table:str, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def manage_blacklist(guild_id:int, table:str, operation:str, guild_name:str = None, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -426,25 +425,35 @@ class DatabaseUpdates():
         items = [channel_id, category_id, role_id, user_id]
         
         try:
-                
-            for count in range(len(items)):
-                 
-                if items[count] != None:
+            
+            if items:
 
-                    if operation == "add":
-
-                        level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
-                        level_sys_blacklist_values = [guild_id, guild_name, items[count]]
-                        count = 0
+                for count in range(len(items)):
                     
-                    elif operation == "remove":
+                    if items[count] != None:
 
-                        level_sys_blacklist = f"DELETE FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
-                        level_sys_blacklist_values = [guild_id, items[count]]
+                        if operation == "add":
 
-                    cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-                    db_connect.commit()
+                            level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
+                            level_sys_blacklist_values = [guild_id, guild_name, items[count]]
+                            count = 0
+                        
+                        elif operation == "remove":
+
+                            level_sys_blacklist = f"DELETE FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
+                            level_sys_blacklist_values = [guild_id, items[count]]
+
+                        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
+                        db_connect.commit()
+
+            else:
+
+                level_sys_blacklist = f"DELETE FROM {table_name} WHERE guildId = %s"
+                level_sys_blacklist_values = [guild_id]
         
+            cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
+            db_connect.commit()
+
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
 
@@ -704,89 +713,11 @@ class DatabaseRemoveDatas():
 
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
-    
-    # Removes items from the level system blacklist
-    def _remove_level_system_blacklist(guild_id:int, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        database_infos = [
-            ("channelId", channel_id),
-            ("categoryId", category_id),
-            ("roleId", role_id),
-            ("userId", user_id)
-        ]
-
-        try:
-
-            if channel_id != None or category_id != None or role_id != None or user_id != None:
-
-                for column_name, id in database_infos:
-            
-                    remove_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name} = %s"
-                    remove_blacklist_values = [guild_id, id]
-                    cursor.execute(remove_blacklist, remove_blacklist_values)
-                    db_connect.commit()
-                         
-            else:
-                
-                remove_blacklist = "DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
-                remove_blacklist_values = [guild_id]
-                cursor.execute(remove_blacklist, remove_blacklist_values)
-                db_connect.commit()
-        
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-        
-        finally:
-            
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
-            return True
 
 
 
 
 ##############################################  Removes values from the economy system  ######################################
-
-
-    # Removes items from the economy system blacklist
-    def _remove_economy_system_blacklist(guild_id:int, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
-        
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        database_infos = [
-            ("channelId", channel_id),
-            ("categoryId", category_id),
-            ("roleId", role_id),
-            ("userId", user_id)
-        ]
-
-        try:
-
-            if any([channel_id, category_id, role_id, user_id]) != None:
-                
-                for column_name, id in database_infos:
-
-                    remove_blacklist = f"DELETE FROM EconomySystemBlacklist WHERE guildId = %s AND {column_name} = %s"
-                    remove_blacklist_values = [guild_id, id]
-
-            else:
-
-                remove_blacklist = "DELETE FROM EconomySystemBlacklist WHERE guildId = %s"
-                remove_blacklist_values = [guild_id]   
-            
-            cursor.execute(remove_blacklist, remove_blacklist_values)
-            db_connect.commit()
-        
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-        
-        finally:
-            
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
-            return True
 
 
     # Removes economy system stats

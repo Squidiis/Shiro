@@ -1,7 +1,7 @@
 import mysql.connector
 from discord.ext import commands
 import discord
-from sql_function import DatabaseCheck, DatabaseRemoveDatas
+from sql_function import DatabaseCheck, DatabaseRemoveDatas, DatabaseSetup
 
 
 class UserLeavesServer(commands.Cog):
@@ -17,28 +17,29 @@ class UserLeavesServer(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
 
-        guild_id = guild.id
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
 
-        # Level System checks
-        level_system_blacklist = DatabaseCheck.check_level_system_blacklist(guild=guild_id)
-        level_system_stats = DatabaseCheck.check_level_system_stats(guild=guild_id)
-        level_system_control = DatabaseCheck.check_bot_settings(guild=guild_id)
-        level_system_levelroles = DatabaseCheck.check_level_system_levelroles(guild=guild_id)
+        tables = ["LevelSystemStats", 
+                  "LevelSystemBlacklist", 
+                  "LevelSystemRoles", 
+                  "LevelSystemSettings",  
+                  "BotSettings", 
+                  "AutoReactionSetup", 
+                  "AutoReactionSettings", 
+                  "EconomySystemStats", 
+                  "EconomySystemBlacklist", 
+                  "EconomySystemShop"]
 
         try:
 
-            # Delete all values from the Level System!
-            if level_system_blacklist:
-                DatabaseRemoveDatas._remove_level_system_blacklist(guild=guild_id)
+            for table in tables:
 
-            if level_system_stats:
-                DatabaseRemoveDatas._remove_level_system_stats(guild=guild_id)
+                delete_datas = f"DELETE FROM {table} WHERE guildId = %s"
+                delete_datas_values = [guild.id]
 
-            if level_system_control:
-                DatabaseRemoveDatas._remove_bot_settings(guild=guild_id)
-
-            if level_system_levelroles:
-                DatabaseRemoveDatas._remove_level_system_level_roles(guild=guild_id)
+                cursor.execute(delete_datas, delete_datas_values)
+                db_connect.commit()
 
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
@@ -54,36 +55,30 @@ class UserLeavesServer(commands.Cog):
 
         if not member.bot:
 
-            guild_id = member.guild.id
+            db_connect = DatabaseSetup.db_connector()
+            cursor = db_connect.cursor()
 
-            # Searches everything for the user 
-            check_level_blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, user=member.id)
-            check_level_stats = DatabaseCheck.check_level_system_stats(guild=guild_id, user=member.id)
-            check_economy_blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, user=member.id)
-            check_economy_stats = DatabaseCheck.check_economy_system_stats(guild=guild_id, user=member.id)
-
+            tables = ["EconomySystemBlacklist", 
+                      "EconomySystemStats", 
+                      "LevelSystemBlacklist", 
+                      "LevelSystemStats"]
+            
             try:
 
-                # Deletes all data from the user
-                if check_level_blacklist:
-                    DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=member.guild.id, user_id=member.id)
-                
-                if check_level_stats:
-                    DatabaseRemoveDatas._remove_level_system_stats(guild_id=member.guild.id, user_id=member.id)
+                for table in tables:
 
-                if check_economy_blacklist:
-                    DatabaseRemoveDatas._remove_economy_system_blacklist(guild_id=member.guild.id, user_id=member.id)
-
-                if check_economy_stats:
-                    DatabaseRemoveDatas._remove_economy_system_stats(guild_id=member.guild.id, user_id=member.id)
-
+                    delete_user_datas = f"DELETE {table} WHERE guildId = %s AND userId = %s"
+                    delete_user_datas_values = [member.guild.id, member.id]
+                    cursor.execute(delete_user_datas, delete_user_datas_values)
+                    db_connect.commit()
+            
             except mysql.connector.Error as error:
                 print("parameterized query failed {}".format(error))
 
             finally:
 
                 return True
-            
+
 
 def setup(bot):
     bot.add_cog(UserLeavesServer(bot))

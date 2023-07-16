@@ -1167,17 +1167,13 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "add-channel-level-blacklist", description = "Exclude channels from the level system!")
     @commands.has_permissions(administrator = True)
-    async def add_chanels_level_blacklist(self, ctx, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel that you want to exclude from the level system!")):
-
-        guild_id = ctx.guild.id
-        channel_id = channel.id
-        guild_name = ctx.guild.name
+    async def add_chanels_level_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel that you want to exclude from the level system!")):
         
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel=channel_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="level")
 
         if blacklist:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This channel is already on the blacklist {fail_emoji}", 
                 description=f"""The following channels are on the blacklist:\n
@@ -1187,26 +1183,23 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, channel_id=channel_id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, channel_id=channel.id, table="level")
 
             emb = discord.Embed(title=f"This channel was successfully blacklisted {succesfully_emoji}", 
-                description=f"""{dot_emoji} The channel: <#{channel_id}> was successfully blacklisted.
+                description=f"""{dot_emoji} The channel: <#{channel.id}> was successfully blacklisted.
                 {dot_emoji} If you want to remove it again use this command:\n{remove_blacklist_level_channel}""", color=shiro_colour)
             await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = "remove-channel-level-blacklist", description = "Remove a channel from the level blacklist!")
     @commands.has_permissions(administrator = True)
-    async def remove_channel_blacklist(self, ctx, channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Select a channel to remove from the blacklist!")):
-        
-        guild_id = ctx.guild.id
-        channel_id = channel.id
+    async def remove_channel_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Select a channel to remove from the blacklist!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel=channel_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="level")
 
         if blacklist:
                 
-            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=guild_id, channel_id=channel_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channel.id, table="level")
 
             emb = discord.Embed(title=f"The channel was removed from the blacklist {succesfully_emoji}", 
                 description=f"""{dot_emoji} The channel has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_channel} command.
@@ -1215,27 +1208,23 @@ class LevelSystem(commands.Cog):
         
         else:
             
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This channel is not on the blacklist {fail_emoji}", 
-                description=f"""{dot_emoji} The channel: <#{channel_id}> is not blacklisted.
+                description=f"""{dot_emoji} The channel: <#{channel.id}> is not blacklisted.
                 The following channels are blacklisted:\n\n{blacklist[0]}""", color=error_red)
             await ctx.respond(embed=emb)
         
     
     @commands.slash_command(name = "add-category-level-blacklist", description = "Exclude categories from the level system and all channels that belong to them!")
     @commands.has_permissions(administrator = True)
-    async def add_category_blacklist(self, ctx, category:Option(discord.CategoryChannel, description="Select a category that you want to exclude from the level system!")):
+    async def add_category_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Select a category that you want to exclude from the level system!")):
 
-        category_id = category.id
-        guild_id = ctx.guild.id
-        guild_name = ctx.guild.name
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category=category_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id, table="level")
         
         if blacklist:
             
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
                 
             emb = discord.Embed(title=f"This category is already on the blacklist {fail_emoji}", 
                 description=f"""The following categories are on the blacklist:\n
@@ -1245,26 +1234,23 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, category_id=category_id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, category_id=category.id, table="level")
             
             emb = discord.Embed(title=f"This category was successfully blacklisted {succesfully_emoji}", 
-                description=f"""{dot_emoji} The category: <#{category_id}> was successfully blacklisted.
+                description=f"""{dot_emoji} The category: <#{category.id}> was successfully blacklisted.
                 {dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_category}""", color=shiro_colour)
             await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name="remove-category-level-blacklist", description = "Remove categories from the level blacklist!")
     @commands.has_permissions(administrator = True)
-    async def remove_category_blacklist(self, ctx, category:Option(discord.CategoryChannel, description="Select a category to remove from the blacklist!")):
+    async def remove_category_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Select a category to remove from the blacklist!")):
 
-        guild_id = ctx.guild.id
-        category_id = category.id
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category=category_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id, table="level")
 
         if blacklist:
             
-            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=guild_id, category_id=category_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", category_id=category.id, table="level")
             
             emb = discord.Embed(title=f"The category was removed from the blacklist {succesfully_emoji}", 
                 description=f"""{dot_emoji} The category has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_category} command.
@@ -1273,27 +1259,23 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This category is not on the blacklist{fail_emoji}", 
-                description=f"""{dot_emoji} The category: <#{category_id}> is not on the blacklist.
+                description=f"""{dot_emoji} The category: <#{category.id}> is not on the blacklist.
                 The following categories are blacklisted:\n\n{blacklist[1]}""", color=error_red)
             await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = "add-role-level-blacklist", description = "Choose a role that you want to exclude from the level system!")
     @commands.has_permissions(administrator = True)
-    async def add_role_blacklist(self, ctx, role:Option(discord.Role, description="Select a role that you want to exclude from the level system!")):
+    async def add_role_blacklist(self, ctx:commands.Context, role:Option(discord.Role, description="Select a role that you want to exclude from the level system!")):
 
-        guild_id = ctx.guild.id
-        role_id = role.id
-        guild_name = ctx.guild.name
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role=role_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id, table="level")
 
         if blacklist:
      
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This role is already on the blacklist {fail_emoji}", 
                 description=f"""The following roles are on the blacklist:\n\n{blacklist[2]}
@@ -1302,26 +1284,23 @@ class LevelSystem(commands.Cog):
         
         else:
             
-            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, role_id=role_id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, role_id=role.id, table="level")
             
             emb = discord.Embed(title=f"This role has been successfully blacklisted {succesfully_emoji}", 
-                description=f"""{dot_emoji} The role: <#{role_id}> has been successfully blacklisted.
+                description=f"""{dot_emoji} The role: <#{role.id}> has been successfully blacklisted.
                 {dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_role}""", color=shiro_colour)
             await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = "remove-role-level-blacklist", description = "Remove a role from the level blacklist!")
     @commands.has_permissions(administrator = True)
-    async def remove_role_blacklist(self, ctx, role:Option(discord.Role, description="Select a role you want to remove from the blacklist!")):
-        
-        guild_id = ctx.guild.id
-        role_id = role.id
+    async def remove_role_blacklist(self, ctx:commands.Context, role:Option(discord.Role, description="Select a role you want to remove from the blacklist!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role=role_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id, table="level")
 
         if blacklist:
 
-            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=guild_id, role_id=role_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", role_id=role.id, table="level")
             
             emb = discord.Embed(title=f"The role was removed from the blacklist {succesfully_emoji}", 
                 description=f"""{dot_emoji} The role has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_role} command.
@@ -1330,23 +1309,19 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This role is not blacklisted {fail_emoji}", 
-                description=f"""{dot_emoji} The role: <@&{role_id}> is not blacklisted.
+                description=f"""{dot_emoji} The role: <@&{role.id}> is not blacklisted.
                 The following roles are blacklisted:\n\n{blacklist[2]}""", color=error_red)
             await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name= "add-user-level-blacklist", description = "Choose a user that you want to exclude from the level system!")
     @commands.has_permissions(administrator = True)
-    async def add_user_level_blacklsit(self, ctx, user:Option(discord.User, description="Select a user that you want to exclude from the level system!")):
+    async def add_user_level_blacklsit(self, ctx:commands.Context, user:Option(discord.User, description="Select a user that you want to exclude from the level system!")):
 
-        guild_id = ctx.guild.id 
-        user_id = user.id 
-        guild_name = ctx.guild.name 
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user=user_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id, table="level")
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb, view=None)
@@ -1355,7 +1330,7 @@ class LevelSystem(commands.Cog):
 
             if blacklist:
 
-                blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+                blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
 
                 emb = discord.Embed(title=f"This user is already on the blacklist {fail_emoji}", 
                     description=f"""The following users are on the blacklist:\n\n{blacklist[3]}
@@ -1364,26 +1339,23 @@ class LevelSystem(commands.Cog):
 
             else:   
 
-                DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, user_id=user_id, table="level")
+                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, user_id=user.id, table="level")
 
                 emb = discord.Embed(title=f"This user was successfully blacklisted {succesfully_emoji}", 
-                    description=f"""{dot_emoji} The user: <@{user_id}> was successfully blacklisted.
+                    description=f"""{dot_emoji} The user: <@{user.id}> was successfully blacklisted.
                     If you want to remove it again use this command:\n{remove_blacklist_level_user}""", color=shiro_colour)
                 await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name="remove-user-level-blacklist", description="Remove a user from the level blacklist!")
     @commands.has_permissions(administrator = True)
-    async def remove_user_level_blacklist(self, ctx, user:Option(discord.User, description="Select a user you want to remove from the blacklist!")):
-
-        guild_id = ctx.guild.id
-        user_id = user.id
+    async def remove_user_level_blacklist(self, ctx:commands.Context, user:Option(discord.User, description="Select a user you want to remove from the blacklist!")):
         
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user=user_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id, table="level")
 
         if blacklist:
             
-            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=guild_id, user_id=user_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", user_id=user.id, table="level")
 
             emb = discord.Embed(title=f"The user was removed from the blacklist {succesfully_emoji}", 
                 description=f"""{dot_emoji} The user has been successfully removed from the blacklist if you want to add him again use the: {add_blacklist_level_user} command.
@@ -1392,10 +1364,10 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This user is not on the blacklist {fail_emoji}", 
-                description=f"""The user: <@{user_id}> is not on the blacklist.
+                description=f"""The user: <@{user.id}> is not on the blacklist.
                 The following users are on the blacklist:\n\n{blacklist[3]}""", color=error_red)
             await ctx.respond(embed=emb)
 
