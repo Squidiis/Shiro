@@ -1036,7 +1036,7 @@ class LevelSystem(commands.Cog):
                 
                     for rank_count in all_info:
 
-                        count += 1
+                        count = count + 1
                                                             
                         if user.id == rank_count[1]:
 
