@@ -3,7 +3,7 @@ from Import_file import *
 from check import check_exists
 from typing import Union
 from easy_pil import Editor, load_image_async, Font
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from io import BytesIO
 from check import *
 import re
@@ -1776,21 +1776,19 @@ class LevelSystem(commands.Cog):
     async def test2(self, ctx, user:discord.User):
         
         background_color = (8, 120, 151)
-        rounded_rectangle_color = (31, 209, 79)
     
-        background = round_rectangle((885, 303), 35, background_color)
+        background = round_rectangle((885, 303), radius=29, fill=background_color)
         
         img = Image.open("assets/rank-card/card2.png")
         image = img.resize(size=(867, 285))
-
+        filtered_image = image.filter(ImageFilter.BoxBlur(4))
         w, h = image.size
 
         mask = Image.new('RGBA', (w, h), 255)
-        border_radius = 35
         draw = ImageDraw.Draw(mask)
-        draw.rounded_rectangle((0, 0, w, h), border_radius, fill=(255, 255, 255, 255), outline=None)
-
-        background.paste(image, (9, 9), mask=mask)
+        draw.rounded_rectangle((0, 0, w, h), radius=29, fill=(255, 255, 255, 255), outline=None)
+        
+        background.paste(filtered_image, (9, 9), mask=mask)
 
         bytes = BytesIO()
         background.save(bytes, format="PNG")
