@@ -1777,11 +1777,20 @@ class LevelSystem(commands.Cog):
         
         background_color = (8, 120, 151)
         rounded_rectangle_color = (31, 209, 79)
-        #background = Image.new(mode='RGBA', size=(885, 303), color=(8, 120, 151, 0) )
+    
         background = round_rectangle((885, 303), 35, background_color)
         
-        draw = ImageDraw.Draw(background)
-        draw.rounded_rectangle((9, 9, 875, 293), 35, fill=rounded_rectangle_color)
+        img = Image.open("assets/rank-card/card2.png")
+        image = img.resize(size=(867, 285))
+
+        w, h = image.size
+
+        mask = Image.new('RGBA', (w, h), 255)
+        border_radius = 35
+        draw = ImageDraw.Draw(mask)
+        draw.rounded_rectangle((0, 0, w, h), border_radius, fill=(255, 255, 255, 255), outline=None)
+
+        background.paste(image, (9, 9), mask=mask)
 
         bytes = BytesIO()
         background.save(bytes, format="PNG")
@@ -1792,7 +1801,7 @@ class LevelSystem(commands.Cog):
 
 def round_corner(radius, fill):
     """Draw a round corner"""
-    corner = Image.new('RGB', (radius, radius), (0, 0, 0, 0))
+    corner = Image.new('RGBA', (radius, radius), (0, 0, 0, 0))
     draw = ImageDraw.Draw(corner)
     draw.pieslice((0, 0, radius * 2, radius * 2), 180, 270, fill=fill)
     return corner
@@ -1801,7 +1810,7 @@ def round_corner(radius, fill):
 def round_rectangle(size, radius, fill):
     """Draw a rounded rectangle"""
     width, height = size
-    rectangle = Image.new('RGB', size, fill)
+    rectangle = Image.new('RGBA', size, fill)
     corner = round_corner(radius, fill)
     rectangle.paste(corner, (0, 0))
     rectangle.paste(corner.rotate(90), (0, height - radius))  # Rotate the corner and paste it

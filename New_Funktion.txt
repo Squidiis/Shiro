@@ -18,5 +18,3 @@ Aktivster user Leaderbord
 
 
 Level rollen mit einer Temp db machen 
-
-Rank Card einen Unsischtbaren background eingügen
