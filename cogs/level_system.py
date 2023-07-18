@@ -1779,16 +1779,29 @@ class LevelSystem(commands.Cog):
     
         background = round_rectangle((885, 303), radius=29, fill=background_color)
         
-        img = Image.open("assets/rank-card/card2.png")
-        image = img.resize(size=(867, 285))
-        filtered_image = image.filter(ImageFilter.BoxBlur(4))
-        w, h = image.size
+        img = Image.open("assets/rank-card/card2.png").resize((867, 285))
+        filtered_image = img.filter(ImageFilter.BoxBlur(4))
+        bigsize = (img.size[0] * 3, img.size[1] * 3)
 
-        mask = Image.new('RGBA', (w, h), 255)
+        mask_rectangle = Image.new('L', bigsize, 0)
+        draw = ImageDraw.Draw(mask_rectangle)
+        draw.rounded_rectangle((0, 0)+bigsize, radius=87, fill=(255), outline=None)
+        mask_rectangle = mask_rectangle.resize(img.size, Image.ANTIALIAS)
+        img.putalpha(mask_rectangle)
+        background.paste(filtered_image, (9, 9), mask=mask_rectangle)
+
+        # Get the profile picture and set it on the background
+        pfp = BytesIO(await user.display_avatar.read())
+        profile = Image.open(pfp).resize((225, 225))
+        bigsize = (profile.size[0] * 3, profile.size[1] * 3)
+        mask = Image.new("L", bigsize, 0)
         draw = ImageDraw.Draw(mask)
-        draw.rounded_rectangle((0, 0, w, h), radius=29, fill=(255, 255, 255, 255), outline=None)
-        
-        background.paste(filtered_image, (9, 9), mask=mask)
+        draw.ellipse((0, 0)+ bigsize, 255)
+        mask = mask.resize(profile.size, Image.ANTIALIAS)
+        profile.putalpha(mask)
+
+        background.paste(profile, (47, 39), mask=mask)
+
 
         bytes = BytesIO()
         background.save(bytes, format="PNG")
