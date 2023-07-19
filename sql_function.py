@@ -109,7 +109,7 @@ class DatabaseStatusCheck():
 
     def _economy_system_status(guild_id:int, text:int = None, voice:int = None):
 
-        check_status = DatabaseCheck.check_bot_settings(guild_id=guild_id)
+        check_status = DatabaseCheck.check_economy_settings(guild_id=guild_id)
 
         if check_status:
 
@@ -308,6 +308,20 @@ class DatabaseCheck():
 
 ###########################################################  Checks stats or values in the economic system  ###############################################
 
+
+    def check_economy_settings(guild_id:int):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        economy_settings_check = f"SELECT * FROM EconomySystemSettings WHERE guildId = %s"
+        economy_settings_check_values = [guild_id]
+        cursor.execute(economy_settings_check, economy_settings_check_values)
+        economy_settings = cursor.fetchone()
+
+        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return economy_settings
+        
 
     # Checks the stats from a user in the economic system
     def check_economy_system_stats(guild:int, user:int = None):
@@ -602,7 +616,7 @@ class DatabaseUpdates():
 
         try:
             
-            update_status_economy = "UPDATE BotSettings SET econemyStatus = %s WHERE guildId = %s"
+            update_status_economy = "UPDATE EconomySystemSettings SET econemyStatus = %s WHERE guildId = %s"
             update_status_economy_values = [status, guild_id]
             cursor.execute(update_status_economy, update_status_economy_values)
             db_connect.commit()
