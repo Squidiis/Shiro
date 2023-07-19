@@ -62,7 +62,7 @@ class DatabaseStatusCheck():
     # Returns the value True if "on" in the database and False when not
     def _level_system_status(guild_id:int):
 
-        levelsystem_status = DatabaseCheck.check_bot_settings(guild_id=guild_id)
+        levelsystem_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
         if levelsystem_status:
 
@@ -107,19 +107,19 @@ class DatabaseStatusCheck():
                 return None
 
 
-    def _economy_system_status(guild_id:int, text:int = None, voice:int = None, work:int = None):
+    def _economy_system_status(guild_id:int, text:int = None, voice:int = None):
 
         check_status = DatabaseCheck.check_bot_settings(guild_id=guild_id)
 
         if check_status:
 
-            if check_status[4] == "off":
+            if check_status[2] == "off":
                 return False
             else:
 
                 if text != None:
 
-                    if check_status[4] == "on_all" or check_status[4] == "on_message":
+                    if check_status[2] == "on_all" or check_status[2] == "on_message":
                         return True
                     
                     else:
@@ -127,7 +127,7 @@ class DatabaseStatusCheck():
                     
                 if voice != None:
 
-                    if check_status[4] == "on_all" or "on_voice":
+                    if check_status[2] == "on_all" or "on_voice":
                         return True
                     else:
                         return False

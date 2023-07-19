@@ -546,7 +546,7 @@ class ResetBlacklistLevelButton(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
             guild_id = interaction.guild.id
 
-            DatabaseRemoveDatas._remove_level_system_blacklist(guild_id=guild_id)
+            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", table="level")
 
             emb = discord.Embed(title=f"Die blacklist wurde geresetet {succesfully_emoji}", 
                 description=f"""{arrow_emoji} alle Channel, User, Rollen und Kategorien wurden von der Blacklist entfernt.
@@ -632,23 +632,17 @@ class LevelSystem(commands.Cog):
         if message.author.bot:
             return 
 
-        # user infos 
-        user_id_insert = message.author.id
-
-        guild_id_insert = message.guild.id
-        user_name_insert = message.author.name
-
-        check_levelsystem_control = DatabaseStatusCheck._level_system_status(guild_id=guild_id_insert)
+        check_levelsystem_control = DatabaseStatusCheck._level_system_status(guild_id=message.guild.id)
         
         if check_levelsystem_control == False:
             return
         
         if check_levelsystem_control == None:
-            DatabaseUpdates._create_bot_settings(guild_id=guild_id_insert)
+            DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
             return
                 
         # Blacklist check
-        check_blacklist = DatabaseStatusCheck._blacklist_check_text(message_check=message, guild_id=guild_id_insert)
+        check_blacklist = DatabaseStatusCheck._blacklist_check_text(message_check=message, guild_id=message.guild.id)
                         
         if isinstance(message.channel, discord.TextChannel):
                     
@@ -658,7 +652,7 @@ class LevelSystem(commands.Cog):
                 try:   
                             
                     # Database check for all values 
-                    check_if_exists = DatabaseCheck.check_level_system_stats(guild_id=guild_id_insert, user=user_id_insert)
+                    check_if_exists = DatabaseCheck.check_level_system_stats(guild_id=message.guild.id, user=message.author.id)
                     if check_if_exists:
 
                         # All user stats                   
@@ -679,7 +673,7 @@ class LevelSystem(commands.Cog):
                             try:
                                 
                                 # Updates the XP
-                                DatabaseUpdates._update_user_stats_level(guild_id=guild_id_insert, user_id=user_id_insert, level=new_level)
+                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, level=new_level)
 
                                 print("Data were changed")
 
@@ -688,8 +682,8 @@ class LevelSystem(commands.Cog):
                                                                     
                             finally:   
 
-                                level_role_check = DatabaseCheck.check_level_system_levelroles(guild=guild_id_insert, needed_level=new_level)
-                                levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=guild_id_insert)
+                                level_role_check = DatabaseCheck.check_level_system_levelroles(guild=message.guild.id, needed_level=new_level)
+                                levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
 
                                 if level_role_check:
 
@@ -706,31 +700,31 @@ class LevelSystem(commands.Cog):
                                     level_role = message.guild.get_role(role_id)
                                     await message.author.add_roles(level_role) 
 
-                                    await levelup_channel.send(f"<@{user_id_insert}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
-                                    await levelup_channel.send(f"Oh nice <@{user_id_insert}> you have a new level your newlevel is {new_level}")
+                                    await levelup_channel.send(f"<@{message.author.id}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
+                                    await levelup_channel.send(f"Oh nice <@{message.author.id}> you have a new level your newlevel is {new_level}")
                                 
                                 elif levelup_channel_check[3] == None and level_role_check != None:
                                     
                                     level_role = message.guild.get_role(role_id)
                                     await message.author.add_roles(level_role)
 
-                                    await message.channel.send(f"Oh nice <@{user_id_insert}> you have a new level your newlevel is {new_level}")
-                                    await message.channel.send(f"<@{user_id_insert}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
+                                    await message.channel.send(f"Oh nice <@{message.author.id}> you have a new level your newlevel is {new_level}")
+                                    await message.channel.send(f"<@{message.author.id}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
 
                                 elif levelup_channel_check[3] == None and level_role_check == None:
 
-                                    await message.channel.send(f"Oh nice <@{user_id_insert}> you have a new level your newlevel is {new_level}") 
+                                    await message.channel.send(f"Oh nice <@{message.author.id}> you have a new level your newlevel is {new_level}") 
 
                                 elif levelup_channel_check[3] != None and level_role_check == None:
                                         
                                     levelup_channel = bot.get_channel(levelup_channel_check[3])
-                                    await levelup_channel.send(f"Oh nice <@{user_id_insert}> you have a new level your newlevel is {new_level}")
+                                    await levelup_channel.send(f"Oh nice <@{message.author.id}> you have a new level your newlevel is {new_level}")
                          
                         else:
 
                             try:
 
-                                DatabaseUpdates._update_user_stats_level(guild_id=guild_id_insert, user_id=user_id_insert, xp=user_has_xp)                       
+                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp)                       
                                 print("Data were changed")
 
                             except mysql.connector.Error as error:
@@ -738,36 +732,14 @@ class LevelSystem(commands.Cog):
 
                     else:
                             
-                        DatabaseUpdates._insert_user_stats_level(guild_id=guild_id_insert, user_id=user_id_insert, user_name=user_name_insert)
+                        DatabaseUpdates._insert_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name)
 
                 except mysql.connector.Error as error:
                     print("parameterized query failed {}".format(error))
                     
         DatabaseSetup.db_close(cursor=my_cursor, db_connection=connection_db_level)
-                
+   
 
-
-    @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        
-        if not member.bot:
-
-            user_id = member.id
-            guild_id = member.guild.id
-
-            check_level_system = DatabaseCheck.check_level_system_stats(guild_id=guild_id, user=user_id)
-
-            if check_level_system:
-                  
-                if user_id == check_level_system[1] and guild_id == check_level_system[0]:
-                    
-                    DatabaseRemoveDatas._remove_level_system_stats(guild_id=guild_id, user_id=user_id)
-
-                else:
-                    return
-
-        else:
-            return
 
 
 
@@ -1075,16 +1047,6 @@ class LevelSystem(commands.Cog):
                 
             rank_card = discord.File(fp=background.image_bytes, filename="rank.png")
             await ctx.respond(file=rank_card)
-
-            #emb = discord.Embed(title=f"{ctx.user.name} rank!", description=f"All your values in the level system and your rank.", color=discord.Colour.blurple())
-            #emb.add_field(name="Name:",
-            #    value=f"<@{user_id}>", inline=True)
-            #emb.add_field(name="Rank:", value=f"**{count_end}**", inline=False)
-            #emb.add_field(name="Level:", value=f"**{user_data[1]}**")
-            #emb.add_field(name="XP:", value=f"**{user_data[2]}**")
-            #emb.add_field(name="Nedded-XP:", value=f"**{xp_need_next_level}**")
-            #emb.set_thumbnail(url=f"{user.display_avatar.url}")
-            #await ctx.respond(embed=emb)
 
         else:
                             
