@@ -749,19 +749,15 @@ class LevelSystem(commands.Cog):
     # Command to give a user XP, The XP awarded can only be as high as he needs for a new level!
     @commands.slash_command(name = "give-xp", description = "Give a user a quantity of XP chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def give_xp_slash(self, ctx, user:Option(discord.Member, description="Select a user who should receive the xp!"),
+    async def give_xp_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user who should receive the xp!"),
         xp:Option(int, description="Specify a quantity of XP to be added!")):
-
-        user_id = user.id
-        guild_id = ctx.guild.id
-        user_name = user.name
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
 
         else:
 
-            check_stats = DatabaseCheck.check_level_system_stats(guild=guild_id, user=user_id)
+            check_stats = DatabaseCheck.check_level_system_stats(guild=ctx.guild.id, user=user.id)
 
             if check_stats:
                 
@@ -772,42 +768,42 @@ class LevelSystem(commands.Cog):
 
                     new_xp = user_xp + xp
 
-                    DatabaseUpdates._update_user_stats_level(guild_id=guild_id, user_id=user_id, xp=new_xp)
+                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp)
                         
-                    emb = discord.Embed(title=f"You have successfully passed {user_name} to {xp} XP {succesfully_emoji}", 
-                        description=f"""{dot_emoji} You have transferred **{user_name}** {xp} XP **{user_name}** has from now on **{new_xp}** XP.
-                        {dot_emoji} If you want to remove **{user_name}** XP again use the:\n{remove_xp} command {exclamation_mark_emoji}""", color=shiro_colour)
+                    emb = discord.Embed(title=f"You have successfully passed {user.name} to {xp} XP {succesfully_emoji}", 
+                        description=f"""{dot_emoji} You have transferred **{user.name}** {xp} XP **{user.names}** has from now on **{new_xp}** XP.
+                        {dot_emoji} If you want to remove **{user.name}** XP again use the:\n{remove_xp} command {exclamation_mark_emoji}""", color=shiro_colour)
                     await ctx.respond(embed=emb)
 
                     if xp >= xp_need_next_level:
 
                         new_level = user_level + 1
                                             
-                        DatabaseUpdates._update_user_stats_level(guild_id=guild_id, user_id=user_id, level=new_level)
-                        levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=guild_id)
+                        DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level)
+                        levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
                         if levelup_channel_check != None:
 
-                            await ctx.send(f"Oh nice <@{user_id}> you have a new level, your newlevel is {new_level}")
+                            await ctx.send(f"Oh nice <@{user.id}> you have a new level, your newlevel is {new_level}")
                             
                         else:
                             
                             levelup_channel = bot.get_channel(levelup_channel_check[3])
-                            await levelup_channel.send(f"Oh nice <@{user_id}> you have a new level, your newlevel is {new_level}")
+                            await levelup_channel.send(f"Oh nice <@{user.id}> you have a new level, your newlevel is {new_level}")
                 else:
         
-                    emb = discord.Embed(title=f"The XP you want to give {user_name} is too high {fail_emoji}", 
-                        description=f"""{dot_emoji} The XP you want to pass to **{user_name}** is too high.
-                        {dot_emoji} You can only give **{user_name}** a maximum of **{xp_need_next_level}** XP.""", color=error_red)
+                    emb = discord.Embed(title=f"The XP you want to give {user.name} is too high {fail_emoji}", 
+                        description=f"""{dot_emoji} The XP you want to pass to **{user.name}** is too high.
+                        {dot_emoji} You can only give **{user.name}** a maximum of **{xp_need_next_level}** XP.""", color=error_red)
                     await ctx.respond(embed=emb)
 
             else:
 
-                DatabaseUpdates._insert_user_stats_level(guild_id=guild_id, user_id=user_id, user_name=user_name)
+                DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                 
                 emb = discord.Embed(title=f"The user was not found {fail_emoji}", 
-                    description=f"""{dot_emoji} No entry was found for **{user_name}**, so one was created.
-                    {dot_emoji} **{user_name}** now starts at level 0 with 0 xp""", color=error_red)
+                    description=f"""{dot_emoji} No entry was found for **{user.name}**, so one was created.
+                    {dot_emoji} **{user.name}** now starts at level 0 with 0 xp""", color=error_red)
                 await ctx.respond(embed=emb)
 
 
@@ -1508,16 +1504,14 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "show-all-level-roles", description = "View all rolls that are available with a level!")
-    async def show_all_level_roles(self, ctx):
+    async def show_all_level_roles(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild=guild_id, status="level_role")
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, status="level_role")
         
         if level_roles:
             
             result_strings = []
-            for guild_id, role_id, level, _ in level_roles:
+            for _, role_id, level, _ in level_roles:
                 result_strings.append(f"{dot_emoji} <@&{role_id}> you get from level: {level}")
 
             result = '\n'.join(result_strings)
@@ -1538,16 +1532,13 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(nanme = "set-level-up-channel", description = "Set a channel for the level up notifications!")
     @commands.has_permissions(administrator = True)
-    async def set_levelup_channel(self, ctx, channel:Option(discord.TextChannel, description="Select a channel in which the level up message should be sent")):
+    async def set_levelup_channel(self, ctx:commands.Context, channel:Option(discord.TextChannel, description="Select a channel in which the level up message should be sent")):
 
-        guild_id = ctx.guild.id
-        channel_id = channel.id
-
-        level_up_channel = DatabaseCheck.check_level_settings(guild_id=guild_id)
+        level_up_channel = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
         if level_up_channel[3]:
        
-            if channel_id == level_up_channel[3]:
+            if channel.id == level_up_channel[3]:
 
                 emb = discord.Embed(title=f"This channel is already assigned as level up channel {fail_emoji}", 
                     description=f"{dot_emoji} This channel is already set as a level up channel if you want to remove it as a level up channel use the:\n{disable_level_up_channel} command {exclamation_mark_emoji}", color=error_red)
@@ -1555,10 +1546,10 @@ class LevelSystem(commands.Cog):
 
             else:
 
-                DatabaseUpdates.update_level_settings(guild_id=guild_id, levelup_channel=channel_id)
+                DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, levelup_channel=channel.id)
 
                 emb = discord.Embed(title=f"The level up channel was set successfully {succesfully_emoji}", 
-                    description=f"""{dot_emoji} You have successfully set the channel <#{channel_id}> as a level up channel.
+                    description=f"""{dot_emoji} You have successfully set the channel <#{channel.id}> as a level up channel.
                     {dot_emoji} From now on all level up notifications will be sent to this channel.""", color=shiro_colour)
                 await ctx.respond(embed=emb)
 
@@ -1568,20 +1559,18 @@ class LevelSystem(commands.Cog):
                 description=f"""{dot_emoji} Currently the channel <#{level_up_channel[3]}> is set as level up channel. 
                 {dot_emoji} Do you want to overwrite this one?
                 {dot_emoji} If yes select the yes button if not select the no button {exclamation_mark_emoji}""", color=shiro_colour)
-            await ctx.respond(embed=emb, view=LevelUpChannelButtons(channel=channel_id))
+            await ctx.respond(embed=emb, view=LevelUpChannelButtons(channel=channel.id))
 
 
     @commands.slash_command(name = "disable-level-up-channel", description = "Deactivate the level up channel!")
     @commands.has_permissions(administrator = True)
-    async def disable_levelup_channel(self, ctx):
+    async def disable_levelup_channel(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-
-        level_up_channel = DatabaseCheck.check_level_settings(guild_id=guild_id)
+        level_up_channel = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
         if level_up_channel[3]:
                 
-            DatabaseUpdates.update_level_settings(guild_id=guild_id, levelup_channel=None)
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, levelup_channel=None)
 
             emb = discord.Embed(title=f"The level up channel was successfully removed {succesfully_emoji}", 
                 description=f"""{dot_emoji} From now on level up notifications will always be sent after level up.""", color=shiro_colour)
@@ -1595,7 +1584,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "show-level-up-channel", description = "Let them show the current level up channel!")
-    async def show_levelup_channel(self, ctx):
+    async def show_levelup_channel(self, ctx:commands.Context):
 
         level_up_channel = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
         
@@ -1790,6 +1779,9 @@ def round_rectangle(size, radius, fill):
     rectangle.paste(corner.rotate(180), (width - radius, height - radius))
     rectangle.paste(corner.rotate(270), (width - radius, 0))
     return rectangle
+
+
+
 
 
 ##################################################  Voice leveling  ####################################################

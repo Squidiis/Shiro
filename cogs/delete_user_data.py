@@ -29,7 +29,8 @@ class UserLeavesServer(commands.Cog):
                   "AutoReactionSettings", 
                   "EconomySystemStats", 
                   "EconomySystemBlacklist", 
-                  "EconomySystemShop"]
+                  "EconomySystemShop",
+                  "EconomySystemSettings"]
 
         try:
 

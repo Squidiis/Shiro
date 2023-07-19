@@ -18,6 +18,3 @@ Aktivster user Leaderbord
 
 
 Level rollen mit einer Temp db machen 
-
-
-Rank card mit einer Mask machen das die 2 funktionen wegfallen 

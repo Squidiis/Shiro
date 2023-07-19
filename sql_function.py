@@ -113,13 +113,13 @@ class DatabaseStatusCheck():
 
         if check_status:
 
-            if check_status[2] == "off":
+            if check_status[1] == "off":
                 return False
             else:
 
                 if text != None:
 
-                    if check_status[2] == "on_all" or check_status[2] == "on_message":
+                    if check_status[1] == "on_all" or check_status[1] == "on_message":
                         return True
                     
                     else:
@@ -127,7 +127,7 @@ class DatabaseStatusCheck():
                     
                 if voice != None:
 
-                    if check_status[2] == "on_all" or "on_voice":
+                    if check_status[1] == "on_all" or "on_voice":
                         return True
                     else:
                         return False
@@ -349,7 +349,7 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        sql_tables = ["BotSettings", "LevelSystemSettings"]
+        sql_tables = ["BotSettings", "LevelSystemSettings", "EconomySystemSettings"]
 
         try:
 

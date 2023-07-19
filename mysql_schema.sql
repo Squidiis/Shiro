@@ -95,8 +95,7 @@ DROP TABLE IF EXISTS `BotSettings`;
 
 CREATE TABLE BotSettings (
     guildId BIGINT UNSIGNED NOT NULL,
-    prefix VARCHAR(20) DEFAULT '?',
-    econemyStatus VARCHAR(50) DEFAULT 'on_all'
+    prefix VARCHAR(20) DEFAULT '?'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -156,6 +155,14 @@ CREATE TABLE EconomySystemShopRolles (
     guildName VARCHAR(255) NOT NULL,
     rolesId BIGINT UNSIGNED NULL,
     itemPrice INT UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `EconomySystemSettings`;
+
+CREATE TABLE LevelSystemSettings (
+    guildId BIGINT UNSIGNED NOT NULL,
+    econemyStatus VARCHAR(50) DEFAULT 'on_all'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
