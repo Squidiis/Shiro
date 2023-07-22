@@ -1727,7 +1727,12 @@ class LevelSystem(commands.Cog):
     async def test2(self, ctx, user:discord.User):
         
         background_color = (8, 120, 151)
-    
+        user_name = user.name
+        final_xp = 1000
+        xp = 100
+
+        medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 35)
+
         background = round_rectangle((885, 303), radius=29, fill=background_color)
         
         img = Image.open("assets/rank-card/card2.png").resize((867, 285))
@@ -1753,6 +1758,31 @@ class LevelSystem(commands.Cog):
 
         background.paste(profile, (47, 39), mask=mask)
 
+
+        bar = Image.new('RGBA', background.size, (255, 255, 255, 0))
+        draw = ImageDraw.Draw(bar)
+
+        bar_offset_x = 304
+        bar_offset_y = 179
+        bar_offset_x_1 = 849
+        bar_offset_y_1 = 214
+
+        # Progress Bar
+        draw.rounded_rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), radius=13 ,fill=(0, 0, 0, 160))
+
+        # Filling Bar
+        bar_length = bar_offset_x_1 - bar_offset_x
+        progress = (final_xp - xp) * 100 / final_xp
+        progress = 100 - progress
+        progress_bar_length = round(bar_length * progress / 100)
+        bar_offset_x_1 = bar_offset_x + progress_bar_length
+
+        # Filling the Progress Bar
+        draw.rounded_rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), radius=13, fill=background_color)
+
+
+        bar_out = Image.alpha_composite(background, bar)
+        background.paste(bar_out)
 
         bytes = BytesIO()
         background.save(bytes, format="PNG")
