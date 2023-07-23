@@ -609,7 +609,7 @@ class LevelSystem(commands.Cog):
         self.bot = bot
         self.cd = commands.CooldownMapping.from_cooldown(1, 10.0, commands.BucketType.member)
 
-    def get_ratelimit(self, message: discord.Message):
+    def get_ratelimit(self, message:discord.Message):
         bucket = self.cd.get_bucket(message)
         return bucket.update_rate_limit()
 

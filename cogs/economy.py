@@ -14,7 +14,7 @@ class ResetEconomyStatsButton(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.blurple, row=1, custom_id="yes_button_stats")
-    async def reset_stats_button_economy_yes(self, button, interaction, ):
+    async def reset_stats_button_economy_yes(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -32,7 +32,7 @@ class ResetEconomyStatsButton(discord.ui.View):
 
 
     @discord.ui.button(label="No", style=discord.ButtonStyle.blurple, row=1, custom_id="no_button_stats")
-    async def reset_stats_button_economy_no(self, button, interaction):
+    async def reset_stats_button_economy_no(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -52,13 +52,13 @@ class ResetBlacklistEconomyButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Yes", style=discord.ButtonStyle.blurple, row=1, custom_id="yes_button_blacklist")
-    async def reset_blacklist_button_economy_yes(self, button, interaction, ):
+    @discord.ui.button(label="Yes", style=discord.ButtonStyle.blurple, row=1, custom_id="reset_economy_blacklist")
+    async def reset_economy_blacklist(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
             guild_id = interaction.guild.id
 
-            DatabaseRemoveDatas._remove_economy_system_blacklist(guild_id=guild_id)
+            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", table="economy")
             emb = discord.Embed(title=f"Die blacklist wurde geresetet {succesfully_emoji}", 
                 description=f"""{arrow_emoji} alle Channel, User, Rollen und Kategorien wurden von der Blacklist entfernt.
                 Wenn du wieder Dinge auf die Blacklist setzten möchtest kannst du die Befehle wie zuvor nutzen {exclamation_mark_emoji}""", color=shiro_colour)
@@ -69,8 +69,8 @@ class ResetBlacklistEconomyButton(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb)
 
 
-    @discord.ui.button(label="No", style=discord.ButtonStyle.blurple, row=1, custom_id="no_button_blacklist")
-    async def reset_blacklist_button_economy_no(self, button, interaction):
+    @discord.ui.button(label="No", style=discord.ButtonStyle.blurple, row=1, custom_id="no_reset_economy_blacklist")
+    async def no_reset_economy_blacklist(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -85,8 +85,8 @@ class ResetBlacklistEconomyButton(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb)
 
             
-    @discord.ui.button(label="Shows all elements of the blacklist", style=discord.ButtonStyle.blurple, row=2, custom_id="show_blacklist_button_economy")
-    async def show_blacklist_button_economy(self, button, interaction):
+    @discord.ui.button(label="Shows all elements of the blacklist", style=discord.ButtonStyle.blurple, row=2, custom_id="show_economy_blacklist")
+    async def show_economy_blacklist(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -142,7 +142,7 @@ class EconomySystemSettings(discord.ui.View):
         discord.SelectOption(label="Voice", description="Hier werden alle aktivitäten in voice channels belohnt", value="voice"),
         discord.SelectOption(label="Abbrechen", description="Hier brichst du die einrichtung ab", value="cancel")     
     ])
-    async def economy_system_control_callback(self, select, interaction: discord.Interaction):
+    async def economy_system_settings(self, select, interaction:discord.Interaction):
         
         guild_id = interaction.guild.id
 
@@ -188,7 +188,7 @@ class EconomySystemSettings(discord.ui.View):
 
                 
     @discord.ui.button(label="Click my for Help", style=discord.ButtonStyle.green, custom_id="help_button", emoji=help_emoji)
-    async def help_button_economy_system_callback(self, button, interaction):
+    async def help_button_economy_system(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -240,11 +240,11 @@ class EconomySystemSettings(discord.ui.View):
 
         else:
 
-            await interaction.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
     
     @discord.ui.button(label="On/Off economy system", style=discord.ButtonStyle.blurple, custom_id="on_off_system")
-    async def on_off_button_economy_system_callback(self, button, interaction):
+    async def on_off_button_economy_system_callback(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -283,7 +283,7 @@ class EconomySystemSettings(discord.ui.View):
 
         else:
 
-            await interaction.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 
@@ -303,7 +303,7 @@ class EconomySystem(commands.Cog):
         return coins
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message:discord.Message):
 
         if self.get_ratelimit(message):
             return
@@ -314,25 +314,19 @@ class EconomySystem(commands.Cog):
         if message.content.startswith("?"):
             return
 
-        # user infos
-        guild_id = message.guild.id
-        user_id = message.author.id
-        guild_name = message.guild.name
-        user_name = message.author.name
-
-        economy_system_status = DatabaseStatusCheck._economy_system_status(guild_id=guild_id)
+        economy_system_status = DatabaseStatusCheck._economy_system_status(guild_id=message.guild.id)
         if economy_system_status == True:
             return
         elif economy_system_status == None:
-            DatabaseUpdates._create_bot_settings(guild_id=guild_id)
+            DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
         else:
 
             # checks the blacklist
-            blacklist_check = DatabaseStatusCheck._economy_system_blacklist_check(guild_id=guild_id, message_check=message)
+            blacklist_check = DatabaseStatusCheck._economy_system_blacklist_check(guild_id=message.guild.id, message_check=message)
 
             if blacklist_check != True:
 
-                user_stats = DatabaseCheck.check_economy_system_stats(guild=guild_id, user=user_id)
+                user_stats = DatabaseCheck.check_economy_system_stats(guild=message.guild.id, user=message.author.id)
                 
                 if user_stats:
 
@@ -343,19 +337,18 @@ class EconomySystem(commands.Cog):
                     new_money_count = money_count + money
                     print("money")
 
-                    DatabaseUpdates._update_user_money_economy(guild_id=guild_id, user_id=user_id, money=new_money_count)
+                    DatabaseUpdates._update_user_money_economy(guild_id=message.guild.id, user_id=message.author.id, money=new_money_count)
 
                 else:
 
-                    DatabaseUpdates._insert_user_stats_economy(guild_id=guild_id, user_id=user_id, user_name=user_name)
+                    DatabaseUpdates._insert_user_stats_economy(guild_id=message.guild.id, user_id=message.author.id, user_name=message.guild.name)
 
     
     @commands.slash_command(name="economy-system-settings", description="Stellen sie das economy system ein!")
     @commands.has_permissions(administrator=True)
-    async def economy_system_settings(self, ctx):
+    async def economy_system_settings(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-        check_settings = DatabaseCheck.check_bot_settings(guild=guild_id)
+        check_settings = DatabaseCheck.check_bot_settings(guild=ctx.guild.id)
         
         settings_list = []
 
@@ -388,10 +381,9 @@ class EconomySystem(commands.Cog):
 
     
     @commands.slash_command(name="show-economy-settings")
-    async def show_economy_settings(self, ctx):
+    async def show_economy_settings(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-        check_settings = DatabaseCheck.check_bot_settings(guild=guild_id)
+        check_settings = DatabaseCheck.check_bot_settings(guild=ctx.guild.id)
         
         settings_list = []
 
@@ -427,14 +419,14 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="add-channel-economy-blacklist", description="Schliese einen Channel vom economy system aus!")
     @commands.has_permissions(administrator=True)
-    async def add_channel_economy_blacklist(self, ctx, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], 
+    async def add_channel_economy_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], 
         description="Wählen sie ein channel aus der auf die blacklist gesetzt werden soll!")):
 
         channel_id = channel.id
         guild_id = ctx.guild.id
         guild_name = ctx.guild.name
 
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, channel=channel_id)
+        blacklist = DatabaseCheck.check_blacklist(guild=guild_id, channel=channel_id, table="economy")
 
         if blacklist:
             
@@ -449,7 +441,7 @@ class EconomySystem(commands.Cog):
 
         else:
 
-            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, channel_id=channel_id, table="economy")
+            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", guild_name=guild_name, channel_id=channel_id, table="economy")
 
             emb = discord.Embed(title=f"Dieser Channel wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
                 description=f"""Der channel: <#{channel_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
