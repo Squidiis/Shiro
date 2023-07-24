@@ -1739,14 +1739,8 @@ class LevelSystem(commands.Cog):
 
         img = Image.open("assets/rank-card/card2.png").resize((867, 285))
         filtered_image = img.filter(ImageFilter.BoxBlur(4))
-        bigsize = (img.size[0] * 3, img.size[1] * 3)
-
-        mask_rectangle = Image.new('L', bigsize, 0)
-        draw = ImageDraw.Draw(mask_rectangle)
-        draw.rounded_rectangle((0, 0)+bigsize, radius=87, fill=(255), outline=None)
-        mask_rectangle = mask_rectangle.resize(img.size, Image.ANTIALIAS)
-        img.putalpha(mask_rectangle)
-        background.paste(filtered_image, (9, 9), mask=mask_rectangle)
+        new_img = round_corner_mask(radius=87, rectangle=filtered_image)
+        background.paste(new_img[0], (9, 9), mask=new_img[1])
 
         # Get the profile picture and set it on the background
         pfp = BytesIO(await user.display_avatar.read())
