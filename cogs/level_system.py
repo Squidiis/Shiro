@@ -1733,8 +1733,10 @@ class LevelSystem(commands.Cog):
 
         medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 35)
 
-        background = round_rectangle((885, 303), radius=29, fill=background_color)
-        
+        background = Image.new("RGBA", (885, 303), color=background_color)
+        new_background = round_corner_mask(radius=87, rectangle=background)
+        background.paste(new_background[0], (0, 0), new_background[1])
+
         img = Image.open("assets/rank-card/card2.png").resize((867, 285))
         filtered_image = img.filter(ImageFilter.BoxBlur(4))
         bigsize = (img.size[0] * 3, img.size[1] * 3)
@@ -1790,25 +1792,15 @@ class LevelSystem(commands.Cog):
         dfile = discord.File(bytes, filename="card.png")
         await ctx.send(file=dfile)
 
-
-def round_corner(radius, fill):
-    """Draw a round corner"""
-    corner = Image.new('RGBA', (radius, radius), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(corner)
-    draw.pieslice((0, 0, radius * 2, radius * 2), 180, 270, fill=fill)
-    return corner
-
-
-def round_rectangle(size, radius, fill):
-    """Draw a rounded rectangle"""
-    width, height = size
-    rectangle = Image.new('RGBA', size, fill)
-    corner = round_corner(radius, fill)
-    rectangle.paste(corner, (0, 0))
-    rectangle.paste(corner.rotate(90), (0, height - radius))  # Rotate the corner and paste it
-    rectangle.paste(corner.rotate(180), (width - radius, height - radius))
-    rectangle.paste(corner.rotate(270), (width - radius, 0))
-    return rectangle
+def round_corner_mask(radius, rectangle):
+    
+    bigsize = (rectangle.size[0] * 3, rectangle.size[1] * 3)
+    mask_rectangle = Image.new('L', bigsize, 0)
+    draw = ImageDraw.Draw(mask_rectangle)
+    draw.rounded_rectangle((0, 0)+bigsize, radius=radius, fill=(255), outline=None)
+    mask = mask_rectangle.resize(rectangle.size, Image.ANTIALIAS)
+    rectangle.putalpha(mask)
+    return (rectangle, mask)
 
 
 
