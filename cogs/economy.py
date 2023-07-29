@@ -326,7 +326,7 @@ class EconomySystem(commands.Cog):
 
             if blacklist_check != True:
 
-                user_stats = DatabaseCheck.check_economy_system_stats(guild=message.guild.id, user=message.author.id)
+                user_stats = DatabaseCheck.check_economy_system_stats(guild_id=message.guild.id, user=message.author.id)
                 
                 if user_stats:
 
@@ -424,15 +424,11 @@ class EconomySystem(commands.Cog):
     async def add_channel_economy_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], 
         description="Wählen sie ein channel aus der auf die blacklist gesetzt werden soll!")):
 
-        channel_id = channel.id
-        guild_id = ctx.guild.id
-        guild_name = ctx.guild.name
-
-        blacklist = DatabaseCheck.check_blacklist(guild=guild_id, channel=channel_id, table="economy")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="economy")
 
         if blacklist:
             
-            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"Dieser channel ist bereits auf der economy system Blacklist {fail_emoji}", 
                 description=f"""Auf der economy system Blacklist befinden sich folgende channels:\n
@@ -443,10 +439,10 @@ class EconomySystem(commands.Cog):
 
         else:
 
-            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", guild_name=guild_name, channel_id=channel_id, table="economy")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, channel_id=channel.id, table="economy")
 
             emb = discord.Embed(title=f"Dieser Channel wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
-                description=f"""Der channel: <#{channel_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
+                description=f"""Der channel: <#{channel.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                 Wenn du in wieder entfernen möchtest benutze diesen command: 
                 {remove_blacklist_economy_channel}""", color=shiro_colour)
             await ctx.respond(embed=emb)
@@ -674,11 +670,9 @@ class EconomySystem(commands.Cog):
 
 
     @commands.slash_command(name="show-economy-blacklist", description="Lass dir alles was auf der Blacklist steht anzeigen!")
-    async def show_economy_blacklist(self, ctx):
+    async def show_economy_blacklist(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-
-        blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+        blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
         channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
         emb = discord.Embed(title=f"Hier siehst du die Gesamte economy system Blacklist", 
@@ -697,55 +691,47 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="give-money")
     @commands.has_permissions(administrator=True)
-    async def give_money(self, ctx, user:Option(discord.Member), money:Option(int), ):
-
-        guild_id = ctx.guild.id
-        user_id = user.id
-        user_name = user.name
+    async def give_money(self, ctx:commands.Context, user:Option(discord.Member), money:Option(int, description="gebe eine menge an coins an die übertragen werden sollen!")):
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb, view=None)
 
         else:
 
-            check_user = DatabaseCheck.check_economy_system_stats(guild=guild_id, user=user_id)
+            check_user = DatabaseCheck.check_economy_system_stats(guild_id=ctx.guild.id, user=user.id)
 
             if check_user:
                 
                 new_coins = check_user[2] + money
 
-                DatabaseUpdates._update_user_money_economy(guild_id=guild_id, user_id=user_id, money=new_coins)
+                DatabaseUpdates._update_user_money_economy(guild_id=ctx.guild.id, user_id=user.id, money=new_coins)
 
-                emb = discord.Embed(title=f"Du hast {user_name} erfolgreich die coins übergeben {succesfully_emoji}", 
-                    description=f"""{dot_emoji} Du hast dem user: <@{user_id}> erfolgreich {money} coins übertagen {dollar_animation_emoji}.
-                    {dot_emoji} <@{user_id}> hat ab jetzt {new_coins} coins.
-                    {dot_emoji} Wenn du diesen <@{user_id}> seine Coins wieder entfernen möchtest kannst du den\n{remove_money} command nutzen {exclamation_mark_emoji}""", color=shiro_colour)
+                emb = discord.Embed(title=f"Du hast {user.name} erfolgreich die coins übergeben {succesfully_emoji}", 
+                    description=f"""{dot_emoji} Du hast dem user: <@{user.id}> erfolgreich {money} coins übertagen {dollar_animation_emoji}.
+                    {dot_emoji} <@{user.id}> hat ab jetzt {new_coins} coins.
+                    {dot_emoji} Wenn du diesen <@{user.id}> seine Coins wieder entfernen möchtest kannst du den\n{remove_money} command nutzen {exclamation_mark_emoji}""", color=shiro_colour)
                 await ctx.respond(embed=emb)
 
             else:
 
-                DatabaseUpdates._insert_user_stats_economy(guild_id=guild_id, user_id=user_id, user_name=user_name)
+                DatabaseUpdates._insert_user_stats_economy(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                 
                 emb = discord.Embed(title=f"Der angegebene user wurde nicht gefunden {fail_emoji}", 
-                    description=f"""{dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user_id}> nachrtäglich hinzugefügt.
+                    description=f"""{dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user.id}> nachrtäglich hinzugefügt.
                     {dot_emoji} Der user wurde hinzugefügt und startet mit 0 coins.""", color=error_red)
                 await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name="remove-money")
     @commands.has_permissions(administrator=True)
-    async def remove_money(self, ctx, user:Option(discord.Member), money:(Option(int))):
-
-        guild_id = ctx.guild.id
-        user_id = user.id
-        user_name = user.name
+    async def remove_money(self, ctx:commands.Context, user:Option(discord.Member), money:(Option(int, description="gibt eine menge an coins an die entfernt werden sollen!"))):
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb, view=None)
 
         else:
 
-            check_user = DatabaseCheck.check_economy_system_stats(guild=guild_id, user=user_id)
+            check_user = DatabaseCheck.check_economy_system_stats(guild_id=ctx.guild.id, user=user.id)
 
             if check_user:
 
@@ -753,32 +739,31 @@ class EconomySystem(commands.Cog):
 
                     emb = discord.Embed(title=f"Der user hat nicht so viel geld {fail_emoji}", 
                         description=f"""Der user hat nicht genug geld.
-                        {dot_emoji} Der user: <@{user_id}> hat nur {check_user[2]} coins!
+                        {dot_emoji} Der user: <@{user.id}> hat nur {check_user[2]} coins!
                         {dot_emoji} Wenn du diesen User coins entfernen willst der wert den du entfernen willst kleiner oder gleich mit dem Kontostand des users sein {exclamation_mark_emoji}""", color=error_red)
                     await ctx.respond(embed=emb)
 
                 else:
 
                     emb = discord.Embed(title=f"Du hast diesen user erfolgreich den angegebenen betrag abgebucht {succesfully_emoji}", 
-                        description=f"""{dot_emoji} Du hast den user: <@{user_id}> erfolgreich {money} coin abgebucht {dollar_animation_emoji}.
+                        description=f"""{dot_emoji} Du hast den user: <@{user.id}> erfolgreich {money} coin abgebucht {dollar_animation_emoji}.
                         {dot_emoji} Wenn du diesen user wieder coins geben möchtest benutze den:\n{give_money} command {exclamation_mark_emoji}""", color=shiro_colour)
                     await ctx.respond(embed=emb)
 
             else:
 
-                DatabaseUpdates._insert_user_stats_economy(guild_id=guild_id, user_id=user_id, user_name=user_name)
+                DatabaseUpdates._insert_user_stats_economy(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
 
                 emb = discord.Embed(title=f"Der angegebene user wurd nicht gefunden {fail_emoji}",
-                    description=f"""{dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user_id}> nachrtäglich hinzugefügt.
+                    description=f"""{dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user.id}> nachrtäglich hinzugefügt.
                     {dot_emoji} Der user wurde hinzugefügt und startet mit 0 coins.""", color=error_red)
                 await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name="reset-economy-stats")
-    async def reset_economy_stats(self, ctx):
-        
-        guild_id = ctx.guild.id
-        check_user_stats = DatabaseCheck.check_economy_system_stats(guild=guild_id)
+    async def reset_economy_stats(self, ctx:commands.Context):
+
+        check_user_stats = DatabaseCheck.check_economy_system_stats(guild_id=ctx.guild.id)
 
         if check_user_stats:
 
@@ -798,9 +783,9 @@ class EconomySystem(commands.Cog):
 
     
     @commands.slash_command()
-    async def show_points(self, ctx, user:Option(discord.User, description="Wähle einen user dessen werte du ansehen möchtest!")):
+    async def show_points(self, ctx:commands.Context, user:Option(discord.User, description="Wähle einen user dessen werte du ansehen möchtest!")):
 
-        check_stats = DatabaseCheck.check_economy_system_stats(guild=ctx.guild.id, user=user.id)
+        check_stats = DatabaseCheck.check_economy_system_stats(guild_id=ctx.guild.id, user=user.id)
 
         emb = discord.Embed(title=f"Hier siehst du alle werte von {user.name} im economy system {dollar_animation_emoji}", 
             description=f"""{dot_emoji} Hiest sihst du alle werte aufgelistet:

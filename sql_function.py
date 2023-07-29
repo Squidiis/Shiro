@@ -324,7 +324,7 @@ class DatabaseCheck():
         
 
     # Checks the stats from a user in the economic system
-    def check_economy_system_stats(guild:int, user:int = None):
+    def check_economy_system_stats(guild_id:int, user:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -332,12 +332,12 @@ class DatabaseCheck():
         if user == None:
 
             economy_system_check = "SELECT * FROM EconomySystemStats WHERE guildId = %s"
-            economy_system_check_values = [guild]
+            economy_system_check_values = [guild_id]
 
         else:
 
             economy_system_check = "SELECT * FROM EconomySystemStats WHERE guildId = %s AND userId = %s"
-            economy_system_check_values = [guild, user]
+            economy_system_check_values = [guild_id, user]
         
         cursor.execute(economy_system_check, economy_system_check_values)
 
