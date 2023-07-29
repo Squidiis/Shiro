@@ -1,6 +1,6 @@
 Econumy 
 
-Status: on_message, on_work, on_all, off
+Status: an / aus schalter für voice und messages dann noch machen das man mini games spielen kann aber dafür braucht man erstmal welche
 Noch hinzufügen das man den status gleich am anfang sieht 
 
 
@@ -18,4 +18,6 @@ Aktivster user Leaderbord
 
 
 Level rollen mit einer Temp db machen 
+
+
 

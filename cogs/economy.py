@@ -194,7 +194,7 @@ class EconomySystemSettings(discord.ui.View):
 
             guild_id = interaction.guild.id
 
-            infos = DatabaseCheck.check_bot_settings(guild=guild_id)
+            infos = DatabaseCheck.check_economy_settings(guild_id=guild_id)
             
             if infos == None:
 
@@ -204,16 +204,16 @@ class EconomySystemSettings(discord.ui.View):
             else:
 
                 parameter = []
-                if "on_all" in infos[4]:
+                if "on_all" in infos[1]:
                     parameter.append(f"{dot_emoji} Alles auf Nachrichten, Voice time und Work commands")
                 else:
-                    if "on_message" in infos[4]:
+                    if "on_message" in infos[1]:
                         parameter.append(f"{dot_emoji} Das schicken von Nachrichten")
-                    if "on_voice" in infos[4]:
+                    if "on_voice" in infos[1]:
                         parameter.append(f"{dot_emoji} Die zeit die ein user in einen Voice channel vergringt")
-                    if "on_work" in infos[4]:
+                    if "on_work" in infos[1]:
                         parameter.append(f'{dot_emoji} Das nutzen von Work Commands')
-                    if "off" in infos[4]:
+                    if "off" in infos[1]:
                         parameter.append(f"{dot_emoji} Nichts da es deaktiveirt wurde")
 
                 status = f"\n".join(parameter)
@@ -250,7 +250,7 @@ class EconomySystemSettings(discord.ui.View):
 
             guild_id = interaction.guild.id
 
-            check_status = DatabaseCheck.check_bot_settings(guild=guild_id)
+            check_status = DatabaseCheck.check_economy_settings(guild_id=guild_id)
 
             if check_status == None:
 
@@ -264,12 +264,12 @@ class EconomySystemSettings(discord.ui.View):
 
                 status, new_status, opposite_status = "", "", ""
 
-                if "on_message"  in check_status[4] or "on_voice"  in check_status[4] or "on_work"  in check_status[4] or "on_all" in check_status[4]:
+                if "on_message"  in check_status[1] or "on_voice"  in check_status[1] or "on_work"  in check_status[1] or "on_all" in check_status[1]:
 
                     new_status, status = "Eingeschalten", "off"
                     opposite_status = "Ausgeschalten"
 
-                elif check_status[4] == "off":
+                elif check_status[1] == "off":
 
                     new_status, status = "Ausgeschalten", "on_all"
                     opposite_status = "Eingeschalten"
@@ -348,11 +348,11 @@ class EconomySystem(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def economy_system_settings(self, ctx:commands.Context):
 
-        check_settings = DatabaseCheck.check_bot_settings(guild=ctx.guild.id)
+        check_settings = DatabaseCheck.check_economy_settings(guild_id=ctx.guild.id)
         
         settings_list = []
 
-        if check_settings[4] != "off":
+        if check_settings[1] != "off":
             status = "**off**"
             settings = f"{arrow_emoji} Nichts denn es ist nicht aktiv!"
         else:
@@ -364,10 +364,10 @@ class EconomySystem(commands.Cog):
 
             else:
 
-                settings_list.append("message\n") if check_settings[4] == "on_message" else None
-                settings_list.append("work commands\n") if check_settings[4] == "on_work" else None
-                settings_list.append("voice time\n") if check_settings[4] == "on_voice" else None
-                settings_list.append("mini games\n") if check_settings[4] == "on_mini_games" else None
+                settings_list.append("message\n") if check_settings[1] == "on_message" else None
+                settings_list.append("work commands\n") if check_settings[1] == "on_work" else None
+                settings_list.append("voice time\n") if check_settings[1] == "on_voice" else None
+                settings_list.append("mini games\n") if check_settings[1] == "on_mini_games" else None
         
             settings = f"{dot_emoji} ".join(settings_list)
 
@@ -383,11 +383,11 @@ class EconomySystem(commands.Cog):
     @commands.slash_command(name="show-economy-settings")
     async def show_economy_settings(self, ctx:commands.Context):
 
-        check_settings = DatabaseCheck.check_bot_settings(guild=ctx.guild.id)
+        check_settings = DatabaseCheck.check_economy_settings(guild_id=ctx.guild.id)
         
         settings_list = []
 
-        if check_settings[4] != "off":
+        if check_settings[1] != "off":
             status = "**off**"
             settings = f"{arrow_emoji} Nichts denn es ist nicht aktiv!"
         else:
@@ -399,10 +399,10 @@ class EconomySystem(commands.Cog):
 
             else:
 
-                settings_list.append("message\n") if check_settings[4] == "on_message" else None
-                settings_list.append("work commands\n") if check_settings[4] == "on_work" else None
-                settings_list.append("voice time\n") if check_settings[4] == "on_voice" else None
-                settings_list.append("mini games\n") if check_settings[4] == "on_mini_games" else None
+                settings_list.append("message\n") if check_settings[1] == "on_message" else None
+                settings_list.append("work commands\n") if check_settings[1] == "on_work" else None
+                settings_list.append("voice time\n") if check_settings[1] == "on_voice" else None
+                settings_list.append("mini games\n") if check_settings[1] == "on_mini_games" else None
         
             settings = f"{dot_emoji} ".join(settings_list)
 
@@ -411,6 +411,8 @@ class EconomySystem(commands.Cog):
         emb.add_field(name="Status:", value=f"Der status des Economy systems ist {status}", inline=False)
         emb.add_field(name="Einstellungen:", value=f"Das economy system reagiert auf:\n{settings}", inline=False)
         await ctx.respond(embed=emb)
+
+
 
 
 
@@ -452,16 +454,13 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="remove-channel-economy-blacklist", description="Entferne einen Channel von der Economy system blacklist!")
     @commands.has_permissions(administrator=True)
-    async def remove_channel_economy_blacklist(self, ctx, channel:Option(Union[discord.VoiceChannel, discord.TextChannel])):
+    async def remove_channel_economy_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel])):
 
-        channel_id = channel.id
-        guild_id = ctx.guild.id
-
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, channel=channel_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel=channel.id, table="economy")
 
         if blacklist:
 
-            DatabaseRemoveDatas._remove_economy_system_blacklist(guild_id=guild_id, channel_id=channel_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove",channel_id=channel.id, table="economy")
 
             emb = discord.Embed(title=f"Der channel wurde von der economy system Blacklist entfernt {succesfully_emoji}", 
                 description=f"""Der channel wurde erfolgreich von der economy system Blacklist entfernt wenn du in wieder hinzugügen möchtest benutze den: {add_blacklist_economy_channel} command.
@@ -470,10 +469,10 @@ class EconomySystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"Dieser Channel ist nicht auf der economy system Blacklist {fail_emoji}", 
-                description=f"""Der Channel: <#{channel_id}> ist nicht auf der economy system Blacklist. 
+                description=f"""Der Channel: <#{channel.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden channels sind auf der Blacklist:\n
                 {blacklist[0]}""", color=error_red)
             await ctx.respond(embed=emb)
@@ -481,17 +480,13 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="add-category-economy-blacklist", description="Schliese eine Kategorie von economy system aus!")
     @commands.has_permissions(administrator=True)
-    async def add_category_economy_blacklist(self, ctx, category:Option(discord.CategoryChannel)):
+    async def add_category_economy_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel)):
 
-        guild_id = ctx.guild.id
-        category_id = category.id
-        guild_name = ctx.guild.name
-
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, category=category_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category=category.id, table="economy")
 
         if blacklist:
             
-            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
                 
             emb = discord.Embed(title=f"Diese Category ist bereits auf der economy system Blacklist {fail_emoji}", 
                 description=f"""Auf der economy system Blacklist befinden sich folgende categories:\n
@@ -502,10 +497,10 @@ class EconomySystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, category_id=category_id, table="economy")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, category_id=category.id, table="economy")
 
             emb = discord.Embed(title=f"Diese Category wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
-                description=f"""Die Category: <#{category_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
+                description=f"""Die Category: <#{category.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                 Wenn du sie wieder entfernen möchtest benutze diesen command: 
                 {remove_blacklist_economy_category}""", color=shiro_colour)
             await ctx.respond(embed=emb)
@@ -513,16 +508,13 @@ class EconomySystem(commands.Cog):
     
     @commands.slash_command(name="remove-category-economyblacklist", description="Entfernt eine category von der economy system blacklist!")
     @commands.has_permissions(administrator=True)
-    async def remove_category_economy_blacklist(self, ctx, category:Option(discord.CategoryChannel)):
+    async def remove_category_economy_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel)):
 
-        guild_id = ctx.guild.id
-        category_id = category.id
-
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, category=category_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category=category.id, table="economy")
 
         if blacklist:
 
-            DatabaseRemoveDatas._remove_economy_system_blacklist(guild_id=guild_id, category_id=category_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", category_id=category.id, table="economy")
 
             emb = discord.Embed(title=f"Die Category wurde von der economy system blacklist entfernt {succesfully_emoji}", 
                 description=f"""Die Kategorie wurde erfolgreich von der economy system blacklist entfernt wenn du sie wieder hinzugügen möchtest benutze den: {add_blacklist_economy_category} command.
@@ -531,10 +523,10 @@ class EconomySystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"Diese Kategorie ist nicht auf der economy system Blacklist {fail_emoji}", 
-                description=f"""Die Kategorie: <#{category_id}> ist nicht auf der economy system Blacklist. 
+                description=f"""Die Kategorie: <#{category.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden Kategorien sind auf der Blacklist:\n
                 {blacklist[1]}""", color=error_red)
             await ctx.respond(embed=emb)
@@ -542,17 +534,13 @@ class EconomySystem(commands.Cog):
     
     @commands.slash_command(name="add-role-economy-blacklist")
     @commands.has_permissions(administrator=True)
-    async def add_role_economy_blacklist(self, ctx, role:Option(discord.Role, description="Wähle eine rolle aus die du vom economy system auschlisen möchtest")):
-
-        guild_id = ctx.guild.id
-        role_id = role.id
-        guild_name = ctx.guild.name
+    async def add_role_economy_blacklist(self, ctx:commands.Context, role:Option(discord.Role, description="Wähle eine rolle aus die du vom economy system auschlisen möchtest")):
         
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, role=role_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role=role.id, table="economy")
 
         if blacklist:
             
-            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"Diese rolle ist bereits auf der economy system Blacklist {fail_emoji}", 
                 description=f"""Auf der economy system blacklist befinden sich folgende rollen:\n
@@ -563,10 +551,10 @@ class EconomySystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, role_id=role_id, table="economy")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, role_id=role.id, table="economy")
 
             emb = discord.Embed(title=f"Diese rolle wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
-                description=f"""Die rolle: <@&{role_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
+                description=f"""Die rolle: <@&{role.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                 Wenn du sie wieder entfernen möchtest benutze diesen command: 
                 {remove_blacklist_economy_role}""", color=shiro_colour)
             await ctx.respond(embed=emb)
@@ -574,16 +562,13 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="remove-role-economy-blacklist")
     @commands.has_permissions(administrator=True)
-    async def remove_role_economy_blacklist(self, ctx, role:Option(discord.Role)):
-
-        guild_id = ctx.guild.id
-        role_id = role.id
+    async def remove_role_economy_blacklist(self, ctx:commands.Context, role:Option(discord.Role)):
         
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, role=role_id)
+        blacklist = DatabaseCheck.check_blacklist(guild=ctx.guild.id, role=role.id, table="economy")
 
         if blacklist:
             
-            DatabaseRemoveDatas._remove_economy_system_blacklist(guild_id=guild_id, role_id=role_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", role_id=role.id, table="economy")
 
             emb = discord.Embed(title=f"Die rolle wurde von der economy system blacklist entfernt {succesfully_emoji}", 
                 description=f"""Die Rolle wurde erfolgreich von der economy system blacklist entfernt wenn du sie wieder hinzugügen möchtest benutze den: {add_blacklist_economy_role} command.
@@ -592,10 +577,10 @@ class EconomySystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"Diese Rolle ist nicht auf der economy system Blacklist {fail_emoji}", 
-                description=f"""Die Rolle: <@&{role_id}> ist nicht auf der economy system Blacklist. 
+                description=f"""Die Rolle: <@&{role.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden Rollen sind auf der Blacklist:\n
                 {blacklist[2]}""", color=error_red)
             await ctx.respond(embed=emb)
@@ -603,13 +588,9 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="add-user-economy-blacklist")
     @commands.has_permissions(administrator=True)
-    async def add_user_economy_blacklist(self, ctx, user:Option(discord.Member)):
+    async def add_user_economy_blacklist(self, ctx:commands.Context, user:Option(discord.Member)):
 
-        guild_id = ctx.guild.id
-        user_id = user.id
-        guild_name = ctx.guild.name
-        
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, user=user_id)
+        blacklist = DatabaseCheck.check_blacklist(guild=ctx.guild.id, user=user.id, table="economy")
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb, view=None)
@@ -618,7 +599,7 @@ class EconomySystem(commands.Cog):
 
             if blacklist:
                 
-                blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+                blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
                 emb = discord.Embed(title=f"Dieser user ist bereits auf der economy system Blacklist {fail_emoji}", 
                     description=f"""Auf der economy system blacklist befinden sich folgende users:
@@ -629,10 +610,10 @@ class EconomySystem(commands.Cog):
 
             else:
                 
-                DatabaseUpdates.set_on_blacklist(guild_id=guild_id, guild_name=guild_name, user_id=user_id, table="economy")
+                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, user_id=user.id, table="economy")
 
                 emb = discord.Embed(title=f"Dieser user wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
-                    description=f"""Der user: <@{user_id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
+                    description=f"""Der user: <@{user.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                     Wenn du ihn wieder entfernen möchtest benutze diesen command: 
                     {remove_blacklist_economy_user}""", color=shiro_colour)
                 await ctx.respond(embed=emb)
@@ -640,16 +621,13 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="remove-user-economy-blacklist", description="Streiche einen user von der blacklist!")
     @commands.has_permissions(administrator=True)
-    async def remove_user_economy_blacklist(self, ctx, user:Option(discord.Member, description="Wähle einen User den du von der blacklist steichen möchtest!")):
+    async def remove_user_economy_blacklist(self, ctx:commands.Context, user:Option(discord.Member, description="Wähle einen User den du von der blacklist steichen möchtest!")):
 
-        guild_id = ctx.guild.id 
-        user_id = user.id
-
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id, user=user_id)
+        blacklist = DatabaseCheck.check_blacklist(guild=ctx.guild.id, user=user.id, table="economy")
 
         if blacklist:
             
-            DatabaseRemoveDatas._remove_economy_system_blacklist(guild_id=guild_id, user_id=user_id)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", user_id=user.id, table="economy")
 
             emb = discord.Embed(title=f"Der user wurde von der economy system blacklist entfernt {succesfully_emoji}", 
                 description=f"""Der user wurde erfolgreich von der economy system blacklist entfernt wenn du ihn wieder hinzugügen möchtest benutze den: {add_blacklist_economy_user} command.
@@ -658,10 +636,10 @@ class EconomySystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=guild_id)
+            blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"Dieser user ist nicht auf der economy system Blacklist {fail_emoji}", 
-                description=f"""Der user: <@{user_id}> ist nicht auf der economy system Blacklist. 
+                description=f"""Der user: <@{user.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden users sind auf der Blacklist:\n
                 {blacklist[3]}""", color=error_red)
             await ctx.respond(embed=emb)
@@ -669,10 +647,9 @@ class EconomySystem(commands.Cog):
 
     @commands.slash_command(name="reset-economy-blacklist", description="Setze die gesammte blacklist zurück!")
     @commands.has_permissions(administrator=True)
-    async def reset_economy_blacklist(self, ctx):
+    async def reset_economy_blacklist(self, ctx:commands.Context):
         
-        guild_id = ctx.guild.id
-        blacklist = DatabaseCheck.check_economy_system_blacklist(guild=guild_id)
+        blacklist = DatabaseCheck.check_blacklist(guild=ctx.guild.id, table="economy")
 
         if blacklist:
 
