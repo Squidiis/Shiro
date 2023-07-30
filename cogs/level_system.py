@@ -632,13 +632,13 @@ class LevelSystem(commands.Cog):
         if message.author.bot:
             return 
 
-        check_levelsystem_control = DatabaseStatusCheck._level_system_status(guild_id=message.guild.id)
+        check_settings = DatabaseStatusCheck._level_system_status(guild_id=message.guild.id)
         
-        if check_levelsystem_control == False:
+        if check_settings == None:
+            DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
             return
         
-        if check_levelsystem_control == None:
-            DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
+        elif check_settings == False:
             return
                 
         # Blacklist check
@@ -1614,12 +1614,12 @@ class LevelSystem(commands.Cog):
         small_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 24)
 
         background = Image.new("RGBA", (885, 303), color=background_color)
-        new_background = round_corner_mask(radius=87, rectangle=background, fill=255)
+        new_background = round_corner_mask(radius=50, rectangle=background, fill=255)
         background.paste(new_background[0], (0, 0), new_background[1])
 
         img = Image.open("assets/rank-card/card2.png").resize((867, 285))
         filtered_image = img.filter(ImageFilter.BoxBlur(4))
-        new_img = round_corner_mask(radius=87, rectangle=filtered_image, fill=255)
+        new_img = round_corner_mask(radius=50, rectangle=filtered_image, fill=255)
         background.paste(new_img[0], (9, 9), mask=new_img[1])
 
         # Get the profile picture and set it on the background
@@ -1657,7 +1657,7 @@ class LevelSystem(commands.Cog):
         draw.rounded_rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), radius=13, fill=background_color)
 
         xp_display_line = Image.new(mode="RGBA", size=(380, 33), color=(0, 0, 0))
-        xp_display_line = round_corner_mask(radius=45, rectangle=xp_display_line, fill=160)
+        xp_display_line = round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
         offset_x = 304
         offset_y = bar_offset_y_1 + 33
         background.paste(xp_display_line[0], (offset_x, offset_y), xp_display_line[1])
@@ -1712,29 +1712,6 @@ class VoiceLevelSystem(commands.Cog):
         user_id = member.id
         check_settings = DatabaseStatusCheck._level_system_status(guild_id=guild_id)
         
-        if check_settings:
-
-            if check_settings == False:
-                return
-            
-            else:
-
-                if not member.voice:
-                    try:
-
-                        call_length = round(datetime.time())
-                        
-
-                    except KeyError:
-                        return
-                    
-                else:
-
-                    call_length = round(datetime.time())
-        
-        else:
-
-            DatabaseUpdates._create_bot_settings(guild_id=guild_id)
         
        
 

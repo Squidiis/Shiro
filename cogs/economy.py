@@ -314,11 +314,15 @@ class EconomySystem(commands.Cog):
         if message.content.startswith("?"):
             return
 
-        economy_system_status = DatabaseStatusCheck._economy_system_status(guild_id=message.guild.id)
-        if economy_system_status == True:
+        economy_settings = DatabaseStatusCheck._economy_system_status(guild_id=message.guild.id, text="check")
+        
+        if economy_settings == False:
             return
-        elif economy_system_status == None:
+        
+        elif economy_settings == None:
             DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
+            return
+        
         else:
 
             # checks the blacklist
