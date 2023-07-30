@@ -1601,145 +1601,25 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command()
-    async def test(self, ctx, user:Option(discord.Member)):
-
-        level = 999
-        rank = 544
-        final_xp = 1000
-        xp = 400
-        user_name = user.name
-
-        # Text fronts
-        big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 55)
-        medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 35)
-        rank_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 25)
-        small_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 30)
-        very_small_fron = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 20)
-
-        img = Image.open("assets/rank-card/card2.png")
-        new = Image.new('RGBA', img.size, (255, 255, 255, 0))
-
-        draw = ImageDraw.Draw(new)
-        rectangle_width = 850
-        rectangle_height = 270
-        left = img.width // 2 - rectangle_width // 2
-        top = img.height // 2 - rectangle_height // 2
-        right = left + rectangle_width
-        bottom = top + rectangle_height
-        draw.rectangle([(left, top), (right, bottom)], fill=(0, 0, 0, 130))
-        out = Image.alpha_composite(img, new)
-
-        pfp = BytesIO(await user.display_avatar.read())
-        profile = Image.open(pfp).resize((170, 170))
-        bigsize = (profile.size[0] * 3, profile.size[1] * 3)
-        mask = Image.new("L", bigsize, 0)
-        draw = ImageDraw.Draw(mask)
-        draw.ellipse((0, 0)+ bigsize, 255)
-        mask = mask.resize(profile.size, Image.ANTIALIAS)
-        profile.putalpha(mask)
-
-        img.paste(out)
-        img.paste(profile, (20, 20), mask=mask)
-
-        # Bar
-        bar = Image.new('RGBA', img.size, (255, 255, 255, 0))
-        draw = ImageDraw.Draw(bar)
-
-        bar_offset_x = 210
-        bar_offset_y = 230
-        bar_offset_x_1 = 820
-        bar_offset_y_1 = 270
-        circle_size = bar_offset_y_1 - bar_offset_y 
-        circle_size = bar_offset_y_1 - bar_offset_y  # Diameter
-
-        # Progress Bar
-        draw.rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), fill=(0, 0, 0, 160))
-        draw.ellipse((bar_offset_x - circle_size // 2, bar_offset_y, bar_offset_x + circle_size // 2, bar_offset_y_1), fill=(0, 0, 0, 160))
-        draw.ellipse((bar_offset_x_1 - circle_size // 2, bar_offset_y, bar_offset_x_1 + circle_size // 2, bar_offset_y_1), fill=(0, 0, 0, 160))
-
-        # Filling Bar
-        bar_length = bar_offset_x_1 - bar_offset_x
-        progress = (final_xp - xp) * 100 / final_xp
-        progress = 100 - progress
-        progress_bar_length = round(bar_length * progress / 100)
-        bar_offset_x_1 = bar_offset_x + progress_bar_length
-
-        # Filling the Progress Bar
-        draw.rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), fill="#11ebf2")
-        draw.ellipse((bar_offset_x - circle_size // 2, bar_offset_y, bar_offset_x + circle_size // 2, bar_offset_y_1), fill="#11ebf2")
-        draw.ellipse((bar_offset_x_1 - circle_size // 2, bar_offset_y, bar_offset_x_1 + circle_size // 2, bar_offset_y_1), fill="#11ebf2")
-
-        text_size = draw.textsize(f"/ {final_xp} XP", font=small_font)    
-        offset_x = 810 - text_size[0]
-        offset_y = bar_offset_y - text_size[1] - 10
-        draw.text((offset_x, offset_y), f"/ {final_xp:,} XP", font=small_font, fill="#727175")
-
-        text_size = draw.textsize(f"{xp:,}", font=small_font)
-        offset_x -= text_size[0] + 8
-        draw.text((offset_x, offset_y), f"{xp:,}", font=small_font, fill="#fff")
-
-
-        text_size = draw.textsize(f"Rank:", font=rank_font)
-        offset_x = 205
-        draw.text((offset_x, offset_y + 5), f"Rank:", font=rank_font, fill="#fff")
-
-        text_size = draw.textsize(f"#{rank}", font=medium_font)
-        offset_x = 275
-        draw.text((offset_x, offset_y - 5), f"#{rank}", font=medium_font, fill="#fff")
-
-        text_size = draw.textsize(str(level), font=big_font)
-        if level <= 9:
-            offset_x = 205 - text_size[1]
-        elif level <= 99:
-            offset_x = 174 - text_size[1]
-        elif level <= 999:
-            offset_x = 141 - text_size[1]
-        offset_y = bar_offset_y - 10
-        draw.text((offset_x, offset_y), str(level), font=big_font, fill="white")
-
-        text_size = draw.textsize("LVL", font=very_small_fron)
-        if level <= 9:
-            offset_x = 144
-        elif level <= 99:
-            offset_x = 128
-        elif level <= 999:
-            offset_x = 121
-        draw.text((offset_x, offset_y - 15), "LVL", font=very_small_fron, fill="white")
-        
-        # Blitting Name
-        text_size = draw.textsize(user_name, font=big_font)
-        offset_x = 200
-        offset_y = 80
-        draw.text((offset_x, offset_y), user_name, font=big_font, fill="#fff")
-
-        bar_out = Image.alpha_composite(img, bar)
-        img.paste(bar_out)
-
-        bytes = BytesIO()
-        img.save(bytes, format="PNG")
-        bytes.seek(0)
-        dfile = discord.File(bytes, filename="card.png")
-        await ctx.respond(file=dfile)
-
-
     @commands.command()
     async def test2(self, ctx, user:discord.User):
         
         background_color = (8, 120, 151)
         user_name = user.name
-        final_xp = 1000
-        xp = 100
+        final_xp = 5000
+        xp = 400
+        rank = 1
 
-        medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 35)
+        medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
+        small_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 24)
 
         background = Image.new("RGBA", (885, 303), color=background_color)
-        new_background = round_corner_mask(radius=87, rectangle=background)
+        new_background = round_corner_mask(radius=87, rectangle=background, fill=255)
         background.paste(new_background[0], (0, 0), new_background[1])
 
         img = Image.open("assets/rank-card/card2.png").resize((867, 285))
         filtered_image = img.filter(ImageFilter.BoxBlur(4))
-        new_img = round_corner_mask(radius=87, rectangle=filtered_image)
+        new_img = round_corner_mask(radius=87, rectangle=filtered_image, fill=255)
         background.paste(new_img[0], (9, 9), mask=new_img[1])
 
         # Get the profile picture and set it on the background
@@ -1755,7 +1635,7 @@ class LevelSystem(commands.Cog):
         background.paste(profile, (47, 39), mask=mask)
 
 
-        bar = Image.new('RGBA', background.size, (255, 255, 255, 0))
+        bar = Image.new('RGBA', background.size, (0, 0, 0, 0))
         draw = ImageDraw.Draw(bar)
 
         bar_offset_x = 304
@@ -1776,6 +1656,18 @@ class LevelSystem(commands.Cog):
         # Filling the Progress Bar
         draw.rounded_rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), radius=13, fill=background_color)
 
+        xp_display_line = Image.new(mode="RGBA", size=(380, 33), color=(0, 0, 0))
+        xp_display_line = round_corner_mask(radius=45, rectangle=xp_display_line, fill=160)
+        offset_x = 304
+        offset_y = bar_offset_y_1 + 33
+        background.paste(xp_display_line[0], (offset_x, offset_y), xp_display_line[1])
+
+        # Blitting Name
+        draw.text((offset_x, 97), user_name, font=medium_font, fill=(255, 255, 255))
+
+        offset_x = 315
+        offset_y = offset_y + 2
+        draw.text((offset_x, offset_y), f"{xp:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
 
         bar_out = Image.alpha_composite(background, bar)
         background.paste(bar_out)
@@ -1786,12 +1678,12 @@ class LevelSystem(commands.Cog):
         dfile = discord.File(bytes, filename="card.png")
         await ctx.send(file=dfile)
 
-def round_corner_mask(radius, rectangle):
+def round_corner_mask(radius, rectangle, fill):
     
     bigsize = (rectangle.size[0] * 3, rectangle.size[1] * 3)
     mask_rectangle = Image.new('L', bigsize, 0)
     draw = ImageDraw.Draw(mask_rectangle)
-    draw.rounded_rectangle((0, 0)+bigsize, radius=radius, fill=(255), outline=None)
+    draw.rounded_rectangle((0, 0)+bigsize, radius=radius, fill=fill, outline=None)
     mask = mask_rectangle.resize(rectangle.size, Image.ANTIALIAS)
     rectangle.putalpha(mask)
     return (rectangle, mask)
@@ -1809,24 +1701,39 @@ class VoiceLevelSystem(commands.Cog):
 
     # Testen und neu Optimieren
     @commands.Cog.listener()
-    async def on_voice_state_update(self, member:discord.Member, before: discord.VoiceState, after:discord.VoiceState):
+    async def on_voice_state_update(self, member:discord.Member, before:discord.VoiceState, after:discord.VoiceState):
         
+        print(f"before: {before}")
+        print(f"after: {after}")
         if member.bot:
             return
         
         guild_id = member.guild.id
         user_id = member.id
-
-        channel_id = before.channel.id
-        print(channel_id)
-        print(before)
-
-        check_levelsys_control = DatabaseStatusCheck._level_system_status(guild_id=guild_id)
-        print(check_levelsys_control)
-        if check_levelsys_control == False:
-            return
+        check_settings = DatabaseStatusCheck._level_system_status(guild_id=guild_id)
         
-        elif check_levelsys_control == None:
+        if check_settings:
+
+            if check_settings == False:
+                return
+            
+            else:
+
+                if not member.voice:
+                    try:
+
+                        call_length = round(datetime.time())
+                        
+
+                    except KeyError:
+                        return
+                    
+                else:
+
+                    call_length = round(datetime.time())
+        
+        else:
+
             DatabaseUpdates._create_bot_settings(guild_id=guild_id)
         
        

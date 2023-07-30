@@ -63,7 +63,7 @@ class DatabaseStatusCheck():
     def _level_system_status(guild_id:int):
 
         levelsystem_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
-
+        # Anpassen das es auch überprüft ob voice und so an ist!
         if levelsystem_status:
 
             if levelsystem_status[2] == "on":
@@ -261,7 +261,7 @@ class DatabaseCheck():
         level_settings_check = "SELECT * FROM LevelSystemSettings WHERE guildId = %s"
         level_settings_check_values = [guild_id]
         cursor.execute(level_settings_check, level_settings_check_values)
-        level_system_settings = db_connect.commit()
+        level_system_settings = cursor.fetchone()
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return level_system_settings
