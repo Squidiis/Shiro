@@ -65,21 +65,22 @@ show_blacklist_level = ""
 give_money = ""
 remove_money = ""
 
+class Emojis:
 # Emojis
-arrow_emoji = "<a:shiro_arrow:1092443788900831355>"
-load_emoji = "<a:shiro_load:1092862133181612133>"
-fail_emoji = "<a:shiro_failed:1092862110381383762>"
-diamond_emoji = "<a:shiro_diamant:1092862078731161771>"
-fire_emoji = "<a:shiro_blueflame:1092862057432481792>"
-dot_emoji = "<:shiro_dot_blue:1092871145075781662>"
-ban_hammer_emoji = "<:shiro_hammer:1092871051500855297>"
-party_girl_emoji = "<a:shiro_partygirl:1092871048879419412>"
-settings_emoji = "<a:shiro_settings:1092871148494143499>"
-help_emoji = "<:shiro_help:1092872576017109033>"
-dollar_emoji = "<:shiro_dollar:1092876159894683712>"
-dollar_animation_emoji = "<a:shiro_dollar_animation:1092876162805534820>"
-exclamation_mark_emoji = "<a:shiro_important:1092870970785665055>"
-succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
+    arrow_emoji = "<a:shiro_arrow:1092443788900831355>"
+    load_emoji = "<a:shiro_load:1092862133181612133>"
+    fail_emoji = "<a:shiro_failed:1092862110381383762>"
+    diamond_emoji = "<a:shiro_diamant:1092862078731161771>"
+    fire_emoji = "<a:shiro_blueflame:1092862057432481792>"
+    dot_emoji = "<:shiro_dot_blue:1092871145075781662>"
+    ban_hammer_emoji = "<:shiro_hammer:1092871051500855297>"
+    party_girl_emoji = "<a:shiro_partygirl:1092871048879419412>"
+    settings_emoji = "<a:shiro_settings:1092871148494143499>"
+    help_emoji = "<:shiro_help:1092872576017109033>"
+    dollar_emoji = "<:shiro_dollar:1092876159894683712>"
+    dollar_animation_emoji = "<a:shiro_dollar_animation:1092876162805534820>"
+    exclamation_mark_emoji = "<a:shiro_important:1092870970785665055>"
+    succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
         
 
 
@@ -102,11 +103,11 @@ shiro_colour = 0x89d7ff
 
 no_permissions_emb = discord.Embed(title="Du bist nicht berechtigt", description=f"Du bist nicht berechtigt diesen Knopf zu drücken nur admins durfen mit diesen Command interagieren",color = error_red)
 
-user_bot_emb = discord.Embed(title=f"Der nutzer ist ein bot {fail_emoji}", 
+user_bot_emb = discord.Embed(title=f"Der nutzer ist ein bot {Emojis.fail_emoji}", 
     description=f"Der nutzer den du ausgewählt hast ist ein bot und kann nicht in diesen Command auswewählt werden!", color=error_red)
 
-user_not_found_emb = discord.Embed(title=f"Der user wurde nicht gefunden {fail_emoji}", 
-    description=f"{dot_emoji} Es wurde kein eintrag gefunden der user befindet sich auch nicht mehr auf den server {exclamation_mark_emoji}", color=error_red)
+user_not_found_emb = discord.Embed(title=f"Der user wurde nicht gefunden {Emojis.fail_emoji}", 
+    description=f"{Emojis.dot_emoji} Es wurde kein eintrag gefunden der user befindet sich auch nicht mehr auf den server {Emojis.exclamation_mark_emoji}", color=error_red)
 
 
 class Help_menu(discord.Cog):

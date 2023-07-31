@@ -203,8 +203,8 @@ class ApplicationButton(discord.ui.View):
 
         emb = discord.Embed(title=f"Wait here for a moment, an admin will contact you in a moment", 
             description=f"An admin will get right back to you on this channel!", color=0x09ebdf)
-        emb.add_field(name=f"Infos {help_emoji}", 
-            value=f"{dot_emoji} user: {interaction.user.mention}\n{dot_emoji} Id: {interaction.user.id}\n{dot_emoji} Advertising as: {select.values[0]}")
+        emb.add_field(name=f"Infos {Emojis.help_emoji}", 
+            value=f"{Emojis.dot_emoji} user: {interaction.user.mention}\n{Emojis.dot_emoji} Id: {interaction.user.id}\n{Emojis.dot_emoji} Advertising as: {select.values[0]}")
         emb.set_footer(icon_url=interaction.user.avatar.url, text=f"Applicant: {interaction.user.name}")
         await channels.send(embed=emb)
 
