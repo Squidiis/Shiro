@@ -14,6 +14,7 @@ from discord.ui import Select, View, Button, Modal
 from discord.commands import Option
 from PIL import Image
 from sql_function import *
+import yaml
 
 
 """
@@ -87,7 +88,10 @@ succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
 intent = discord.Intents.default()
 intent.members = True
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="$", intents=intents)
+with open("config.yaml", 'w') as f:
+    data = yaml.safe_load(f)
+
+bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
 
 
 bot.remove_command("help")

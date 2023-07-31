@@ -1606,12 +1606,14 @@ class LevelSystem(commands.Cog):
         
         background_color = (8, 120, 151)
         user_name = user.name
-        final_xp = 5000
-        xp = 400
+        final_xp = 500000
+        xp = 400000
         rank = 1
+        level = 100
 
         medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
-        small_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 24)
+        small_font = ImageFont.truetype("arial.ttf", 25)
+
 
         background = Image.new("RGBA", (885, 303), color=background_color)
         new_background = round_corner_mask(radius=50, rectangle=background, fill=255)
@@ -1668,6 +1670,9 @@ class LevelSystem(commands.Cog):
         offset_x = 315
         offset_y = offset_y + 2
         draw.text((offset_x, offset_y), f"{xp:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
+
+        offset_x = 568 if level < 100 else 555
+        draw.text((offset_x, offset_y), f"#{rank} Lvl {level}", font=small_font, fill=(255, 255, 255))
 
         bar_out = Image.alpha_composite(background, bar)
         background.paste(bar_out)
