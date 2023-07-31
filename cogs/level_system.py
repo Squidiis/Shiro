@@ -1635,7 +1635,6 @@ class LevelSystem(commands.Cog):
 
         background.paste(profile, (47, 39), mask=mask)
 
-
         bar = Image.new('RGBA', background.size, (0, 0, 0, 0))
         draw = ImageDraw.Draw(bar)
 
@@ -1685,6 +1684,7 @@ class LevelSystem(commands.Cog):
         dfile = discord.File(bytes, filename="card.png")
         await ctx.send(file=dfile)
 
+
 def round_corner_mask(radius, rectangle, fill):
     
     bigsize = (rectangle.size[0] * 3, rectangle.size[1] * 3)
@@ -1710,13 +1710,13 @@ class VoiceLevelSystem(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member:discord.Member, before:discord.VoiceState, after:discord.VoiceState):
         
-        print(f"before: {before}")
-        print(f"after: {after}")
+        
         if member.bot:
             return
         
         guild_id = member.guild.id
         user_id = member.id
+
         check_settings = DatabaseStatusCheck._level_system_status(guild_id=guild_id)
         
         
