@@ -1606,14 +1606,13 @@ class LevelSystem(commands.Cog):
         
         background_color = (8, 120, 151)
         user_name = user.name
-        final_xp = 500000
-        xp = 400000
-        rank = 1
+        final_xp = 5000000
+        xp = 4000000
+        rank = 100
         level = 100
 
-        medium_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
-        small_font = ImageFont.truetype("arial.ttf", 25)
-
+        big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
+        small_font = ImageFont.truetype("arial.ttf", 24)
 
         background = Image.new("RGBA", (885, 303), color=background_color)
         new_background = round_corner_mask(radius=50, rectangle=background, fill=255)
@@ -1658,20 +1657,23 @@ class LevelSystem(commands.Cog):
         # Filling the Progress Bar
         draw.rounded_rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), radius=13, fill=background_color)
 
-        xp_display_line = Image.new(mode="RGBA", size=(380, 33), color=(0, 0, 0))
+        xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
         xp_display_line = round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
-        offset_x = 304
         offset_y = bar_offset_y_1 + 33
-        background.paste(xp_display_line[0], (offset_x, offset_y), xp_display_line[1])
+        background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
+
+        data_display = Image.new(mode="RGBA", size=(200, 33), color=(0, 0, 0))
+        data_display = round_corner_mask(radius=50, rectangle=data_display, fill=160)
+        background.paste(data_display[0], (655, offset_y), data_display[1])
 
         # Blitting Name
-        draw.text((offset_x, 97), user_name, font=medium_font, fill=(255, 255, 255))
+        draw.text((304, 97), user_name, font=big_font, fill=(255, 255, 255))
 
         offset_x = 315
         offset_y = offset_y + 2
         draw.text((offset_x, offset_y), f"{xp:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
 
-        offset_x = 568 if level < 100 else 555
+        offset_x = 665
         draw.text((offset_x, offset_y), f"#{rank} Lvl {level}", font=small_font, fill=(255, 255, 255))
 
         bar_out = Image.alpha_composite(background, bar)

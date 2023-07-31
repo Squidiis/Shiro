@@ -88,7 +88,7 @@ succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
 intent = discord.Intents.default()
 intent.members = True
 intents = discord.Intents.all()
-with open("config.yaml", 'w') as f:
+with open("config.yaml", 'r') as f:
     data = yaml.safe_load(f)
 
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)

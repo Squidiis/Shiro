@@ -1,1 +1,10 @@
 Prefix: "$"
+
+
+
+#####################  Rank settings  ######################
+
+# This is the default value of the blur effect of the Rank card
+Blur_effect: 4
+
+
