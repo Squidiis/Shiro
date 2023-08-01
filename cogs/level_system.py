@@ -1635,16 +1635,16 @@ class LevelSystem(commands.Cog):
 
         background.paste(profile, (47, 39), mask=mask)
 
-        bar = Image.new('RGBA', background.size, (0, 0, 0, 0))
-        draw = ImageDraw.Draw(bar)
+        draw = ImageDraw.Draw(background)
 
         bar_offset_x = 304
         bar_offset_y = 179
         bar_offset_x_1 = 849
         bar_offset_y_1 = 214
 
-        # Progress Bar
-        draw.rounded_rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), radius=13 ,fill=(0, 0, 0, 160))
+        bar = Image.new('RGBA', (545, 36), (0, 0, 0))
+        bar = round_corner_mask(radius=50, rectangle=bar, fill=160)
+        background.paste(bar[0], (bar_offset_x, bar_offset_y), bar[1])
 
         # Filling Bar
         bar_length = bar_offset_x_1 - bar_offset_x
@@ -1652,9 +1652,11 @@ class LevelSystem(commands.Cog):
         progress = 100 - progress
         progress_bar_length = round(bar_length * progress / 100)
         bar_offset_x_1 = bar_offset_x + progress_bar_length
-
-        # Filling the Progress Bar
-        draw.rounded_rectangle((bar_offset_x, bar_offset_y, bar_offset_x_1, bar_offset_y_1), radius=13, fill=background_color)
+        print(bar_offset_x_1)
+        # Progress Bar
+        progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
+        progress_bar = round_corner_mask(radius=50, rectangle=progress_bar, fill=255)
+        background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
 
         xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
         xp_display_line = round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
@@ -1674,9 +1676,6 @@ class LevelSystem(commands.Cog):
 
         offset_x = 665
         draw.text((offset_x, offset_y), f"#{rank} Lvl {level}", font=small_font, fill=(255, 255, 255))
-
-        bar_out = Image.alpha_composite(background, bar)
-        background.paste(bar_out)
 
         bytes = BytesIO()
         background.save(bytes, format="PNG")
