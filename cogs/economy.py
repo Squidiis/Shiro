@@ -21,9 +21,9 @@ class ResetEconomyStatsButton(discord.ui.View):
             guild_id = interaction.guild.id
             DatabaseRemoveDatas._remove_economy_system_stats(guild_id=guild_id)
 
-            emb = discord.Embed(title=f"Du hast alle stats des economy systems zurückgesetzt {succesfully_emoji}", 
-                description=f"""{arrow_emoji} Alle user datein wurden gelöscht jeder user hat jetzt wieder 0 coins.
-                Es werden wieder bei aktivitäht neue enträge erstellt, wenn sie das nicht möchten stellen sie das economy system aus {exclamation_mark_emoji}""", color=shiro_colour)
+            emb = discord.Embed(title=f"Du hast alle stats des economy systems zurückgesetzt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.arrow_emoji} Alle user datein wurden gelöscht jeder user hat jetzt wieder 0 coins.
+                Es werden wieder bei aktivitäht neue enträge erstellt, wenn sie das nicht möchten stellen sie das economy system aus {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -36,8 +36,8 @@ class ResetEconomyStatsButton(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {succesfully_emoji}", 
-                description=f"""{dot_emoji} Das resetten der stats wurde erfolgreich abgebrochen.
+            emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Das resetten der stats wurde erfolgreich abgebrochen.
                 Alle user behalten Ihre stats im economy system.""", color=shiro_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
@@ -59,9 +59,9 @@ class ResetBlacklistEconomyButton(discord.ui.View):
             guild_id = interaction.guild.id
 
             DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", table="economy")
-            emb = discord.Embed(title=f"Die blacklist wurde geresetet {succesfully_emoji}", 
-                description=f"""{arrow_emoji} alle Channel, User, Rollen und Kategorien wurden von der Blacklist entfernt.
-                Wenn du wieder Dinge auf die Blacklist setzten möchtest kannst du die Befehle wie zuvor nutzen {exclamation_mark_emoji}""", color=shiro_colour)
+            emb = discord.Embed(title=f"Die blacklist wurde geresetet {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.arrow_emoji} alle Channel, User, Rollen und Kategorien wurden von der Blacklist entfernt.
+                Wenn du wieder Dinge auf die Blacklist setzten möchtest kannst du die Befehle wie zuvor nutzen {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -74,10 +74,10 @@ class ResetBlacklistEconomyButton(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {succesfully_emoji}", 
-                description=f"""{dot_emoji} Das resetten der blacklist wurde erfolgreich abgebrochen.
+            emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Das resetten der blacklist wurde erfolgreich abgebrochen.
                 Alle Channels, Rollen, Kategorien und User sind weiterhin auf der blacklist gelistet.
-                {dot_emoji} Wenn du einzelne elemente von der blacklist steichen möchtest kannst du sie mit den Remove commands streichen lassen {exclamation_mark_emoji}""", color=shiro_colour)
+                {Emojis.dot_emoji} Wenn du einzelne elemente von der blacklist steichen möchtest kannst du sie mit den Remove commands streichen lassen {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -95,7 +95,7 @@ class ResetBlacklistEconomyButton(discord.ui.View):
             
             channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
-            emb = discord.Embed(title=f"Hier siehst du alle Elemente die auf der Blacklist stehen {exclamation_mark_emoji}", 
+            emb = discord.Embed(title=f"Hier siehst du alle Elemente die auf der Blacklist stehen {Emojis.exclamation_mark_emoji}", 
                 description=f"""Hier sind alle Elemente aufgelistet die auf der Blacklist stehen.""", color=shiro_colour)
             emb.add_field(name="Channels:", value=f"{channel}", inline=False)
             emb.add_field(name="Categories:", value=f"{category}", inline=False)
@@ -159,15 +159,15 @@ class EconomySystemSettings(discord.ui.View):
             for values in select.values:
                 
                 if values == "message":
-                    parameter.append(f"{dot_emoji} message\n")
+                    parameter.append(f"{Emojis.dot_emoji} message\n")
                     _insert_parameter.append("on_message")
 
                 if values == "work":
-                    parameter.append(f"{dot_emoji} work\n")
+                    parameter.append(f"{Emojis.dot_emoji} work\n")
                     _insert_parameter.append("on_work")
 
                 if values == "voice":
-                    parameter.append(f"{dot_emoji} voice\n")
+                    parameter.append(f"{Emojis.dot_emoji} voice\n")
                     _insert_parameter.append("on_voice")
 
                 if "on_voice" in _insert_parameter and "on_work" in _insert_parameter and "on_message" in _insert_parameter:
@@ -179,7 +179,7 @@ class EconomySystemSettings(discord.ui.View):
            
             DatabaseUpdates._update_status_economy(status=insert_parameter, guild_id=guild_id)
                 
-            emb = discord.Embed(title=f"Das Economy system ist jetzt eingestellt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Das Economy system ist jetzt eingestellt {Emojis.succesfully_emoji}", 
                 description=f"""Das Economy system reagiert ab jetzt auf:
                 {all_parameter}
                 Wenn du diese einstellungen ändern möchtest führen sie diesen command noch einmal aus
@@ -187,7 +187,7 @@ class EconomySystemSettings(discord.ui.View):
             await interaction.response.send_message(embed=emb, ephemeral=True, view=None) 
 
                 
-    @discord.ui.button(label="Click my for Help", style=discord.ButtonStyle.green, custom_id="help_button", emoji=help_emoji)
+    @discord.ui.button(label="Click my for Help", style=discord.ButtonStyle.green, custom_id="help_button", emoji=Emojis.help_emoji)
     async def help_button_economy_system(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -205,31 +205,31 @@ class EconomySystemSettings(discord.ui.View):
 
                 parameter = []
                 if "on_all" in infos[1]:
-                    parameter.append(f"{dot_emoji} Alles auf Nachrichten, Voice time und Work commands")
+                    parameter.append(f"{Emojis.dot_emoji} Alles auf Nachrichten, Voice time und Work commands")
                 else:
                     if "on_message" in infos[1]:
-                        parameter.append(f"{dot_emoji} Das schicken von Nachrichten")
+                        parameter.append(f"{Emojis.dot_emoji} Das schicken von Nachrichten")
                     if "on_voice" in infos[1]:
-                        parameter.append(f"{dot_emoji} Die zeit die ein user in einen Voice channel vergringt")
+                        parameter.append(f"{Emojis.dot_emoji} Die zeit die ein user in einen Voice channel vergringt")
                     if "on_work" in infos[1]:
-                        parameter.append(f'{dot_emoji} Das nutzen von Work Commands')
+                        parameter.append(f'{Emojis.dot_emoji} Das nutzen von Work Commands')
                     if "off" in infos[1]:
-                        parameter.append(f"{dot_emoji} Nichts da es deaktiveirt wurde")
+                        parameter.append(f"{Emojis.dot_emoji} Nichts da es deaktiveirt wurde")
 
                 status = f"\n".join(parameter)
-            help_embed = discord.Embed(title=f"Hilfe zum einstellen des Economy systems {help_emoji}", 
+            help_embed = discord.Embed(title=f"Hilfe zum einstellen des Economy systems {Emojis.help_emoji}", 
                 description=f"""
                 Das Economy system ist ein system bei denen akktivitäten mit coins belohnt werden dabei kann man auswählen was belohnt wird: 
 
-                {dot_emoji} Nachrichten.
-                {dot_emoji} Voice zeit.
-                {dot_emoji} Benutzen von den Fun work commands.
+                {Emojis.dot_emoji} Nachrichten.
+                {Emojis.dot_emoji} Voice zeit.
+                {Emojis.dot_emoji} Benutzen von den Fun work commands.
 
                 Es ist auch möglich alles auzuwählen.
                 Du kann auch ein Individuelles Genre wählen.
-                Auch ist es möglich seine coins im shop auszugeben {dollar_animation_emoji},
+                Auch ist es möglich seine coins im shop auszugeben {Emojis.dollar_animation_emoji},
                 für mehr informatinen dazu kannst du unten auf die Knöpfe drücken""", color=shiro_colour)
-            help_embed.add_field(name=f"Status {settings_emoji}", value=f"Das economy system belohnt:\n{status}", inline= False)
+            help_embed.add_field(name=f"Status {Emojis.settings_emoji}", value=f"Das economy system belohnt:\n{status}", inline= False)
             help_embed.add_field(name="Was bringt das economy system", 
                 value="Es soll bei der steigerung der server aktivität und beim wacksen deiner Community Helfen", inline=True)
             help_embed.add_field(name="Steuerung", 
@@ -254,10 +254,10 @@ class EconomySystemSettings(discord.ui.View):
 
             if check_status == None:
 
-                emb = discord.Embed(title=f"Es wurde kein eintrag gefunden {fail_emoji}", 
+                emb = discord.Embed(title=f"Es wurde kein eintrag gefunden {Emojis.fail_emoji}", 
                     description=f"""Es wurde kein eintrag gefunden deshalb wurde einer für dein server erstellt. 
-                    {dot_emoji} Das Economy system wurde auch gleich automatisch eingeschalten.
-                    {dot_emoji} Wenn du es deaktivieren möchtest benutzen sie diesen command einfach noch einmal""", color=error_red)
+                    {Emojis.dot_emoji} Das Economy system wurde auch gleich automatisch eingeschalten.
+                    {Emojis.dot_emoji} Wenn du es deaktivieren möchtest benutzen sie diesen command einfach noch einmal""", color=error_red)
                 await interaction.response.edit_message(embed=emb)
 
             else:
@@ -278,7 +278,7 @@ class EconomySystemSettings(discord.ui.View):
 
                 emb = discord.Embed(title=f"Das economy system wurde {new_status}", 
                     description=f"""Sie haben das Economy system erfolgreich {new_status}.
-                    {dot_emoji} Wenn sie das economy system wieder {opposite_status} wollen benutzen sie diesen command einfach noch einmal {exclamation_mark_emoji}""", color=shiro_colour)
+                    {Emojis.dot_emoji} Wenn sie das economy system wieder {opposite_status} wollen benutzen sie diesen command einfach noch einmal {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -358,13 +358,13 @@ class EconomySystem(commands.Cog):
 
         if check_settings[1] != "off":
             status = "**off**"
-            settings = f"{arrow_emoji} Nichts denn es ist nicht aktiv!"
+            settings = f"{Emojis.arrow_emoji} Nichts denn es ist nicht aktiv!"
         else:
             status = "**on**"
 
             if "on_all" in check_settings:
 
-                settings = f"""Alles darunter zählt: {dot_emoji} messages\n{dot_emoji} Work commands\n{dot_emoji} voice time"""
+                settings = f"""Alles darunter zählt: {Emojis.dot_emoji} messages\n{Emojis.dot_emoji} Work commands\n{Emojis.dot_emoji} voice time"""
 
             else:
 
@@ -373,13 +373,13 @@ class EconomySystem(commands.Cog):
                 settings_list.append("voice time\n") if check_settings[1] == "on_voice" else None
                 settings_list.append("mini games\n") if check_settings[1] == "on_mini_games" else None
         
-            settings = f"{dot_emoji} ".join(settings_list)
+            settings = f"{Emojis.dot_emoji} ".join(settings_list)
 
         emb = discord.Embed(title="Hir kannst du das economy system einstellen", 
             description=f"""Mit dem on/off button kannst du das economy system aus oder an schalten.
             Mit dem Help button kannst du dir alles erklären lassen wir das economy system funktioniert.""", color=shiro_colour)
         emb.add_field(name="Festlegung der Parameter", value=f"Mit dem Select menü kannst du auswählen wie man Punkte verdient", inline=False)
-        emb.add_field(name=f"{help_emoji} Aktueller status:", value=f"""{status} es reagiert auf:
+        emb.add_field(name=f"{Emojis.help_emoji} Aktueller status:", value=f"""{status} es reagiert auf:
         {settings}""", inline=False)
         await ctx.respond(embed=emb, view=EconomySystemSettings())
 
@@ -393,13 +393,13 @@ class EconomySystem(commands.Cog):
 
         if check_settings[1] != "off":
             status = "**off**"
-            settings = f"{arrow_emoji} Nichts denn es ist nicht aktiv!"
+            settings = f"{Emojis.arrow_emoji} Nichts denn es ist nicht aktiv!"
         else:
             status = "**on**"
 
             if "on_all" in check_settings:
 
-                settings = f"""Alles darunter zählt: {dot_emoji} messages\n{dot_emoji} Work commands\n{dot_emoji} voice time"""
+                settings = f"""Alles darunter zählt: {Emojis.dot_emoji} messages\n{Emojis.dot_emoji} Work commands\n{Emojis.dot_emoji} voice time"""
 
             else:
 
@@ -408,10 +408,10 @@ class EconomySystem(commands.Cog):
                 settings_list.append("voice time\n") if check_settings[1] == "on_voice" else None
                 settings_list.append("mini games\n") if check_settings[1] == "on_mini_games" else None
         
-            settings = f"{dot_emoji} ".join(settings_list)
+            settings = f"{Emojis.dot_emoji} ".join(settings_list)
 
-        emb = discord.Embed(title=f"Hier siehst du alle einstellungen des Economy systems {settings_emoji}", 
-            description=f"""{dot_emoji} Wenn du die einstellugen ändern möchtest benutze den {economy_settings} command!""", color=shiro_colour)
+        emb = discord.Embed(title=f"Hier siehst du alle einstellungen des Economy systems {Emojis.settings_emoji}", 
+            description=f"""{Emojis.dot_emoji} Wenn du die einstellugen ändern möchtest benutze den {economy_settings} command!""", color=shiro_colour)
         emb.add_field(name="Status:", value=f"Der status des Economy systems ist {status}", inline=False)
         emb.add_field(name="Einstellungen:", value=f"Das economy system reagiert auf:\n{settings}", inline=False)
         await ctx.respond(embed=emb)
@@ -434,7 +434,7 @@ class EconomySystem(commands.Cog):
             
             blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"Dieser channel ist bereits auf der economy system Blacklist {fail_emoji}", 
+            emb = discord.Embed(title=f"Dieser channel ist bereits auf der economy system Blacklist {Emojis.fail_emoji}", 
                 description=f"""Auf der economy system Blacklist befinden sich folgende channels:\n
                 {blacklist[0]}
                 Wenn du channels von der Blacklist entfernen möchtest führen sie diesen command aus: 
@@ -445,7 +445,7 @@ class EconomySystem(commands.Cog):
 
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, channel_id=channel.id, table="economy")
 
-            emb = discord.Embed(title=f"Dieser Channel wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Dieser Channel wurde erfolgreich auf die economy system Blacklist gesetzt {Emojis.succesfully_emoji}", 
                 description=f"""Der channel: <#{channel.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                 Wenn du in wieder entfernen möchtest benutze diesen command: 
                 {remove_blacklist_economy_channel}""", color=shiro_colour)
@@ -462,7 +462,7 @@ class EconomySystem(commands.Cog):
 
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove",channel_id=channel.id, table="economy")
 
-            emb = discord.Embed(title=f"Der channel wurde von der economy system Blacklist entfernt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Der channel wurde von der economy system Blacklist entfernt {Emojis.succesfully_emoji}", 
                 description=f"""Der channel wurde erfolgreich von der economy system Blacklist entfernt wenn du in wieder hinzugügen möchtest benutze den: {add_blacklist_economy_channel} command.
                 Wenn du sehen willst was noch auf der Blacklist steht dann benutze den: {show_blacklist_economy}""", color=shiro_colour)
             await ctx.respond(embed=emb)
@@ -471,7 +471,7 @@ class EconomySystem(commands.Cog):
 
             blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"Dieser Channel ist nicht auf der economy system Blacklist {fail_emoji}", 
+            emb = discord.Embed(title=f"Dieser Channel ist nicht auf der economy system Blacklist {Emojis.fail_emoji}", 
                 description=f"""Der Channel: <#{channel.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden channels sind auf der Blacklist:\n
                 {blacklist[0]}""", color=error_red)
@@ -488,7 +488,7 @@ class EconomySystem(commands.Cog):
             
             blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
                 
-            emb = discord.Embed(title=f"Diese Category ist bereits auf der economy system Blacklist {fail_emoji}", 
+            emb = discord.Embed(title=f"Diese Category ist bereits auf der economy system Blacklist {Emojis.fail_emoji}", 
                 description=f"""Auf der economy system Blacklist befinden sich folgende categories:\n
                 {blacklist[1]}
                 Wenn du categories von der blacklist entfernen möchtest führen sie diesen command aus: 
@@ -499,7 +499,7 @@ class EconomySystem(commands.Cog):
             
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, category_id=category.id, table="economy")
 
-            emb = discord.Embed(title=f"Diese Category wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Diese Category wurde erfolgreich auf die economy system Blacklist gesetzt {Emojis.succesfully_emoji}", 
                 description=f"""Die Category: <#{category.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                 Wenn du sie wieder entfernen möchtest benutze diesen command: 
                 {remove_blacklist_economy_category}""", color=shiro_colour)
@@ -516,7 +516,7 @@ class EconomySystem(commands.Cog):
 
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", category_id=category.id, table="economy")
 
-            emb = discord.Embed(title=f"Die Category wurde von der economy system blacklist entfernt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Die Category wurde von der economy system blacklist entfernt {Emojis.succesfully_emoji}", 
                 description=f"""Die Kategorie wurde erfolgreich von der economy system blacklist entfernt wenn du sie wieder hinzugügen möchtest benutze den: {add_blacklist_economy_category} command.
                 Wenn du sehen willst was noch auf der Blacklist steht dann benutze den: {show_blacklist_economy} comamnd""", color=shiro_colour)
             await ctx.respond(embed=emb)
@@ -525,7 +525,7 @@ class EconomySystem(commands.Cog):
 
             blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"Diese Kategorie ist nicht auf der economy system Blacklist {fail_emoji}", 
+            emb = discord.Embed(title=f"Diese Kategorie ist nicht auf der economy system Blacklist {Emojis.fail_emoji}", 
                 description=f"""Die Kategorie: <#{category.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden Kategorien sind auf der Blacklist:\n
                 {blacklist[1]}""", color=error_red)
@@ -542,7 +542,7 @@ class EconomySystem(commands.Cog):
             
             blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"Diese rolle ist bereits auf der economy system Blacklist {fail_emoji}", 
+            emb = discord.Embed(title=f"Diese rolle ist bereits auf der economy system Blacklist {Emojis.fail_emoji}", 
                 description=f"""Auf der economy system blacklist befinden sich folgende rollen:\n
                 {blacklist[2]}
                 Wenn du rollen von der blacklist entfernen möchtest führen sie diesen command aus: 
@@ -553,7 +553,7 @@ class EconomySystem(commands.Cog):
             
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, role_id=role.id, table="economy")
 
-            emb = discord.Embed(title=f"Diese rolle wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Diese rolle wurde erfolgreich auf die economy system Blacklist gesetzt {Emojis.succesfully_emoji}", 
                 description=f"""Die rolle: <@&{role.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                 Wenn du sie wieder entfernen möchtest benutze diesen command: 
                 {remove_blacklist_economy_role}""", color=shiro_colour)
@@ -570,7 +570,7 @@ class EconomySystem(commands.Cog):
             
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", role_id=role.id, table="economy")
 
-            emb = discord.Embed(title=f"Die rolle wurde von der economy system blacklist entfernt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Die rolle wurde von der economy system blacklist entfernt {Emojis.succesfully_emoji}", 
                 description=f"""Die Rolle wurde erfolgreich von der economy system blacklist entfernt wenn du sie wieder hinzugügen möchtest benutze den: {add_blacklist_economy_role} command.
                 Wenn du sehen willst was noch auf der Blacklist steht dann benutze den: {show_blacklist_economy} comamnd""", color=shiro_colour)
             await ctx.respond(embed=emb)
@@ -579,7 +579,7 @@ class EconomySystem(commands.Cog):
 
             blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"Diese Rolle ist nicht auf der economy system Blacklist {fail_emoji}", 
+            emb = discord.Embed(title=f"Diese Rolle ist nicht auf der economy system Blacklist {Emojis.fail_emoji}", 
                 description=f"""Die Rolle: <@&{role.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden Rollen sind auf der Blacklist:\n
                 {blacklist[2]}""", color=error_red)
@@ -601,7 +601,7 @@ class EconomySystem(commands.Cog):
                 
                 blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
-                emb = discord.Embed(title=f"Dieser user ist bereits auf der economy system Blacklist {fail_emoji}", 
+                emb = discord.Embed(title=f"Dieser user ist bereits auf der economy system Blacklist {Emojis.fail_emoji}", 
                     description=f"""Auf der economy system blacklist befinden sich folgende users:
                     {blacklist[3]}
                     Wenn du users von der blacklist entfernen möchtest führen sie diesen command aus: 
@@ -612,7 +612,7 @@ class EconomySystem(commands.Cog):
                 
                 DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, user_id=user.id, table="economy")
 
-                emb = discord.Embed(title=f"Dieser user wurde erfolgreich auf die economy system Blacklist gesetzt {succesfully_emoji}", 
+                emb = discord.Embed(title=f"Dieser user wurde erfolgreich auf die economy system Blacklist gesetzt {Emojis.succesfully_emoji}", 
                     description=f"""Der user: <@{user.id}> wurde erfolgreich auf die economy system Blacklist gesetzt. 
                     Wenn du ihn wieder entfernen möchtest benutze diesen command: 
                     {remove_blacklist_economy_user}""", color=shiro_colour)
@@ -629,7 +629,7 @@ class EconomySystem(commands.Cog):
             
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", user_id=user.id, table="economy")
 
-            emb = discord.Embed(title=f"Der user wurde von der economy system blacklist entfernt {succesfully_emoji}", 
+            emb = discord.Embed(title=f"Der user wurde von der economy system blacklist entfernt {Emojis.succesfully_emoji}", 
                 description=f"""Der user wurde erfolgreich von der economy system blacklist entfernt wenn du ihn wieder hinzugügen möchtest benutze den: {add_blacklist_economy_user} command.
                 Wenn du sehen willst was noch auf der Blacklist steht dann benutze den: {show_blacklist_economy} comamnd""", color=shiro_colour)
             await ctx.respond(embed=emb)
@@ -638,7 +638,7 @@ class EconomySystem(commands.Cog):
 
             blacklist = ShowBlacklist._show_blacklist_economy(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"Dieser user ist nicht auf der economy system Blacklist {fail_emoji}", 
+            emb = discord.Embed(title=f"Dieser user ist nicht auf der economy system Blacklist {Emojis.fail_emoji}", 
                 description=f"""Der user: <@{user.id}> ist nicht auf der economy system Blacklist. 
                 Die folgenden users sind auf der Blacklist:\n
                 {blacklist[3]}""", color=error_red)
@@ -654,22 +654,22 @@ class EconomySystem(commands.Cog):
         if blacklist:
 
             emb = discord.Embed(title="Bist du dir sicher das du alles von der economy system Blacklist streichen möchtest?", 
-                description=f"""{help_emoji} Mit den Buttuns kannst du deine Entscheidung bestätigen!
-                {dot_emoji} Wenn du auf den **Yes button** drückst werden alle Channels, Kategorien, Users und Rollen entgültig von der economy system Blacklist gestrichen.
-                {dot_emoji} Wenn du auf den **No button** drückst wird der vorgang abgebrochen.
-                {dot_emoji} Der **Shows all elements button** zeigt dir was gerade alles auf der economy system Blacklist steht.""", color=shiro_colour)
+                description=f"""{Emojis.help_emoji} Mit den Buttuns kannst du deine Entscheidung bestätigen!
+                {Emojis.dot_emoji} Wenn du auf den **Yes button** drückst werden alle Channels, Kategorien, Users und Rollen entgültig von der economy system Blacklist gestrichen.
+                {Emojis.dot_emoji} Wenn du auf den **No button** drückst wird der vorgang abgebrochen.
+                {Emojis.dot_emoji} Der **Shows all elements button** zeigt dir was gerade alles auf der economy system Blacklist steht.""", color=shiro_colour)
             await ctx.respond(embed=emb, view=ResetBlacklistEconomyButton())
         
         else:
 
-            emb = discord.Embed(title=f"Es befindet sich nichts auf der economy system Blacklist {fail_emoji}", 
-                description=f"""{dot_emoji} Die economy system blacklist konnte nicht zurück gesetzt werden da auf Ihr nichts gespeichert ist.
-                {dot_emoji} Wenn sie etwas auf die Blacklist setzen möchten benutzen sie einen dieser Commands:
+            emb = discord.Embed(title=f"Es befindet sich nichts auf der economy system Blacklist {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die economy system blacklist konnte nicht zurück gesetzt werden da auf Ihr nichts gespeichert ist.
+                {Emojis.dot_emoji} Wenn sie etwas auf die Blacklist setzen möchten benutzen sie einen dieser Commands:
                 
-                {arrow_emoji} {add_blacklist_economy_channel}
-                {arrow_emoji} {add_blacklist_economy_category}
-                {arrow_emoji} {add_blacklist_economy_role}
-                {arrow_emoji} {add_blacklist_economy_user}""", color=shiro_colour)
+                {Emojis.arrow_emoji} {add_blacklist_economy_channel}
+                {Emojis.arrow_emoji} {add_blacklist_economy_category}
+                {Emojis.arrow_emoji} {add_blacklist_economy_role}
+                {Emojis.arrow_emoji} {add_blacklist_economy_user}""", color=shiro_colour)
             await ctx.respond(embed=emb)
 
 
@@ -680,12 +680,12 @@ class EconomySystem(commands.Cog):
         channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
         emb = discord.Embed(title=f"Hier siehst du die Gesamte economy system Blacklist", 
-            description=f"""Hier siehst du alles was sich auf der economy system Blacklist befindet:{exclamation_mark_emoji}
+            description=f"""Hier siehst du alles was sich auf der economy system Blacklist befindet:{Emojis.exclamation_mark_emoji}
             """, color=shiro_colour)
-        emb.add_field(name=f"{arrow_emoji} All Channels on the Blacklist", value=f"{channel}", inline=False)
-        emb.add_field(name=f"{arrow_emoji} All Categories on the Blacklist", value=f"{category}", inline=False)
-        emb.add_field(name=f"{arrow_emoji} All Roles on the Blacklist", value=f"{role}", inline=False)
-        emb.add_field(name=f"{arrow_emoji} All Users on the Blacklist", value=f"{user}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Channels on the Blacklist", value=f"{channel}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Categories on the Blacklist", value=f"{category}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Roles on the Blacklist", value=f"{role}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Users on the Blacklist", value=f"{user}", inline=False)
         await ctx.respond(embed=emb)
 
 
@@ -710,19 +710,19 @@ class EconomySystem(commands.Cog):
 
                 DatabaseUpdates._update_user_money_economy(guild_id=ctx.guild.id, user_id=user.id, money=new_coins)
 
-                emb = discord.Embed(title=f"Du hast {user.name} erfolgreich die coins übergeben {succesfully_emoji}", 
-                    description=f"""{dot_emoji} Du hast dem user: <@{user.id}> erfolgreich {money} coins übertagen {dollar_animation_emoji}.
-                    {dot_emoji} <@{user.id}> hat ab jetzt {new_coins} coins.
-                    {dot_emoji} Wenn du diesen <@{user.id}> seine Coins wieder entfernen möchtest kannst du den\n{remove_money} command nutzen {exclamation_mark_emoji}""", color=shiro_colour)
+                emb = discord.Embed(title=f"Du hast {user.name} erfolgreich die coins übergeben {Emojis.succesfully_emoji}", 
+                    description=f"""{Emojis.dot_emoji} Du hast dem user: <@{user.id}> erfolgreich {money} coins übertagen {Emojis.dollar_animation_emoji}.
+                    {Emojis.dot_emoji} <@{user.id}> hat ab jetzt {new_coins} coins.
+                    {Emojis.dot_emoji} Wenn du diesen <@{user.id}> seine Coins wieder entfernen möchtest kannst du den\n{remove_money} command nutzen {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
                 await ctx.respond(embed=emb)
 
             else:
 
                 DatabaseUpdates._insert_user_stats_economy(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                 
-                emb = discord.Embed(title=f"Der angegebene user wurde nicht gefunden {fail_emoji}", 
-                    description=f"""{dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user.id}> nachrtäglich hinzugefügt.
-                    {dot_emoji} Der user wurde hinzugefügt und startet mit 0 coins.""", color=error_red)
+                emb = discord.Embed(title=f"Der angegebene user wurde nicht gefunden {Emojis.fail_emoji}", 
+                    description=f"""{Emojis.dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user.id}> nachrtäglich hinzugefügt.
+                    {Emojis.dot_emoji} Der user wurde hinzugefügt und startet mit 0 coins.""", color=error_red)
                 await ctx.respond(embed=emb)
 
 
@@ -741,26 +741,26 @@ class EconomySystem(commands.Cog):
 
                 if check_user[2] < money:
 
-                    emb = discord.Embed(title=f"Der user hat nicht so viel geld {fail_emoji}", 
+                    emb = discord.Embed(title=f"Der user hat nicht so viel geld {Emojis.fail_emoji}", 
                         description=f"""Der user hat nicht genug geld.
-                        {dot_emoji} Der user: <@{user.id}> hat nur {check_user[2]} coins!
-                        {dot_emoji} Wenn du diesen User coins entfernen willst der wert den du entfernen willst kleiner oder gleich mit dem Kontostand des users sein {exclamation_mark_emoji}""", color=error_red)
+                        {Emojis.dot_emoji} Der user: <@{user.id}> hat nur {check_user[2]} coins!
+                        {Emojis.dot_emoji} Wenn du diesen User coins entfernen willst der wert den du entfernen willst kleiner oder gleich mit dem Kontostand des users sein {Emojis.exclamation_mark_emoji}""", color=error_red)
                     await ctx.respond(embed=emb)
 
                 else:
 
-                    emb = discord.Embed(title=f"Du hast diesen user erfolgreich den angegebenen betrag abgebucht {succesfully_emoji}", 
-                        description=f"""{dot_emoji} Du hast den user: <@{user.id}> erfolgreich {money} coin abgebucht {dollar_animation_emoji}.
-                        {dot_emoji} Wenn du diesen user wieder coins geben möchtest benutze den:\n{give_money} command {exclamation_mark_emoji}""", color=shiro_colour)
+                    emb = discord.Embed(title=f"Du hast diesen user erfolgreich den angegebenen betrag abgebucht {Emojis.succesfully_emoji}", 
+                        description=f"""{Emojis.dot_emoji} Du hast den user: <@{user.id}> erfolgreich {money} coin abgebucht {Emojis.dollar_animation_emoji}.
+                        {Emojis.dot_emoji} Wenn du diesen user wieder coins geben möchtest benutze den:\n{give_money} command {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
                     await ctx.respond(embed=emb)
 
             else:
 
                 DatabaseUpdates._insert_user_stats_economy(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
 
-                emb = discord.Embed(title=f"Der angegebene user wurd nicht gefunden {fail_emoji}",
-                    description=f"""{dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user.id}> nachrtäglich hinzugefügt.
-                    {dot_emoji} Der user wurde hinzugefügt und startet mit 0 coins.""", color=error_red)
+                emb = discord.Embed(title=f"Der angegebene user wurd nicht gefunden {Emojis.fail_emoji}",
+                    description=f"""{Emojis.dot_emoji} Der user konnte nicht gefunden werden deshalb wurde der user: <@{user.id}> nachrtäglich hinzugefügt.
+                    {Emojis.dot_emoji} Der user wurde hinzugefügt und startet mit 0 coins.""", color=error_red)
                 await ctx.respond(embed=emb)
 
 
@@ -772,17 +772,17 @@ class EconomySystem(commands.Cog):
         if check_user_stats:
 
             emb = discord.Embed(title=f"Bist du dir sicher das du alle stats des economy systems zurücksetzen möchtest?", 
-                description=f"""{help_emoji} Mit den Buttuns kannst du deine Entscheidung bestätigen!
-                {dot_emoji} Wenn du auf den **Yes button** drückst werden alle user stats gelöscht.
-                {dot_emoji} Wenn du auf den **No button** drückst wird der vorgang abgebrochen.""", color=shiro_colour)
+                description=f"""{Emojis.help_emoji} Mit den Buttuns kannst du deine Entscheidung bestätigen!
+                {Emojis.dot_emoji} Wenn du auf den **Yes button** drückst werden alle user stats gelöscht.
+                {Emojis.dot_emoji} Wenn du auf den **No button** drückst wird der vorgang abgebrochen.""", color=shiro_colour)
             await ctx.respond(embed=emb, view=ResetEconomyStatsButton())
 
         else:
 
-            emb = discord.Embed(title=f"Es wurden keine daten zu diesen Server gefunden {fail_emoji}", 
-                description=f"""{dot_emoji} Es wurden keine Daten zu diesen Server gefunden,
+            emb = discord.Embed(title=f"Es wurden keine daten zu diesen Server gefunden {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} Es wurden keine Daten zu diesen Server gefunden,
                 deshalb konnte nichts gelöscht werden. 
-                {help_emoji} Daten werden automatisch erstellt sobald nachrichten gesendet werden und das economy system eingeschaltet ist.""", color=error_red)
+                {Emojis.help_emoji} Daten werden automatisch erstellt sobald nachrichten gesendet werden und das economy system eingeschaltet ist.""", color=error_red)
             await ctx.respond(embed=emb)
 
     
@@ -791,8 +791,8 @@ class EconomySystem(commands.Cog):
 
         check_stats = DatabaseCheck.check_economy_system_stats(guild_id=ctx.guild.id, user=user.id)
 
-        emb = discord.Embed(title=f"Hier siehst du alle werte von {user.name} im economy system {dollar_animation_emoji}", 
-            description=f"""{dot_emoji} Hiest sihst du alle werte aufgelistet:
+        emb = discord.Embed(title=f"Hier siehst du alle werte von {user.name} im economy system {Emojis.dollar_animation_emoji}", 
+            description=f"""{Emojis.dot_emoji} Hiest sihst du alle werte aufgelistet:
             Gesammelte coins: {check_stats[2]}""")
     
 
