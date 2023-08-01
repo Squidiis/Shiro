@@ -298,7 +298,7 @@ class DropdownAutoReaction(discord.ui.View):
                 description=f"""
                     **Aktive Prarameter**
                     {all_parameter}
-                """, color=shiro_colour)
+                """, color=bot_colour)
             DatabaseUpdates._insert_auto_reaction(guild_id=guild_id, reaction_parameter=all_parameter)
             await interaction.edit_original_response(embed=emb_1, view=None)
             
@@ -345,7 +345,7 @@ class AutoReaction(commands.Cog):
             description=f"""Wählen sie aus nach welchen Parametern das Aoto Reaction system agieren soll.
             Sie können wählen zwischen links, nachrichten, foren und Speziefischen nachrichten dort wird auf den Inhalt der nachricht geachtet.
             Wenn sie Speziefische nachrichten haben wollen müssen sie in das danach erscheinende Textfeld alles eingeben auf was geachtet werden soll trenne sie die wörter mit einen `,`
-            aktueller status: {status}""", color=shiro_colour)
+            aktueller status: {status}""", color=bot_colour)
         await ctx.respond(embed=emb, view=DropdownAutoReaction())
 
 

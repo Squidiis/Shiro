@@ -31,7 +31,7 @@ class BlacklistManagerButtons(discord.ui.View):
                 {Emojis.dot_emoji} Du kannst dabei frei wählen was du möchtest du kannst aber nur maximal 5 elemente pro menü auswählen
                 {Emojis.dot_emoji} Wenn du alles ausgewählt hast was du möchtest bestätige deine auswähl indem du auf den Safe configuaration button drückst
                 {Emojis.dot_emoji} Wenn du sehen möchtest schon alles auf der blacklist ist benutzen den Show blacklist button.
-                {Emojis.help_emoji} Falls du etwas auswählen solltest was bereits auf der blacklist ist wird es automatisch aussortiert {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                {Emojis.help_emoji} Falls du etwas auswählen solltest was bereits auf der blacklist ist wird es automatisch aussortiert {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=view)
 
         else:
@@ -53,7 +53,7 @@ class BlacklistManagerButtons(discord.ui.View):
                 description=f"""{Emojis.dot_emoji} Mit den unseren selectmenüs kannst du auswählen was von der Blacklist enfernt werden soll
                 {Emojis.dot_emoji} Wenn du alles ausgewählt hast was du möchtest bestätige deine auswähl indem du auf den Safe configuaration button drückst 
                 {Emojis.dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen
-                {Emojis.help_emoji} Falls du etwas auswählen solltest nicht auf der blacklist ist wird es automatisch aussortiert {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                {Emojis.help_emoji} Falls du etwas auswählen solltest nicht auf der blacklist ist wird es automatisch aussortiert {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=view)
 
         else:
@@ -292,7 +292,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                     emb = discord.Embed(title=f"Die ausgwählten elemente wurden auf die blacklist gesetzt {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} Es wurde alles auf die Blacklist gesetzt was du ausgewählt hattest.
                         {Emojis.dot_emoji} Hier sihst du noch mal alles was hinzugefügt wurde:\n\n{mentions}\n
-                        {Emojis.help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich bereits auf der Blacklist {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                        {Emojis.help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich bereits auf der Blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await interaction.edit_original_response(embed=emb, view=None)
 
                 if temp_blacklist[5] == "remove":
@@ -300,14 +300,14 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                     emb = discord.Embed(title=f"Die ausgewählten elemente wurden von der blacklist entfernt {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} Es wurde alles von der Blacklist entfernt was du ausgewählt hattest.
                         {Emojis.dot_emoji} Hier sihst du nochmal alles was entfernt wurde: \n\n{mentions}\n
-                        {Emojis.help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich nicht auf der Blacklist {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                        {Emojis.help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich nicht auf der Blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await interaction.edit_original_response(embed=emb, view=None)
 
             else:
 
                 emb = discord.Embed(title=f"Es wurde nichts ausgewählt {Emojis.fail_emoji}", 
                     description=f"""{Emojis.dot_emoji} Es wurde nichta ausgewählt was auf die Blacklist gesetzt oder entfernt werden soll.
-                    {Emojis.dot_emoji} Wenn du elemente auf die blacklist setzen oder von ihr entfernen möchtest kanns du diesen Command einfach erneut nutzen.""", color=shiro_colour)
+                    {Emojis.dot_emoji} Wenn du elemente auf die blacklist setzen oder von ihr entfernen möchtest kanns du diesen Command einfach erneut nutzen.""", color=bot_colour)
                 await interaction.edit_original_response(embed=emb, view=None)
 
 
@@ -355,7 +355,7 @@ class LevelSystemSettings(discord.ui.View):
                         
                 emb = discord.Embed(title=f"Das Level system wurde {new_status}", 
                     description=f"""Sie haben das Level system erfolgreich {new_status}.
-                    {Emojis.dot_emoji} Wenn sie das level system wieder {opposite_status} wollen benutzen sie diesen command einfach noch einmal {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                    {Emojis.dot_emoji} Wenn sie das level system wieder {opposite_status} wollen benutzen sie diesen command einfach noch einmal {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
         
         else:
@@ -385,7 +385,7 @@ class LevelRolesButtons(discord.ui.View):
                 emb = discord.Embed(title=f"Die rolle oder das Level konnte nicht überschrieben werden {Emojis.fail_emoji}", 
                     description=f"""{Emojis.dot_emoji} Die rolle oder das Level konnte nicht überschrieben werden da der Prozess abgelaufen ist.
                     {Emojis.dot_emoji} Dies Passiert wenn man zu lange wartet um auf den Button zu reagieren.
-                    {Emojis.dot_emoji} Du kannst den Command einfach erneut ausführen wenn du das level oder die rolle noch immer überschreiben möchtest {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                    {Emojis.dot_emoji} Du kannst den Command einfach erneut ausführen wenn du das level oder die rolle noch immer überschreiben möchtest {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
             else:
@@ -394,7 +394,7 @@ class LevelRolesButtons(discord.ui.View):
                             
                 emb = discord.Embed(title=f"Erfolgreiche überschreibung der level role {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} Die level role wurde erfolgreich überschrieben. 
-                    {Emojis.dot_emoji} Die role <@&{self.role_id}> wird ab jetzt bei level {self.role_level} vergeben.""", color=shiro_colour)
+                    {Emojis.dot_emoji} Die role <@&{self.role_id}> wird ab jetzt bei level {self.role_level} vergeben.""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -422,14 +422,14 @@ class LevelRolesButtons(discord.ui.View):
 
                     emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen", 
                         description=f"""{Emojis.dot_emoji} Das überschreiben der level role wurde erfolgreich abgebrochen.
-                        {Emojis.dot_emoji} Die role <@&{self.role_id}> wird weiterhin bei errechen von level {check_level_roles[2]} vergeben""", color=shiro_colour)
+                        {Emojis.dot_emoji} Die role <@&{self.role_id}> wird weiterhin bei errechen von level {check_level_roles[2]} vergeben""", color=bot_colour)
                     await interaction.response.edit_message(embed=emb, view=None)
 
                 if check_level_roles[2] == self.role_level:
 
                     emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen", 
                         description=f"""{Emojis.dot_emoji} Das überschreiben der level role wurde erfolgreich abgebrochen.
-                        {Emojis.dot_emoji} Bei erreichen von level {self.role_level} erhält man weiterhin die rolle {check_level_roles[1]}""", color=shiro_colour)
+                        {Emojis.dot_emoji} Bei erreichen von level {self.role_level} erhält man weiterhin die rolle {check_level_roles[1]}""", color=bot_colour)
                     await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -467,7 +467,7 @@ class LevelUpChannelButtons(discord.ui.View):
 
                 emb = discord.Embed(title=f"Der level up channel wurde erfolgreich überschrieben {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} Der level up channel wurde erfolgreich überschrieben.
-                    {Emojis.dot_emoji} Ab jetzt ist der channel <#{self.channel}> als level up channel zugewiesen.""", color=shiro_colour)
+                    {Emojis.dot_emoji} Ab jetzt ist der channel <#{self.channel}> als level up channel zugewiesen.""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -508,7 +508,7 @@ class ResetLevelStatsButton(discord.ui.View):
 
             emb = discord.Embed(title=f"Du hast alle stats des level systems zurückgesetzt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.arrow_emoji} Alle user datein wurden gelöscht jeder user ist jetzt wieder level 0 und hat 0 XP.
-                Es werden wieder bei aktivitäht neue enträge erstellt, wenn sie das nicht möchten stellen sie das level system aus {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                Es werden wieder bei aktivitäht neue enträge erstellt, wenn sie das nicht möchten stellen sie das level system aus {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
 
@@ -524,7 +524,7 @@ class ResetLevelStatsButton(discord.ui.View):
         
             emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Das resetten der stats wurde erfolgreich abgebrochen.
-                Alle user behalten Ihre stats im level system.""", color=shiro_colour)
+                Alle user behalten Ihre stats im level system.""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
                     
         else:
@@ -550,7 +550,7 @@ class ResetBlacklistLevelButton(discord.ui.View):
 
             emb = discord.Embed(title=f"Die blacklist wurde geresetet {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.arrow_emoji} alle Channel, User, Rollen und Kategorien wurden von der Blacklist entfernt.
-                Wenn du wieder Dinge auf die Blacklist setzten möchtest kannst du die Befehle wie zuvor nutzen {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                Wenn du wieder Dinge auf die Blacklist setzten möchtest kannst du die Befehle wie zuvor nutzen {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -566,7 +566,7 @@ class ResetBlacklistLevelButton(discord.ui.View):
             emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Das resetten der blacklist wurde erfolgreich abgebrochen.
                 Alle Channels, Rollen, Kategorien und User sind weiterhin auf der blacklist gelistet.
-                {Emojis.dot_emoji} Wenn du einzelne elemente von der blacklist steichen möchtest kannst du sie mit den Remove commands streichen lassen {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                {Emojis.dot_emoji} Wenn du einzelne elemente von der blacklist steichen möchtest kannst du sie mit den Remove commands streichen lassen {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -587,7 +587,7 @@ class ShowBlacklistLevelSystemButton(discord.ui.Button):
             channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
             emb = discord.Embed(title=f"Hier siehst du alle Elemente die auf der Blacklist des level systems stehen {Emojis.exclamation_mark_emoji}", 
-                description=f"""Hier sind alle Elemente aufgelistet die auf der level system Blacklist stehen.""", color=shiro_colour)
+                description=f"""Hier sind alle Elemente aufgelistet die auf der level system Blacklist stehen.""", color=bot_colour)
             emb.add_field(name="Channels:", value=f"{channel}", inline=False)
             emb.add_field(name="Categories:", value=f"{category}", inline=False)
             emb.add_field(name="Rolles", value=f"{role}", inline=False)
@@ -772,7 +772,7 @@ class LevelSystem(commands.Cog):
                         
                     emb = discord.Embed(title=f"You have successfully passed {user.name} to {xp} XP {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} You have transferred **{user.name}** {xp} XP **{user.names}** has from now on **{new_xp}** XP.
-                        {Emojis.dot_emoji} If you want to remove **{user.name}** XP again use the:\n{remove_xp} command {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                        {Emojis.dot_emoji} If you want to remove **{user.name}** XP again use the:\n{remove_xp} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                     if xp >= xp_need_next_level:
@@ -842,7 +842,7 @@ class LevelSystem(commands.Cog):
 
                     emb = discord.Embed(title=f"You have successfully removed {user_name} {xp} XP {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} You have removed **{user_name}** {xp} XP **{user_name}** has **{new_xp}** XP from now on.
-                        {Emojis.dot_emoji} If you want to give **{user_name}** XP again use the:\n{give_xp} command {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                        {Emojis.dot_emoji} If you want to give **{user_name}** XP again use the:\n{give_xp} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
             else:
@@ -891,7 +891,7 @@ class LevelSystem(commands.Cog):
 
                     emb = discord.Embed(title=f"You have successfully added {user_name} {level} level {Emojis.succesfully_emoji}",
                         description=f"""{Emojis.dot_emoji} You gave **{user_name}** {level} level **{user_name}** now has **{new_level}** level.
-                        {Emojis.dot_emoji} If you want to remove **{user_name}** level again use the:\n{remove_level} command {Emojis.exclamation_mark_emoji}""", colour=shiro_colour)
+                        {Emojis.dot_emoji} If you want to remove **{user_name}** level again use the:\n{remove_level} command {Emojis.exclamation_mark_emoji}""", colour=bot_colour)
                     await ctx.respond(embed=emb)
 
             else:
@@ -940,7 +940,7 @@ class LevelSystem(commands.Cog):
 
                     emb = discord.Embed(title=f"You have successfully removed {user_name} {level} level {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} You have removed **{user_name}** {level} level **{user_name}** is now level **{new_level}**
-                        {Emojis.dot_emoji} If you want to give **{user_name}** level again use the:\n{give_level} command {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                        {Emojis.dot_emoji} If you want to give **{user_name}** level again use the:\n{give_level} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
             else:
@@ -966,7 +966,7 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title="Are you sure you want to reset the level system?", 
                 description=f"""{Emojis.help_emoji} With the buttuns you can confirm your decision!
                 {Emojis.dot_emoji} If you press the **Yes button** all user stats will be deleted.
-                {Emojis.dot_emoji} If you press the **No button** the process will be aborted.""", color=shiro_colour)
+                {Emojis.dot_emoji} If you press the **No button** the process will be aborted.""", color=bot_colour)
             await ctx.respond(embed=emb, view=ResetLevelStatsButton())
 
         else:
@@ -1105,7 +1105,7 @@ class LevelSystem(commands.Cog):
                 active_deactive = "Deactivated"
 
             emb = discord.Embed(title=f"Here you can see all the settings of the level system {Emojis.help_emoji}", 
-                description=f"With the lower button you can set the level system, You can activate or deactivate. At the moment it is: **{active_deactive}**",color=shiro_colour)
+                description=f"With the lower button you can set the level system, You can activate or deactivate. At the moment it is: **{active_deactive}**",color=bot_colour)
             await ctx.respond(embed=emb, view=LevelSystemSettings())
 
         else:
@@ -1145,7 +1145,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"This channel was successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel: <#{channel.id}> was successfully blacklisted.
-                {Emojis.dot_emoji} If you want to remove it again use this command:\n{remove_blacklist_level_channel}""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to remove it again use this command:\n{remove_blacklist_level_channel}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1161,7 +1161,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The channel was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_channel} command.
-                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} command""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} command""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -1196,7 +1196,7 @@ class LevelSystem(commands.Cog):
             
             emb = discord.Embed(title=f"This category was successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The category: <#{category.id}> was successfully blacklisted.
-                {Emojis.dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_category}""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_category}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1212,7 +1212,7 @@ class LevelSystem(commands.Cog):
             
             emb = discord.Embed(title=f"The category was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The category has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_category} command.
-                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1246,7 +1246,7 @@ class LevelSystem(commands.Cog):
             
             emb = discord.Embed(title=f"This role has been successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role: <#{role.id}> has been successfully blacklisted.
-                {Emojis.dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_role}""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_role}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1262,7 +1262,7 @@ class LevelSystem(commands.Cog):
             
             emb = discord.Embed(title=f"The role was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_role} command.
-                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1301,7 +1301,7 @@ class LevelSystem(commands.Cog):
 
                 emb = discord.Embed(title=f"This user was successfully blacklisted {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} The user: <@{user.id}> was successfully blacklisted.
-                    If you want to remove it again use this command:\n{remove_blacklist_level_user}""", color=shiro_colour)
+                    If you want to remove it again use this command:\n{remove_blacklist_level_user}""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
 
@@ -1317,7 +1317,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The user was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The user has been successfully removed from the blacklist if you want to add him again use the: {add_blacklist_level_user} command.
-                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1347,7 +1347,7 @@ class LevelSystem(commands.Cog):
                 description=f"""{Emojis.help_emoji} With the buttuns you can confirm your decision!!
                 {Emojis.dot_emoji} If you press the **Yes button** all channels, categories, users and roles will be removed from the blacklist.
                 {Emojis.dot_emoji} If you press the **No button** the process will be aborted.
-                {Emojis.dot_emoji} The **Shows all elements button** shows you what is currently on the blacklist.""", color=shiro_colour)
+                {Emojis.dot_emoji} The **Shows all elements button** shows you what is currently on the blacklist.""", color=bot_colour)
             await ctx.respond(embed=emb, view=view)
         
         else:
@@ -1359,7 +1359,7 @@ class LevelSystem(commands.Cog):
                 {Emojis.arrow_emoji} {add_blacklist_level_channel}
                 {Emojis.arrow_emoji} {add_blacklist_level_category}
                 {Emojis.arrow_emoji} {add_blacklist_level_role}
-                {Emojis.arrow_emoji} {add_blacklist_level_user}""", color=shiro_colour)
+                {Emojis.arrow_emoji} {add_blacklist_level_user}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1369,7 +1369,7 @@ class LevelSystem(commands.Cog):
         emb = discord.Embed(title=f"Wilkommen im blacklist manager {Emojis.settings_emoji}", 
             description=f"""{Emojis.help_emoji} Mit den Beiden Buttons kannst du auswählen ob du etwas auf die Blacklist setzen möchtest oder etwas entfernen möchtest!
             {Emojis.dot_emoji} Sobalt du etwas ausgewählt hast werden dir select menüs angezeigt.
-            {Emojis.dot_emoji} Mit diesen kannst du auswählen was du auf die blacklist setzen oder entfernen möchtest.""", color=shiro_colour)
+            {Emojis.dot_emoji} Mit diesen kannst du auswählen was du auf die blacklist setzen oder entfernen möchtest.""", color=bot_colour)
         await ctx.respond(embed=emb, view=BlacklistManagerButtons())
 
 
@@ -1384,7 +1384,7 @@ class LevelSystem(commands.Cog):
 
         emb = discord.Embed(title=f"Here you can see the complete level system blacklist", 
             description=f"""Here you can see everything that is on the level system blacklist:{Emojis.exclamation_mark_emoji}
-            """, color=shiro_colour)
+            """, color=bot_colour)
         emb.add_field(name=f"{Emojis.arrow_emoji} All Channels on the Blacklist", value=f"{channel}", inline=False)
         emb.add_field(name=f"{Emojis.arrow_emoji} All Categories on the Blacklist", value=f"{category}", inline=False)
         emb.add_field(name=f"{Emojis.arrow_emoji} All Roles on the Blacklist", value=f"{role}", inline=False)
@@ -1420,7 +1420,7 @@ class LevelSystem(commands.Cog):
 
                 emb = discord.Embed(title=f"The role was assigned successfully {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} The role <@&{role_id}> was successfully assigned to the level {level}.
-                    {Emojis.dot_emoji} As soon as a user reaches {level} he gets the <@&{role_id}> role. {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                    {Emojis.dot_emoji} As soon as a user reaches {level} he gets the <@&{role_id}> role. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
             await ctx.respond(embed=emb_level_0) if level == 0 else None
@@ -1447,7 +1447,7 @@ class LevelSystem(commands.Cog):
                     emb = discord.Embed(title=f"This role is already assigned {Emojis.fail_emoji}", 
                         description=f"""{Emojis.dot_emoji} Do you want to override the required level for this role? 
                         {Emojis.dot_emoji} The role <@&{role_id}> is currently assigned at level **{level_needed}**.
-                        {Emojis.dot_emoji} If you want to override the required level for this role select the yes buttons otherwise the no button {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                        {Emojis.dot_emoji} If you want to override the required level for this role select the yes buttons otherwise the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role_id, role_level=level, status="role"))
     
                 elif level == level_roles[2]:
@@ -1457,7 +1457,7 @@ class LevelSystem(commands.Cog):
                     emb = discord.Embed(title=f"This level is already assigned {Emojis.fail_emoji}", 
                         description=f"""{Emojis.dot_emoji} Do you want to overwrite the role for this level?
                         {Emojis.dot_emoji} For the level {level} the role <@&{level_role}> is currently assigned.
-                        {Emojis.dot_emoji} If you want to override the role for this level select the yes buttons otherwise select the no button {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                        {Emojis.dot_emoji} If you want to override the role for this level select the yes buttons otherwise select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role_id, role_level=level, status="level"))   
 
 
@@ -1477,7 +1477,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(f"This role has been removed as a level role {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role <@&{role_id}> was successfully removed as a level role.
-                {Emojis.dot_emoji} If you want to add them again you can do this with the {add_level_role} command {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                {Emojis.dot_emoji} If you want to add them again you can do this with the {add_level_role} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1517,12 +1517,12 @@ class LevelSystem(commands.Cog):
             result = '\n'.join(result_strings)
             
             emb = discord.Embed(title="Here you can find all level roles", 
-                description=f"{Emojis.help_emoji} Here you can see all level rolls sorted by level in descending order:\n\n {result}", color=shiro_colour)
+                description=f"{Emojis.help_emoji} Here you can see all level rolls sorted by level in descending order:\n\n {result}", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
             emb = discord.Embed(title=f"No level rolls have been added yet", 
-                description=f"{Emojis.help_emoji} There are no level rolls added yet if you want to add some use the {add_level_role} command", color=shiro_colour)
+                description=f"{Emojis.help_emoji} There are no level rolls added yet if you want to add some use the {add_level_role} command", color=bot_colour)
             await ctx.respond(embed=emb)
 
        
@@ -1550,7 +1550,7 @@ class LevelSystem(commands.Cog):
 
                 emb = discord.Embed(title=f"The level up channel was set successfully {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} You have successfully set the channel <#{channel.id}> as a level up channel.
-                    {Emojis.dot_emoji} From now on all level up notifications will be sent to this channel.""", color=shiro_colour)
+                    {Emojis.dot_emoji} From now on all level up notifications will be sent to this channel.""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
         else:
@@ -1558,7 +1558,7 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title=f"There is already a level up channel assigned {Emojis.fail_emoji}", 
                 description=f"""{Emojis.dot_emoji} Currently the channel <#{level_up_channel[3]}> is set as level up channel. 
                 {Emojis.dot_emoji} Do you want to overwrite this one?
-                {Emojis.dot_emoji} If yes select the yes button if not select the no button {Emojis.exclamation_mark_emoji}""", color=shiro_colour)
+                {Emojis.dot_emoji} If yes select the yes button if not select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await ctx.respond(embed=emb, view=LevelUpChannelButtons(channel=channel.id))
 
 
@@ -1573,7 +1573,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, levelup_channel=None)
 
             emb = discord.Embed(title=f"The level up channel was successfully removed {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} From now on level up notifications will always be sent after level up.""", color=shiro_colour)
+                description=f"""{Emojis.dot_emoji} From now on level up notifications will always be sent after level up.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1591,7 +1591,7 @@ class LevelSystem(commands.Cog):
         if level_up_channel[3]:
         
             emb = discord.Embed(title=f"Here you can see the current level up channel {Emojis.help_emoji}", 
-                description=f"""{Emojis.dot_emoji} The current level up channel is <#{level_up_channel[3]}> all level up notifications are sent to this channel.""", color=shiro_colour)
+                description=f"""{Emojis.dot_emoji} The current level up channel is <#{level_up_channel[3]}> all level up notifications are sent to this channel.""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:

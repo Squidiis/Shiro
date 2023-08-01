@@ -65,8 +65,10 @@ show_blacklist_level = ""
 give_money = ""
 remove_money = ""
 
+
+# These are all emojis used in this bot the individual eimojis are stored again in this folder: discord_bot/emojis
 class Emojis:
-# Emojis
+
     arrow_emoji = "<a:shiro_arrow:1092443788900831355>"
     load_emoji = "<a:shiro_load:1092862133181612133>"
     fail_emoji = "<a:shiro_failed:1092862110381383762>"
@@ -82,25 +84,28 @@ class Emojis:
     exclamation_mark_emoji = "<a:shiro_important:1092870970785665055>"
     succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
         
-
-
+with open("config.yaml", 'r') as f:
+    data = yaml.safe_load(f)
 
 #Intents
 intent = discord.Intents.default()
 intent.members = True
 intents = discord.Intents.all()
-with open("config.yaml", 'r') as f:
-    data = yaml.safe_load(f)
 
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
 
 
 bot.remove_command("help")
 
+
+
+# The red colour for the fail / error embeds
 error_red = discord.Colour.brand_red()
 
-shiro_colour = 0x89d7ff
+# The bot color, each embed has this color
+bot_colour = data["Bot_colour"]
 
+# Fail / error embeds
 no_permissions_emb = discord.Embed(title="Du bist nicht berechtigt", description=f"Du bist nicht berechtigt diesen Knopf zu drücken nur admins durfen mit diesen Command interagieren",color = error_red)
 
 user_bot_emb = discord.Embed(title=f"Der nutzer ist ein bot {Emojis.fail_emoji}", 
@@ -110,6 +115,7 @@ user_not_found_emb = discord.Embed(title=f"Der user wurde nicht gefunden {Emojis
     description=f"{Emojis.dot_emoji} Es wurde kein eintrag gefunden der user befindet sich auch nicht mehr auf den server {Emojis.exclamation_mark_emoji}", color=error_red)
 
 
+# Help command
 class Help_menu(discord.Cog):
     def __init__(self, bot):
         self.bot = bot
