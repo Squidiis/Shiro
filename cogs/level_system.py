@@ -1530,6 +1530,7 @@ class LevelSystem(commands.Cog):
 #############################################  Level up channel settings  #################################
 
 
+    # Sets the level up channel then all level up messages are automatically sent to this channel
     @commands.slash_command(nanme = "set-level-up-channel", description = "Set a channel for the level up notifications!")
     @commands.has_permissions(administrator = True)
     async def set_levelup_channel(self, ctx:commands.Context, channel:Option(discord.TextChannel, description="Select a channel in which the level up message should be sent")):
