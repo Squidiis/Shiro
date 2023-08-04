@@ -1562,6 +1562,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb, view=LevelUpChannelButtons(channel=channel.id))
 
 
+    # Removes the level up channel and sets it back to none, from this moment on the bot sends the level up message in the same channel
     @commands.slash_command(name = "disable-level-up-channel", description = "Deactivate the level up channel!")
     @commands.has_permissions(administrator = True)
     async def disable_levelup_channel(self, ctx:commands.Context):
@@ -1583,6 +1584,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
+    # Sends an embed with the current level up channel
     @commands.slash_command(name = "show-level-up-channel", description = "Let them show the current level up channel!")
     async def show_levelup_channel(self, ctx:commands.Context):
 
