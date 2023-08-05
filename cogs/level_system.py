@@ -1332,11 +1332,9 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "reset-level-blacklist", description="Reset the blacklist of the level system and remove all entries!")
     @commands.has_permissions(administrator = True)
-    async def reset_blacklist(self, ctx):
+    async def reset_blacklist(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
 
         if blacklist:
 
@@ -1364,7 +1362,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "manage-level-blacklist")
-    async def manage_level_blacklist(self, ctx):
+    async def manage_level_blacklist(self, ctx:commands.Context):
 
         emb = discord.Embed(title=f"Wilkommen im blacklist manager {Emojis.settings_emoji}", 
             description=f"""{Emojis.help_emoji} Mit den Beiden Buttons kannst du auswählen ob du etwas auf die Blacklist setzen möchtest oder etwas entfernen möchtest!
@@ -1375,11 +1373,9 @@ class LevelSystem(commands.Cog):
 
    
     @commands.slash_command(name = "show-level-blacklist", description = "Shows you everything that is blacklisted!")
-    async def show_blacklist(self, ctx):
+    async def show_blacklist(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-
-        blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+        blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
         channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
         emb = discord.Embed(title=f"Here you can see the complete level system blacklist", 
