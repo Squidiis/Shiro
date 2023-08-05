@@ -1398,96 +1398,97 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "add-level-role", description = "Add a role that you get from a certain level!")
     @commands.has_permissions(administrator = True)
-    async def add_level_role(self, ctx, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
+    async def add_level_role(self, ctx:commands.Context, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
         level:Option(int, description = "Enter a level from which this role should be assigned")):
-        
-        guild_id = ctx.guild.id
-        guild_name = ctx.guild.name
-        role_id = role.id
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild=guild_id, level_role=role_id, needed_level=level, status="check")
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, level_role=role.id, needed_level=level, status="check")
 
         emb_level_0 = discord.Embed(title=f"The level you want to set is 0 {Emojis.fail_emoji}", 
             description=f"""{Emojis.dot_emoji} The level to vest a level role must be at least **1**.""", color=error_red)
         emb_higher = discord.Embed(title=f"The level you want to set for the level role is too high {Emojis.fail_emoji}", 
             description=f"""{Emojis.dot_emoji} The level you want to set for the level role is too high you can only set a value that is below or equal to **999**.""", color=error_red)
 
-        if level_roles == None:
-            
-            if level <= 999:
-                         
-                DatabaseUpdates._insert_level_roles(guild_id=guild_id, role_id=role_id, level=level, guild_name=guild_name)
+        if role.permissions.administrator:
 
-                emb = discord.Embed(title=f"The role was assigned successfully {Emojis.succesfully_emoji}", 
-                    description=f"""{Emojis.dot_emoji} The role <@&{role_id}> was successfully assigned to the level {level}.
-                    {Emojis.dot_emoji} As soon as a user reaches {level} he gets the <@&{role_id}> role. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                await ctx.respond(embed=emb)
-
-            await ctx.respond(embed=emb_level_0) if level == 0 else None
-
-            await ctx.respond(embed=emb_higher) if  level > 999 else None 
+            emb = discord.Embed(title=f"This role cannot be assigned as a level role {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} This role has administations rule therefore it cannot be assigned as a level role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
         else:
 
-            check_same = DatabaseCheck.check_level_system_levelroles(guild=guild_id, level_role=role_id, needed_level=level)
+            if level_roles == None:
                 
-            if check_same:
+                if level <= 999:
+                            
+                    DatabaseUpdates._insert_level_roles(guild_id=ctx.guild.id, role_id=role.id, level=level, guild_name=ctx.guild.name)
 
-                same_emb = discord.Embed(title=f"This role has already been set at this level {Emojis.fail_emoji}",
-                    description=f"""{Emojis.dot_emoji} The role <@&{role_id}> is already assigned to the level {level}.
-                    {Emojis.dot_emoji} If you want to change it you can assign this role to another level or another role to this level {Emojis.exclamation_mark_emoji}""", color=error_red)
-                await ctx.respond(embed=same_emb)
+                    emb = discord.Embed(title=f"The role was assigned successfully {Emojis.succesfully_emoji}", 
+                        description=f"""{Emojis.dot_emoji} The role {role.mention} was successfully assigned to the level {level}.
+                        {Emojis.dot_emoji} As soon as a user reaches {level} he gets the <@&{role.mention}> role. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    await ctx.respond(embed=emb)
+
+                await ctx.respond(embed=emb_level_0) if level == 0 else None
+
+                await ctx.respond(embed=emb_higher) if  level > 999 else None 
 
             else:
-                
-                if role_id == level_roles[1]:
 
-                    level_needed = level_roles[2]
-        
-                    emb = discord.Embed(title=f"This role is already assigned {Emojis.fail_emoji}", 
-                        description=f"""{Emojis.dot_emoji} Do you want to override the required level for this role? 
-                        {Emojis.dot_emoji} The role <@&{role_id}> is currently assigned at level **{level_needed}**.
-                        {Emojis.dot_emoji} If you want to override the required level for this role select the yes buttons otherwise the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                    await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role_id, role_level=level, status="role"))
-    
-                elif level == level_roles[2]:
+                check_same = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, level_role=role.id, needed_level=level)
                     
-                    level_role = level_roles[1]
+                if check_same:
 
-                    emb = discord.Embed(title=f"This level is already assigned {Emojis.fail_emoji}", 
-                        description=f"""{Emojis.dot_emoji} Do you want to overwrite the role for this level?
-                        {Emojis.dot_emoji} For the level {level} the role <@&{level_role}> is currently assigned.
-                        {Emojis.dot_emoji} If you want to override the role for this level select the yes buttons otherwise select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                    await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role_id, role_level=level, status="level"))   
+                    same_emb = discord.Embed(title=f"This role has already been set at this level {Emojis.fail_emoji}",
+                        description=f"""{Emojis.dot_emoji} The role {role.mention} is already assigned to the level {level}.
+                        {Emojis.dot_emoji} If you want to change it you can assign this role to another level or another role to this level {Emojis.exclamation_mark_emoji}""", color=error_red)
+                    await ctx.respond(embed=same_emb)
+
+                else:
+                    
+                    if role.id == level_roles[1]:
+
+                        level_needed = level_roles[2]
+            
+                        emb = discord.Embed(title=f"This role is already assigned {Emojis.fail_emoji}", 
+                            description=f"""{Emojis.dot_emoji} Do you want to override the required level for this role? 
+                            {Emojis.dot_emoji} The role {role.mention} is currently assigned at level **{level_needed}**.
+                            {Emojis.dot_emoji} If you want to override the required level for this role select the yes buttons otherwise the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                        await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status="role"))
+        
+                    elif level == level_roles[2]:
+                        
+                        level_role = level_roles[1]
+
+                        emb = discord.Embed(title=f"This level is already assigned {Emojis.fail_emoji}", 
+                            description=f"""{Emojis.dot_emoji} Do you want to overwrite the role for this level?
+                            {Emojis.dot_emoji} For the level {level} the role <@&{level_role}> is currently assigned.
+                            {Emojis.dot_emoji} If you want to override the role for this level select the yes buttons otherwise select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                        await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status="level"))   
 
 
 
     @commands.slash_command(name = "remove-level-role", description = "Choose a role that you want to remove as a level role!")
     @commands.has_permissions(administrator = True)
-    async def remove_level_role(self, ctx, role:Option(discord.Role, description="Select a level role that you want to remove")):
-        
-        guild_id = ctx.guild.id
-        role_id = role.id
+    async def remove_level_role(self, ctx:commands.Context, role:Option(discord.Role, description="Select a level role that you want to remove")):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild=guild_id, level_role=role_id)
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, level_role=role.id)
 
         if level_roles:
             
-            DatabaseRemoveDatas._remove_level_system_level_roles(guild_id=guild_id, role_id=role_id)
+            DatabaseRemoveDatas._remove_level_system_level_roles(guild_id=ctx.guild.id, role_id=role.id)
 
             emb = discord.Embed(f"This role has been removed as a level role {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The role <@&{role_id}> was successfully removed as a level role.
+                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> was successfully removed as a level role.
                 {Emojis.dot_emoji} If you want to add them again you can do this with the {add_level_role} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
-            level_roles = DatabaseCheck.check_level_system_levelroles(guild=guild_id, status="level_role")
+            level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, status="level_role")
 
             if level_roles:
                 
                 result_strings = []
-                for guild_id, role_id, level, _ in level_roles:
+                for _, role_id, level, _ in level_roles:
                     result_strings.append(f"{Emojis.dot_emoji} <@&{role_id}> we assign on level: {level}")
 
                 result = '\n'.join(result_strings)
@@ -1666,6 +1667,7 @@ class LevelSystem(commands.Cog):
         offset_y = bar_offset_y_1 + 33
         background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
 
+        # Displays the level of the user
         data_display = Image.new(mode="RGBA", size=(200, 33), color=(0, 0, 0))
         data_display = round_corner_mask(radius=50, rectangle=data_display, fill=160)
         background.paste(data_display[0], (655, offset_y), data_display[1])
@@ -1696,35 +1698,9 @@ def round_corner_mask(radius, rectangle, fill):
     mask = mask_rectangle.resize(rectangle.size, Image.ANTIALIAS)
     rectangle.putalpha(mask)
     return (rectangle, mask)
-
-
-
-
-
-##################################################  Voice leveling  ####################################################
-
-
-class VoiceLevelSystem(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    # Testen und neu Optimieren
-    @commands.Cog.listener()
-    async def on_voice_state_update(self, member:discord.Member, before:discord.VoiceState, after:discord.VoiceState):
-        
-        
-        if member.bot:
-            return
-        
-        guild_id = member.guild.id
-        user_id = member.id
-
-        check_settings = DatabaseStatusCheck._level_system_status(guild_id=guild_id)
         
         
        
-
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
-    bot.add_cog(VoiceLevelSystem(bot))
     
