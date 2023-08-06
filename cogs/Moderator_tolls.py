@@ -97,22 +97,6 @@ class moderator_commands(commands.Cog):
 
 
 
-    @commands.slash_command(name = "bans", description = "Get a list with all bans from this server!")
-    @commands.has_permissions(ban_members = True)
-    async def bans_slash(self, ctx):
-        await ctx.defer()
-        bans = await ctx.guild.bans()
-        embed = discord.Embed(title = f"Ban list from {ctx.guild}", timestamp = datetime.now(), color = discord.Colour.red())
-        for entry in bans:
-            if len(embed.fields) >= 25:
-                break
-            if len(embed) > 5900:
-                embed.add_field(name = "**Too many bans in the list!**")
-            else:
-                embed.add_field(name = f"Ban", value = f"**Benutzername:** `{entry.user.name}#{entry.user.discriminator}`\n**Grund:** `{entry.reason}`\n**Benutzer-ID:** `{entry.user.id}`\n**Ist Bot:** `{entry.user.bot}`", inline = False)
-        await ctx.respond(embed = embed)
-
-
     @commands.slash_command(name = "unban", description = "Unbanned a member")
     @commands.has_permissions(ban_members = True)
     async def unban_slash(self, ctx, id: Option(discord.Member, description = "The user ID of the member you want to unban.", required = True)):

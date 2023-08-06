@@ -626,7 +626,10 @@ class LevelSystem(commands.Cog):
         if self.get_ratelimit(message):
             return
 
-        if message.content.startswith("?"):
+        with open("config.yaml", 'r') as f:
+            data = yaml.safe_load(f)
+
+        if message.content.startswith(data["Prefix"]):
             return
 
         if message.author.bot:
@@ -674,8 +677,6 @@ class LevelSystem(commands.Cog):
                                 
                                 # Updates the XP
                                 DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, level=new_level)
-
-                                print("Data were changed")
 
                             except mysql.connector.Error as error:
                                 print("parameterized query failed {}".format(error))
