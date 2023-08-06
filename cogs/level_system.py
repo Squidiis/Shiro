@@ -306,7 +306,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
             else:
 
                 emb = discord.Embed(title=f"Es wurde nichts ausgewählt {Emojis.fail_emoji}", 
-                    description=f"""{Emojis.dot_emoji} Es wurde nichta ausgewählt was auf die Blacklist gesetzt oder entfernt werden soll.
+                    description=f"""{Emojis.dot_emoji} Es wurde nichts ausgewählt was auf die Blacklist gesetzt oder entfernt werden soll.
                     {Emojis.dot_emoji} Wenn du elemente auf die blacklist setzen oder von ihr entfernen möchtest kanns du diesen Command einfach erneut nutzen.""", color=bot_colour)
                 await interaction.edit_original_response(embed=emb, view=None)
 
@@ -413,23 +413,20 @@ class LevelRolesButtons(discord.ui.View):
             if self.role_id == None and self.role_level == None and self.status == None:
 
                 emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen",
-                    description=f"""{Emojis.dot_emoji} Die überschreiben der level role wurde erfolgreich abgebrochen.
-                    {Emojis.dot_emoji} Wenn du alle level rollen sehen möchtest verwende den {show_level_role} command.""")
+                    description=f"""{Emojis.dot_emoji} Wenn du alle level rollen sehen möchtest verwende den {show_level_role} command.""")
 
             else:
 
                 if check_level_roles[1] == self.role_id:
 
                     emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen", 
-                        description=f"""{Emojis.dot_emoji} Das überschreiben der level role wurde erfolgreich abgebrochen.
-                        {Emojis.dot_emoji} Die role <@&{self.role_id}> wird weiterhin bei errechen von level {check_level_roles[2]} vergeben""", color=bot_colour)
+                        description=f"""{Emojis.dot_emoji} Die role <@&{self.role_id}> wird weiterhin bei errechen von level {check_level_roles[2]} vergeben""", color=bot_colour)
                     await interaction.response.edit_message(embed=emb, view=None)
 
                 if check_level_roles[2] == self.role_level:
 
                     emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen", 
-                        description=f"""{Emojis.dot_emoji} Das überschreiben der level role wurde erfolgreich abgebrochen.
-                        {Emojis.dot_emoji} Bei erreichen von level {self.role_level} erhält man weiterhin die rolle {check_level_roles[1]}""", color=bot_colour)
+                        description=f"""{Emojis.dot_emoji} Bei erreichen von level {self.role_level} erhält man weiterhin die rolle {check_level_roles[1]}""", color=bot_colour)
                     await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -465,9 +462,8 @@ class LevelUpChannelButtons(discord.ui.View):
 
                 DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, levelup_channel=self.channel)
 
-                emb = discord.Embed(title=f"Der level up channel wurde erfolgreich überschrieben {Emojis.succesfully_emoji}", 
-                    description=f"""{Emojis.dot_emoji} Der level up channel wurde erfolgreich überschrieben.
-                    {Emojis.dot_emoji} Ab jetzt ist der channel <#{self.channel}> als level up channel zugewiesen.""", color=bot_colour)
+                emb = discord.Embed(title=f"The level up channel was successfully overwritten {Emojis.succesfully_emoji}", 
+                    description=f"""{Emojis.dot_emoji} From now on the channel <#{self.channel}> is assigned as level up channel.""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -481,8 +477,8 @@ class LevelUpChannelButtons(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(title="Erfolgreich abgebrochen", 
-                description=f"Du hast erfolgreich die Überschreibung des level up channels abgebrochen",color = discord.Colour.brand_green())
+            emb = discord.Embed(title=f"Successfully canceled {Emojis.succesfully_emoji}", 
+                description=f"{Emojis.dot_emoji} You have successfully canceled the overwriting of the level up channel",color = bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
         
         else:
@@ -506,9 +502,9 @@ class ResetLevelStatsButton(discord.ui.View):
             guild_id = interaction.guild.id
             DatabaseRemoveDatas._remove_level_system_stats(guild_id=guild_id)
 
-            emb = discord.Embed(title=f"Du hast alle stats des level systems zurückgesetzt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.arrow_emoji} Alle user datein wurden gelöscht jeder user ist jetzt wieder level 0 und hat 0 XP.
-                Es werden wieder bei aktivitäht neue enträge erstellt, wenn sie das nicht möchten stellen sie das level system aus {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(title=f"You have reset all the stats of the level system {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.arrow_emoji} All user files have been deleted every user is now level 0 again and has 0 XP.
+                New entries will be created again when there is activity, if you do not want this, turn off the level system. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
 
@@ -522,9 +518,9 @@ class ResetLevelStatsButton(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
         
-            emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Das resetten der stats wurde erfolgreich abgebrochen.
-                Alle user behalten Ihre stats im level system.""", color=bot_colour)
+            emb = discord.Embed(title=f"The operation was successfully canceled {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji}Resetting the stats was successfully aborted.
+                All users keep their stats in the level system.""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
                     
         else:
@@ -548,9 +544,9 @@ class ResetBlacklistLevelButton(discord.ui.View):
 
             DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", table="level")
 
-            emb = discord.Embed(title=f"Die blacklist wurde geresetet {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.arrow_emoji} alle Channel, User, Rollen und Kategorien wurden von der Blacklist entfernt.
-                Wenn du wieder Dinge auf die Blacklist setzten möchtest kannst du die Befehle wie zuvor nutzen {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(title=f"The blacklist has been reset {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.arrow_emoji} all channels, users, roles and categories have been removed from the blacklist.
+                If you want to blacklist things again you can use the commands as before {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -563,10 +559,10 @@ class ResetBlacklistLevelButton(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(title=f"Der vorgang wurde erfolgreich abgebrochen {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Das resetten der blacklist wurde erfolgreich abgebrochen.
-                Alle Channels, Rollen, Kategorien und User sind weiterhin auf der blacklist gelistet.
-                {Emojis.dot_emoji} Wenn du einzelne elemente von der blacklist steichen möchtest kannst du sie mit den Remove commands streichen lassen {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(title=f"The operation was successfully canceled {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Resetting the blacklist was successfully aborted.
+                All channels, roles, categories and users are still listed on the blacklist.
+                {Emojis.dot_emoji} If you want to remove single elements from the blacklist you can remove them with the Remove commands {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -586,11 +582,11 @@ class ShowBlacklistLevelSystemButton(discord.ui.Button):
             
             channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
-            emb = discord.Embed(title=f"Hier siehst du alle Elemente die auf der Blacklist des level systems stehen {Emojis.exclamation_mark_emoji}", 
-                description=f"""Hier sind alle Elemente aufgelistet die auf der level system Blacklist stehen.""", color=bot_colour)
+            emb = discord.Embed(title=f"Here you can see all the elements that are on the blacklist of the level system {Emojis.exclamation_mark_emoji}", 
+                description=f"""Here are listed all the elements that are on the level system blacklist.""", color=bot_colour)
             emb.add_field(name="Channels:", value=f"{channel}", inline=False)
             emb.add_field(name="Categories:", value=f"{category}", inline=False)
-            emb.add_field(name="Rolles", value=f"{role}", inline=False)
+            emb.add_field(name="Roles", value=f"{role}", inline=False)
             emb.add_field(name="Users", value=f"{user}", inline=False)
             emb.set_footer(icon_url=bot.user.avatar ,text="This message is only visible to you")
             await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
