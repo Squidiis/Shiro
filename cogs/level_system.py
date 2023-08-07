@@ -17,7 +17,7 @@ class BlacklistManagerButtons(discord.ui.View):
         super().__init__(timeout=None)
 
     # Button for adding items to the Blacklist Manager
-    @discord.ui.button(label="Add to Blacklist", style=discord.ButtonStyle.blurple, custom_id="add_blacklist")
+    @discord.ui.button(label="add to blacklist", style=discord.ButtonStyle.blurple, custom_id="add_blacklist")
     async def add_blacklist_manager_button(self, button, interaction:discord.Interaction):
 
         view = BlacklistManagerSelectAdd()
@@ -26,12 +26,12 @@ class BlacklistManagerButtons(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(title=f"Hier kannst du auswählen was du auf die Blacklist setzen möchtest", 
-                description=f"""{Emojis.dot_emoji} Mit den unteren select menüs kannst du auswählen was du auf die Blacklist setzen möchtest!
-                {Emojis.dot_emoji} Du kannst dabei frei wählen was du möchtest du kannst aber nur maximal 5 elemente pro menü auswählen
-                {Emojis.dot_emoji} Wenn du alles ausgewählt hast was du möchtest bestätige deine auswähl indem du auf den Safe configuaration button drückst
-                {Emojis.dot_emoji} Wenn du sehen möchtest schon alles auf der blacklist ist benutzen den Show blacklist button.
-                {Emojis.help_emoji} Falls du etwas auswählen solltest was bereits auf der blacklist ist wird es automatisch aussortiert {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(title=f"Here you can select what you want to blacklist", 
+                description=f"""{Emojis.dot_emoji} With the lower select menus you can choose what you want to put on the blacklist!
+                {Emojis.dot_emoji} You can freely choose what you want, but you can only select a maximum of 5 items per menu.
+                {Emojis.dot_emoji} When you have selected everything you want, confirm your selection by pressing the safe configuration button.
+                {Emojis.dot_emoji} If you want to see already everything on the blacklist use the show blacklist button.
+                {Emojis.help_emoji} If you select something that is already on the blacklist it will be automatically sorted out. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=view)
 
         else:
@@ -40,7 +40,7 @@ class BlacklistManagerButtons(discord.ui.View):
 
 
     # Button for removing items from the Blacklist Manager
-    @discord.ui.button(label="Remove from blacklist", style=discord.ButtonStyle.blurple, custom_id="remove_blacklist")
+    @discord.ui.button(label="remove from blacklist", style=discord.ButtonStyle.blurple, custom_id="remove_blacklist")
     async def remove_blacklist_manager_button(self, button, interaction:discord.Interaction):
         
         view = BlacklistManagerSelectRemove()
@@ -49,11 +49,11 @@ class BlacklistManagerButtons(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(title=f"Hier kannst du auswählen was du von der Blacklist entfernen willst", 
-                description=f"""{Emojis.dot_emoji} Mit den unseren selectmenüs kannst du auswählen was von der Blacklist enfernt werden soll
-                {Emojis.dot_emoji} Wenn du alles ausgewählt hast was du möchtest bestätige deine auswähl indem du auf den Safe configuaration button drückst 
-                {Emojis.dot_emoji} Wenn du nicht weißt was auf der Blacklist steht kannst du entweder auf den show blacklist button drücken oder den {show_blacklist_level} command benutzen
-                {Emojis.help_emoji} Falls du etwas auswählen solltest nicht auf der blacklist ist wird es automatisch aussortiert {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(title=f"Here you can select what you want to remove from the blacklist {Emojis.help_emoji}", 
+                description=f"""{Emojis.dot_emoji} With our selectmenus you can choose what to remove from the blacklist.
+                {Emojis.dot_emoji} When you have selected everything you want, confirm your selection by pressing the Safe configuaration button.
+                {Emojis.dot_emoji} If you don't know what is on the blacklist you can either press the show blacklist button or use the {show_blacklist_level} command.
+                {Emojis.help_emoji} If you select something that is not on the blacklist it will be sorted out automatically.  {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=view)
 
         else:
@@ -162,7 +162,7 @@ class BlacklistManagerSelectAdd(discord.ui.View):
         self.table = "level"
         super().__init__(timeout=None)
 
-    @discord.ui.channel_select(placeholder="Wähle die channels aus die du auf die Blacklist setzen möchtest!", min_values=1, max_values=5, 
+    @discord.ui.channel_select(placeholder="Select the channels you want to blacklist!", min_values=1, max_values=5, 
         channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="add_channel_blacklist_select")
     async def add_blacklist_channel_level_select(self, select, interaction:discord.Interaction):
 
@@ -170,7 +170,7 @@ class BlacklistManagerSelectAdd(discord.ui.View):
         BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", channel_id=channel_list)
         await interaction.response.defer()
 
-    @discord.ui.channel_select(placeholder="Wähle die Kategorien aus die du auf die Blacklist setzen möchtest!", min_values=1, max_values=5, 
+    @discord.ui.channel_select(placeholder="Select the categories you want to blacklist!", min_values=1, max_values=5, 
         channel_types=[discord.ChannelType.category], custom_id="add_category_blacklist_select")
     async def add_blacklist_category_level_select(self, select, interaction:discord.Interaction):
 
@@ -178,14 +178,14 @@ class BlacklistManagerSelectAdd(discord.ui.View):
         BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", category_id=category_list)
         await interaction.response.defer()
 
-    @discord.ui.role_select(placeholder="Wähle die rollen aus die du auf die Blacklist setzen möchtes!", min_values=1, max_values=5, custom_id="add_role_blacklist_select")
+    @discord.ui.role_select(placeholder="Select the roles you want to blacklist!", min_values=1, max_values=5, custom_id="add_role_blacklist_select")
     async def add_blacklist_role_level_select(self, select, interaction:discord.Interaction):
 
         role_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, roles=select.values, operation="add", table=self.table)
         BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", role_id=role_list)
         await interaction.response.defer()
         
-    @discord.ui.user_select(placeholder="Wähle die User aus die du auf die Blacklist setzen möchtest!", min_values=1, max_values=5, custom_id="add_user_blacklist_select")
+    @discord.ui.user_select(placeholder="Select the users you want to blacklist!", min_values=1, max_values=5, custom_id="add_user_blacklist_select")
     async def add_blacklist_user_level_select(self, select, interaction:discord.Interaction):
 
         user_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, users=select.values, operation="add", table=self.table)
@@ -198,7 +198,7 @@ class BlacklistManagerSelectRemove(discord.ui.View):
         self.table = "level"
         super().__init__(timeout=None)
 
-    @discord.ui.channel_select(placeholder="Wähle die channels aus die du von der Blacklist entfernen möchtest!", min_values=1, max_values=5, 
+    @discord.ui.channel_select(placeholder="Select the channels you want to remove from the blacklist!", min_values=1, max_values=5, 
         channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="remove_channel_blacklist_select")
     async def add_blacklist_channel_level_select(self, select, interaction:discord.Interaction):
 
@@ -206,7 +206,7 @@ class BlacklistManagerSelectRemove(discord.ui.View):
         BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", channel_id=channel_list)
         await interaction.response.defer()
 
-    @discord.ui.channel_select(placeholder="Wähle die Kategorien aus die du von der Blacklist entfernen möchtest!", min_values=1, max_values=5, 
+    @discord.ui.channel_select(placeholder="Select the categories you want to remove from the blacklist!", min_values=1, max_values=5, 
         channel_types=[discord.ChannelType.category], custom_id="remove_category_blacklist_select")
     async def add_blacklist_category_level_select(self, select, interaction:discord.Interaction):
 
@@ -214,14 +214,14 @@ class BlacklistManagerSelectRemove(discord.ui.View):
         BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", category_id=category_list)
         await interaction.response.defer()
 
-    @discord.ui.role_select(placeholder="Wähle die rollen aus die du von der Blacklist entfernen möchtes!", min_values=1, max_values=5, custom_id="remove_role_blacklist_select")
+    @discord.ui.role_select(placeholder="Select the roles you want to remove from the blacklist!", min_values=1, max_values=5, custom_id="remove_role_blacklist_select")
     async def add_blacklist_role_level_select(self, select, interaction:discord.Interaction):
         
         role_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, roles=select.values, operation="remove", table=self.table)
         BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", role_id=role_list)
         await interaction.response.defer()
         
-    @discord.ui.user_select(placeholder="Wähle die User aus die du von der Blacklist entfernen möchtest!", min_values=1, max_values=5, custom_id="remove_user_blacklist_select")
+    @discord.ui.user_select(placeholder="Select the users you want to remove from the blacklist!", min_values=1, max_values=5, custom_id="remove_user_blacklist_select")
     async def add_blacklist_user_level_select(self, select, interaction:discord.Interaction):
 
         user_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, users=select.values, operation="remove", table=self.table)
@@ -289,25 +289,25 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
 
                 if temp_blacklist[5] == "add":
 
-                    emb = discord.Embed(title=f"Die ausgwählten elemente wurden auf die blacklist gesetzt {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} Es wurde alles auf die Blacklist gesetzt was du ausgewählt hattest.
-                        {Emojis.dot_emoji} Hier sihst du noch mal alles was hinzugefügt wurde:\n\n{mentions}\n
-                        {Emojis.help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich bereits auf der Blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    emb = discord.Embed(title=f"The selected elements were set on the blacklist {Emojis.succesfully_emoji}", 
+                        description=f"""{Emojis.dot_emoji} Everything you selected was blacklisted.
+                        {Emojis.dot_emoji} Here you can see again everything that was added:\n\n{mentions}\n
+                        {Emojis.help_emoji} If something is not listed it is already on the blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await interaction.edit_original_response(embed=emb, view=None)
 
                 if temp_blacklist[5] == "remove":
 
-                    emb = discord.Embed(title=f"Die ausgewählten elemente wurden von der blacklist entfernt {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} Es wurde alles von der Blacklist entfernt was du ausgewählt hattest.
-                        {Emojis.dot_emoji} Hier sihst du nochmal alles was entfernt wurde: \n\n{mentions}\n
-                        {Emojis.help_emoji} Wenn etwas nicht aufgelistet ist befindet es sich nicht auf der Blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    emb = discord.Embed(title=f"The selected elements have been removed from the blacklist {Emojis.succesfully_emoji}", 
+                        description=f"""{Emojis.dot_emoji} Everything you selected was removed from the blacklist.
+                        {Emojis.dot_emoji} Here you can see again everything that was removed:\n\n{mentions}\n
+                        {Emojis.help_emoji} If something is not listed it is not on the blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await interaction.edit_original_response(embed=emb, view=None)
 
             else:
 
-                emb = discord.Embed(title=f"Es wurde nichts ausgewählt {Emojis.fail_emoji}", 
-                    description=f"""{Emojis.dot_emoji} Es wurde nichts ausgewählt was auf die Blacklist gesetzt oder entfernt werden soll.
-                    {Emojis.dot_emoji} Wenn du elemente auf die blacklist setzen oder von ihr entfernen möchtest kanns du diesen Command einfach erneut nutzen.""", color=bot_colour)
+                emb = discord.Embed(title=f"Nothing was selected {Emojis.fail_emoji}", 
+                    description=f"""{Emojis.dot_emoji} Nothing has been selected to be blacklisted or removed.
+                    {Emojis.dot_emoji} If you want to blacklist or remove items from the blacklist you can simply use this command again.""", color=bot_colour)
                 await interaction.edit_original_response(embed=emb, view=None)
 
 
@@ -323,7 +323,7 @@ class LevelSystemSettings(discord.ui.View):
     
     # Button to set the status of the level system to on
     @discord.ui.button(label="On/Off Level system", style=discord.ButtonStyle.blurple, custom_id="on_off_level_system")
-    async def yes_button_settings(self, button, interaction:discord.Interaction):
+    async def level_system_settings(self, button, interaction:discord.Interaction):
 
         guild_id = interaction.guild.id
         
@@ -333,32 +333,32 @@ class LevelSystemSettings(discord.ui.View):
 
             if check_status == None:
 
-                emb = discord.Embed(title=f"Es wurde kein eintrag gefunden {Emojis.fail_emoji}", 
-                    description=f"""Es wurde kein eintrag gefunden deshalb wurde einer für dein server erstellt. 
-                    {Emojis.dot_emoji} Das Level system wurde auch gleich automatisch eingeschalten.
-                    {Emojis.dot_emoji} Wenn du es deaktivieren möchtest benutzen sie diesen command einfach noch einmal""", color=error_red)
+                emb = discord.Embed(title=f"No entry was found {Emojis.fail_emoji}", 
+                    description=f"""No entry was found so one was created for your server. 
+                    {Emojis.dot_emoji} The level system was also switched on automatically.
+                    {Emojis.dot_emoji} If you want to disable it just use this command again""", color=error_red)
                 await interaction.response.edit_message(embed=emb)
 
             else:
 
                 if check_status[2] == "on":
 
-                    new_status, status = "Ausgeschalten", "off"
-                    opposite_status = "Einschalten"
+                    new_status, status = "Switched off", "off"
+                    opposite_status = "Switch on"
 
                 elif check_status[2] == "off":
 
-                    new_status, status = "Eingeschalten", "on"
-                    opposite_status = "Ausschalten"
+                    new_status, status = "Switch on", "on"
+                    opposite_status = "Switched off"
 
                 DatabaseUpdates.update_level_settings(guild_id=guild_id, level_status=status)
                         
-                emb = discord.Embed(title=f"Das Level system wurde {new_status}", 
-                    description=f"""Sie haben das Level system erfolgreich {new_status}.
-                    {Emojis.dot_emoji} Wenn sie das level system wieder {opposite_status} wollen benutzen sie diesen command einfach noch einmal {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                emb = discord.Embed(title=f"The level system has been {new_status}", 
+                    description=f"""{Emojis.dot_emoji} If you want to {opposite_status} the level system just use this command again {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
         
         else:
+
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
@@ -382,19 +382,19 @@ class LevelRolesButtons(discord.ui.View):
 
             if self.role_id == None and self.role_level == None and self.status == None:
 
-                emb = discord.Embed(title=f"Die rolle oder das Level konnte nicht überschrieben werden {Emojis.fail_emoji}", 
-                    description=f"""{Emojis.dot_emoji} Die rolle oder das Level konnte nicht überschrieben werden da der Prozess abgelaufen ist.
-                    {Emojis.dot_emoji} Dies Passiert wenn man zu lange wartet um auf den Button zu reagieren.
-                    {Emojis.dot_emoji} Du kannst den Command einfach erneut ausführen wenn du das level oder die rolle noch immer überschreiben möchtest {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                emb = discord.Embed(title=f"The role or level could not be overwritten {Emojis.fail_emoji}", 
+                    description=f"""{Emojis.dot_emoji} The role or level could not be overwritten because the process has expired.
+                    {Emojis.dot_emoji} This happens when you wait too long to react to the button.
+                    {Emojis.dot_emoji} You can simply run the command again if you still want to overwrite the level or role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
             else:
 
                 DatabaseUpdates.update_level_roles(guild_id=guild_id, role_id=self.role_id, role_level=self.role_level, status=self.status)
                             
-                emb = discord.Embed(title=f"Erfolgreiche überschreibung der level role {Emojis.succesfully_emoji}", 
-                    description=f"""{Emojis.dot_emoji} Die level role wurde erfolgreich überschrieben. 
-                    {Emojis.dot_emoji} Die role <@&{self.role_id}> wird ab jetzt bei level {self.role_level} vergeben.""", color=bot_colour)
+                emb = discord.Embed(title=f"Successful override of the level role {Emojis.succesfully_emoji}", 
+                    description=f"""{Emojis.dot_emoji} The level role was successfully overwritten.
+                    {Emojis.dot_emoji} The role <@&{self.role_id}> will be assigned at level {self.role_level} from now on.""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -408,30 +408,32 @@ class LevelRolesButtons(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
+            title = "The overwriting of the level role was canceled"
             check_level_roles = DatabaseCheck.check_level_system_levelroles(guild=interaction.guild.id, level_role=self.role_id, needed_level=self.role_level, status="check")
 
             if self.role_id == None and self.role_level == None and self.status == None:
 
-                emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen",
-                    description=f"""{Emojis.dot_emoji} Wenn du alle level rollen sehen möchtest verwende den {show_level_role} command.""")
+                emb = discord.Embed(title=title,
+                    description=f"""{Emojis.dot_emoji} If you want to see all level roles use the {show_level_role} command.""", color=bot_colour)
+                await interaction.response.edit_message(embed=emb, view=None)
 
             else:
 
                 if check_level_roles[1] == self.role_id:
 
-                    emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen", 
-                        description=f"""{Emojis.dot_emoji} Die role <@&{self.role_id}> wird weiterhin bei errechen von level {check_level_roles[2]} vergeben""", color=bot_colour)
+                    emb = discord.Embed(title=title, 
+                        description=f"""{Emojis.dot_emoji} The role <@&{self.role_id}> will still be assigned when level {check_level_roles[2]} is reached""", color=bot_colour)
                     await interaction.response.edit_message(embed=emb, view=None)
 
                 if check_level_roles[2] == self.role_level:
 
-                    emb = discord.Embed(title=f"Die überschreibung der level role wurde abgebrochen", 
-                        description=f"""{Emojis.dot_emoji} Bei erreichen von level {self.role_level} erhält man weiterhin die rolle {check_level_roles[1]}""", color=bot_colour)
+                    emb = discord.Embed(title=title, 
+                        description=f"""{Emojis.dot_emoji} When reaching level {self.role_level} you still get the role {check_level_roles[1]}""", color=bot_colour)
                     await interaction.response.edit_message(embed=emb, view=None)
 
         else:
             
-            await interaction.response.send_message(embed=no_permissions_emb ,view=None, ephemeral=True)
+            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
 
 
 
@@ -451,10 +453,10 @@ class LevelUpChannelButtons(discord.ui.View):
 
             if self.channel == None:
 
-                emb = discord.Embed(title=f"Der level up channel konnte nicht überschrieben werden {Emojis.fail_emoji}", 
-                    description=f"""{Emojis.dot_emoji} Der level up channel konnte nicht überschrieben werden da der Prozess abgelaufen ist.
-                    {Emojis.dot_emoji} Dies Passiert wenn man zu lange wartet um auf den Button zu reagieren.
-                    {Emojis.dot_emoji} Du kannst den Command einfach erneut ausführen wenn du den level up channel noch immer überschreiben möchtest {Emojis.exclamation_mark_emoji}""")
+                emb = discord.Embed(title=f"The level up channel could not be overwritten {Emojis.fail_emoji}", 
+                    description=f"""{Emojis.dot_emoji} The level up channel could not be overwritten because the process has expired.
+                    {Emojis.dot_emoji} This happens when you wait too long to react to the button.
+                    {Emojis.dot_emoji} You can simply run the command again if you still want to overwrite the level up channel {Emojis.exclamation_mark_emoji}""")
                 await interaction.response.edit_message(embed=emb, view=None)
 
 
@@ -519,8 +521,8 @@ class ResetLevelStatsButton(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
         
             emb = discord.Embed(title=f"The operation was successfully canceled {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji}Resetting the stats was successfully aborted.
-                All users keep their stats in the level system.""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} Resetting the stats was successfully aborted.
+                {Emojis.dot_emoji} All users keep their stats in the level system.""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
                     
         else:
@@ -545,8 +547,8 @@ class ResetBlacklistLevelButton(discord.ui.View):
             DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", table="level")
 
             emb = discord.Embed(title=f"The blacklist has been reset {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.arrow_emoji} all channels, users, roles and categories have been removed from the blacklist.
-                If you want to blacklist things again you can use the commands as before {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                description=f"""{Emojis.arrow_emoji} All channels, users, roles and categories have been removed from the blacklist.
+                {Emojis.dot_emoji} If you want to blacklist things again you can use the commands as before {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -561,7 +563,7 @@ class ResetBlacklistLevelButton(discord.ui.View):
 
             emb = discord.Embed(title=f"The operation was successfully canceled {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Resetting the blacklist was successfully aborted.
-                All channels, roles, categories and users are still listed on the blacklist.
+                {Emojis.dot_emoji} All channels, roles, categories and users are still listed on the blacklist.
                 {Emojis.dot_emoji} If you want to remove single elements from the blacklist you can remove them with the Remove commands {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
