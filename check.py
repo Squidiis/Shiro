@@ -1,40 +1,6 @@
 import discord 
 from Import_file import *
 
-
-def check_exists(guild_id:int, user_id:int = None, channel_id:int = None, category_id:int = None, role_id:int = None):
-
-    guild = bot.get_guild(guild_id)
-
-    if user_id != None:
-
-        if guild.get_member(user_id) is not None:
-
-            return True
-        
-        else:
-
-            return False
-        
-    if channel_id != None:
-
-        if guild.get_channel(channel_id) is not None:
-
-            return True
-        
-        else:
-
-            return False
-        
-    if role_id != None:
-
-        if guild.get_role(role_id) is not None:
-
-            return True
-        
-        else:
-
-            return False
         
 
 class ShowBlacklist():

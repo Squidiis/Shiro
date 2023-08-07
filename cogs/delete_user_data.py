@@ -81,5 +81,33 @@ class UserLeavesServer(commands.Cog):
                 return True
 
 
+class DeleteData(commands.Cog):
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    def delete_data(self, table:str, column:str, item:str):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        delete_datas = f"DELETE {table} WHERE guildId = %s AND {column} = %s"
+        delete_datas_values = [table, item.guild.id, item.id]
+
+
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel):
+
+        tables = ["LevelSystemBlacklist", "ManageBlacklistTemp", "AutoReactionSetup", "LevelSystemSettings", "EconomySystemBlacklist", "EconomySystemSettings"]
+        for table in tables:
+
+            DeleteData.delete_data(table=table, column="channelId", item=channel)
+
+    
+    
+        
+
+
 def setup(bot):
+    bot.add_cog(DeleteData(bot))
     bot.add_cog(UserLeavesServer(bot))
