@@ -95,7 +95,8 @@ DROP TABLE IF EXISTS `BotSettings`;
 
 CREATE TABLE BotSettings (
     guildId BIGINT UNSIGNED NOT NULL,
-    prefix VARCHAR(20) DEFAULT '?'
+    prefix VARCHAR(20) DEFAULT '?',
+    botColour VARCHAR(20) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

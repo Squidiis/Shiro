@@ -207,7 +207,7 @@ class DatabaseCheck():
     
     
     # Checks the level roles, when you get them or what level you need to get them
-    def check_level_system_levelroles(guild:int, level_role:int = None, needed_level:int = None, status:str = None):
+    def check_level_system_levelroles(guild_id:int, level_role:int = None, needed_level:int = None, status:str = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -215,32 +215,32 @@ class DatabaseCheck():
         if level_role != None and needed_level != None and status == None:
 
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s AND roleId = %s AND roleLevel = %s"
-            levelsys_levelroles_check_values = [guild, level_role, needed_level]
+            levelsys_levelroles_check_values = [guild_id, level_role, needed_level]
         
         elif level_role != None and needed_level == None and status == None:
 
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s AND roleId = %s"
-            levelsys_levelroles_check_values = [guild, level_role]
+            levelsys_levelroles_check_values = [guild_id, level_role]
 
         elif level_role == None and needed_level != None and status == None:
 
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s AND roleLevel = %s"
-            levelsys_levelroles_check_values = [guild, needed_level]
+            levelsys_levelroles_check_values = [guild_id, needed_level]
 
         elif level_role != None and needed_level != None and status == "check":
 
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s AND roleId = %s OR roleLevel = %s"
-            levelsys_levelroles_check_values = [guild, level_role, needed_level]
+            levelsys_levelroles_check_values = [guild_id, level_role, needed_level]
 
         elif level_role == None and needed_level == None and status == "level_role":
             
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s ORDER BY roleLevel DESC"
-            levelsys_levelroles_check_values = [guild]
+            levelsys_levelroles_check_values = [guild_id]
 
         else:
 
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s"
-            levelsys_levelroles_check_values = [guild]
+            levelsys_levelroles_check_values = [guild_id]
 
         cursor.execute(levelsys_levelroles_check, levelsys_levelroles_check_values)
 
@@ -387,15 +387,15 @@ class DatabaseUpdates():
 
 
     # Inserts all data of the user into the database
-    def _insert_user_stats_level(guild_id:int, user_id:int, user_name:str, user_level:int = 0, user_xp:int = 0):
+    def _insert_user_stats_level(guild_id:int, user_id:int, user_name:str, user_level:int = 0, user_xp:int = 0, whole_xp:int = 0):
     
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
         try:
 
-            insert_new_user = "INSERT INTO LevelSystemStats (guildId, userId, userLevel, userXp, userName) VALUES (%s, %s, %s, %s, %s)"        
-            insert_new_user_values = [guild_id, user_id, user_level, user_xp, user_name]
+            insert_new_user = "INSERT INTO LevelSystemStats (guildId, userId, userLevel, userXp, userName, wholeXp) VALUES (%s, %s, %s, %s, %s, %s)"        
+            insert_new_user_values = [guild_id, user_id, user_level, user_xp, user_name, whole_xp]
             cursor.execute(insert_new_user, insert_new_user_values)
             db_connect.commit()
 
@@ -503,7 +503,7 @@ class DatabaseUpdates():
 
 
     # Update the stats from users in the level system  
-    def _update_user_stats_level(guild_id:int, user_id:int, level:int = None, xp:int = None):
+    def _update_user_stats_level(guild_id:int, user_id:int, level:int = None, xp:int = None, whole_xp:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -512,8 +512,8 @@ class DatabaseUpdates():
 
             if xp != None:
 
-                update_stats = f"UPDATE LevelSystemStats SET userXp = %s WHERE guildId = %s  AND userId = %s"
-                update_stats_values = [xp, guild_id, user_id]
+                update_stats = f"UPDATE LevelSystemStats SET userXp = %s, wholeXp = %s WHERE guildId = %s  AND userId = %s"
+                update_stats_values = [xp, whole_xp, guild_id, user_id]
 
             elif level != None:
 
@@ -696,7 +696,7 @@ class DatabaseRemoveDatas():
 
 
     # Removes level roles from the level system
-    def _remove_level_system_level_roles(guild:int, role_id:int = None, role_level:int = None):
+    def _remove_level_system_level_roles(guild_id:int, role_id:int = None, role_level:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -710,12 +710,12 @@ class DatabaseRemoveDatas():
 
             if all([role_id, role_level]) == None:
                 remove_level_role = "DELETE FROM LevelSystemRoles WHERE guildId = %s"
-                remove_level_role_values = [guild]
+                remove_level_role_values = [guild_id]
 
             else:
 
                 remove_level_role = f"DELETE FROM LevelSystemRoles WHERE guildId = %s AND {column_name} = %s"
-                remove_level_role_values = [guild, data]
+                remove_level_role_values = [guild_id, data]
 
             cursor.execute(remove_level_role, remove_level_role_values)
             db_connect.commit()

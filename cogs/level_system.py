@@ -10,12 +10,9 @@ import re
 
 class CheckLevelSystem():
 
-    def __init__(self):
-        self.table = "level"
+    def show_blacklist_level(guild_id:int):
 
-    def show_blacklist_level(self, guild_id:int):
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table=self.table)
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="level")
         
         if blacklist:
 
@@ -668,7 +665,12 @@ class LevelSystem(commands.Cog):
         xp = 20
         return xp
     
-    def round_corner_mask(self, radius, rectangle, fill):
+    def xp_generator_global(self):
+        xp = 20
+        return xp
+    
+    @staticmethod
+    def round_corner_mask(radius, rectangle, fill):
     
         bigsize = (rectangle.size[0] * 3, rectangle.size[1] * 3)
         mask_rectangle = Image.new('L', bigsize, 0)
@@ -720,19 +722,20 @@ class LevelSystem(commands.Cog):
                     if check_if_exists:
 
                         # All user stats                   
-                        user_level, user_xp = check_if_exists[2], check_if_exists[3]
                         if check_if_exists[2] >= 999:
                             return
 
                         XP = self.xp_generator()
-                        user_has_xp = user_xp + XP 
+                        xp_global = self.xp_generator_global()
+                        user_xp_global = xp_global + check_if_exists[6]
+                        user_has_xp = check_if_exists[3] + XP 
                                                                     
-                        xp_need_next_level = 5 * (user_level ^ 2) + (50 * user_level) + 100 - user_xp
-                        final_xp = xp_need_next_level + user_xp
+                        xp_need_next_level = 5 * (check_if_exists[2] ^ 2) + (50 * check_if_exists[2]) + 100 - check_if_exists[3]
+                        final_xp = xp_need_next_level + check_if_exists[3]
                         
                         if user_has_xp >= final_xp:
                                                                         
-                            new_level = user_level + 1    
+                            new_level = check_if_exists[2] + 1    
 
                             try:
                                 
@@ -786,7 +789,7 @@ class LevelSystem(commands.Cog):
 
                             try:
 
-                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp)                       
+                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp, whole_xp=user_xp_global)                       
                                 print("Data were changed")
 
                             except mysql.connector.Error as error:
@@ -819,7 +822,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            check_stats = DatabaseCheck.check_level_system_stats(guild=ctx.guild.id, user=user.id)
+            check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
 
             if check_stats:
                 
@@ -879,7 +882,7 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         user_name = user.name
             
-        check_stats = DatabaseCheck.check_level_system_stats(guild=guild_id, user=user_id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=guild_id, user=user_id)
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -976,7 +979,7 @@ class LevelSystem(commands.Cog):
         guild_id = ctx.guild.id
         user_name = user.name
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild=guild_id, user=user_id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=guild_id, user=user_id)
         
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -1015,13 +1018,13 @@ class LevelSystem(commands.Cog):
                 await ctx.respond(embed=emb)    
     
     
-    @commands.slash_command(name = "reset-level", description = "Reset all levels and xp of everyone!")
+    @commands.slash_command(name = "reset-level-system", description = "Reset all levels and xp of everyone!")
     @commands.has_permissions(administrator = True)
     async def reset_levels_slash(self, ctx):
 
         guild_id = ctx.guild.id
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild=guild_id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=guild_id)
 
         if check_stats:
 
@@ -1061,7 +1064,7 @@ class LevelSystem(commands.Cog):
             my_cursor.execute(rank_show_infos_level, rank_show_infos_levels_values)
             all_info = my_cursor.fetchall()
           
-            for _, user_id_rank, _, _, _, _ in all_info:
+            for _, user_id_rank, _, _, _, _, _ in all_info:
                     
                 if user.id == user_id_rank:
                 
@@ -1072,7 +1075,7 @@ class LevelSystem(commands.Cog):
                         if user.id == rank_count[1]:
 
                             rank = count 
-                            print(check_user)
+                            
             xp = check_user[3]
         
             xp_needed = 5 * (check_user[2] ^ 2) + (50 * check_user[2]) + 100 - check_user[3]
@@ -1110,20 +1113,18 @@ class LevelSystem(commands.Cog):
 
             bar_offset_x = 304
             bar_offset_y = 179
-            bar_offset_x_1 = 849
-            bar_offset_y_1 = 214
-
+        
             bar = Image.new('RGBA', (545, 36), (0, 0, 0))
             bar = self.round_corner_mask(radius=50, rectangle=bar, fill=160)
             background.paste(bar[0], (bar_offset_x, bar_offset_y), bar[1])
 
             # Filling Bar
-            bar_length = bar_offset_x_1 - bar_offset_x
+            bar_length = 849 - bar_offset_x
             progress = (final_xp - xp_have) * 100 / final_xp
             progress = 100 - progress
             progress_bar_length = round(bar_length * progress / 100)
             bar_offset_x_1 = bar_offset_x + progress_bar_length
-            print(bar_offset_x_1)
+           
             # Progress Bar
             progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
             progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255)
@@ -1131,7 +1132,7 @@ class LevelSystem(commands.Cog):
 
             xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
             xp_display_line = self.round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
-            offset_y = bar_offset_y_1 + 33
+            offset_y = 247
             background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
 
             # Displays the level of the user
@@ -1142,18 +1143,15 @@ class LevelSystem(commands.Cog):
             # Blitting Name
             draw.text((304, 97), user.name, font=big_font, fill=(255, 255, 255))
 
-            offset_x = 315
-            offset_y = offset_y + 2
-            draw.text((offset_x, offset_y), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
+            draw.text((315, 249), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
 
-            offset_x = 665
-            draw.text((offset_x, offset_y), f"#{rank} Lvl {check_user[3]}", font=small_font, fill=(255, 255, 255))
+            draw.text((665, offset_y), f"#{rank} Lvl {check_user[2]}", font=small_font, fill=(255, 255, 255))
 
             bytes = BytesIO()
             background.save(bytes, format="PNG")
             bytes.seek(0)
             dfile = discord.File(bytes, filename="card.png")
-            await ctx.send(file=dfile)
+            await ctx.respond(file=dfile)
 
         else:
 
@@ -1506,7 +1504,7 @@ class LevelSystem(commands.Cog):
     async def add_level_role(self, ctx:commands.Context, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
         level:Option(int, description = "Enter a level from which this role should be assigned")):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, level_role=role.id, needed_level=level, status="check")
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status="check")
 
         emb_level_0 = discord.Embed(title=f"The level you want to set is 0 {Emojis.fail_emoji}", 
             description=f"""{Emojis.dot_emoji} The level to vest a level role must be at least **1**.""", color=error_red)
@@ -1538,7 +1536,7 @@ class LevelSystem(commands.Cog):
 
             else:
 
-                check_same = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, level_role=role.id, needed_level=level)
+                check_same = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level)
                     
                 if check_same:
 
@@ -1575,7 +1573,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_level_role(self, ctx:commands.Context, role:Option(discord.Role, description="Select a level role that you want to remove")):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, level_role=role.id)
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id)
 
         if level_roles:
             
@@ -1588,7 +1586,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, status="level_role")
+            level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
 
             if level_roles:
                 
@@ -1612,7 +1610,7 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-all-level-roles", description = "View all rolls that are available with a level!")
     async def show_all_level_roles(self, ctx:commands.Context):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild=ctx.guild.id, status="level_role")
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
         
         if level_roles:
             
@@ -1708,6 +1706,23 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title=f"No level up channel has been set {Emojis.help_emoji}", 
                 description=f"""{Emojis.dot_emoji} No level up channel has been set if you want to set one use that:\n{add_level_up_channel} command""", color=error_red)
             await ctx.respond(embed=emb)
+
+
+    @commands.slash_command(name = "")
+    async def set_xp_rate(self, ctx:commands.Context, xp:Option(int, description="Setze einen Grundwert wie viel XP man pro nachricht bekommt!")):
+
+        if xp <= 0:
+
+            emb = discord.Embed(title=f"Die xp menge die du festlegen willst ist zu niedrieg {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die XP menge die du festlegen möchtest ist zu gering sie muss mindestens 1 sein!""", color=error_red)
+            await ctx.respond(embed=emb)
+
+        else:
+            
+            
+
+            emb = discord.Embed(title="", 
+                description=f"""""", color=bot_colour)
 
 
         
