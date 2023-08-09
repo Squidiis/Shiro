@@ -13,7 +13,7 @@ class CheckLevelSystem():
     def __init__(self):
         self.table = "level"
 
-    def show_blacklist_level(self, guild_id):
+    def show_blacklist_level(self, guild_id:int):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table=self.table)
         
@@ -31,31 +31,31 @@ class CheckLevelSystem():
                 None if None == blacklist_user else all_users.append(f"{Emojis.dot_emoji} <@{blacklist_user}>\n")
                 
             if all_channels == []:
-                channels_mention = f"{Emojis.dot_emoji} Es gibt keine channels auf der Blacklist"
+                channels_mention = f"{Emojis.dot_emoji} There are no channels on the blacklist"
             else:
                 channels_mention = "".join(all_channels)
                 
             if all_categories == []:
-                categories_mention = f"{Emojis.dot_emoji} Es gibt keine categories auf der Blacklist"
+                categories_mention = f"{Emojis.dot_emoji} There are no categories on the blacklist"
             else:
                 categories_mention = "".join(all_categories)
                 
             if all_roles == []:
-                roles_mention = f"{Emojis.dot_emoji} Es gibt keine roles auf der Blacklist"
+                roles_mention = f"{Emojis.dot_emoji} There are no roles on the blacklist"
             else:
                 roles_mention = "".join(all_roles)
                 
             if all_users == []:
-                users_mention = f"{Emojis.dot_emoji} Es gibt keine users auf der Blacklist"
+                users_mention = f"{Emojis.dot_emoji} There are no users on the blacklist"
             else:
                 users_mention = "".join(all_users)
         
         else:
 
-            channels_mention = f"{Emojis.dot_emoji} Es gibt keine channels auf der Blacklist"
-            categories_mention = f"{Emojis.dot_emoji} Es gibt keine categories auf der Blacklist"
-            roles_mention = f"{Emojis.dot_emoji} Es gibt keine roles auf der Blacklist"
-            users_mention = f"{Emojis.dot_emoji} Es gibt keine users auf der Blacklist"
+            channels_mention = f"{Emojis.dot_emoji} There are no channels on the blacklist"
+            categories_mention = f"{Emojis.dot_emoji} There are no categories on the blacklist"
+            roles_mention = f"{Emojis.dot_emoji} There are no roles on the blacklist"
+            users_mention = f"{Emojis.dot_emoji} There are no users on the blacklist"
 
         return [channels_mention, categories_mention, roles_mention, users_mention]
 
@@ -633,7 +633,7 @@ class ShowBlacklistLevelSystemButton(discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
 
             guild_id = interaction.guild.id
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=guild_id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=guild_id)
             
             channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
@@ -667,6 +667,16 @@ class LevelSystem(commands.Cog):
     def xp_generator(self):
         xp = 20
         return xp
+    
+    def round_corner_mask(self, radius, rectangle, fill):
+    
+        bigsize = (rectangle.size[0] * 3, rectangle.size[1] * 3)
+        mask_rectangle = Image.new('L', bigsize, 0)
+        draw = ImageDraw.Draw(mask_rectangle)
+        draw.rounded_rectangle((0, 0)+bigsize, radius=radius, fill=fill, outline=None)
+        mask = mask_rectangle.resize(rectangle.size, Image.ANTIALIAS)
+        rectangle.putalpha(mask)
+        return (rectangle, mask)
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -1038,10 +1048,11 @@ class LevelSystem(commands.Cog):
         connection_to_db_level = DatabaseSetup.db_connector()
         my_cursor = connection_to_db_level.cursor()
 
-        error_emb = discord.Embed(title="The user was not found", 
-            description="The user either does not exist or he has not yet shown that he exists.", color=error_red)
+        error_emb = discord.Embed(title=f"The user was not found {Emojis.fail_emoji}", 
+            description=f"""{Emojis.dot_emoji} Der User wurde nich gefunden es kann sein das er noch nicht am level system teilimmt.
+            {Emojis.help_emoji} Man nimmt erst am level system teil wemm man mindestens eine Nachricht in einen Channel gesendet hat der auf keiner Blacklist steht {Emojis.exclamation_mark_emoji}""", color=error_red)
 
-        check_user = DatabaseCheck.check_level_system_stats(guild=ctx.guild.id, user=user.id)
+        check_user = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
         
         if check_user:
 
@@ -1068,39 +1079,85 @@ class LevelSystem(commands.Cog):
             final_xp = xp_needed + xp
             xp_have = check_user[3]
 
-            percentage = int(((xp_have * 100)/ final_xp))
+            # Create card
 
-            poppins = Font.poppins(size=70)
-            poppins_small = Font.poppins(size=30)
+            big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
+            small_font = ImageFont.truetype("arial.ttf", 24)
 
-            background = Editor(("assets/rank-card/card1.png"))
-            profile = await load_image_async(user.display_avatar.url)
-            circle_avatar = Editor(profile).resize((200, 200)).circle_image()
+            background_color = (8, 120, 151)
+            background = Image.new("RGBA", (885, 303), color=background_color)
+            new_background = self.round_corner_mask(radius=50, rectangle=background, fill=255)
+            background.paste(new_background[0], (0, 0), new_background[1])
 
-            imag = Editor("assets/rank-card/zBLACK.png")
-            
-            background.blend(image=imag, alpha=.5, on_top=True)
-            background.ellipse((15, 15), width=210, height=210, outline="#1b67e0", stroke_width=10)
-            background.rectangle((40, 250), width=720, height=40, fill="#484b4e", radius=15)
-            
-            background.paste(circle_avatar, (20, 20))
-            background.rectangle((250, 180), width=650, height=40, fill="#fff", radius=15)
-            background.bar((250, 180), max_width=650, height=40, percentage=percentage, fill="#1b67e0", radius=15)
+            img = Image.open("assets/rank-card/card2.png").resize((867, 285))
+            filtered_image = img.filter(ImageFilter.BoxBlur(4))
+            new_img = self.round_corner_mask(radius=50, rectangle=filtered_image, fill=255)
+            background.paste(new_img[0], (9, 9), mask=new_img[1])
 
-            background.text((260, 50), text=user.name, font=poppins, color="white")
-            background.text((260, 135), text=f"Level : {check_user[2]}", font=poppins_small, color="white")
-            background.text((680, 135), text=f"XP : {xp} / {final_xp}", font=poppins_small, color="white")
-            background.text((920, 187), text=f"# {rank}", font=poppins_small, color="white")
+            # Get the profile picture and set it on the background
+            pfp = BytesIO(await user.display_avatar.read())
+            profile = Image.open(pfp).resize((225, 225))
+            bigsize = (profile.size[0] * 3, profile.size[1] * 3)
+            mask = Image.new("L", bigsize, 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((0, 0)+ bigsize, 255)
+            mask = mask.resize(profile.size, Image.ANTIALIAS)
+            profile.putalpha(mask)
 
-                
-            rank_card = discord.File(fp=background.image_bytes, filename="rank.png")
-            await ctx.respond(file=rank_card)
+            background.paste(profile, (47, 39), mask=mask)
+
+            draw = ImageDraw.Draw(background)
+
+            bar_offset_x = 304
+            bar_offset_y = 179
+            bar_offset_x_1 = 849
+            bar_offset_y_1 = 214
+
+            bar = Image.new('RGBA', (545, 36), (0, 0, 0))
+            bar = self.round_corner_mask(radius=50, rectangle=bar, fill=160)
+            background.paste(bar[0], (bar_offset_x, bar_offset_y), bar[1])
+
+            # Filling Bar
+            bar_length = bar_offset_x_1 - bar_offset_x
+            progress = (final_xp - xp_have) * 100 / final_xp
+            progress = 100 - progress
+            progress_bar_length = round(bar_length * progress / 100)
+            bar_offset_x_1 = bar_offset_x + progress_bar_length
+            print(bar_offset_x_1)
+            # Progress Bar
+            progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
+            progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255)
+            background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
+
+            xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
+            xp_display_line = self.round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
+            offset_y = bar_offset_y_1 + 33
+            background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
+
+            # Displays the level of the user
+            data_display = Image.new(mode="RGBA", size=(200, 33), color=(0, 0, 0))
+            data_display = self.round_corner_mask(radius=50, rectangle=data_display, fill=160)
+            background.paste(data_display[0], (655, offset_y), data_display[1])
+
+            # Blitting Name
+            draw.text((304, 97), user.name, font=big_font, fill=(255, 255, 255))
+
+            offset_x = 315
+            offset_y = offset_y + 2
+            draw.text((offset_x, offset_y), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
+
+            offset_x = 665
+            draw.text((offset_x, offset_y), f"#{rank} Lvl {check_user[3]}", font=small_font, fill=(255, 255, 255))
+
+            bytes = BytesIO()
+            background.save(bytes, format="PNG")
+            bytes.seek(0)
+            dfile = discord.File(bytes, filename="card.png")
+            await ctx.send(file=dfile)
 
         else:
-                            
-            await ctx.respond(embed=error_emb)
 
-        DatabaseSetup.db_close(cursor=my_cursor, db_connection=connection_to_db_level)
+            await ctx.respond(embed=error_emb) 
 
 
 
@@ -1183,7 +1240,7 @@ class LevelSystem(commands.Cog):
 
         if blacklist:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This channel is already on the blacklist {Emojis.fail_emoji}", 
                 description=f"""The following channels are on the blacklist:\n
@@ -1218,7 +1275,7 @@ class LevelSystem(commands.Cog):
         
         else:
             
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This channel is not on the blacklist {Emojis.fail_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel: <#{channel.id}> is not blacklisted.
@@ -1234,7 +1291,7 @@ class LevelSystem(commands.Cog):
         
         if blacklist:
             
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
                 
             emb = discord.Embed(title=f"This category is already on the blacklist {Emojis.fail_emoji}", 
                 description=f"""The following categories are on the blacklist:\n
@@ -1269,7 +1326,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This category is not on the blacklist{Emojis.fail_emoji}", 
                 description=f"""{Emojis.dot_emoji} The category: <#{category.id}> is not on the blacklist.
@@ -1285,7 +1342,7 @@ class LevelSystem(commands.Cog):
 
         if blacklist:
      
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This role is already on the blacklist {Emojis.fail_emoji}", 
                 description=f"""The following roles are on the blacklist:\n\n{blacklist[2]}
@@ -1319,7 +1376,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This role is not blacklisted {Emojis.fail_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role: <@&{role.id}> is not blacklisted.
@@ -1340,7 +1397,7 @@ class LevelSystem(commands.Cog):
 
             if blacklist:
 
-                blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+                blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
                 emb = discord.Embed(title=f"This user is already on the blacklist {Emojis.fail_emoji}", 
                     description=f"""The following users are on the blacklist:\n\n{blacklist[3]}
@@ -1374,7 +1431,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This user is not on the blacklist {Emojis.fail_emoji}", 
                 description=f"""The user: <@{user.id}> is not on the blacklist.
@@ -1427,7 +1484,7 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-level-blacklist", description = "Shows you everything that is blacklisted!")
     async def show_blacklist(self, ctx:commands.Context):
 
-        blacklist = ShowBlacklist._show_blacklist_level(guild_id=ctx.guild.id)
+        blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
         channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
         emb = discord.Embed(title=f"Here you can see the complete level system blacklist", 
@@ -1653,100 +1710,6 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.command()
-    async def test2(self, ctx, user:discord.User):
-        
-        background_color = (8, 120, 151)
-        user_name = user.name
-        final_xp = 5000000
-        xp = 4000000
-        rank = 100
-        level = 100
-
-        big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
-        small_font = ImageFont.truetype("arial.ttf", 24)
-
-        background = Image.new("RGBA", (885, 303), color=background_color)
-        new_background = round_corner_mask(radius=50, rectangle=background, fill=255)
-        background.paste(new_background[0], (0, 0), new_background[1])
-
-        img = Image.open("assets/rank-card/card2.png").resize((867, 285))
-        filtered_image = img.filter(ImageFilter.BoxBlur(4))
-        new_img = round_corner_mask(radius=50, rectangle=filtered_image, fill=255)
-        background.paste(new_img[0], (9, 9), mask=new_img[1])
-
-        # Get the profile picture and set it on the background
-        pfp = BytesIO(await user.display_avatar.read())
-        profile = Image.open(pfp).resize((225, 225))
-        bigsize = (profile.size[0] * 3, profile.size[1] * 3)
-        mask = Image.new("L", bigsize, 0)
-        draw = ImageDraw.Draw(mask)
-        draw.ellipse((0, 0)+ bigsize, 255)
-        mask = mask.resize(profile.size, Image.ANTIALIAS)
-        profile.putalpha(mask)
-
-        background.paste(profile, (47, 39), mask=mask)
-
-        draw = ImageDraw.Draw(background)
-
-        bar_offset_x = 304
-        bar_offset_y = 179
-        bar_offset_x_1 = 849
-        bar_offset_y_1 = 214
-
-        bar = Image.new('RGBA', (545, 36), (0, 0, 0))
-        bar = round_corner_mask(radius=50, rectangle=bar, fill=160)
-        background.paste(bar[0], (bar_offset_x, bar_offset_y), bar[1])
-
-        # Filling Bar
-        bar_length = bar_offset_x_1 - bar_offset_x
-        progress = (final_xp - xp) * 100 / final_xp
-        progress = 100 - progress
-        progress_bar_length = round(bar_length * progress / 100)
-        bar_offset_x_1 = bar_offset_x + progress_bar_length
-        print(bar_offset_x_1)
-        # Progress Bar
-        progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
-        progress_bar = round_corner_mask(radius=50, rectangle=progress_bar, fill=255)
-        background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
-
-        xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
-        xp_display_line = round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
-        offset_y = bar_offset_y_1 + 33
-        background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
-
-        # Displays the level of the user
-        data_display = Image.new(mode="RGBA", size=(200, 33), color=(0, 0, 0))
-        data_display = round_corner_mask(radius=50, rectangle=data_display, fill=160)
-        background.paste(data_display[0], (655, offset_y), data_display[1])
-
-        # Blitting Name
-        draw.text((304, 97), user_name, font=big_font, fill=(255, 255, 255))
-
-        offset_x = 315
-        offset_y = offset_y + 2
-        draw.text((offset_x, offset_y), f"{xp:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
-
-        offset_x = 665
-        draw.text((offset_x, offset_y), f"#{rank} Lvl {level}", font=small_font, fill=(255, 255, 255))
-
-        bytes = BytesIO()
-        background.save(bytes, format="PNG")
-        bytes.seek(0)
-        dfile = discord.File(bytes, filename="card.png")
-        await ctx.send(file=dfile)
-
-
-def round_corner_mask(radius, rectangle, fill):
-    
-    bigsize = (rectangle.size[0] * 3, rectangle.size[1] * 3)
-    mask_rectangle = Image.new('L', bigsize, 0)
-    draw = ImageDraw.Draw(mask_rectangle)
-    draw.rounded_rectangle((0, 0)+bigsize, radius=radius, fill=fill, outline=None)
-    mask = mask_rectangle.resize(rectangle.size, Image.ANTIALIAS)
-    rectangle.putalpha(mask)
-    return (rectangle, mask)
-        
         
        
 def setup(bot):

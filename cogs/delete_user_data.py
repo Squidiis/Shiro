@@ -93,6 +93,8 @@ class DeleteData(commands.Cog):
 
         delete_datas = f"DELETE {table} WHERE guildId = %s AND {column} = %s"
         delete_datas_values = [table, item.guild.id, item.id]
+        cursor.execute(delete_datas, delete_datas_values)
+        db_connect.commit()
 
 
     @commands.Cog.listener()
