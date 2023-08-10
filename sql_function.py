@@ -477,7 +477,7 @@ class DatabaseUpdates():
 
     
     # Update the level system settings
-    def update_level_settings(guild_id:int, xp_rate:int = None, level_status:str = None, levelup_channel:int = None):
+    def update_level_settings(guild_id:int, xp_rate:int = None, level_status:str = None, levelup_channel:int = None, back_to_none:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -486,14 +486,22 @@ class DatabaseUpdates():
         items = [xp_rate, level_status, levelup_channel]
 
         try:
+            
+            if back_to_none == None:
 
-            for count in range(len(items)):
+                for count in range(len(items)):
 
-                update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
-                update_settings_values = (items[count], guild_id)
-                cursor.execute(update_settings, update_settings_values)
-                db_connect.commit()
+                    update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
+                    update_settings_values = (items[count], guild_id)
 
+            else:
+
+                update_settings = f"UPDATE LevelSystemSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s"
+                update_settings_values = [guild_id]
+                
+            cursor.execute(update_settings, update_settings_values)
+            db_connect.commit()
+            
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
 

@@ -1651,20 +1651,20 @@ class LevelSystem(commands.Cog):
 
             else:
 
-                DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, levelup_channel=channel.id)
-
-                emb = discord.Embed(title=f"The level up channel was set successfully {Emojis.succesfully_emoji}", 
-                    description=f"""{Emojis.dot_emoji} You have successfully set the channel <#{channel.id}> as a level up channel.
-                    {Emojis.dot_emoji} From now on all level up notifications will be sent to this channel.""", color=bot_colour)
-                await ctx.respond(embed=emb)
+                emb = discord.Embed(title=f"There is already a level up channel assigned {Emojis.fail_emoji}", 
+                    description=f"""{Emojis.dot_emoji} Currently the channel <#{level_up_channel[3]}> is set as level up channel. 
+                    {Emojis.dot_emoji} Do you want to overwrite this one?
+                    {Emojis.dot_emoji} If yes select the yes button if not select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                await ctx.respond(embed=emb, view=LevelUpChannelButtons(channel=channel.id))
 
         else:
 
-            emb = discord.Embed(title=f"There is already a level up channel assigned {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Currently the channel <#{level_up_channel[3]}> is set as level up channel. 
-                {Emojis.dot_emoji} Do you want to overwrite this one?
-                {Emojis.dot_emoji} If yes select the yes button if not select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-            await ctx.respond(embed=emb, view=LevelUpChannelButtons(channel=channel.id))
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, levelup_channel=channel.id)
+
+            emb = discord.Embed(title=f"The level up channel was set successfully {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} You have successfully set the channel <#{channel.id}> as a level up channel.
+                {Emojis.dot_emoji} From now on all level up notifications will be sent to this channel.""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 
     # Removes the level up channel and sets it back to none, from this moment on the bot sends the level up message in the same channel
@@ -1676,7 +1676,7 @@ class LevelSystem(commands.Cog):
 
         if level_up_channel[3]:
                 
-            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, levelup_channel=None)
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=2)
 
             emb = discord.Embed(title=f"The level up channel was successfully removed {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} From now on level up notifications will always be sent after level up.""", color=bot_colour)
@@ -1684,8 +1684,8 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            emb = discord.Embed(title=f"No level up channel was assigned {Emojis.fail_emoji}", 
-                description=f"{Emojis.dot_emoji} There was no level up channel assigned so none could be removed.", color=error_red)
+            emb = discord.Embed(title=f"No level up channel was assigned {Emojis.help_emoji}", 
+                description=f"{Emojis.dot_emoji} There was no level up channel assigned so none could be removed.", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1704,12 +1704,13 @@ class LevelSystem(commands.Cog):
         else:
             
             emb = discord.Embed(title=f"No level up channel has been set {Emojis.help_emoji}", 
-                description=f"""{Emojis.dot_emoji} No level up channel has been set if you want to set one use that:\n{add_level_up_channel} command""", color=error_red)
+                description=f"""{Emojis.dot_emoji} No level up channel has been set if you want to set one use that:\n{add_level_up_channel} command""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "")
-    async def set_xp_rate(self, ctx:commands.Context, xp:Option(int, description="Setze einen Grundwert wie viel XP man pro nachricht bekommt!")):
+    @commands.slash_command(name = "set-xp-rate")
+    @commands.has_permissions(administrator = True)
+    async def set_xp_rate(self, ctx:commands.Context, xp:Option(int, description="Setze einen Grundwert wie viel XP man pro nachricht verdient!")):
 
         if xp <= 0:
 
@@ -1719,12 +1720,32 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, xp_rate=xp)
 
-            emb = discord.Embed(title="", 
-                description=f"""""", color=bot_colour)
+            emb = discord.Embed(title=f"Du hast erfolgreich die zu vergebenden xp pro nachricht vestgelegt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die zu vergebenden xp pro nachricht wurden auf **{xp}** gesetzt.
+                {Emojis.help_emoji} Ab jetzt wird jede nachricht mit **{xp}** belohnt {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 
+    @commands.slash_command(name = "set-xp-rate-default")
+    async def set_xp_rate_default(self, ctx:commands.Context):
+        
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+
+        if check_settings[1] == 20:
+
+            emb = discord.Embed(title=f"Die xp menge ist bereits auf den standart einstellungen {Emojis.help_emoji}", 
+                description=f"{Emojis.dot_emoji} Die xp menge die für jede nachricht vergeben wird ist schon auf dem standart wert von **20**", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=0)
+
+            emb = discord.Embed(title=f"Die XP menge für nachrichten wurde erfolgreich zurück gesetzt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die Sp die für jede nachricht vergeben wird wurde zurück auf **20** gesetzt.""", color=bot_colour)
+            await ctx.respond(embed=emb)
         
        
 def setup(bot):
