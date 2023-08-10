@@ -1468,13 +1468,13 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "manage-level-blacklist")
+    @commands.slash_command(name = "manage-level-blacklist", description = "Add or remove anything you want from the blacklist")
     async def manage_level_blacklist(self, ctx:commands.Context):
 
-        emb = discord.Embed(title=f"Wilkommen im blacklist manager {Emojis.settings_emoji}", 
-            description=f"""{Emojis.help_emoji} Mit den Beiden Buttons kannst du auswählen ob du etwas auf die Blacklist setzen möchtest oder etwas entfernen möchtest!
-            {Emojis.dot_emoji} Sobalt du etwas ausgewählt hast werden dir select menüs angezeigt.
-            {Emojis.dot_emoji} Mit diesen kannst du auswählen was du auf die blacklist setzen oder entfernen möchtest.""", color=bot_colour)
+        emb = discord.Embed(title=f"Welcome to the blacklist manager for the level system {Emojis.settings_emoji}", 
+            description=f"""{Emojis.help_emoji} With the two buttons you can select whether you want to put something on the blacklist or remove something!
+            {Emojis.dot_emoji} As soon as you have selected something, select menus are displayed.
+            {Emojis.dot_emoji} With these you can select what you want to blacklist or remove.""", color=bot_colour)
         await ctx.respond(embed=emb, view=BlacklistManagerButtons())
 
 
@@ -1639,11 +1639,11 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def set_levelup_channel(self, ctx:commands.Context, channel:Option(discord.TextChannel, description="Select a channel in which the level up message should be sent")):
 
-        level_up_channel = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
-        if level_up_channel[3]:
+        if check_settings[3]:
        
-            if channel.id == level_up_channel[3]:
+            if channel.id == check_settings[3]:
 
                 emb = discord.Embed(title=f"This channel is already assigned as level up channel {Emojis.fail_emoji}", 
                     description=f"{Emojis.dot_emoji} This channel is already set as a level up channel if you want to remove it as a level up channel use the:\n{disable_level_up_channel} command {Emojis.exclamation_mark_emoji}", color=error_red)
@@ -1652,7 +1652,7 @@ class LevelSystem(commands.Cog):
             else:
 
                 emb = discord.Embed(title=f"There is already a level up channel assigned {Emojis.fail_emoji}", 
-                    description=f"""{Emojis.dot_emoji} Currently the channel <#{level_up_channel[3]}> is set as level up channel. 
+                    description=f"""{Emojis.dot_emoji} Currently the channel <#{check_settings[3]}> is set as level up channel. 
                     {Emojis.dot_emoji} Do you want to overwrite this one?
                     {Emojis.dot_emoji} If yes select the yes button if not select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await ctx.respond(embed=emb, view=LevelUpChannelButtons(channel=channel.id))
@@ -1672,9 +1672,9 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def disable_levelup_channel(self, ctx:commands.Context):
 
-        level_up_channel = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
-        if level_up_channel[3]:
+        if check_settings[3]:
                 
             DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=2)
 
@@ -1693,12 +1693,12 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-level-up-channel", description = "Let them show the current level up channel!")
     async def show_levelup_channel(self, ctx:commands.Context):
 
-        level_up_channel = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
         
-        if level_up_channel[3]:
+        if check_settings[3]:
         
             emb = discord.Embed(title=f"Here you can see the current level up channel {Emojis.help_emoji}", 
-                description=f"""{Emojis.dot_emoji} The current level up channel is <#{level_up_channel[3]}> all level up notifications are sent to this channel.""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} The current level up channel is <#{check_settings[3]}> all level up notifications are sent to this channel.""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -1706,6 +1706,10 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title=f"No level up channel has been set {Emojis.help_emoji}", 
                 description=f"""{Emojis.dot_emoji} No level up channel has been set if you want to set one use that:\n{add_level_up_channel} command""", color=bot_colour)
             await ctx.respond(embed=emb)
+
+
+
+##########################################  Set xp rate system  ###################################
 
 
     @commands.slash_command(name = "set-xp-rate", description = "Set how much XP will be awarded per message!")
@@ -1728,8 +1732,8 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "set-xp-rate-back-to-default", description = "Setze die XP die man pro nachricht erhält zurück auf standart einstellungen!")
-    @commands.has_permissions(administrator = True)
+    @commands.slash_command(name = "set-xp-rate-back-to-default", description = "Set the XP you get per message back to default settings!")
+    @commands.has_permissionsa(dministrator = True)
     async def set_xp_rate_default(self, ctx:commands.Context):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
@@ -1749,6 +1753,17 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
         
        
+    @commands.slash_command(name = "show-xp-rate", description = "Let us show you how much xp you currently get per message!")
+    @commands.has_permissions(dministrator = True)
+    async def show_xp_rate(self, ctx:commands.Context):
+        
+        check_settings = DatabaseCheck.check_level_settings
+
+        emb = discord.Embed(title=f"Here you can see how much XP you get per message {Emojis.help_emoji}",
+            description=f"""{Emojis.dot_emoji} Per message you get {check_settings[1]} XP.
+            {Emojis.dot_emoji} We recommend that you do not set this value too high if you adjust it, otherwise the level system will lose much of its meaning {Emojis.exclamation_mark_emoji}""")
+        await ctx.respond(embed=emb)
+
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
     
