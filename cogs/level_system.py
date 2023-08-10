@@ -1708,43 +1708,44 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "set-xp-rate")
+    @commands.slash_command(name = "set-xp-rate", description = "Set how much XP will be awarded per message!")
     @commands.has_permissions(administrator = True)
-    async def set_xp_rate(self, ctx:commands.Context, xp:Option(int, description="Setze einen Grundwert wie viel XP man pro nachricht verdient!")):
+    async def set_xp_rate(self, ctx:commands.Context, xp:Option(int, description="Set a base value how much XP you earn per message!")):
 
         if xp <= 0:
 
-            emb = discord.Embed(title=f"Die xp menge die du festlegen willst ist zu niedrieg {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Die XP menge die du festlegen möchtest ist zu gering sie muss mindestens 1 sein!""", color=error_red)
+            emb = discord.Embed(title=f"The xp amount you want to set is too low {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} The XP amount you get per message as a reward is too low it must be at least 1!""", color=error_red)
             await ctx.respond(embed=emb)
 
         else:
             
             DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, xp_rate=xp)
 
-            emb = discord.Embed(title=f"Du hast erfolgreich die zu vergebenden xp pro nachricht vestgelegt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Die zu vergebenden xp pro nachricht wurden auf **{xp}** gesetzt.
-                {Emojis.help_emoji} Ab jetzt wird jede nachricht mit **{xp}** belohnt {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(title=f"You have successfully set the xp to be assigned per message {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} The xp to be assigned per message has been set to **{xp}**. 
+                {Emojis.help_emoji} From now on every message will be rewarded with **{xp}** XP. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "set-xp-rate-default")
+    @commands.slash_command(name = "set-xp-rate-back-to-default", description = "Setze die XP die man pro nachricht erhält zurück auf standart einstellungen!")
+    @commands.has_permissions(administrator = True)
     async def set_xp_rate_default(self, ctx:commands.Context):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
         if check_settings[1] == 20:
 
-            emb = discord.Embed(title=f"Die xp menge ist bereits auf den standart einstellungen {Emojis.help_emoji}", 
-                description=f"{Emojis.dot_emoji} Die xp menge die für jede nachricht vergeben wird ist schon auf dem standart wert von **20**", color=bot_colour)
+            emb = discord.Embed(title=f"The xp quantity is already set to the default settings  {Emojis.help_emoji}", 
+                description=f"{Emojis.dot_emoji} The xp amount assigned for each message is already at the default value of **20**.", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=0)
 
-            emb = discord.Embed(title=f"Die XP menge für nachrichten wurde erfolgreich zurück gesetzt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Die Sp die für jede nachricht vergeben wird wurde zurück auf **20** gesetzt.""", color=bot_colour)
+            emb = discord.Embed(title=f"The XP quantity for messages was successfully reset {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} The XP assigned for each message has been set back to **20**.""", color=bot_colour)
             await ctx.respond(embed=emb)
         
        
