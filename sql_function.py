@@ -493,14 +493,15 @@ class DatabaseUpdates():
 
                     update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
                     update_settings_values = (items[count], guild_id)
+                    cursor.execute(update_settings, update_settings_values)
+                    db_connect.commit()
 
             else:
 
                 update_settings = f"UPDATE LevelSystemSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s"
                 update_settings_values = [guild_id]
-                
-            cursor.execute(update_settings, update_settings_values)
-            db_connect.commit()
+                cursor.execute(update_settings, update_settings_values)
+                db_connect.commit()
             
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))

@@ -661,9 +661,10 @@ class LevelSystem(commands.Cog):
         bucket = self.cd.get_bucket(message)
         return bucket.update_rate_limit()
 
-    def xp_generator(self):
-        xp = 20
-        return xp
+    def xp_generator(self, guild_id:int):
+
+        settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
+        return settings[1]
     
     def xp_generator_global(self):
         xp = 20
@@ -685,7 +686,7 @@ class LevelSystem(commands.Cog):
 
         connection_db_level = DatabaseSetup.db_connector()
         my_cursor = connection_db_level.cursor()
-
+        
         if self.get_ratelimit(message):
             return
 
@@ -720,12 +721,13 @@ class LevelSystem(commands.Cog):
                     # Database check for all values 
                     check_if_exists = DatabaseCheck.check_level_system_stats(guild_id=message.guild.id, user=message.author.id)
                     if check_if_exists:
-
+                        
                         # All user stats                   
                         if check_if_exists[2] >= 999:
                             return
 
-                        XP = self.xp_generator()
+                        XP = self.xp_generator(guild_id=message.guild.id)
+                        
                         xp_global = self.xp_generator_global()
                         user_xp_global = xp_global + check_if_exists[6]
                         user_has_xp = check_if_exists[3] + XP 
@@ -1733,7 +1735,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "set-xp-rate-back-to-default", description = "Set the XP you get per message back to default settings!")
-    @commands.has_permissionsa(dministrator = True)
+    @commands.has_permissions(administrator = True)
     async def set_xp_rate_default(self, ctx:commands.Context):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
@@ -1754,10 +1756,10 @@ class LevelSystem(commands.Cog):
         
        
     @commands.slash_command(name = "show-xp-rate", description = "Let us show you how much xp you currently get per message!")
-    @commands.has_permissions(dministrator = True)
+    @commands.has_permissions(administrator = True)
     async def show_xp_rate(self, ctx:commands.Context):
         
-        check_settings = DatabaseCheck.check_level_settings
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
         emb = discord.Embed(title=f"Here you can see how much XP you get per message {Emojis.help_emoji}",
             description=f"""{Emojis.dot_emoji} Per message you get {check_settings[1]} XP.
