@@ -26,8 +26,7 @@ class main(commands.Cog):
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        cursor.execute(
-            """
+        tables = ["""
             CREATE TABLE IF NOT EXISTS LevelSystemStats (
                 guildId BIGINT UNSIGNED NOT NULL, 
                 userId BIGINT UNSIGNED NOT NULL,
@@ -36,7 +35,9 @@ class main(commands.Cog):
                 userName VARCHAR(255) NOT NULL,
                 voiceTime TIMESTAMP(6) NULL,
                 wholeXp BIGINT UNSIGNED NOT NULL)
-            
+            """,
+
+            """"
             CREATE TABLE IF NOT EXISTS LevelSystemBlacklist (
                 guildId BIGINT UNSIGNED NOT NULL,
                 guildName VARCHAR(255) NOT NULL,
@@ -44,25 +45,33 @@ class main(commands.Cog):
                 categoryId BIGINT UNSIGNED NULL,
                 roleId BIGINT UNSIGNED NULL,
                 userId BIGINT UNSIGNED NULL)
+            """,
             
+            """
             CREATE TABLE IF NOT EXISTS LevelSystemRoles (
                 guildId BIGINT UNSIGNED NOT NULL,
                 roleId BIGINT UNSIGNED NOT NULL,
                 roleLevel INT UNSIGNED NOT NULL,
                 guildName VARCHAR(255) NOT NULL)
+            """,
 
+            """
             CREATE TABLE IF NOT EXISTS LevelSystemSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 xpRate INT UNSIGNED DEFAULT 20,
                 levelStatus VARCHAR(50) DEFAULT 'on',
                 levelUpChannel BIGINT UNSIGNED NULL)
+            """,
 
+            """
             CREATE TABLE IF NOT EXISTS LevelRankCardSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 cardColor VARCHAR(20) DEFAULT '8, 120, 151',
                 cardImage MEDIUMBLOB NULL,
                 cardLayout INT UNSIGNED DEFAULT 0)
+            """,
 
+            """
             CREATE TABLE IF NOT EXISTS ManageBlacklistTemp (
                 guildId BIGINT UNSIGNED NOT NULL,
                 channelId VARCHAR(500) NULL,
@@ -71,7 +80,11 @@ class main(commands.Cog):
                 userId VARCHAR(500) NULL,
                 operation VARCHAR(50) NOT NULL,
                 systemStatus VARCHAR(50) NOT NULL)
-            """, multi=True)
+            """]
+
+        for table in tables:
+
+            cursor.execute(table)
 
         view = View(timeout=None)
         print(f'Logged in as: {bot.user.name}')

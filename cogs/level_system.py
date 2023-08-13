@@ -425,8 +425,6 @@ class LevelRolesButtons(discord.ui.View):
     # Button to override the level role 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.blurple, custom_id="yes_button_level_role")
     async def yes_button_levelroles(self, button, interaction:discord.Interaction):
-        
-        guild_id = interaction.guild.id 
     
         if interaction.user.guild_permissions.administrator:
 
@@ -440,7 +438,7 @@ class LevelRolesButtons(discord.ui.View):
 
             else:
 
-                DatabaseUpdates.update_level_roles(guild_id=guild_id, role_id=self.role_id, role_level=self.role_level, status=self.status)
+                DatabaseUpdates.update_level_roles(guild_id=interaction.guild.id , role_id=self.role_id, role_level=self.role_level, status=self.status)
                             
                 emb = discord.Embed(title=f"Successful override of the level role {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} The level role was successfully overwritten.
@@ -506,7 +504,7 @@ class LevelUpChannelButtons(discord.ui.View):
                 emb = discord.Embed(title=f"The level up channel could not be overwritten {Emojis.fail_emoji}", 
                     description=f"""{Emojis.dot_emoji} The level up channel could not be overwritten because the process has expired.
                     {Emojis.dot_emoji} This happens when you wait too long to react to the button.
-                    {Emojis.dot_emoji} You can simply run the command again if you still want to overwrite the level up channel {Emojis.exclamation_mark_emoji}""")
+                    {Emojis.dot_emoji} You can simply run the command again if you still want to overwrite the level up channel {Emojis.exclamation_mark_emoji}""", color=error_red)
                 await interaction.response.edit_message(embed=emb, view=None)
 
 
@@ -683,10 +681,8 @@ class LevelSystem(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-
-        connection_db_level = DatabaseSetup.db_connector()
-        my_cursor = connection_db_level.cursor()
         
+        # Check if the cool down has already expired if not the message will not be counted
         if self.get_ratelimit(message):
             return
 
@@ -699,6 +695,7 @@ class LevelSystem(commands.Cog):
         if message.author.bot:
             return 
 
+        # Checks the settings and returns false if the level system is disabled and none if no entry was found 
         check_settings = DatabaseStatusCheck._level_system_status(guild_id=message.guild.id)
         
         if check_settings == None:
@@ -708,21 +705,20 @@ class LevelSystem(commands.Cog):
         elif check_settings == False:
             return
                 
-        # Blacklist check
+        # Checks the blacklist and returns true if the channel is on the blacklist
         check_blacklist = DatabaseStatusCheck._blacklist_check_text(message_check=message, guild_id=message.guild.id)
                         
         if isinstance(message.channel, discord.TextChannel):
                     
-            # Check if the blacklist returns None
             if check_blacklist != True:
                 
                 try:   
                             
                     # Database check for all values 
                     check_if_exists = DatabaseCheck.check_level_system_stats(guild_id=message.guild.id, user=message.author.id)
+
                     if check_if_exists:
-                        
-                        # All user stats                   
+                                     
                         if check_if_exists[2] >= 999:
                             return
 
@@ -749,6 +745,7 @@ class LevelSystem(commands.Cog):
                                                                     
                             finally:   
 
+                                # Checks if a level role or a level up channel is defined                                
                                 level_role_check = DatabaseCheck.check_level_system_levelroles(guild=message.guild.id, needed_level=new_level)
                                 levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
 
@@ -803,8 +800,6 @@ class LevelSystem(commands.Cog):
 
                 except mysql.connector.Error as error:
                     print("parameterized query failed {}".format(error))
-                    
-        DatabaseSetup.db_close(cursor=my_cursor, db_connection=connection_db_level)
    
 
 
@@ -813,7 +808,6 @@ class LevelSystem(commands.Cog):
 ####################################################  User stats setting  #################################################
 
 
-    # Command to give a user XP, The XP awarded can only be as high as he needs for a new level!
     @commands.slash_command(name = "give-xp", description = "Give a user a quantity of XP chosen by you!")
     @commands.has_permissions(administrator = True)
     async def give_xp_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user who should receive the xp!"),
@@ -874,10 +868,9 @@ class LevelSystem(commands.Cog):
                 await ctx.respond(embed=emb)
 
 
-    # Command to removing XP from a user, The XP what should be removed can only be as high as the user owns 
     @commands.slash_command(name = "remove-xp", description = "Remove a chosen amount of Xp from a user!")
     @commands.has_permissions(administrator = True)
-    async def remove_xp_slash(self, ctx, user:Option(discord.Member, description="Choose a user from which you want to remove xp!"),
+    async def remove_xp_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user from which you want to remove xp!"),
         xp:Option(int, description="Specify a quantity of Xp to be removed!")):
 
         user_id = user.id
@@ -922,10 +915,9 @@ class LevelSystem(commands.Cog):
                 await ctx.respond(embed=emb)  
 
 
-    # Command to give a user Level
     @commands.slash_command(name = "give-levels", description = "Give a user a selected amount of levels!")
     @commands.has_permissions(administrator = True)
-    async def give_level_slash(self, ctx, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
+    async def give_level_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
         level:Option(int, description="Specify a set of levels that you want to assign!")):
 
         user_id = user.id
@@ -971,10 +963,9 @@ class LevelSystem(commands.Cog):
                 await ctx.respond(embed=emb)
                 
 
-    # command to removing levels from a user 
     @commands.slash_command(name = "remove-level", description = "Remove a quantity of levels chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def remove_level_slash(self, ctx, user:Option(discord.Member, description="Select a user from whom you want to remove the level!"), 
+    async def remove_level_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user from whom you want to remove the level!"), 
         level:Option(int, description="Specify how many levels should be removed!")):
 
         user_id = user.id
@@ -1019,10 +1010,10 @@ class LevelSystem(commands.Cog):
                     {Emojis.dot_emoji} **{user_name}** now starts at level 0 with 0 xp""", color=error_red)
                 await ctx.respond(embed=emb)    
     
-    
+
     @commands.slash_command(name = "reset-level-system", description = "Reset all levels and xp of everyone!")
     @commands.has_permissions(administrator = True)
-    async def reset_levels_slash(self, ctx):
+    async def reset_levels_slash(self, ctx:commands.Context):
 
         guild_id = ctx.guild.id
 
@@ -1044,9 +1035,8 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    
     @commands.slash_command(name = "rank", description = "Shows you the rank of a user in the level system!")
-    async def rank_slash(self, ctx, user:Option(discord.Member, description="Let others show you the rank!")):
+    async def rank_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Let others show you the rank!")):
 
         count = 0
         rank = 0
@@ -1085,7 +1075,6 @@ class LevelSystem(commands.Cog):
             xp_have = check_user[3]
 
             # Create card
-
             big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
             small_font = ImageFont.truetype("arial.ttf", 24)
 
@@ -1142,11 +1131,8 @@ class LevelSystem(commands.Cog):
             data_display = self.round_corner_mask(radius=50, rectangle=data_display, fill=160)
             background.paste(data_display[0], (655, offset_y), data_display[1])
 
-            # Blitting Name
             draw.text((304, 97), user.name, font=big_font, fill=(255, 255, 255))
-
             draw.text((315, 249), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
-
             draw.text((665, offset_y), f"#{rank} Lvl {check_user[2]}", font=small_font, fill=(255, 255, 255))
 
             bytes = BytesIO()
@@ -1162,7 +1148,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "leaderboard-level", description = "Shows the highest ranks in the lavel system!")
-    async def leaderboard(self, ctx):
+    async def leaderboard(self, ctx:commands.Context):
 
         leaderboard_connect = DatabaseSetup.db_connector()
         my_cursor = leaderboard_connect.cursor()
@@ -1195,9 +1181,9 @@ class LevelSystem(commands.Cog):
 #############################################  Level system Settings  #####################################################    
 
 
-    @commands.slash_command(name = "level-system-settings", description = "Stelle das level system frei ein!")
+    @commands.slash_command(name = "level-system-settings", description = "Set the level system freely!")
     @commands.has_permissions(administrator = True)
-    async def level_system_settings(self, ctx):
+    async def level_system_settings(self, ctx:commands.Context):
 
         guild_id = ctx.guild.id
         
@@ -1636,7 +1622,6 @@ class LevelSystem(commands.Cog):
 #############################################  Level up channel settings  #################################
 
 
-    # Sets the level up channel then all level up messages are automatically sent to this channel
     @commands.slash_command(nanme = "set-level-up-channel", description = "Set a channel for the level up notifications!")
     @commands.has_permissions(administrator = True)
     async def set_levelup_channel(self, ctx:commands.Context, channel:Option(discord.TextChannel, description="Select a channel in which the level up message should be sent")):
@@ -1669,7 +1654,6 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    # Removes the level up channel and sets it back to none, from this moment on the bot sends the level up message in the same channel
     @commands.slash_command(name = "disable-level-up-channel", description = "Deactivate the level up channel!")
     @commands.has_permissions(administrator = True)
     async def disable_levelup_channel(self, ctx:commands.Context):
@@ -1691,7 +1675,6 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    # Sends an embed with the current level up channel
     @commands.slash_command(name = "show-level-up-channel", description = "Let them show the current level up channel!")
     async def show_levelup_channel(self, ctx:commands.Context):
 
@@ -1765,6 +1748,7 @@ class LevelSystem(commands.Cog):
             description=f"""{Emojis.dot_emoji} Per message you get {check_settings[1]} XP.
             {Emojis.dot_emoji} We recommend that you do not set this value too high if you adjust it, otherwise the level system will lose much of its meaning {Emojis.exclamation_mark_emoji}""")
         await ctx.respond(embed=emb)
+
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
