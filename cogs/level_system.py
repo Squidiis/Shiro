@@ -1036,7 +1036,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "rank", description = "Shows you the rank of a user in the level system!")
-    async def rank_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Let others show you the rank!")):
+    async def rank_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Look at the rank of others!")):
 
         count = 0
         rank = 0
@@ -1713,7 +1713,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"You have successfully set the xp to be assigned per message {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The xp to be assigned per message has been set to **{xp}**. 
-                {Emojis.help_emoji} From now on every message will be rewarded with **{xp}** XP. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                {Emojis.help_emoji} From now on every message will be rewarded with **{xp}** XP {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1725,7 +1725,7 @@ class LevelSystem(commands.Cog):
 
         if check_settings[1] == 20:
 
-            emb = discord.Embed(title=f"The xp quantity is already set to the default settings  {Emojis.help_emoji}", 
+            emb = discord.Embed(title=f"The xp quantity is already set to the default settings {Emojis.help_emoji}", 
                 description=f"{Emojis.dot_emoji} The xp amount assigned for each message is already at the default value of **20**.", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1754,14 +1754,31 @@ class LevelSystem(commands.Cog):
 ################################  Bonus xp system  #################################
 
 
-    # Eingestellt
-#    @commands.slash_command(name = "add-bonus-xp-channel")
-#    async def add_bonus_xp_channel(self, ctx:commands.Context, 
-#        channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that is rewarded with extra xp!"), 
-#        bonus:Option(int, description="") = None):
+   
+    @commands.slash_command(name = "add-bonus-xp-channel")
+    @commands.has_permissions(administrator = True)
+    async def add_bonus_xp_channel(self, ctx:commands.Context, 
+        channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that is rewarded with extra xp!"), 
+        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
-#        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
 
+        if check_list: 
+
+            emb = discord.Embed(title=f"Dieser Channel wurde bereits als XP bonus channel festgelegt {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde bereits als XP bonus channel festgelegt""", color=error_red)
+
+        else:
+
+            if bonus != None or bonus != 0:
+                bonus_percentage = bonus
+            else:
+                bonus_percentage = bonus
+
+            emb = discord.Embed(title=f"Der bonus xp channel wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde als XP bonus channel festgelegt.
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten in diesen Channel werden mit {bonus_percentage} % mehr XP belohnt""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
