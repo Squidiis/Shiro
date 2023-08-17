@@ -62,6 +62,18 @@ CREATE TABLE LevelRankCardSettings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+#DROP TABLE IF EXISTS `BonusXpList`;
+
+#CREATE TABLE BonusXpList (
+#    guildId BIGINT UNSIGNED NOT NULL,
+#    channelId BIGINT UNSIGNED NULL,
+#    categoryId BIGINT UNSIGNED NULL,
+#    roleId BIGINT UNSIGNED NULL,
+#    userId BIGINT UNSIGNED NULL,
+#    PercentBonusXp INT UNSIGNED DEFAULT 0
+#) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 DROP TABLE IF EXISTS `ManageBlacklistTemp`;
 
 CREATE TABLE ManageBlacklistTemp (

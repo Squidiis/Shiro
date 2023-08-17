@@ -253,6 +253,41 @@ class DatabaseCheck():
         return levelsys_levelroles
     
 
+    # Eingestellt
+    def check_xp_bonus_list(guild_id:int, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+        
+        column_name = ["channelId", "categoryId", "roleId", "userId"]
+        
+        all_items = [channel_id, category_id, role_id, user_id]
+        
+        if all(x is None for x in all_items):
+            
+            check_xp_bonus_list = f"SELECT * FROM BonusXpList WHERE guildId = %s"
+            check_xp_bonus_list_values = [guild_id]
+
+        else:
+            
+            for count in range(len(all_items)):
+                if all_items[count] != None:
+                    
+                    check_xp_bonus_list = f"SELECT * FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
+                    check_xp_bonus_list_values = [guild_id, all_items[count]]
+
+        cursor.execute(check_xp_bonus_list, check_xp_bonus_list_values)
+        
+        if all(x is None for x in all_items):
+            xp_bonus_list = cursor.fetchall()
+        
+        else:
+            xp_bonus_list = cursor.fetchone()
+            
+        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return xp_bonus_list
+    
+
     def check_level_settings(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
@@ -559,6 +594,52 @@ class DatabaseUpdates():
                 update_level_roles_values = [role_id, guild_id, role_level]
 
             cursor.execute(update_level_roles, update_level_roles_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+    # Eingestellt
+    def manage_xp_bonus(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None, bonus:int = None):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+        
+        column_name = ["channelId", "categoryId", "roleId", "userId"]
+        items = [channel_id, category_id, role_id, user_id]
+        
+        try:
+            
+            if items:
+
+                for count in range(len(items)):
+                    
+                    if items[count] != None:
+
+                        if operation == "add":
+
+                            level_sys_blacklist = f"INSERT INTO BonusXpList (guildId, {column_name[count]}) VALUES (%s, %s)" if bonus == None else f"INSERT INTO BonusXpList (guildId, {column_name[count]}, PercentBonusXp) VALUES (%s, %s, %s)"
+                            level_sys_blacklist_values = [guild_id, items[count]] if bonus == None else [guild_id, items[count], bonus]
+                            count = 0
+                        
+                        elif operation == "remove":
+
+                            level_sys_blacklist = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
+                            level_sys_blacklist_values = [guild_id, items[count]]
+
+                        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
+                        db_connect.commit()
+
+            else:
+
+                level_sys_blacklist = f"DELETE FROM BonusXpList WHERE guildId = %s"
+                level_sys_blacklist_values = [guild_id]
+        
+            cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
             db_connect.commit()
 
         except mysql.connector.Error as error:

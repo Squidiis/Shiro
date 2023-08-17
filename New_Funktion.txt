@@ -10,8 +10,8 @@ Den Table so anpassen das man die emojis mit einen komma trennt dann halt mehr s
 
 levelsystem: 
 
-Einzelne funktion für XP skalierug und übertragung
 XP bonus für rollen channel und einzelne user
+hinzufügen das man auch global level aufsteigen kann
 
 Aktivster user Leaderbord 
 

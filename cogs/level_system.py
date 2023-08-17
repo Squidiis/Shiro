@@ -1750,6 +1750,19 @@ class LevelSystem(commands.Cog):
         await ctx.respond(embed=emb)
 
 
+
+################################  Bonus xp system  #################################
+
+
+    # Eingestellt
+#    @commands.slash_command(name = "add-bonus-xp-channel")
+#    async def add_bonus_xp_channel(self, ctx:commands.Context, 
+#        channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that is rewarded with extra xp!"), 
+#        bonus:Option(int, description="") = None):
+
+#        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
+
+
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
     
