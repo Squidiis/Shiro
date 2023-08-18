@@ -1229,8 +1229,7 @@ class LevelSystem(commands.Cog):
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This channel is already on the blacklist {Emojis.fail_emoji}", 
-                description=f"""The following channels are on the blacklist:\n
-                {blacklist[0]}
+                description=f"""The following channels are on the blacklist:\n\n{blacklist[0]}
                 If you want to remove channels from the blacklist execute this command:\n{remove_blacklist_level_channel}""", color=error_red)
             await ctx.respond(embed=emb)
 
@@ -1239,7 +1238,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, channel_id=channel.id, table="level")
 
             emb = discord.Embed(title=f"This channel was successfully blacklisted {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The channel: <#{channel.id}> was successfully blacklisted.
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was successfully blacklisted.
                 {Emojis.dot_emoji} If you want to remove it again use this command:\n{remove_blacklist_level_channel}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1255,7 +1254,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channel.id, table="level")
 
             emb = discord.Embed(title=f"The channel was removed from the blacklist {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The channel has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_channel} command.
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_channel} command.
                 {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} command""", color=bot_colour)
             await ctx.respond(embed=emb)
         
@@ -1264,7 +1263,7 @@ class LevelSystem(commands.Cog):
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This channel is not on the blacklist {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} The channel: <#{channel.id}> is not blacklisted.
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> is not blacklisted.
                 The following channels are blacklisted:\n\n{blacklist[0]}""", color=error_red)
             await ctx.respond(embed=emb)
         
@@ -1280,8 +1279,7 @@ class LevelSystem(commands.Cog):
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
                 
             emb = discord.Embed(title=f"This category is already on the blacklist {Emojis.fail_emoji}", 
-                description=f"""The following categories are on the blacklist:\n
-                {blacklist[1]}
+                description=f"""The following categories are on the blacklist:\n\n{blacklist[1]}
                 If you want to remove categories from the blacklist execute this command:\n{remove_blacklist_level_category}""", color=error_red)
             await ctx.respond(embed=emb)
 
@@ -1290,7 +1288,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, category_id=category.id, table="level")
             
             emb = discord.Embed(title=f"This category was successfully blacklisted {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The category: <#{category.id}> was successfully blacklisted.
+                description=f"""{Emojis.dot_emoji} The category <#{category.id}> was successfully blacklisted.
                 {Emojis.dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_category}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1306,7 +1304,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", category_id=category.id, table="level")
             
             emb = discord.Embed(title=f"The category was removed from the blacklist {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The category has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_category} command.
+                description=f"""{Emojis.dot_emoji} The category <#{category.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_category} command.
                 {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1315,7 +1313,7 @@ class LevelSystem(commands.Cog):
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This category is not on the blacklist{Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} The category: <#{category.id}> is not on the blacklist.
+                description=f"""{Emojis.dot_emoji} The category <#{category.id}> is not on the blacklist.
                 The following categories are blacklisted:\n\n{blacklist[1]}""", color=error_red)
             await ctx.respond(embed=emb)
 
@@ -1340,7 +1338,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, role_id=role.id, table="level")
             
             emb = discord.Embed(title=f"This role has been successfully blacklisted {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The role: <#{role.id}> has been successfully blacklisted.
+                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> has been successfully blacklisted.
                 {Emojis.dot_emoji} If you want to remove them again use this command:\n{remove_blacklist_level_role}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1356,7 +1354,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", role_id=role.id, table="level")
             
             emb = discord.Embed(title=f"The role was removed from the blacklist {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The role has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_role} command.
+                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_role} command.
                 {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1365,7 +1363,7 @@ class LevelSystem(commands.Cog):
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This role is not blacklisted {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} The role: <@&{role.id}> is not blacklisted.
+                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> is not blacklisted.
                 The following roles are blacklisted:\n\n{blacklist[2]}""", color=error_red)
             await ctx.respond(embed=emb)
 
@@ -1395,7 +1393,7 @@ class LevelSystem(commands.Cog):
                 DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, user_id=user.id, table="level")
 
                 emb = discord.Embed(title=f"This user was successfully blacklisted {Emojis.succesfully_emoji}", 
-                    description=f"""{Emojis.dot_emoji} The user: <@{user.id}> was successfully blacklisted.
+                    description=f"""{Emojis.dot_emoji} The user <@{user.id}> was successfully blacklisted.
                     If you want to remove it again use this command:\n{remove_blacklist_level_user}""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
@@ -1411,7 +1409,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", user_id=user.id, table="level")
 
             emb = discord.Embed(title=f"The user was removed from the blacklist {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The user has been successfully removed from the blacklist if you want to add him again use the: {add_blacklist_level_user} command.
+                description=f"""{Emojis.dot_emoji} The user <@{user.id}> has been successfully removed from the blacklist if you want to add him again use the: {add_blacklist_level_user} command.
                 {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1420,7 +1418,7 @@ class LevelSystem(commands.Cog):
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"This user is not on the blacklist {Emojis.fail_emoji}", 
-                description=f"""The user: <@{user.id}> is not on the blacklist.
+                description=f"""The user <@{user.id}> is not on the blacklist.
                 The following users are on the blacklist:\n\n{blacklist[3]}""", color=error_red)
             await ctx.respond(embed=emb)
 
@@ -1753,8 +1751,19 @@ class LevelSystem(commands.Cog):
 
 ################################  Bonus xp system  #################################
 
+    def check_bonus_percentage(self, bonus):
 
-   
+        if bonus != 0 and bonus != None:
+
+            bonus_percentage = bonus
+
+        else:
+            
+            bonus_percentage = bonus
+
+        return bonus_percentage
+    
+
     @commands.slash_command(name = "add-bonus-xp-channel")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_channel(self, ctx:commands.Context, 
@@ -1766,18 +1775,34 @@ class LevelSystem(commands.Cog):
         if check_list: 
 
             emb = discord.Embed(title=f"Dieser Channel wurde bereits als XP bonus channel festgelegt {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde bereits als XP bonus channel festgelegt""", color=error_red)
+                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde bereits als XP bonus channel festgelegt deshalb werden alle aktivitäten in diesen channel mit extra XP belohnt""", color=error_red)
 
         else:
 
-            if bonus != None or bonus != 0:
-                bonus_percentage = bonus
-            else:
-                bonus_percentage = bonus
-
             emb = discord.Embed(title=f"Der bonus xp channel wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde als XP bonus channel festgelegt.
-                {Emojis.dot_emoji} Nachrichten oder aktivitäten in diesen Channel werden mit {bonus_percentage} % mehr XP belohnt""", color=bot_colour)
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten in diesen Channel werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+
+    @commands.slash_command(name = "add-bonus-xp-category")
+    @commands.has_permissions(administrator = True)
+    async def add_bonus_xp_category(self, ctx:commands.Context, 
+        category:Option(discord.CategoryChannel, description="Wähle eine Kategorie in der alle aktivitäten in allen channel mit extra xp belohnt werden"),
+        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
+
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, category_id=category.id)
+
+        if check_list: 
+
+            emb = discord.Embed(title=f"Diese Category wurde bereits als XP bonus Category festgelegt {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> ist als XP bonus Category festgelegt deshalb werden alle aktivitäten in allen channeln der Category mit extra XP belohnt""", color=error_red)
+
+        else:
+
+            emb = discord.Embed(title=f"Die bonus xp Category wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> wurde als XP bonus Category festgelegt.
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten in dieser Category werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 def setup(bot):

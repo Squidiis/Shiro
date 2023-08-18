@@ -12,6 +12,7 @@ levelsystem:
 
 XP bonus für rollen channel und einzelne user
 hinzufügen das man auch global level aufsteigen kann
+Hinzufügen das überprüft wird ob ein channel in einer category auf der blacklist ist
 
 Aktivster user Leaderbord 
 
