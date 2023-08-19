@@ -1767,7 +1767,7 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "add-bonus-xp-channel")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_channel(self, ctx:commands.Context, 
-        channel:Option(Union[discord.TextChannel, discord.VoiceChannel, discord.ForumChannel], description="Choose a channel that is rewarded with extra xp!"), 
+        channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that is rewarded with extra xp!"), 
         bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
@@ -1790,7 +1790,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-bonus-xp-channel")
     @commands.has_permissions(administrator = True)
-    async def remove_bonus_xp_channel(self, ctx:commands.Context, channel:Option(Union[discord.TextChannel, discord.VoiceChannel, discord.ForumChannel], description="Wähle einen channel den du als XP bonus channel entfenren willst!")):
+    async def remove_bonus_xp_channel(self, ctx:commands.Context, channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Wähle einen channel den du als XP bonus channel entfenren willst!")):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
 
@@ -1806,13 +1806,12 @@ class LevelSystem(commands.Cog):
 
             bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
             
-            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[1]] if bonus_xp_list else "Es wurde kein channel als bonus XP channel festgelegt"
+            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[1]] if bonus_xp_list else ["Es wurde kein channel als bonus XP channel festgelegt"]
             bonus_channels = "\n".join(bonus_xp_channels)
 
-            emb = discord.Embed(title=f"Dieser channel wurde nicht als bonus XP channel festgelegt {Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Dieser channel wurde nicht als bonus XP channel festgelegt.", 
                 description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde nicht als bonus XP channel festgelegt und kann daher nicht entfernt werden.
-                Hier sihst du alle channel die als bonus XP channel festgelegt wurden:\n\n
-                {bonus_channels}""")
+                Hier sihst du alle channel die als bonus XP channel festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1826,8 +1825,8 @@ class LevelSystem(commands.Cog):
 
         if check_list: 
 
-            emb = discord.Embed(title=f"Diese Category wurde bereits als XP bonus Category festgelegt {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> ist als XP bonus Category festgelegt deshalb werden alle aktivitäten in allen channeln der Category mit extra XP belohnt.""", color=error_red)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Diese Category wurde bereits als XP bonus Category festgelegt.", 
+                description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> ist als XP bonus Category festgelegt deshalb werden alle aktivitäten in allen channeln der Category mit extra XP belohnt.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1850,8 +1849,8 @@ class LevelSystem(commands.Cog):
 
         if check_list: 
 
-            emb = discord.Embed(title=f"Diese rolle wurde bereits als XP bonus rolle festgelegt {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Die rolle <@&{role.id}> ist als XP bonus rolle festgelegt deshalb werden alle aktivitäten von benutzern mit dieser rolle mit mehr XP belohnt.""", color=error_red)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Diese rolle wurde bereits als XP bonus rolle festgelegt.", 
+                description=f"""{Emojis.dot_emoji} Die rolle <@&{role.id}> ist als XP bonus rolle festgelegt deshalb werden alle aktivitäten von benutzern mit dieser rolle mit mehr XP belohnt.""", color=bot_colour)
             await ctx.respond(embed=emb)
             
         else:
@@ -1874,8 +1873,8 @@ class LevelSystem(commands.Cog):
 
         if check_list: 
 
-            emb = discord.Embed(title=f"Dieser user wurde bereits als XP bonus user festgelegt {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> ist als XP bonus user festgelegt deshalb werden alle aktivitäten von <@{user.id}> mit mehr XP belohnt.""", color=error_red)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Dieser user wurde bereits als XP bonus user festgelegt.", 
+                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> ist als XP bonus user festgelegt deshalb werden alle aktivitäten von <@{user.id}> mit mehr XP belohnt.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
