@@ -4,10 +4,6 @@ Status: an / aus schalter für voice und messages dann noch machen das man mini 
 Noch hinzufügen das man den status gleich am anfang sieht 
 
 
-Auto reaction system 
-Den Table so anpassen das man die emojis mit einen komma trennt dann halt mehr space und nur 4 stück
-
-
 levelsystem: 
 
 XP bonus für rollen channel und einzelne user

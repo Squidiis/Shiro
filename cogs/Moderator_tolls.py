@@ -222,70 +222,6 @@ class moderator_commands(commands.Cog):
                 embed=discord.Embed(title=f":ghost: | Ghost ping", description=f"**{len(message.mentions)} User** have been ghostpinged.\n \n**message by {message.author.mention}:** {message.content}", color=0xffb375)
                 await message.channel.send(embed=embed)
 
-
-
-
-class ModalAutoReactionParameter(discord.ui.Modal):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-        self.add_item(discord.ui.InputText(label="Bitte geben sie die Gewünschten Parameter ein", style=discord.InputTextStyle.long))
-
-    async def callback(self, interaction: discord.Interaction):
-
-        embed = discord.Embed(title="Parameter erfolgreich festgelegt", 
-            description=f"Folgende Parameter wurden festgelegt:\n{self.children[0].value}")
-
-        DatabaseUpdates._insert_auto_reaction(guild_id=global_gild_id, reaction_parameter=self.children[0].value)
-        await interaction.response.send_message(embeds=[embed])
-
-# TODO: Anpassen das in die datenbank eine liste insertet wird und dann noch die texte anpassen modal, Dropdown und Command
-class DropdownAutoReaction(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.select(placeholder="Wähle auf was Reagiert werden soll", min_values=1, max_values=4, custom_id="interaction:DropdownAutoReaction", options = [
-
-        discord.SelectOption(label="links", description="Hier reagiert er auf alle links mit einer Reaktion", value="link_1"),
-        discord.SelectOption(label="messages", description="Hier reagiert er auf alle nachrichten mit einer Reaktion", value="message_2"),
-        discord.SelectOption(label="forums", description="Hier reagiert er auf alle posts in einen Forum", value="forums_3"),
-        discord.SelectOption(label="Specific messages", description="Hier reagiert er nur auf nachrichten mit einen bestimmten inhalt", value="specific_messages_4")
-    ])
-
-    async def callback_dropdown_autoreaction(self, select, interaction: discord.Interaction): 
-        
-        parameter = []
-
-        if "specific_messages_4" in select.values:
-            parameter.append("specific_messages")
-            await interaction.response.send_modal(ModalAutoReactionParameter(title="Parameter festlegung"))
-        else:
-            await interaction.response.defer()
-
-        guild_id = interaction.guild.id
-        
-        
-        for values in select.values:
-    
-            if values == "link_1":
-                parameter.append("> link\n")    
-
-            if values == "message_2":
-                parameter.append("> message\n")
-              
-            if values == "forums_3":
-                parameter.append("> forum\n")
-            
-            all_parameter = "".join(parameter)
-            
-            emb_1 = discord.Embed(title="Es wird ab jetzt auf folgendes reagiert", 
-                description=f"""
-                    **Aktive Prarameter**
-                    {all_parameter}
-                """, color=bot_colour)
-            DatabaseUpdates._insert_auto_reaction(guild_id=guild_id, reaction_parameter=all_parameter)
-            await interaction.edit_original_response(embed=emb_1, view=None)
-            
     
 
     @commands.slash_command()
@@ -417,31 +353,6 @@ class AutoReaction(commands.Cog):
                         await message.add_reaction("❤")
         else:
             return
-
-
-    @commands.slash_command(name="auto-reaction-parameter")
-    async def auto_reaction_set_parameter(self, ctx):
-
-        global global_gild_id
-        guild_id = ctx.guild.id
-        global_gild_id = guild_id
-
-        check_auto_reaction = DatabaseCheck.check_autoreaction(guild=guild_id)
-        print(check_auto_reaction)
-        
-        if check_auto_reaction:
-
-            status = check_auto_reaction
-        
-        else:
-            status = "Keine Parameter festgelegt"
-
-        emb = discord.Embed(title="auto-reaction", 
-            description=f"""Wählen sie aus nach welchen Parametern das Aoto Reaction system agieren soll.
-            Sie können wählen zwischen links, nachrichten, foren und Speziefischen nachrichten dort wird auf den Inhalt der nachricht geachtet.
-            Wenn sie Speziefische nachrichten haben wollen müssen sie in das danach erscheinende Textfeld alles eingeben auf was geachtet werden soll trenne sie die wörter mit einen `,`
-            aktueller status: {status}""", color=bot_colour)
-        await ctx.respond(embed=emb, view=DropdownAutoReaction())
 
 
 def setup(bot):

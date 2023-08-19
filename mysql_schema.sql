@@ -53,7 +53,7 @@ CREATE TABLE LevelSystemSettings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-DROP TABLE IF EXISTS `LevelRankCardSettingsUser`;
+DROP TABLE IF EXISTS `LevelRankCardSettingsGuild`;
 
 CREATE TABLE LevelRankCardSettings (
     guildId BIGINT UNSIGNED NOT NULL,

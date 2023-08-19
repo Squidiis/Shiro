@@ -794,6 +794,7 @@ class EconomySystem(commands.Cog):
         emb = discord.Embed(title=f"Hier siehst du alle werte von {user.name} im economy system {Emojis.dollar_animation_emoji}", 
             description=f"""{Emojis.dot_emoji} Hiest sihst du alle werte aufgelistet:
             Gesammelte coins: {check_stats[2]}""")
+        await ctx.respond(embed=emb)
     
 
 class Shop(commands.Cog):
