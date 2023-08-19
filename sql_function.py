@@ -603,7 +603,8 @@ class DatabaseUpdates():
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
-    # Eingestellt
+    
+    # Updates the bonus xp system
     def manage_xp_bonus(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None, bonus:int = None):
 
         db_connect = DatabaseSetup.db_connector()

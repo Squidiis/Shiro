@@ -1768,7 +1768,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_channel(self, ctx:commands.Context, 
         channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that is rewarded with extra xp!"), 
-        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
+        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
 
@@ -1779,6 +1779,8 @@ class LevelSystem(commands.Cog):
 
         else:
 
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", channel_id=channel.id, bonus=bonus)
+
             emb = discord.Embed(title=f"Der bonus xp channel wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde als XP bonus channel festgelegt.
                 {Emojis.dot_emoji} Nachrichten oder aktivitäten in diesen Channel werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
@@ -1788,21 +1790,69 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "add-bonus-xp-category")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_category(self, ctx:commands.Context, 
-        category:Option(discord.CategoryChannel, description="Wähle eine Kategorie in der alle aktivitäten in allen channel mit extra xp belohnt werden"),
-        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
+        category:Option(discord.CategoryChannel, description="Wähle eine Kategorie in der alle aktivitäten in allen channel mit extra xp belohnt werden!"),
+        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, category_id=category.id)
 
         if check_list: 
 
             emb = discord.Embed(title=f"Diese Category wurde bereits als XP bonus Category festgelegt {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> ist als XP bonus Category festgelegt deshalb werden alle aktivitäten in allen channeln der Category mit extra XP belohnt""", color=error_red)
+                description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> ist als XP bonus Category festgelegt deshalb werden alle aktivitäten in allen channeln der Category mit extra XP belohnt.""", color=error_red)
 
         else:
 
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", category_id=category.id, bonus=bonus)
+
             emb = discord.Embed(title=f"Die bonus xp Category wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> wurde als XP bonus Category festgelegt.
-                {Emojis.dot_emoji} Nachrichten oder aktivitäten in dieser Category werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten in dieser Category werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+    
+    @commands.slash_command(name = "add-bonus-xp-role")
+    @commands.has_permissions(administrator = True)
+    async def add_bonus_xp_role(self, ctx:commands.Context, 
+        role:Option(discord.CategoryChannel, description="Wähle eine rolle wo jeder der diese rolle extra xp erhählt!"),
+        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
+
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, role_id=role.id)
+
+        if check_list: 
+
+            emb = discord.Embed(title=f"Diese rolle wurde bereits als XP bonus rolle festgelegt {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die rolle <@&{role.id}> ist als XP bonus rolle festgelegt deshalb werden alle aktivitäten von benutzern mit dieser rolle mit mehr XP belohnt.""", color=error_red)
+
+        else:
+
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", role_id=role.id, bonus=bonus)
+
+            emb = discord.Embed(title=f"Die bonus xp rolle wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die rolle <@&{role.id}> wurde als XP bonus rolle festgelegt.
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten von nutzern mit dieser Rolle werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+
+    @commands.slash_command(name = "add-bonus-xp-user")
+    @commands.has_permissions(administrator = True)
+    async def add_bonus_xp_role(self, ctx:commands.Context, 
+        user:Option(discord.CategoryChannel, description="Wähle einen user der für jede nachricht oder aktivität extra XP erhählt!"),
+        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
+
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, user_id=user.id)
+
+        if check_list: 
+
+            emb = discord.Embed(title=f"Dieser user wurde bereits als XP bonus user festgelegt {Emojis.fail_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> ist als XP bonus user festgelegt deshalb werden alle aktivitäten von <@{user.id}> mit mehr XP belohnt.""", color=error_red)
+
+        else:
+
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", user_id=user.id, bonus=bonus)
+
+            emb = discord.Embed(title=f"Dder bonus xp user wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> wurde als XP bonus user festgelegt.
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten von <@{user.id}> werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 def setup(bot):
