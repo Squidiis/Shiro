@@ -1228,9 +1228,9 @@ class LevelSystem(commands.Cog):
 
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"This channel is already on the blacklist {Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This channel is already on the blacklist", 
                 description=f"""The following channels are on the blacklist:\n\n{blacklist[0]}
-                If you want to remove channels from the blacklist execute this command:\n{remove_blacklist_level_channel}""", color=error_red)
+                If you want to remove channels from the blacklist execute this command:\n{remove_blacklist_level_channel}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1262,9 +1262,9 @@ class LevelSystem(commands.Cog):
             
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"This channel is not on the blacklist {Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This channel is not on the blacklist", 
                 description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> is not blacklisted.
-                The following channels are blacklisted:\n\n{blacklist[0]}""", color=error_red)
+                The following channels are blacklisted:\n\n{blacklist[0]}""", color=bot_colour)
             await ctx.respond(embed=emb)
         
     
@@ -1278,9 +1278,9 @@ class LevelSystem(commands.Cog):
             
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
                 
-            emb = discord.Embed(title=f"This category is already on the blacklist {Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This category is already on the blacklist", 
                 description=f"""The following categories are on the blacklist:\n\n{blacklist[1]}
-                If you want to remove categories from the blacklist execute this command:\n{remove_blacklist_level_category}""", color=error_red)
+                If you want to remove categories from the blacklist execute this command:\n{remove_blacklist_level_category}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1312,9 +1312,9 @@ class LevelSystem(commands.Cog):
 
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"This category is not on the blacklist{Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This category is not on the blacklist", 
                 description=f"""{Emojis.dot_emoji} The category <#{category.id}> is not on the blacklist.
-                The following categories are blacklisted:\n\n{blacklist[1]}""", color=error_red)
+                The following categories are blacklisted:\n\n{blacklist[1]}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1328,9 +1328,9 @@ class LevelSystem(commands.Cog):
      
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"This role is already on the blacklist {Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This role is already on the blacklist", 
                 description=f"""The following roles are on the blacklist:\n\n{blacklist[2]}
-                If you want to remove roles from the blacklist execute this command:\n{remove_blacklist_level_role}""", color=error_red)
+                If you want to remove roles from the blacklist execute this command:\n{remove_blacklist_level_role}""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -1362,9 +1362,9 @@ class LevelSystem(commands.Cog):
 
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"This role is not blacklisted {Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This role is not on the blacklist", 
                 description=f"""{Emojis.dot_emoji} The role <@&{role.id}> is not blacklisted.
-                The following roles are blacklisted:\n\n{blacklist[2]}""", color=error_red)
+                The following roles are blacklisted:\n\n{blacklist[2]}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1383,9 +1383,9 @@ class LevelSystem(commands.Cog):
 
                 blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-                emb = discord.Embed(title=f"This user is already on the blacklist {Emojis.fail_emoji}", 
+                emb = discord.Embed(title=f"{Emojis.help_emoji} This user is already on the blacklist", 
                     description=f"""The following users are on the blacklist:\n\n{blacklist[3]}
-                    If you want to remove users from the blacklist execute this command:\n{remove_blacklist_level_user}""", color=error_red)
+                    If you want to remove users from the blacklist execute this command:\n{remove_blacklist_level_user}""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
             else:   
@@ -1417,9 +1417,9 @@ class LevelSystem(commands.Cog):
 
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"This user is not on the blacklist {Emojis.fail_emoji}", 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This user is not on the blacklist.",
                 description=f"""The user <@{user.id}> is not on the blacklist.
-                The following users are on the blacklist:\n\n{blacklist[3]}""", color=error_red)
+                The following users are on the blacklist:\n\n{blacklist[3]}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1576,10 +1576,7 @@ class LevelSystem(commands.Cog):
 
             if level_roles:
                 
-                result_strings = []
-                for _, role_id, level, _ in level_roles:
-                    result_strings.append(f"{Emojis.dot_emoji} <@&{role_id}> we assign on level: {level}")
-
+                result_strings = [f"{Emojis.dot_emoji} <@&{i[1]}> you get from level: {i[2]}" for i in level_roles]
                 result = '\n'.join(result_strings)
 
             else:
@@ -1600,10 +1597,7 @@ class LevelSystem(commands.Cog):
         
         if level_roles:
             
-            result_strings = []
-            for _, role_id, level, _ in level_roles:
-                result_strings.append(f"{Emojis.dot_emoji} <@&{role_id}> you get from level: {level}")
-
+            result_strings = [f"{Emojis.dot_emoji} <@&{i[1]}> you get from level: {i[2]}" for i in level_roles]
             result = '\n'.join(result_strings)
             
             emb = discord.Embed(title="Here you can find all level roles", 
