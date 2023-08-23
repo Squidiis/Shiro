@@ -1832,11 +1832,38 @@ class LevelSystem(commands.Cog):
                 {Emojis.dot_emoji} Nachrichten oder aktivitäten in dieser Category werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
+
+    @commands.slash_command(name = "remove-bonus-xp-category")
+    @commands.has_permissions(administrator = True)
+    async def remove_bonus_xp_category(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Wähle eine category die du als XP bonus category entfenren willst!")):
+
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, category_id=category.id)
+
+        if check_list:
+
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", category_id=category.id)
+
+            emb = discord.Embed(title=f"Die category wurde erfolgreich als bonus xp category entfernt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die category <#{category.id}> wurde als XP bonus category entfernt.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
+            
+            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[2]] if bonus_xp_list else ["Es wurde keine category als bonus XP category festgelegt"]
+            bonus_channels = "\n".join(bonus_xp_channels)
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Diese category wurde nicht als bonus XP category festgelegt.", 
+                description=f"""{Emojis.dot_emoji} Die category <#{category.id}> wurde nicht als bonus XP category festgelegt und kann daher nicht entfernt werden.
+                Hier sihst du alle category die als bonus XP categorien festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
     
     @commands.slash_command(name = "add-bonus-xp-role")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_role(self, ctx:commands.Context, 
-        role:Option(discord.CategoryChannel, description="Wähle eine rolle wo jeder der diese rolle extra xp erhählt!"),
+        role:Option(discord.role, description="Wähle eine rolle das jeder der diese rolle hat extra xp erhählt!"),
         bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, role_id=role.id)
@@ -1857,10 +1884,37 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
+    @commands.slash_command(name = "remove-bonus-xp-role")
+    @commands.has_permissions(administrator = True)
+    async def remove_bonus_xp_role(self, ctx:commands.Context, role:Option(discord.Role, description="Wähle eine rolle den du als XP bonus rolle entfenren willst!")):
+
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, role_id=role.id)
+
+        if check_list:
+
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", role_id=role.id)
+
+            emb = discord.Embed(title=f"Die role wurde erfolgreich als bonus xp role entfernt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die role <@&{role.id}> wurde als XP bonus role entfernt.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
+            
+            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[3]] if bonus_xp_list else ["Es wurde keine role als bonus XP role festgelegt"]
+            bonus_channels = "\n".join(bonus_xp_channels)
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Diese role wurde nicht als bonus XP role festgelegt.", 
+                description=f"""{Emojis.dot_emoji} Die role <@&{role.id}> wurde nicht als bonus XP role festgelegt und kann daher nicht entfernt werden.
+                Hier sihst du alle rollen die als bonus XP role festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+
     @commands.slash_command(name = "add-bonus-xp-user")
     @commands.has_permissions(administrator = True)
-    async def add_bonus_xp_role(self, ctx:commands.Context, 
-        user:Option(discord.CategoryChannel, description="Wähle einen user der für jede nachricht oder aktivität extra XP erhählt!"),
+    async def add_bonus_xp_user(self, ctx:commands.Context, 
+        user:Option(discord.User, description="Wähle einen user der für jede nachricht oder aktivität extra XP erhählt!"),
         bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, user_id=user.id)
@@ -1878,6 +1932,33 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title=f"Dder bonus xp user wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Der user <@{user.id}> wurde als XP bonus user festgelegt.
                 {Emojis.dot_emoji} Nachrichten oder aktivitäten von <@{user.id}> werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        
+    @commands.slash_command(name = "remove-bonus-xp-user")
+    @commands.has_permissions(administrator = True)
+    async def remove_bonus_xp_user(self, ctx:commands.Context, user:Option(discord.User, description="Wähle einen user den du als XP bonus user entfenren willst!")):
+
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, user_id=user.id)
+
+        if check_list:
+
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", user_id=user.id)
+
+            emb = discord.Embed(title=f"Der user {user.name} wurde erfolgreich als bonus xp user entfernt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> wurde als XP bonus user entfernt.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
+            
+            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[4]] if bonus_xp_list else ["Es wurde kein user als bonus XP user festgelegt"]
+            bonus_channels = "\n".join(bonus_xp_channels)
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Der user {user.name} wurde nicht als bonus XP user festgelegt.", 
+                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> wurde nicht als bonus XP user festgelegt und kann daher nicht entfernt werden.
+                Hier sihst du alle user die als bonus XP user festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 def setup(bot):
