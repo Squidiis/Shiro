@@ -485,15 +485,11 @@ class DatabaseUpdates():
 
                             level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
                             level_sys_blacklist_values = [guild_id, guild_name, items[count]]
-                            count = 0
                         
                         elif operation == "remove":
 
                             level_sys_blacklist = f"DELETE FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
                             level_sys_blacklist_values = [guild_id, items[count]]
-
-                        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-                        db_connect.commit()
 
             else:
 
@@ -625,15 +621,11 @@ class DatabaseUpdates():
 
                             level_sys_blacklist = f"INSERT INTO BonusXpList (guildId, {column_name[count]}) VALUES (%s, %s)" if bonus == None else f"INSERT INTO BonusXpList (guildId, {column_name[count]}, PercentBonusXp) VALUES (%s, %s, %s)"
                             level_sys_blacklist_values = [guild_id, items[count]] if bonus == None else [guild_id, items[count], bonus]
-                            count = 0
                         
                         elif operation == "remove":
 
                             level_sys_blacklist = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
                             level_sys_blacklist_values = [guild_id, items[count]]
-
-                        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-                        db_connect.commit()
 
             else:
 

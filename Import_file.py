@@ -15,7 +15,7 @@ from discord.commands import Option
 from PIL import Image
 from sql_function import *
 import yaml
-
+import itertools
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
