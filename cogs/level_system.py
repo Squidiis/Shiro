@@ -1860,7 +1860,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "add-bonus-xp-role")
+    @commands.slash_command(name = "add-bonus-xp-role", description = "Füge eine rolle als bonus XP rolle hinzu und lege deren XP bonus fest!")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_role(self, ctx:commands.Context, 
         role:Option(discord.Role, description="Wähle eine rolle das jeder der diese rolle hat extra xp erhählt!"),
@@ -1884,7 +1884,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "remove-bonus-xp-role")
+    @commands.slash_command(name = "remove-bonus-xp-role", description = "Entferne eine rolle als bonus XP rolle!")
     @commands.has_permissions(administrator = True)
     async def remove_bonus_xp_role(self, ctx:commands.Context, role:Option(discord.Role, description="Wähle eine rolle den du als XP bonus rolle entfenren willst!")):
 
@@ -1911,7 +1911,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "add-bonus-xp-user")
+    @commands.slash_command(name = "add-bonus-xp-user", description = "Füge einen user als bonus XP user hinzu und lege dessen XP bonus fest!")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_user(self, ctx:commands.Context, 
         user:Option(discord.User, description="Wähle einen user der für jede nachricht oder aktivität extra XP erhählt!"),
@@ -1935,7 +1935,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
         
-    @commands.slash_command(name = "remove-bonus-xp-user")
+    @commands.slash_command(name = "remove-bonus-xp-user", description = "Entferne einen user als bonus XP user!")
     @commands.has_permissions(administrator = True)
     async def remove_bonus_xp_user(self, ctx:commands.Context, user:Option(discord.User, description="Wähle einen user den du als XP bonus user entfenren willst!")):
 
@@ -1962,7 +1962,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "show-bonus-xp-list")
+    @commands.slash_command(name = "show-bonus-xp-list", description = "Lass die alle Bonus XP itmes anzeigen!")
     @commands.has_permissions(administrator = True)
     async def show_bonus_xp_list(self, ctx:commands.Context):
 
@@ -1971,21 +1971,19 @@ class LevelSystem(commands.Cog):
 
         if check_list:
 
-            bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> aktivitäten in diesen channel werden mit {i[5] if i[5] else bonus} % mehr XP belohnt" if i[1] else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <#{i[2]}> aktivitäten dieser Kategorie werden mit {i[5] if i[5] else bonus} % mehr XP belohnt" if i[2] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} {i[3]} aktivitäten von usern mit dieser rolle werden mit {i[5] if i[5] else bonus} % mehr XP belohnt" if i[3] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} {i[4]} aktivitäten von diesen user wird mit {i[5] if i[5] else bonus} % mehr XP belohnt" if i[4] != None else None for i in check_list]
-            test3 = [x for x in bonus_xp_list if x is not None]
-            
-            test2 = "\n".join(test3)
+            bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> activities in this channel are rewarded with {i[5] if i[5] else bonus} % more XP" if i[1] else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <#{i[2]}> activities of this category are rewarded with {i[5] if i[5] else bonus} % more XP" if i[2] != None else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <@&{i[3]}> activities of users with this role are rewarded with {i[5] if i[5] else bonus} % more XP" if i[3] != None else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <@{i[4]}> activities of this user will be rewarded with {i[5] if i[5] else bonus} % more XP" if i[4] != None else None for i in check_list]
+            filtered_list = [x for x in bonus_xp_list if x is not None]
+            all_bonus_xp_items = "\n".join(filtered_list)
 
         else:
 
-            test2 = f"{Emojis.dot_emoji} Es wurde kein channel, Kategotie, Rolle oder Benutzer mit einen XP bonus versehen!"
+            all_bonus_xp_items = f"{Emojis.dot_emoji} No channel, category, role or user has been given an XP bonus!"
 
-        emb = discord.Embed(title=f"{Emojis.help_emoji} Hier sihst du alles was auf der bonus XP list steht", 
-            description=f"""{Emojis.dot_emoji} Hier sihst du alle channel, Kategorien, Rollen und Benutzer die bonus XP erhalten und deren dazu gehörigen XP bonus!
-            {test2}""", color=bot_colour)
+        emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see everything that is on the bonus XP list", 
+            description=f"""{Emojis.dot_emoji} Here you can see all channels, categories, roles and users that get bonus XP and their XP bonus!\n\n{all_bonus_xp_items}""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 def setup(bot):
