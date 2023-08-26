@@ -508,13 +508,13 @@ class DatabaseUpdates():
 
     
     # Update the level system settings
-    def update_level_settings(guild_id:int, xp_rate:int = None, level_status:str = None, levelup_channel:int = None, back_to_none:int = None):
+    def update_level_settings(guild_id:int, xp_rate:int = None, level_status:str = None, levelup_channel:int = None, percentage:int = None, back_to_none:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        column_name = ["xpRate", "levelStatus", "levelUpChannel"]
-        items = [xp_rate, level_status, levelup_channel]
+        column_name = ["xpRate", "levelStatus", "levelUpChannel", "bonusXpPercentage"]
+        items = [xp_rate, level_status, levelup_channel, percentage]
 
         try:
             

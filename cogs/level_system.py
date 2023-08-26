@@ -1186,9 +1186,6 @@ class LevelSystem(commands.Cog):
     async def level_system_settings(self, ctx:commands.Context):
 
         guild_id = ctx.guild.id
-        
-        level_sytem_conrtol_db = DatabaseSetup.db_connector()
-        my_curser_control = level_sytem_conrtol_db.cursor()
 
         level_settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
@@ -1210,8 +1207,6 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title="No entry found", 
                 description="No entry was found so one was created the level system was also activated immediately", color=error_red)
             await ctx.respond(embed=emb)
-
-        DatabaseSetup.db_close(cursor=my_curser_control, db_connection=level_sytem_conrtol_db)
 
     
 
@@ -1454,7 +1449,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "manage-level-blacklist", description = "Add or remove anything you want from the blacklist")
+    @commands.slash_command(name = "manage-level-blacklist", description = "Add or remove anything you want from the blacklist!")
     async def manage_level_blacklist(self, ctx:commands.Context):
 
         emb = discord.Embed(title=f"Welcome to the blacklist manager for the level system {Emojis.settings_emoji}", 
@@ -1745,7 +1740,8 @@ class LevelSystem(commands.Cog):
 
 ################################  Bonus xp system  #################################
 
-    def check_bonus_percentage(self, bonus):
+    @staticmethod
+    def check_bonus_percentage(guild_id:int, bonus:int = None):
 
         if bonus != 0 and bonus != None:
 
@@ -1753,8 +1749,9 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            bonus_percentage = bonus
-
+            percentage = DatabaseCheck.check_level_settings(guild_id=guild_id)
+            bonus_percentage = percentage[4]
+        
         return bonus_percentage
     
 
@@ -1778,7 +1775,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"Der bonus xp channel wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde als XP bonus channel festgelegt.
-                {Emojis.dot_emoji} Nachrichten oder aktivitäten in diesen Channel werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten in diesen Channel werden mit **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** mehr XP belohnt""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1829,7 +1826,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"Die bonus xp Category wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Die Category <#{category.id}> wurde als XP bonus Category festgelegt.
-                {Emojis.dot_emoji} Nachrichten oder aktivitäten in dieser Category werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt.""", color=bot_colour)
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten in dieser Category werden mit **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** mehr XP belohnt.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1871,7 +1868,7 @@ class LevelSystem(commands.Cog):
         if check_list: 
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} Diese rolle wurde bereits als XP bonus rolle festgelegt.", 
-                description=f"""{Emojis.dot_emoji} Die rolle <@&{role.id}> ist als XP bonus rolle festgelegt deshalb werden alle aktivitäten von benutzern mit dieser rolle mit mehr XP belohnt.""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} Die rolle <@&{role.id}> ist als XP bonus rolle festgelegt deshalb werden alle aktivitäten von benutzern mit dieser rolle mit extra XP belohnt.""", color=bot_colour)
             await ctx.respond(embed=emb)
             
         else:
@@ -1880,7 +1877,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"Die bonus xp rolle wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Die rolle <@&{role.id}> wurde als XP bonus rolle festgelegt.
-                {Emojis.dot_emoji} Nachrichten oder aktivitäten von nutzern mit dieser Rolle werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten von nutzern mit dieser Rolle werden mit **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** mehr XP belohnt""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1922,16 +1919,16 @@ class LevelSystem(commands.Cog):
         if check_list: 
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} Dieser user wurde bereits als XP bonus user festgelegt.", 
-                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> ist als XP bonus user festgelegt deshalb werden alle aktivitäten von <@{user.id}> mit mehr XP belohnt.""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} Der user <@{user.id}> ist als XP bonus user festgelegt deshalb werden alle aktivitäten von <@{user.id}> mit extra XP belohnt.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", user_id=user.id, bonus=bonus)
 
-            emb = discord.Embed(title=f"Dder bonus xp user wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
+            emb = discord.Embed(title=f"Der bonus xp user wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} Der user <@{user.id}> wurde als XP bonus user festgelegt.
-                {Emojis.dot_emoji} Nachrichten oder aktivitäten von <@{user.id}> werden mit {self.check_bonus_percentage(bonus=bonus)} % mehr XP belohnt""", color=bot_colour)
+                {Emojis.dot_emoji} Nachrichten oder aktivitäten von <@{user.id}> werden mit **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** mehr XP belohnt""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         
@@ -1962,19 +1959,20 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "show-bonus-xp-list", description = "Lass die alle Bonus XP itmes anzeigen!")
+    @commands.slash_command(name = "show-bonus-xp-list", description = "Lass dir alles anzeigen was auf der bonus xp list steht!")
     @commands.has_permissions(administrator = True)
     async def show_bonus_xp_list(self, ctx:commands.Context):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
-        bonus = 1
+        check_bonus = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+        bonus = check_bonus[4]
 
         if check_list:
 
-            bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> activities in this channel are rewarded with {i[5] if i[5] else bonus} % more XP" if i[1] else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <#{i[2]}> activities of this category are rewarded with {i[5] if i[5] else bonus} % more XP" if i[2] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <@&{i[3]}> activities of users with this role are rewarded with {i[5] if i[5] else bonus} % more XP" if i[3] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <@{i[4]}> activities of this user will be rewarded with {i[5] if i[5] else bonus} % more XP" if i[4] != None else None for i in check_list]
+            bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> activities in this channel are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[1] else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <#{i[2]}> activities of this category are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[2] != None else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <@&{i[3]}> activities of users with this role are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[3] != None else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <@{i[4]}> activities of this user will be rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[4] != None else None for i in check_list]
             filtered_list = [x for x in bonus_xp_list if x is not None]
             all_bonus_xp_items = "\n".join(filtered_list)
 
@@ -1986,6 +1984,59 @@ class LevelSystem(commands.Cog):
             description=f"""{Emojis.dot_emoji} Here you can see all channels, categories, roles and users that get bonus XP and their XP bonus!\n\n{all_bonus_xp_items}""", color=bot_colour)
         await ctx.respond(embed=emb)
 
+
+    @commands.slash_command(name = "set-bonus-xp-percentage", description = "Set a default percentage for the bonus XP system (this is set to 10% by default)!")
+    async def set_bonus_xp_percentage(self, ctx:commands.Context, percentage:Option(int, description="Specify a percentage to be used as the default percentage for the bonus XP system!",max_value=100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
+
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+
+        if check_settings[4] == percentage:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Der aktuelle Prozentwert ist gleich mit den den du gerade hinzufügen möchtest", 
+                description=f"""{Emojis.dot_emoji} Der aktulle Prozentwert für das bonus XP system liegt bei **{check_settings[4]} %**""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, percentage=percentage)
+
+            emb = discord.Embed(title=f"Der standart Prozentsatz für das bonus XP system wurde erfolgteich zugewiesen {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der stnadart Prozentsatz für das bonus XP system wurde auf **{percentage} %** gesetzt!
+                {Emojis.help_emoji} Dieser Prozentsatz gilt jetzt für alle channel, kategorien, rollen und user die teil des bonus XP systems sind.
+                Dieser Prozentsatz wird nun immer zu den erhaltenen XP dazugerechnet {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+    
+    @commands.slash_command(name = "set-bonus-xp-percentage-default", description = "Set the percentage value for the bonus XP system back to the default value!")
+    async def set_bonus_xp_percentage_default(self, ctx:commands.Context):
+        
+        check_settigns = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+
+        if check_settigns[4] == 10:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Der stanfart Prozentwert für das bonus XP system ist bereits auf den standart wert", 
+                description=f"""{Emojis.dot_emoji} Der standart Prozentwert für das bonus XP system ligt bereits bei **{check_settigns[4]} %**""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=3)
+
+            emb = discord.Embed(title=f"Der standart Prozentwert für das bonus XP system wurde erfolgreich zurückgesetzt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der standart Prozentwert für das bonus XP system wurde zurück auf **10 %** gesetzt.
+                {Emojis.dot_emoji} Alle aktivitäten von oder in allen channel, Kategorien, Rollen oder usern die teil des bonus XP systems sind werden mit **10 %** mehr XP belohnt.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+    
+    @commands.slash_command(name = "show-bonus-xp-percentage", description = "Lass die anzeigen wo der standart Prozent wert für das bonus XP system liegt!")
+    async def show_bonus_xp_percentage(self, ctx:commands.Context):
+
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+
+        emb = discord.Embed(title=f"{Emojis.help_emoji} Hier sihst du wie viel Prozent mehr XP man beim Bonus XP system erhält", 
+            description=f"""{Emojis.dot_emoji} Man erhählt aktuell **{check_settings[4]} %** mehr XP für aktivitäten in Kanälen oder Kategorien die teil des bonus XP systems sind.
+            Ebenso erhält man auch diesen Bonus wenn man eine rolle besitzt die auf der liste für das bonus XP system steht oder wenn man ein user ist der auf der bonus XP liste gelistet ist""", color=bot_colour)
+        await ctx.respond(embed=emb)
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
     

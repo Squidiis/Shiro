@@ -48,8 +48,8 @@ CREATE TABLE LevelSystemSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     xpRate INT UNSIGNED DEFAULT 20,
     levelStatus VARCHAR(50) DEFAULT 'on',
-    levelUpChannel BIGINT UNSIGNED NULL
-    bonusXpDefault INT UNSIGNED DEFAULT 10
+    levelUpChannel BIGINT UNSIGNED NULL,
+    bonusXpPercentage INT UNSIGNED DEFAULT 10
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
