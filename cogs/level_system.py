@@ -1272,6 +1272,16 @@ class LevelSystem(commands.Cog):
         blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id, table="level")
         check_channel_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
 
+        if blacklist:
+            
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
+                
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This category is already on the blacklist", 
+                description=f"""The following categories are on the blacklist:\n\n{blacklist[1]}
+                If you want to remove categories from the blacklist execute this command:\n{remove_blacklist_level_category}""", color=bot_colour)
+            await ctx.respond(embed=emb)
+            return
+
         filtered_list = []
         for _, channel, _, _, _ in check_channel_blacklist:
 
@@ -1288,20 +1298,10 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id, table="level")
                 
             emb = discord.Embed(title=f"{Emojis.help_emoji} {'Ein channel' if len(filtered_list) == 1 else 'Mehere channel'} in dieser Category ist bereits auf der blacklist", 
-                description=f"""{Emojis.dot_emoji} {'Folgender channel ist' if len(filtered_list) == 1 else 'Folgende channel sind'} bereits auf der Blacklist \n{channel_list}
+                description=f"""{Emojis.dot_emoji} {'Folgender channel ist' if len(filtered_list) == 1 else 'Folgende channel sind'} bereits auf der Blacklist\n\n{channel_list}
                     {Emojis.arrow_emoji} Deshalb {'wird dieser' if len(filtered_list) == 1 else 'werden diese'} channel von der blacklist entfernt und die Categorie statdessen hinzugefügt.
                     Damit sind alle channel in der categorie vom level system ausgeschlossen.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-            return  
-
-        if blacklist:
-            
-            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
-                
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This category is already on the blacklist", 
-                description=f"""The following categories are on the blacklist:\n\n{blacklist[1]}
-                If you want to remove categories from the blacklist execute this command:\n{remove_blacklist_level_category}""", color=bot_colour)
-            await ctx.respond(embed=emb)
+            await ctx.respond(embed=emb) 
 
         else:
             
