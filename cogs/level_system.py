@@ -1220,13 +1220,24 @@ class LevelSystem(commands.Cog):
     async def add_chanels_level_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel that you want to exclude from the level system!")):
         
         blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="level")
+        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
+        show_blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
+        check_channel = [f"{Emojis.help_emoji} Die Kategorie von diesen Channel ist bereits auf der Blacklist" if bot.get_channel(i).category.id == i[2] else None for i in check_blacklist]
+
+        if check_channel != None:
+
+            emb = discord.Embed(title=check_channel, 
+                description=f"""{Emojis.dot_emoji} Der channel {channel.mention} ist in einer Kategorie gelistet die auf der Blacklist steht.
+                {Emojis.dot_emoji} Daher ist er bereits vom Level system ausgeschlossen.
+                {Emojis.dot_emoji} Hier shist du auch welche Kategorien schon auf der Blacklist stehen:\n\n{show_blacklist[1]}""")
+            await ctx.respond(embed=emb)
+            return
+        
         if blacklist:
 
-            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
-
             emb = discord.Embed(title=f"{Emojis.help_emoji} This channel is already on the blacklist", 
-                description=f"""The following channels are on the blacklist:\n\n{blacklist[0]}
+                description=f"""The following channels are on the blacklist:\n\n{show_blacklist[0]}
                 If you want to remove channels from the blacklist execute this command:\n{remove_blacklist_level_channel}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -1270,7 +1281,7 @@ class LevelSystem(commands.Cog):
     async def add_category_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Select a category that you want to exclude from the level system!")):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id, table="level")
-        check_channel_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
+        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
 
         if blacklist:
             
@@ -1283,7 +1294,7 @@ class LevelSystem(commands.Cog):
             return
 
         filtered_list = []
-        for _, channel, _, _, _ in check_channel_blacklist:
+        for _, channel, _, _, _ in check_blacklist:
 
             if channel:
 
@@ -1297,10 +1308,10 @@ class LevelSystem(commands.Cog):
             channel_list = "\n".join(filtered_list)
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id, table="level")
                 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} {'Ein channel' if len(filtered_list) == 1 else 'Mehere channel'} in dieser Category ist bereits auf der blacklist", 
-                description=f"""{Emojis.dot_emoji} {'Folgender channel ist' if len(filtered_list) == 1 else 'Folgende channel sind'} bereits auf der Blacklist\n\n{channel_list}
-                    {Emojis.arrow_emoji} Deshalb {'wird dieser' if len(filtered_list) == 1 else 'werden diese'} channel von der blacklist entfernt und die Categorie statdessen hinzugefügt.
-                    Damit sind alle channel in der categorie vom level system ausgeschlossen.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} {'One channel' if len(filtered_list) == 1 else 'Several channels'} in this category is already blacklisted", 
+                description=f"""{Emojis.dot_emoji} The following {'channel is' if len(filtered_list) == 1 else 'channels are'} already blacklisted \n\n{channel_list}
+                    {Emojis.arrow_emoji} Therefore {'this' if len(filtered_list) == 1 else 'these'} channel will be removed from the blacklist and the category will be added instead.
+                    This excludes all channels in the category from the level system.""", color=bot_colour)
             await ctx.respond(embed=emb) 
 
         else:
