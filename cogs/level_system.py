@@ -17,7 +17,7 @@ class CheckLevelSystem():
         if blacklist:
 
             all_channels, all_categories, all_roles, all_users = [], [], [], []
-            for _, _, blacklist_channel, blacklist_category, blacklist_role, blacklist_user in blacklist:
+            for _, blacklist_channel, blacklist_category, blacklist_role, blacklist_user in blacklist:
 
                 None if None == blacklist_channel else all_channels.append(f"{Emojis.dot_emoji} <#{blacklist_channel}>\n")
 
@@ -304,7 +304,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                             
                         mention.append(f"{Emojis.dot_emoji} <#{channel}>")
                         
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, channel_id=channel, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, channel_id=channel, table="level")
 
                 if temp_blacklist[2]: 
 
@@ -313,7 +313,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
 
                         mention.append(f"{Emojis.dot_emoji} <#{category}>")
 
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, category_id=category, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, category_id=category, table="level")
                       
                 if temp_blacklist[3]:
                         
@@ -322,7 +322,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                             
                         mention.append(f"{Emojis.dot_emoji} <@&{role}>")
                         
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, role_id=role, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, role_id=role, table="level")
                                 
                 if temp_blacklist[4]:
                         
@@ -331,7 +331,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
 
                         mention.append(f"{Emojis.dot_emoji} <@{user}>")
                         
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, guild_name=interaction.guild.name, user_id=user, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, user_id=user, table="level")
 
                 BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
                     
@@ -659,12 +659,14 @@ class LevelSystem(commands.Cog):
         bucket = self.cd.get_bucket(message)
         return bucket.update_rate_limit()
 
-    def xp_generator(self, guild_id:int):
+    @staticmethod
+    def xp_generator(guild_id:int):
 
         settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
         return settings[1]
     
-    def xp_generator_global(self):
+    @staticmethod
+    def xp_generator_global():
         xp = 20
         return xp
     
@@ -746,7 +748,7 @@ class LevelSystem(commands.Cog):
                             finally:   
 
                                 # Checks if a level role or a level up channel is defined                                
-                                level_role_check = DatabaseCheck.check_level_system_levelroles(guild=message.guild.id, needed_level=new_level)
+                                level_role_check = DatabaseCheck.check_level_system_levelroles(guild_id=message.guild.id, needed_level=new_level)
                                 levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
 
                                 if level_role_check:
@@ -1230,7 +1232,7 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, channel_id=channel.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", channel_id=channel.id, table="level")
 
             emb = discord.Embed(title=f"This channel was successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was successfully blacklisted.
@@ -1268,7 +1270,30 @@ class LevelSystem(commands.Cog):
     async def add_category_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Select a category that you want to exclude from the level system!")):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id, table="level")
-        
+        check_channel_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
+
+        filtered_list = []
+        for _, channel, _, _, _ in check_channel_blacklist:
+
+            if channel:
+
+                if bot.get_channel(channel).category.id == category.id:
+
+                    DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channel, table="level")
+                    filtered_list.append(f"{Emojis.dot_emoji} <#{channel}>\n")
+
+        if filtered_list != []:  
+            
+            channel_list = "\n".join(filtered_list)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id, table="level")
+                
+            emb = discord.Embed(title=f"{Emojis.help_emoji} {'Ein channel' if len(filtered_list) == 1 else 'Mehere channel'} in dieser Category ist bereits auf der blacklist", 
+                description=f"""{Emojis.dot_emoji} {'Folgender channel ist' if len(filtered_list) == 1 else 'Folgende channel sind'} bereits auf der Blacklist \n{channel_list}
+                    {Emojis.arrow_emoji} Deshalb {'wird dieser' if len(filtered_list) == 1 else 'werden diese'} channel von der blacklist entfernt und die Categorie statdessen hinzugefügt.
+                    Damit sind alle channel in der categorie vom level system ausgeschlossen.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+            return  
+
         if blacklist:
             
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
@@ -1280,7 +1305,7 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, category_id=category.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id, table="level")
             
             emb = discord.Embed(title=f"This category was successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The category <#{category.id}> was successfully blacklisted.
@@ -1330,7 +1355,7 @@ class LevelSystem(commands.Cog):
         
         else:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, role_id=role.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", role_id=role.id, table="level")
             
             emb = discord.Embed(title=f"This role has been successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role <@&{role.id}> has been successfully blacklisted.
@@ -1385,7 +1410,7 @@ class LevelSystem(commands.Cog):
 
             else:   
 
-                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", guild_name=ctx.guild.name, user_id=user.id, table="level")
+                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", user_id=user.id, table="level")
 
                 emb = discord.Embed(title=f"This user was successfully blacklisted {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} The user <@{user.id}> was successfully blacklisted.
@@ -1738,7 +1763,7 @@ class LevelSystem(commands.Cog):
 
 
 
-################################  Bonus xp system  #################################
+#########################################  Bonus xp system  #############################################
 
     @staticmethod
     def check_bonus_percentage(guild_id:int, bonus:int = None):
@@ -1848,12 +1873,12 @@ class LevelSystem(commands.Cog):
 
             bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
             
-            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[2]] if bonus_xp_list else ["Es wurde keine category als bonus XP category festgelegt"]
-            bonus_channels = "\n".join(bonus_xp_channels)
+            bonus_xp_categories = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[2]] if bonus_xp_list else ["Es wurde keine category als bonus XP category festgelegt"]
+            bonus_categories = "\n".join(bonus_xp_categories)
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} Diese category wurde nicht als bonus XP category festgelegt.", 
                 description=f"""{Emojis.dot_emoji} Die category <#{category.id}> wurde nicht als bonus XP category festgelegt und kann daher nicht entfernt werden.
-                Hier sihst du alle category die als bonus XP categorien festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
+                Hier sihst du alle category die als bonus XP categorien festgelegt wurden:\n\n{bonus_categories}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
     
@@ -1899,12 +1924,12 @@ class LevelSystem(commands.Cog):
 
             bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
             
-            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[3]] if bonus_xp_list else ["Es wurde keine role als bonus XP role festgelegt"]
-            bonus_channels = "\n".join(bonus_xp_channels)
+            bonus_xp_roles = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[3]] if bonus_xp_list else ["Es wurde keine role als bonus XP role festgelegt"]
+            bonus_roles = "\n".join(bonus_xp_roles)
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} Diese role wurde nicht als bonus XP role festgelegt.", 
                 description=f"""{Emojis.dot_emoji} Die role <@&{role.id}> wurde nicht als bonus XP role festgelegt und kann daher nicht entfernt werden.
-                Hier sihst du alle rollen die als bonus XP role festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
+                Hier sihst du alle rollen die als bonus XP role festgelegt wurden:\n\n{bonus_roles}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1950,12 +1975,12 @@ class LevelSystem(commands.Cog):
 
             bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
             
-            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[4]] if bonus_xp_list else ["Es wurde kein user als bonus XP user festgelegt"]
-            bonus_channels = "\n".join(bonus_xp_channels)
+            bonus_xp_user = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[4]] if bonus_xp_list else ["Es wurde kein user als bonus XP user festgelegt"]
+            bonus_user = "\n".join(bonus_xp_user)
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} Der user {user.name} wurde nicht als bonus XP user festgelegt.", 
                 description=f"""{Emojis.dot_emoji} Der user <@{user.id}> wurde nicht als bonus XP user festgelegt und kann daher nicht entfernt werden.
-                Hier sihst du alle user die als bonus XP user festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
+                Hier sihst du alle user die als bonus XP user festgelegt wurden:\n\n{bonus_user}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
     
@@ -2037,6 +2062,8 @@ class LevelSystem(commands.Cog):
             description=f"""{Emojis.dot_emoji} Man erhählt aktuell **{check_settings[4]} %** mehr XP für aktivitäten in Kanälen oder Kategorien die teil des bonus XP systems sind.
             Ebenso erhält man auch diesen Bonus wenn man eine rolle besitzt die auf der liste für das bonus XP system steht oder wenn man ein user ist der auf der bonus XP liste gelistet ist""", color=bot_colour)
         await ctx.respond(embed=emb)
+
+
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
     

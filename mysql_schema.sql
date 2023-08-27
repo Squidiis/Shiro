@@ -24,7 +24,6 @@ DROP TABLE IF EXISTS `LevelSystemBlacklist`;
 
 CREATE TABLE LevelSystemBlacklist (
     guildId BIGINT UNSIGNED NOT NULL,
-    guildName VARCHAR(255) NOT NULL,
     channelId BIGINT UNSIGNED NULL,
     categoryId BIGINT UNSIGNED NULL,
     roleId BIGINT UNSIGNED NULL,
@@ -174,7 +173,7 @@ CREATE TABLE EconomySystemShopRolles (
 
 DROP TABLE IF EXISTS `EconomySystemSettings`;
 
-CREATE TABLE LevelSystemSettings (
+CREATE TABLE EconomySystemSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     econemyStatus VARCHAR(50) DEFAULT 'on_all'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

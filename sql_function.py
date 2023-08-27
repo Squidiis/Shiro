@@ -464,7 +464,7 @@ class DatabaseUpdates():
         
 
     # Function that adds all specified data to the blacklist 
-    def manage_blacklist(guild_id:int, table:str, operation:str, guild_name:str = None, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def manage_blacklist(guild_id:int, table:str, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -475,7 +475,7 @@ class DatabaseUpdates():
         
         try:
             
-            if items:
+            if items != [None, None, None, None]:
 
                 for count in range(len(items)):
                     
@@ -483,8 +483,8 @@ class DatabaseUpdates():
 
                         if operation == "add":
 
-                            level_sys_blacklist = f"INSERT INTO {table_name} (guildId, guildName, {column_name[count]}) VALUES (%s, %s, %s)"
-                            level_sys_blacklist_values = [guild_id, guild_name, items[count]]
+                            level_sys_blacklist = f"INSERT INTO {table_name} (guildId, {column_name[count]}) VALUES (%s, %s)"
+                            level_sys_blacklist_values = [guild_id, items[count]]
                         
                         elif operation == "remove":
 
