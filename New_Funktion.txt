@@ -7,7 +7,6 @@ Noch hinzufügen das man den status gleich am anfang sieht
 levelsystem: 
 
 hinzufügen das man auch global level aufsteigen kann
-Hinzufügen das überprüft wird ob ein channel in einer category auf der blacklist ist (Nur noch testen)
 
 Aktivster user Leaderbord 
 

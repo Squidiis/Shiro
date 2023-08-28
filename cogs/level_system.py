@@ -1222,15 +1222,15 @@ class LevelSystem(commands.Cog):
         blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="level")
         check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
         show_blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
+        
+        check_channel = [1 if channel.category.id == i[2] else None for i in check_blacklist]
+        
+        if any(elem is not None for elem in check_channel):
 
-        check_channel = [f"{Emojis.help_emoji} Die Kategorie von diesen Channel ist bereits auf der Blacklist" if bot.get_channel(i).category.id == i[2] else None for i in check_blacklist]
-
-        if check_channel != None:
-
-            emb = discord.Embed(title=check_channel, 
-                description=f"""{Emojis.dot_emoji} Der channel {channel.mention} ist in einer Kategorie gelistet die auf der Blacklist steht.
-                {Emojis.dot_emoji} Daher ist er bereits vom Level system ausgeschlossen.
-                {Emojis.dot_emoji} Hier shist du auch welche Kategorien schon auf der Blacklist stehen:\n\n{show_blacklist[1]}""")
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The category of this channel is already blacklisted", 
+                description=f"""{Emojis.dot_emoji} The channel {channel.mention} is listed in a category that is blacklisted.
+                {Emojis.dot_emoji} Therefore, he is already excluded from the level system.
+                {Emojis.dot_emoji} Here you can also see which categories are already on the blacklist:\n\n{show_blacklist[1]}""", color=bot_colour)
             await ctx.respond(embed=emb)
             return
         
