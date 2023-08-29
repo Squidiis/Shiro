@@ -55,8 +55,35 @@ class CheckLevelSystem():
             users_mention = f"{Emojis.dot_emoji} There are no users on the blacklist"
 
         return [channels_mention, categories_mention, roles_mention, users_mention]
+    
 
+    def check_bonus_xp(guild_id:int, message:discord.Message):
 
+        check_settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
+        check_bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id)
+        
+        if check_bonus_xp_list:
+            
+            for _, channel, category, role, user, percentage in check_bonus_xp_list:
+
+                new_percentage = percentage if percentage != 0 else check_settings[4]
+
+                if user == message.author.id:
+                    return new_percentage
+                
+                check_role = message.guild.get_role(role)
+                if check_role in message.author.roles:
+                    return new_percentage
+                
+                if channel == message.channel.id:
+                    return new_percentage
+
+                if category == message.channel.category.id:
+                    return new_percentage
+        
+        else:
+            return None
+            
 
 
 ##############################################  Blacklist manager  ##############################################
@@ -660,10 +687,17 @@ class LevelSystem(commands.Cog):
         return bucket.update_rate_limit()
 
     @staticmethod
-    def xp_generator(guild_id:int):
+    def xp_generator(guild_id:int, message:discord.Message):
 
         settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
-        return settings[1]
+        check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message)
+
+        if check_bonus_xp_system != 0:
+            xp = settings[1] * (1 + (check_bonus_xp_system / 100))    
+        else:
+            xp = settings[1]
+
+        return xp
     
     @staticmethod
     def xp_generator_global():
@@ -724,8 +758,8 @@ class LevelSystem(commands.Cog):
                         if check_if_exists[2] >= 999:
                             return
 
-                        XP = self.xp_generator(guild_id=message.guild.id)
-                        
+                        XP = self.xp_generator(guild_id=message.guild.id, message=message)
+                        print(XP)
                         xp_global = self.xp_generator_global()
                         user_xp_global = xp_global + check_if_exists[6]
                         user_has_xp = check_if_exists[3] + XP 

@@ -36,11 +36,9 @@ class DatabaseStatusCheck():
 
             if levelsystem_blacklist:
 
-                user_id = message_check.author.id
-
-                for _, _, channel_blacklist, category_blacklist, role_blacklist, user_blacklist in levelsystem_blacklist:
+                for _, channel_blacklist, category_blacklist, role_blacklist, user_blacklist in levelsystem_blacklist:
                    
-                    if user_blacklist == user_id:
+                    if user_blacklist == message_check.author.id:
                         return True
 
                     if role_blacklist != None:
