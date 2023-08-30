@@ -1829,29 +1829,29 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_channel(self, ctx:commands.Context, 
         channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that is rewarded with extra xp!"), 
-        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
+        bonus:Option(int, description="Choose how much more xp to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
 
         if check_list: 
 
-            emb = discord.Embed(title=f"Dieser Channel wurde bereits als XP bonus channel festgelegt {Emojis.fail_emoji}", 
-                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde bereits als XP bonus channel festgelegt deshalb werden alle aktivitäten in diesen channel mit extra XP belohnt""", color=error_red)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This channel has already been set as XP bonus channel", 
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> has already been set as XP bonus channel therefore all activities in this channel will be rewarded with extra XP""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", channel_id=channel.id, bonus=bonus)
 
-            emb = discord.Embed(title=f"Der bonus xp channel wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde als XP bonus channel festgelegt.
-                {Emojis.dot_emoji} Nachrichten oder aktivitäten in diesen Channel werden mit **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** mehr XP belohnt""", color=bot_colour)
+            emb = discord.Embed(title=f"The bonus xp channel was successfully set {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was set as XP bonus channel.
+                {Emojis.dot_emoji} Messages or activities in this channel will be rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP """, color=bot_colour)
             await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = "remove-bonus-xp-channel")
     @commands.has_permissions(administrator = True)
-    async def remove_bonus_xp_channel(self, ctx:commands.Context, channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Wähle einen channel den du als XP bonus channel entfenren willst!")):
+    async def remove_bonus_xp_channel(self, ctx:commands.Context, channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that you want to use as xp bonus channel!")):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
 
@@ -1859,27 +1859,27 @@ class LevelSystem(commands.Cog):
 
             DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", channel_id=channel.id)
 
-            emb = discord.Embed(title=f"Der channel wurde erfolgreich als bonus xp channel entfernt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde als XP bonus channel entfernt.""", color=bot_colour)
+            emb = discord.Embed(title=f"The channel was successfully removed as bonus xp channel {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was removed as XP bonus channel.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
             
-            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[1]] if bonus_xp_list else ["Es wurde kein channel als bonus XP channel festgelegt"]
+            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[1]] if bonus_xp_list else ["No channel has been set as a bonus XP channel"]
             bonus_channels = "\n".join(bonus_xp_channels)
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Dieser channel wurde nicht als bonus XP channel festgelegt.", 
-                description=f"""{Emojis.dot_emoji} Der channel <#{channel.id}> wurde nicht als bonus XP channel festgelegt und kann daher nicht entfernt werden.
-                Hier sihst du alle channel die als bonus XP channel festgelegt wurden:\n\n{bonus_channels}""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This channel was not set as a bonus XP channel.", 
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was not set as a bonus XP channel and therefore cannot be removed.
+                {Emojis.dot_emoji} Here you can see all the channels that have been set as bonus XP channels:\n\n{bonus_channels}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = "add-bonus-xp-category")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_category(self, ctx:commands.Context, 
-        category:Option(discord.CategoryChannel, description="Wähle eine Kategorie in der alle aktivitäten in allen channel mit extra xp belohnt werden!"),
+        category:Option(discord.CategoryChannel, description="Choose  a category in which all activities in all channels are rewarded with extra xp!"),
         bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, category_id=category.id)

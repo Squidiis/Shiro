@@ -100,7 +100,7 @@ class DeleteData(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
 
-        tables = ["LevelSystemBlacklist", "ManageBlacklistTemp", "AutoReactionSetup", "LevelSystemSettings", "EconomySystemBlacklist", "EconomySystemSettings"]
+        tables = ["LevelSystemBlacklist", "ManageBlacklistTemp", "AutoReactionSetup", "LevelSystemSettings", "EconomySystemBlacklist", "EconomySystemSettings", "BonusXpList"]
         for table in tables:
 
             DeleteData.delete_data(table=table, column="channelId", item=channel)
