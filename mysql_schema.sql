@@ -57,7 +57,7 @@ DROP TABLE IF EXISTS `LevelRankCardSettingsGuild`;
 CREATE TABLE LevelRankCardSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     cardColor VARCHAR(20) DEFAULT '8, 120, 151',
-    cardImage MEDIUMBLOB NULL,
+    cardImage BLOB NULL,
     cardLayout INT UNSIGNED DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

@@ -98,6 +98,10 @@ bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
 bot.remove_command("help")
 
 
+# level up message
+def level_message(user_id:int, new_level:int):
+    level_up_message = f"Oh nice <@{user_id}> you have a new level, your newlevel is {new_level}"
+    return level_up_message
 
 # The red colour for the fail / error embeds
 error_red = discord.Colour.brand_red()
