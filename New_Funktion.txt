@@ -10,14 +10,9 @@ hinzufügen das man auch global level aufsteigen kann
 
 Aktivster user Leaderbord 
 
-
-Level rollen mit einer Temp db machen 
-
+hinzufügen das man custom bilder hinzufügen kann für die rank card
+custom level up message
 
 Heute zu erledigen:
-
-- Layout anpassen ({Emojis.help_emoji} an den anfang packen und die "bot_colour" benutzen)
-- Table für die Temp level rollen db erstellen
-- Temp level rollen db eingliedern
 
 

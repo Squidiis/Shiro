@@ -711,7 +711,7 @@ class LevelSystem(commands.Cog):
         mask_rectangle = Image.new('L', bigsize, 0)
         draw = ImageDraw.Draw(mask_rectangle)
         draw.rounded_rectangle((0, 0)+bigsize, radius=radius, fill=fill, outline=None)
-        mask = mask_rectangle.resize(rectangle.size, Image.ANTIALIAS)
+        mask = mask_rectangle.resize(rectangle.size, Image.LANCZOS)
         rectangle.putalpha(mask)
         return (rectangle, mask)
 
@@ -1119,7 +1119,7 @@ class LevelSystem(commands.Cog):
             mask = Image.new("L", bigsize, 0)
             draw = ImageDraw.Draw(mask)
             draw.ellipse((0, 0)+ bigsize, 255)
-            mask = mask.resize(profile.size, Image.ANTIALIAS)
+            mask = mask.resize(profile.size, Image.LANCZOS)
             profile.putalpha(mask)
 
             background.paste(profile, (47, 39), mask=mask)
@@ -1603,7 +1603,6 @@ class LevelSystem(commands.Cog):
                         await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status="level"))   
 
 
-
     @commands.slash_command(name = "remove-level-role", description = "Choose a role that you want to remove as a level role!")
     @commands.has_permissions(administrator = True)
     async def remove_level_role(self, ctx:commands.Context, role:Option(discord.Role, description="Select a level role that you want to remove")):
@@ -1638,7 +1637,6 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-
     @commands.slash_command(name = "show-all-level-roles", description = "View all rolls that are available with a level!")
     async def show_all_level_roles(self, ctx:commands.Context):
 
@@ -1657,8 +1655,8 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title=f"No level rolls have been added yet", 
                 description=f"{Emojis.help_emoji} There are no level rolls added yet if you want to add some use the {add_level_role} command", color=bot_colour)
             await ctx.respond(embed=emb)
-
        
+    
     
 #############################################  Level up channel settings  #################################
 
@@ -1780,7 +1778,6 @@ class LevelSystem(commands.Cog):
         
        
     @commands.slash_command(name = "show-xp-rate", description = "Let us show you how much xp you currently get per message!")
-    @commands.has_permissions(administrator = True)
     async def show_xp_rate(self, ctx:commands.Context):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
@@ -2014,7 +2011,6 @@ class LevelSystem(commands.Cog):
 
     
     @commands.slash_command(name = "show-bonus-xp-list", description = "Display everything that is on the bonus xp list!")
-    @commands.has_permissions(administrator = True)
     async def show_bonus_xp_list(self, ctx:commands.Context):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
@@ -2040,6 +2036,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "set-bonus-xp-percentage", description = "Set a default percentage for the bonus XP system (this is set to 10 % by default)!")
+    @commands.has_permissions(administrator = True)
     async def set_bonus_xp_percentage(self, ctx:commands.Context, percentage:Option(int, description="Specify a percentage to be used as the default percentage for the bonus XP system!",max_value=100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
@@ -2062,6 +2059,7 @@ class LevelSystem(commands.Cog):
 
     
     @commands.slash_command(name = "set-bonus-xp-percentage-default", description = "Set the percentage value for the bonus XP system back to the default value!")
+    @commands.has_permissions(administrator = True)
     async def set_bonus_xp_percentage_default(self, ctx:commands.Context):
         
         check_settigns = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)

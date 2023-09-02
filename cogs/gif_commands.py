@@ -1,4 +1,4 @@
-from Import_file import requests, discord, os, random
+from Import_file import requests, discord, os, random, bot_colour
 from discord.ext import commands
 from discord.commands import Option
 import aiohttp
@@ -8,315 +8,136 @@ import json
 class API(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command()
-    async def kiss(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
         
-        params = {
-            "q": "Anime_kiss",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
-
-        if user == None:
-            Kiss = f"**{ctx.author.mention} kissed himself? ok**"
-        else:
-            Kiss = f"**{ctx.author.mention} has kissed {user.mention}**"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="Kiss",description=Kiss,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
-
-
-    @commands.command()
-    async def hug(self, ctx, user: discord.User = None):
+    def search_gif(self, tags:str):
+        
         key = os.getenv("API_KEY")
 
         params = {
-            "q": "Anime_hug",
+            "q": tags,
             "key": key,
             "limit": "10",
             "client_key": "Discord_bot",
             "media_filter": "gif"
         }
+
         result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
         data = result.json()
-
-        if user == None:
-            Hug = f"**There you go {ctx.author.mention} hugs**"
-        else:
-            Hug = f"**{ctx.author.mention} has hug {user.mention}**"
+        print(data)
 
         number = random.randint(0, 9)
         url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="Hug",description=Hug,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+        return url
     
 
-    @commands.command()
-    async def lick(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
+    @commands.slash_command(description = "Send an anime kiss gif you can also mention someone!")
+    async def kiss(self, ctx, user:discord.Member = None):
+        
+        url = self.search_gif(tags="Anime_kiss")
 
-        params = {
-            "q": "Anime_lick",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
-
-        if user == None:
-            Lick = f"**{ctx.author.mention} is licking... themselves?**"
-        else:
-            Lick = f"**{ctx.author.mention} has licked {user.mention}**"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="lick",description=Lick,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+        emb = discord.Embed(title=f"Kiss", description=f"**{ctx.author.mention} kissed himself? ok**" if user == None else f"**{ctx.author.mention} has kissed {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="via Tenor")
+        await ctx.respond(embed=emb)
 
 
-    @commands.command()
-    async def punch(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
+    @commands.slash_command(description = "Send a anime hug gif you can also mention someone!")
+    async def hug(self, ctx, user:discord.Member = None):
+       
+        url = self.search_gif(tags="Anime_hug")
 
-        params = {
-            "q": "Anime_punch",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
+        emb = discord.Embed(title="Hug", description=f"**There you go {ctx.author.mention} hugs**" if user == None else f"**{ctx.author.mention} has hug {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
+    
 
-        if user == None:
-            Punch = f"**{ctx.author.mention} punch himself?**"
-        else:
-            Punch = f"**{ctx.author.mention} has punch {user.mention}**"
+    @commands.slash_command(description = "Send a anime lick gif you can also mention someone!")
+    async def lick(self, ctx, user:discord.Member = None):
+        
+        url = self.search_gif(tags="Anime_lick")
+    
+        emb = discord.Embed(title="Lick", description=f"**{ctx.author.mention} is licking... themselves?**" if user == None else f"**{ctx.author.mention} has licked {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
 
-        embed = discord.Embed(
-            title="punch",description=Punch,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+    @commands.slash_command(description = "Send a anime punch gif you also mention someone!")
+    async def punch(self, ctx, user:discord.Member = None):
+
+        url = self.search_gif(tags="Anime_punch")
+
+        emb = discord.Embed(title="Punch", description=f"**{ctx.author.mention} punch himself?**" if user == None else f"**{ctx.author.mention} has punch {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
 
     @commands.command()
-    async def idk(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
+    async def idk(self, ctx, user:discord.Member = None):
 
-        params = {
-            "q": "Anime_idk",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
+        url = self.search_gif(tags="Anime_idk")
 
-        if user == None:
-            Idk = f"**{ctx.author.mention} is shrugging ¯\_(ツ)_/**"
-        else:
-            Idk = f"**{ctx.author.mention} is shrugging at {user.mention} ¯\_(ツ)_/¯**"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="idk",description=Idk,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+        emb = discord.Embed(title="Idk", description=f"**{ctx.author.mention} is shrugging ¯\_(ツ)_/**" if user == None else f"**{ctx.author.mention} is shrugging at {user.mention} ¯\_(ツ)_/¯**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
         
     @commands.command()
-    async def dance(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
+    async def dance(self, ctx, user:discord.Member = None):
 
-        params = {
-            "q": "Anime_dance",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
+        url = self.search_gif(tags="Anime_dace")
 
-        if user == None:
-            Dance = f"**{ctx.author.mention} shows his moves! Nice**"
-        else:
-            Dance = f"**Cute {ctx.author.mention} dancing with {user.mention}**"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="dance",description=Dance,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+        emb = discord.Embed(title="Dance", description=f"**{ctx.author.mention} shows his moves! Nice**" if user == None else f"**Cute {ctx.author.mention} dancing with {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
 
     @commands.command()
-    async def slap(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
+    async def slap(self, ctx, user:discord.Member = None):
+        
+        url = self.search_gif("Anime_slap")
 
-        params = {
-            "q": "Anime_slap",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
-
-        if user == None:
-            Slap = f"**{ctx.author.mention} slaps himself?**"
-        else:
-            Slap = f"**{ctx.author.mention} slaps {user.mention}**"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="slap",description=Slap,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+        emb = discord.Embed(title="Slap", description=f"**{ctx.author.mention} slaps himself?**" if user == None else f"**{ctx.author.mention} slaps {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
 
     @commands.command()
-    async def fbi(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
-
-        params = {
-            "q": "Anime_fbi",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
-
-        if user == None:
-            Fbi = f"**{ctx.author.mention} calls the Fbi!**"
-        else:
-            Fbi = f"**{ctx.author.mention} calls the FBI about {user.mention}**"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="fbi",description=Fbi,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+    async def fbi(self, ctx, user:discord.Member = None):
+    
+        url = self.search_gif(tags="Anime_fbi")
+        
+        emb = discord.Embed(title="FBI", description=f"**{ctx.author.mention} calls the Fbi!**" if user == None else f"**{ctx.author.mention} calls the FBI about {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
 
     @commands.command()
-    async def embarres(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
+    async def embarres(self, ctx, user:discord.Member = None):
+        
+        url = self.search_gif(tags="Anime_embarres")
 
-        params = {
-            "q": "Anime_embarrassed",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
-
-        if user == None:
-            Embarres = f"**{ctx.author.mention} is embarrassed, only what?**"
-        else:
-            Embarres = f"**{ctx.author.mention} was embarrassed by {user.mention}**"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="embarres",description=Embarres,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+        emb = discord.Embed(title="Embarres", description=f"**{ctx.author.mention} is embarrassed, only what?**" if user == None else f"**{ctx.author.mention} was embarrassed by {user.mention}**", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
 
     @commands.command()
-    async def pet(self, ctx, user: discord.User = None):
-        key = os.getenv("API_KEY")
-
-        params = {
-            "q": "Anime_pet",
-            "key": key,
-            "limit": "10",
-            "client_key": "Discord_bot",
-            "media_filter": "gif"
-        }
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
-
-        if user == None:
-            Embarres = f"**{ctx.author.mention} will you pet someone, I wonder who it will be?**"
-        else:
-            Embarres = f"**{ctx.author.mention} pats {user.mention}** how cute UwU"
-
-        number = random.randint(0, 9)
-        url = data['results'][number]['media_formats']['gif']['url']
-
-        embed = discord.Embed(
-            title="embarres",description=Embarres,
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via Tenor")
-        await ctx.send(embed=embed)
+    async def pet(self, ctx, user:discord.Member = None):
+        
+        url = self.search_gif(tags="Anime_pet")
+      
+        emb = discord.Embed(title="Pet", description=f"**{ctx.author.mention} will you pet someone, I wonder who it will be?**" if user == None else f"**{ctx.author.mention} pats {user.mention}** how cute UwU", color=bot_colour)
+        emb.set_image(url=url)
+        emb.set_footer(text="Via Tenor")
+        await ctx.send(embed=emb)
 
     
     

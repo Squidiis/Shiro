@@ -27,7 +27,7 @@ class main(commands.Cog):
         print(f'Logged in as: {bot.user.name}')
         print(f'With ID: {bot.user.id}')
         self.bot.loop.create_task(status_task())
-         
+        
         print("┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓")
         print("┃┏━┓┃ ┃┏━┓┃ ┃┃ ┃┃ ┗┫┣┛ ┗┓┏┓┃ ┗┫┣┛")
         print("┃┗━━┓ ┃┃ ┃┃ ┃┃ ┃┃  ┃┃   ┃┃┃┃  ┃┃")
@@ -64,6 +64,7 @@ class main(commands.Cog):
         self.bot.add_view(ResetBlacklistEconomyButton())
 
         self.bot.add_view(view)
+        
 
 bot.add_cog(main(bot))
 
