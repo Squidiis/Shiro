@@ -3,12 +3,12 @@
 </h2>
 
 <h4 align="center">
-    Owner and developer is [Squidi](https://github.com/Squidiis)
+    Owner and developer is <a href="https://github.com/Squidiis">Squidi</a>
 </h4>
 
 <h4 align="center">
     Official discord server for the Shiro discord bot project
-    [![Discord](https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/Zv5JtYhd9r)
+    <a href="https://discord.gg/Zv5JtYhd9r" img src=https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge>Discord</a>
 </h4>
 
 ## 👋 About
