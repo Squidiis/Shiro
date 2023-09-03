@@ -8,7 +8,7 @@
 
 <h4 align="center">
     Official discord server for the Shiro discord bot project
-    <a href="https://discord.gg/Zv5JtYhd9r" img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
+    <a href="https://discord.gg/Zv5JtYhd9r"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
 </h4>
 
 ## 👋 About
