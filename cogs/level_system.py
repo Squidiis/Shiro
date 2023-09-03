@@ -1,4 +1,5 @@
 
+from discord.ui.item import Item
 from Import_file import *
 from typing import Union
 from easy_pil import Editor, load_image_async, Font
@@ -846,7 +847,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-xp", description = "Give a user a quantity of XP chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def give_xp_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user who should receive the xp!"),
+    async def give_xp(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user who should receive the xp!"),
         xp:Option(int, description="Specify a quantity of XP to be added!")):
 
         if user.bot:
@@ -906,7 +907,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-xp", description = "Remove a chosen amount of Xp from a user!")
     @commands.has_permissions(administrator = True)
-    async def remove_xp_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user from which you want to remove xp!"),
+    async def remove_xp(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user from which you want to remove xp!"),
         xp:Option(int, description="Specify a quantity of Xp to be removed!")):
             
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
@@ -949,7 +950,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-levels", description = "Give a user a selected amount of levels!")
     @commands.has_permissions(administrator = True)
-    async def give_level_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
+    async def give_level(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
         level:Option(int, description="Specify a set of levels that you want to assign!")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild=ctx.guild.id, user=user.id)
@@ -993,7 +994,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-level", description = "Remove a quantity of levels chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def remove_level_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user from whom you want to remove the level!"), 
+    async def remove_level(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user from whom you want to remove the level!"), 
         level:Option(int, description="Specify how many levels should be removed!")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
@@ -1037,7 +1038,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "reset-level-system", description = "Reset all levels and xp of everyone!")
     @commands.has_permissions(administrator = True)
-    async def reset_levels_slash(self, ctx:commands.Context):
+    async def reset_level(self, ctx:commands.Context):
 
         guild_id = ctx.guild.id
 
@@ -2090,6 +2091,39 @@ class LevelSystem(commands.Cog):
             You also get this bonus if you have a role that is on the list for the bonus XP system or if you are a user that is listed on the bonus XP list.""", color=bot_colour)
         await ctx.respond(embed=emb)
 
+    
+    @commands.slash_command(name = "set-level-up-message", description = "Lege eine individuelle level up nachricht für deinen server fest!")
+    async def set_level_up_message(self, ctx:discord.ApplicationContext):
+        
+        mark_stings = ["{user}", "{level}"]
+        emb = discord.Embed(title=f"{Emojis.help_emoji} Jetzt eine individuelle level up message festlegen", 
+            description=f"""{Emojis.dot_emoji} Wenn du deine level up message festlegst benutze {mark_stings[0]} um einen user zu makieren der user wirt dann an der stelle gepinnt wo du {mark_stings[1]} einstetzt
+            Um das level anzuzeigen setze {mark_stings[1]} an der stelle wird dann das level angezeigt hier sihst du noch ein kleines beispiel:
+            `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
+            {Emojis.dot_emoji} Wenn du die custom level up message für deinen server festlegen willst drücke den unteren button""", color=bot_colour)
+        await ctx.respond(embed=emb, view=ModalButtonLevelUpMessage())
+
+
+class ModalButtonLevelUpMessage(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Level up nachricht jetzt festlegen", style=discord.ButtonStyle.blurple, custom_id="add_level_up_message")
+    async def add_level_up_message(self, button, interaction:discord.Interaction):
+
+        await interaction.response.send_modal(MyModal(title="Modal via Button"))
+
+
+class MyModal(discord.ui.Modal):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.add_item(discord.ui.InputText(label="Insert here the text for the level up message", style=discord.InputTextStyle.long))
+
+    async def callback(self, interaction: discord.Interaction):
+        embed = discord.Embed(title="Modal Results")
+        embed.add_field(name="Long Input", value=self.children[0].value)
+        await interaction.response.send_message(embeds=[embed])
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
