@@ -2092,15 +2092,17 @@ class LevelSystem(commands.Cog):
         await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "set-level-up-message", description = "Lege eine individuelle level up nachricht für deinen server fest!")
+    @commands.slash_command(name = "set-level-up-message", description = "Set a custom level up message for your server!")
     async def set_level_up_message(self, ctx:discord.ApplicationContext):
         
         mark_stings = ["{user}", "{level}"]
-        emb = discord.Embed(title=f"{Emojis.help_emoji} Jetzt eine individuelle level up message festlegen", 
-            description=f"""{Emojis.dot_emoji} Wenn du deine level up message festlegst benutze {mark_stings[0]} um einen user zu makieren der user wirt dann an der stelle gepinnt wo du {mark_stings[1]} einstetzt
-            Um das level anzuzeigen setze {mark_stings[1]} an der stelle wird dann das level angezeigt hier sihst du noch ein kleines beispiel:
-            `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
-            {Emojis.dot_emoji} Wenn du die custom level up message für deinen server festlegen willst drücke den unteren button""", color=bot_colour)
+        emb = discord.Embed(title=f"{Emojis.help_emoji} Set an individual level up message now", 
+            description=f"""{Emojis.dot_emoji}When you set your level up message use {mark_stings[0]} to mark a user the user will be pinned to the place where you set {mark_stings[1]}.
+            To show the level use {mark_stings[1]} and put it where you want the level to be here is a small example:
+
+            {Emojis.arrow_emoji} `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
+
+            {Emojis.dot_emoji} If you want to set the custom message for your server, press the button located just below this message""", color=bot_colour)
         await ctx.respond(embed=emb, view=ModalButtonLevelUpMessage())
 
 
@@ -2111,19 +2113,22 @@ class ModalButtonLevelUpMessage(discord.ui.View):
     @discord.ui.button(label="Level up nachricht jetzt festlegen", style=discord.ButtonStyle.blurple, custom_id="add_level_up_message")
     async def add_level_up_message(self, button, interaction:discord.Interaction):
 
-        await interaction.response.send_modal(MyModal(title="Modal via Button"))
+        await interaction.response.send_modal(LevelUpMessageModal(title="Modal via Button"))
 
 
-class MyModal(discord.ui.Modal):
+class LevelUpMessageModal(discord.ui.Modal):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
         self.add_item(discord.ui.InputText(label="Insert here the text for the level up message", style=discord.InputTextStyle.long))
 
     async def callback(self, interaction: discord.Interaction):
-        embed = discord.Embed(title="Modal Results")
-        embed.add_field(name="Long Input", value=self.children[0].value)
-        await interaction.response.send_message(embeds=[embed])
+
+        user = f"<@{interaction.user.id}>"
+        level = 1
+        embed = discord.Embed(title=f"Die level up nachricht wurde erlogreich festgelegt {Emojis.succesfully_emoji}", 
+            description=f"""{Emojis.dot_emoji} Die level up nachricht wurde auf:\n`{self.children[0].value}` festgelegt {Emojis.exclamation_mark_emoji}
+            {Emojis.dot_emoji} Wenn jemand ein level aufsteigt wird diese nachricht gesendet""", color=bot_colour)
+        await interaction.response.edit_message(embeds=[embed])
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
