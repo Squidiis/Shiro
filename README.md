@@ -31,6 +31,24 @@ If you wish, you can invite him to your own server by clicking [here](https://di
     - Commands to set how much XP is awarded per message.
     - Commands to give individual XP bonuses to individual channels, categories, roles and users.
     - Level role system to reward users with roles when they reach a certain level (level roles can be customized).
-    - Commands to create custom level-up messages and also some to create a level-up channel to which all level-up messages are sent. 
+    - Commands to create custom level-up messages and also some to create a level-up channel to which all level-up messages are sent.
+    
+* Moderation System
+    - ban, kick, mute, unmute, clear commands
+    - server-info, user-info commands
+    - anti discord invite link system 
+
+## Requirements
+
+- asyncio==3.4.3
+- giphy-client==1.0.0
+- mysql-connector-python==8.0.32
+- Pillow==9.4.0
+- py-cord==2.3.2
+- python-dotenv==0.21.1
+- requests==2.28.2
+- ui==0.1.4
+- aiofiles==22.1.0
+
 
     
