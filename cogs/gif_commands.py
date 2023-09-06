@@ -23,7 +23,6 @@ class API(commands.Cog):
 
         result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
         data = result.json()
-        print(data)
 
         number = random.randint(0, 9)
         url = data['results'][number]['media_formats']['gif']['url']

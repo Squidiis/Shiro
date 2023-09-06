@@ -4,11 +4,9 @@
 
 <h4 align="center">
     Owner and developer is <a href="https://github.com/Squidiis">Squidi</a>
-</h4>
-
-<h4 align="center">
     Official discord server for the Shiro discord bot project
 </h4>
+
 <h4 align="center">
     <a href="https://discord.gg/Zv5JtYhd9r"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
 </h4>
@@ -38,7 +36,7 @@ If you wish, you can invite him to your own server by clicking [here](https://di
     - server-info, user-info commands
     - anti discord invite link system 
 
-## Requirements
+## 📝 Requirements
 
 - asyncio==3.4.3
 - giphy-client==1.0.0
