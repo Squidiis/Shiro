@@ -9,13 +9,11 @@ from discord.ext import commands
 import mysql.connector
 from datetime import *
 import requests
-from giphy_client.rest import ApiException
 from discord.ui import Select, View, Button, Modal
 from discord.commands import Option
 from PIL import Image
 from sql_function import *
 import yaml
-import itertools
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓

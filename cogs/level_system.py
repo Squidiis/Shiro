@@ -1,8 +1,6 @@
 
-from discord.ui.item import Item
 from Import_file import *
 from typing import Union
-from easy_pil import Editor, load_image_async, Font
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from io import BytesIO
 from check import *
@@ -2093,6 +2091,7 @@ class LevelSystem(commands.Cog):
 
     
     @commands.slash_command(name = "set-level-up-message", description = "Set a custom level up message for your server!")
+    @commands.has_permissions(administrator = True)
     async def set_level_up_message(self, ctx:discord.ApplicationContext):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
@@ -2117,6 +2116,7 @@ class LevelSystem(commands.Cog):
 
     
     @commands.slash_command(name = "default-level-up-message", description = "Reset the level-up message to the default message!")
+    @commands.has_permissions(administrator = True)
     async def default_level_up_message(self, ctx:commands.Context):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)

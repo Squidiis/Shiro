@@ -38,15 +38,13 @@ If you wish, you can invite him to your own server by clicking [here](https://di
 
 ## 📝 Requirements
 
-- asyncio==3.4.3
-- giphy-client==1.0.0
-- mysql-connector-python==8.0.32
-- Pillow==9.4.0
-- py-cord==2.3.2
-- python-dotenv==0.21.1
-- requests==2.28.2
-- ui==0.1.4
-- aiofiles==22.1.0
+- [mysql-connector-python 8.1.0](https://pypi.org/project/mysql-connector-python/)
+- [Pillow 10.0.0](https://pypi.org/project/Pillow/)
+- [py-cord 2.4.1](https://pypi.org/project/py-cord/)
+- [python-dotenv 1.0.0](https://pypi.org/project/python-dotenv/)
+- [requests 2.31.0](https://pypi.org/project/requests/)
+- [ui 0.1.4](https://pypi.org/project/ui/)
+
 
 
     

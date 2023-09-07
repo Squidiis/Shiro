@@ -51,9 +51,6 @@ class moderator_commands(commands.Cog):
 
                     count = bot.warnings[message.guild.id][member.id][0]
 
-                    async with aiofiles.open(f"{message.guild.id}.txt", mode="a") as file:
-                        await file.write(f"{member.id} {message.author.id} {reason}\n")
-
                     embed=discord.Embed(description=f"**reason:** posts invitation links", color=0x0094ff)
                     embed.set_author(name=f'{member.display_name}#{member.discriminator} wurde gewarnt', icon_url=member.display_avatar)
                     await message.channel.send(embed=embed)
