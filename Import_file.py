@@ -118,7 +118,8 @@ user_bot_emb = discord.Embed(title=f"Der nutzer ist ein bot {Emojis.fail_emoji}"
 user_not_found_emb = discord.Embed(title=f"Der user wurde nicht gefunden {Emojis.fail_emoji}", 
     description=f"{Emojis.dot_emoji} Es wurde kein eintrag gefunden der user befindet sich auch nicht mehr auf den server {Emojis.exclamation_mark_emoji}", color=error_red)
 
-
+no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} Es wurde kein Eintrag gefunden", 
+    description=f"{Emojis.dot_emoji} Daher wurde einer erstellt versuchen sie es einfach nochmal.", color=bot_colour) 
 # Help command
 class Help_menu(discord.Cog):
     def __init__(self, bot):

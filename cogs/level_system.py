@@ -561,7 +561,7 @@ class LevelUpChannelButtons(discord.ui.View):
         
         else:
             
-            await interaction.response.send_message(embed=no_permissions_emb ,view=None, ephemeral=True)
+            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
 
 
 
@@ -1802,7 +1802,7 @@ class LevelSystem(commands.Cog):
         else:
             
             percentage = DatabaseCheck.check_level_settings(guild_id=guild_id)
-            bonus_percentage = percentage[4]
+            bonus_percentage = percentage[5]
         
         return bonus_percentage
     
@@ -2016,7 +2016,7 @@ class LevelSystem(commands.Cog):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
         check_bonus = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
-        bonus = check_bonus[4]
+        bonus = check_bonus[5]
 
         if check_list:
 
@@ -2042,10 +2042,10 @@ class LevelSystem(commands.Cog):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
-        if check_settings[4] == percentage:
+        if check_settings[5] == percentage:
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} The current percentage value is equal to the one you are about to add", 
-                description=f"""{Emojis.dot_emoji} The current percentage value for the bonus XP system is **{check_settings[4]} %**""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} The current percentage value for the bonus XP system is **{check_settings[5]} %**""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -2059,21 +2059,21 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "set-bonus-xp-percentage-default", description = "Set the percentage value for the bonus XP system back to the default value!")
+    @commands.slash_command(name = "default-bonus-xp-percentage", description = "Set the percentage value for the bonus XP system back to the default value!")
     @commands.has_permissions(administrator = True)
-    async def set_bonus_xp_percentage_default(self, ctx:commands.Context):
+    async def default_bonus_xp_percentage(self, ctx:commands.Context):
         
         check_settigns = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
-        if check_settigns[4] == 10:
+        if check_settigns[5] == 10:
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} The default percentage value for the bonus XP system is already set to the default value", 
-                description=f"""{Emojis.dot_emoji} The default percentage value for the bonus XP system is already at **{check_settigns[4]} %**""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} The default percentage value for the bonus XP system is already at **{check_settigns[5]} %**""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
-            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=3)
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=4)
 
             emb = discord.Embed(title=f"The default percentage value for the bonus XP system was successfully reset {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The default percentage value for the bonus XP system was set back to **10 %**.
@@ -2087,48 +2087,103 @@ class LevelSystem(commands.Cog):
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
         emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see how many percent more XP you get with the Bonus XP system", 
-            description=f"""{Emojis.dot_emoji} You currently get **{check_settings[4]} %** more XP for activities in channels or categories that are part of the bonus XP system.
+            description=f"""{Emojis.dot_emoji} You currently get **{check_settings[5]} %** more XP for activities in channels or categories that are part of the bonus XP system.
             You also get this bonus if you have a role that is on the list for the bonus XP system or if you are a user that is listed on the bonus XP list.""", color=bot_colour)
         await ctx.respond(embed=emb)
 
     
     @commands.slash_command(name = "set-level-up-message", description = "Set a custom level up message for your server!")
     async def set_level_up_message(self, ctx:discord.ApplicationContext):
+
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+
+        if check_settings:
+
+            mark_stings = ["{user}", "{level}"]
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Set an individual level-up message now", 
+                description=f"""{Emojis.dot_emoji}When you set your level-up message use {mark_stings[0]} to mark a user the user will be pinned to the place where you set {mark_stings[1]}.
+                To show the level use {mark_stings[1]} and put it where you want the level to be here is a small example:
+
+                {Emojis.arrow_emoji} `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
+
+                {Emojis.dot_emoji} If you want to set the custom message for your server, press the button located just below this message""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ModalButtonLevelUpMessage())
         
-        mark_stings = ["{user}", "{level}"]
-        emb = discord.Embed(title=f"{Emojis.help_emoji} Set an individual level up message now", 
-            description=f"""{Emojis.dot_emoji}When you set your level up message use {mark_stings[0]} to mark a user the user will be pinned to the place where you set {mark_stings[1]}.
-            To show the level use {mark_stings[1]} and put it where you want the level to be here is a small example:
+        else:
 
-            {Emojis.arrow_emoji} `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
+            DatabaseUpdates._create_bot_settings(guild_id=ctx.guild.id)
+            await ctx.respond(embed=no_entry_emb)
 
-            {Emojis.dot_emoji} If you want to set the custom message for your server, press the button located just below this message""", color=bot_colour)
-        await ctx.respond(embed=emb, view=ModalButtonLevelUpMessage())
+    
+    @commands.slash_command(name = "default-level-up-message", description = "Reset the level-up message to the default message!")
+    async def default_level_up_message(self, ctx:commands.Context):
+
+        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+
+        if check_settings:
+
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=3)
+            level_up_message = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)[4]
+
+            emb = discord.Embed(title=f"Die level-up nachricht wurde zurück auf standart einstellungen gesetzt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Die level-up nachricht für diesen Server wurde auf standart zurückgesetzt.
+                {Emojis.dot_emoji} Hier sihst du die aktuelle level-up nachricht: `{level_up_message}`""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            DatabaseUpdates._create_bot_settings(guild_id=ctx.guild.id)
+            await ctx.respond(embed=no_entry_emb)
+
+        
+    @commands.slash_command(name = "show-level-up-message", description = "Shows the current level-up message from your server")
+    async def show_level_up_message(self, ctx:commands.Context):
+
+        level_up_message = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+
+        if level_up_message:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Hier sihst du die aktuelle level-up nachricht", 
+                description=f"""{Emojis.dot_emoji} Die aktuelle level-up nachricht ist:\n\n{Emojis.arrow_emoji} {level_up_message[4]}\n
+                {Emojis.dot_emoji} Diese nachticht wird immer gesendet wenn ein user ein level aufsteigt.
+                {Emojis.exclamation_mark_emoji} Wenn du ein level-up channel festlegst wird diese nachricht nur in diesen ausgewählten channel gesendet.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+        
+        else:
+
+            DatabaseUpdates._create_bot_settings(guild_id=ctx.guild.id)
+            await ctx.respond(embed=no_entry_emb)
 
 
 class ModalButtonLevelUpMessage(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Level up nachricht jetzt festlegen", style=discord.ButtonStyle.blurple, custom_id="add_level_up_message")
+    @discord.ui.button(label="Level up message now set", style=discord.ButtonStyle.blurple, custom_id="add_level_up_message")
     async def add_level_up_message(self, button, interaction:discord.Interaction):
 
-        await interaction.response.send_modal(LevelUpMessageModal(title="Modal via Button"))
+        await interaction.response.send_modal(LevelUpMessageModal(title="Set a level-up message for your server!"))
 
 
 class LevelUpMessageModal(discord.ui.Modal):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.add_item(discord.ui.InputText(label="Insert here the text for the level up message", style=discord.InputTextStyle.long))
+        self.add_item(discord.ui.InputText(label="Insert here the text for the level-up message", style=discord.InputTextStyle.long))
 
     async def callback(self, interaction: discord.Interaction):
-
-        user = f"<@{interaction.user.id}>"
+        user = interaction.user.mention
         level = 1
-        embed = discord.Embed(title=f"Die level up nachricht wurde erlogreich festgelegt {Emojis.succesfully_emoji}", 
-            description=f"""{Emojis.dot_emoji} Die level up nachricht wurde auf:\n`{self.children[0].value}` festgelegt {Emojis.exclamation_mark_emoji}
+        level_up_message = eval("f'{}'".format(self.children[0].value))
+
+        DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
+
+        embed = discord.Embed(title=f"Die level-up nachricht wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
+            description=f"""{Emojis.dot_emoji} Die level-up nachricht wurde auf:\n{Emojis.arrow_emoji} `{level_up_message}` festgelegt {Emojis.exclamation_mark_emoji}
             {Emojis.dot_emoji} Wenn jemand ein level aufsteigt wird diese nachricht gesendet""", color=bot_colour)
-        await interaction.response.edit_message(embeds=[embed])
+        await interaction.response.edit_message(embeds=[embed], view=None)
+
+
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
