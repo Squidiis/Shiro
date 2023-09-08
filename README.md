@@ -46,5 +46,13 @@ If you wish, you can invite him to your own server by clicking [here](https://di
 - [ui 0.1.4](https://pypi.org/project/ui/)
 
 
+## All commands
+
+| Command | Description |
+| --- | --- |
+|Commands of the level system|
+|give level|Give a user a quantity you choose at level|
+|remove level|Remove a user a quantity of level chosen by you|
+
 
     
