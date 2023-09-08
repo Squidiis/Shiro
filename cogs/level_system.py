@@ -2124,11 +2124,11 @@ class LevelSystem(commands.Cog):
         if check_settings:
 
             DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, back_to_none=3)
-            level_up_message = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)[4]
+            level_up_message = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"Die level-up nachricht wurde zurück auf standart einstellungen gesetzt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Die level-up nachricht für diesen Server wurde auf standart zurückgesetzt.
-                {Emojis.dot_emoji} Hier sihst du die aktuelle level-up nachricht: `{level_up_message}`""", color=bot_colour)
+            emb = discord.Embed(title=f"The level-up message was set back to default settings {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} The level-up message for this server was reset to default.
+                {Emojis.dot_emoji} Here you can see the current level-up message: `{level_up_message[4]}`""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -2144,10 +2144,10 @@ class LevelSystem(commands.Cog):
 
         if level_up_message:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Hier sihst du die aktuelle level-up nachricht", 
-                description=f"""{Emojis.dot_emoji} Die aktuelle level-up nachricht ist:\n\n{Emojis.arrow_emoji} {level_up_message[4]}\n
-                {Emojis.dot_emoji} Diese nachticht wird immer gesendet wenn ein user ein level aufsteigt.
-                {Emojis.exclamation_mark_emoji} Wenn du ein level-up channel festlegst wird diese nachricht nur in diesen ausgewählten channel gesendet.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see the current level-up message", 
+                description=f"""{Emojis.dot_emoji} The current level-up message is:\n\n{Emojis.arrow_emoji} {level_up_message[4]}\n
+                {Emojis.dot_emoji} This message is always sent when a user receives a level-up.
+                {Emojis.exclamation_mark_emoji} If you set a level-up channel, this message will only be sent to this selected channel.""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -2178,9 +2178,9 @@ class LevelUpMessageModal(discord.ui.Modal):
 
         DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
 
-        embed = discord.Embed(title=f"Die level-up nachricht wurde erfolgreich festgelegt {Emojis.succesfully_emoji}", 
-            description=f"""{Emojis.dot_emoji} Die level-up nachricht wurde auf:\n{Emojis.arrow_emoji} `{level_up_message}` festgelegt {Emojis.exclamation_mark_emoji}
-            {Emojis.dot_emoji} Wenn jemand ein level aufsteigt wird diese nachricht gesendet""", color=bot_colour)
+        embed = discord.Embed(title=f"The level-up message was successfully set {Emojis.succesfully_emoji}", 
+            description=f"""{Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}` {Emojis.exclamation_mark_emoji}
+            {Emojis.dot_emoji} When someone receives a level-up this message is sent""", color=bot_colour)
         await interaction.response.edit_message(embeds=[embed], view=None)
 
 

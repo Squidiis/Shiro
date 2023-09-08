@@ -6,7 +6,7 @@ import json
 
 
 
-class API(commands.Cog):
+class ApiSearchCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
@@ -186,6 +186,6 @@ class API(commands.Cog):
 
     
 def setup(bot):
-    bot.add_cog(API(bot))
+    bot.add_cog(ApiSearchCommands(bot))
 
 
