@@ -54,7 +54,7 @@ If you wish, you can invite him to your own server by clicking [here](https://di
 |remove XP|Removes a user a quantity of XP chosen by you.|
 |give level|Gives a user a quantity of level that you choose|
 |remove level|Removes a user a quantity of level chosen by you|
-|reset level|Setzt den vortschrit von allen usern auf den server auf 0 zurück|
-|rank|Zeigt den vortschrit eines users im level system mit hilfe einer rank card, für ein beispil [hier]()|
+|reset level|Resets the forward step of all users on the server to 0|
+|rank|Shows the progress of a user in the level system with the help of a rank card, for example [press here](https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/rank-card/example_rank_card.png?raw=true)|
 
     
