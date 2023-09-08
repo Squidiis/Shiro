@@ -1,6 +1,6 @@
-<h2 align="center">
+<h1 align="center">
     This project is currently in development!<br>
-</h2>
+</h1>
 
 <h4 align="center">
     Owner and developer is <a href="https://github.com/Squidiis">Squidi</a>

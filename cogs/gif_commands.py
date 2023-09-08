@@ -1,15 +1,20 @@
 from Import_file import requests, discord, os, random, bot_colour
 from discord.ext import commands
-from discord.commands import Option
+from discord.commands import Option, slash_command, SlashCommandGroup
 import aiohttp
 import json
+
 
 
 class API(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
-    def search_gif(self, tags:str):
+    
+    anime = SlashCommandGroup(name="anime", description="Group for anime content")
+
+    gif = anime.create_subgroup(name="gif", description="Group for gifs")
+
+    async def search_gif(self, tags:str):
         
         key = os.getenv("API_KEY")
 
@@ -29,10 +34,10 @@ class API(commands.Cog):
         return url
     
 
-    @commands.slash_command(description = "Send an anime kiss gif you can also mention someone!")
+    @gif.command(name = "kiss", description = "Send an anime kiss gif you can also mention someone!")
     async def kiss(self, ctx, user:discord.Member = None):
         
-        url = self.search_gif(tags="Anime_kiss")
+        url = await self.search_gif(tags="anime kiss")
 
         emb = discord.Embed(title=f"Kiss", description=f"**{ctx.author.mention} kissed himself? ok**" if user == None else f"**{ctx.author.mention} has kissed {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
@@ -40,103 +45,103 @@ class API(commands.Cog):
         await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(description = "Send a anime hug gif you can also mention someone!")
+    @gif.command(description = "Send a anime hug gif you can also mention someone!")
     async def hug(self, ctx, user:discord.Member = None):
        
-        url = self.search_gif(tags="Anime_hug")
+        url = await self.search_gif(tags="anime hug")
 
         emb = discord.Embed(title="Hug", description=f"**There you go {ctx.author.mention} hugs**" if user == None else f"**{ctx.author.mention} has hug {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
     
 
-    @commands.slash_command(description = "Send a anime lick gif you can also mention someone!")
+    @gif.command(description = "Send a anime lick gif you can also mention someone!")
     async def lick(self, ctx, user:discord.Member = None):
         
-        url = self.search_gif(tags="Anime_lick")
+        url = await self.search_gif(tags="anime lick")
     
         emb = discord.Embed(title="Lick", description=f"**{ctx.author.mention} is licking... themselves?**" if user == None else f"**{ctx.author.mention} has licked {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(description = "Send a anime punch gif you also mention someone!")
+    @gif.command(description = "Send a anime punch gif you also mention someone!")
     async def punch(self, ctx, user:discord.Member = None):
 
-        url = self.search_gif(tags="Anime_punch")
+        url = await self.search_gif(tags="anime punch")
 
         emb = discord.Embed(title="Punch", description=f"**{ctx.author.mention} punch himself?**" if user == None else f"**{ctx.author.mention} has punch {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
 
-    @commands.command()
+    @gif.command(description = "Send a anime idk gif you can also mention someone!")
     async def idk(self, ctx, user:discord.Member = None):
 
-        url = self.search_gif(tags="Anime_idk")
+        url = await self.search_gif(tags="anime idk")
 
         emb = discord.Embed(title="Idk", description=f"**{ctx.author.mention} is shrugging ¯\_(ツ)_/**" if user == None else f"**{ctx.author.mention} is shrugging at {user.mention} ¯\_(ツ)_/¯**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
         
-    @commands.command()
+    @gif.command(description = "Send a anime dance gif you can also mention someone!")
     async def dance(self, ctx, user:discord.Member = None):
 
-        url = self.search_gif(tags="Anime_dace")
+        url = await self.search_gif(tags="anime dance")
 
         emb = discord.Embed(title="Dance", description=f"**{ctx.author.mention} shows his moves! Nice**" if user == None else f"**Cute {ctx.author.mention} dancing with {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
 
-    @commands.command()
+    @gif.command(description = "Send a anime slap gif you can also mention someone!")
     async def slap(self, ctx, user:discord.Member = None):
         
-        url = self.search_gif("Anime_slap")
+        url = await self.search_gif("anime slap")
 
         emb = discord.Embed(title="Slap", description=f"**{ctx.author.mention} slaps himself?**" if user == None else f"**{ctx.author.mention} slaps {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
 
-    @commands.command()
+    @gif.command(description = "Send a anime fbi gif you can also mention someone!")
     async def fbi(self, ctx, user:discord.Member = None):
     
-        url = self.search_gif(tags="Anime_fbi")
+        url = await self.search_gif(tags="anime fbi")
         
         emb = discord.Embed(title="FBI", description=f"**{ctx.author.mention} calls the Fbi!**" if user == None else f"**{ctx.author.mention} calls the FBI about {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
 
-    @commands.command()
+    @gif.command(description = "Send a anime embarres gif you can also mention someone!")
     async def embarres(self, ctx, user:discord.Member = None):
         
-        url = self.search_gif(tags="Anime_embarres")
+        url = await self.search_gif(tags="anime embarres")
 
         emb = discord.Embed(title="Embarres", description=f"**{ctx.author.mention} is embarrassed, only what?**" if user == None else f"**{ctx.author.mention} was embarrassed by {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
 
-    @commands.command()
+    @gif.command(description = "Send a anime pet gif you can also mention someone!")
     async def pet(self, ctx, user:discord.Member = None):
         
-        url = self.search_gif(tags="Anime_pet")
+        url = await self.search_gif(tags="anime pet")
       
         emb = discord.Embed(title="Pet", description=f"**{ctx.author.mention} will you pet someone, I wonder who it will be?**" if user == None else f"**{ctx.author.mention} pats {user.mention}** how cute UwU", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
-        await ctx.send(embed=emb)
+        await ctx.respond(embed=emb)
 
     
     

@@ -11,7 +11,6 @@ hinzufügen das man auch global level aufsteigen kann
 Aktivster user Leaderbord 
 
 hinzufügen das man custom bilder hinzufügen kann für die rank card
-custom level up message
 
 Heute zu erledigen:
 

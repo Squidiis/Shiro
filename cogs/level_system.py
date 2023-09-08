@@ -1068,7 +1068,7 @@ class LevelSystem(commands.Cog):
 
         error_emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
             description=f"""{Emojis.dot_emoji} The user was not found, it may be that he is not yet participating in the level system.
-            {Emojis.help_emoji} You can only join the level system if you have sent at least one message to a channel that is not blacklisted. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            {Emojis.help_emoji} You can only join the level system if you have sent at least one message to a channel that is not blacklisted {Emojis.exclamation_mark_emoji}""", color=bot_colour)
 
         check_user = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
         
