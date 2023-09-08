@@ -50,9 +50,11 @@ If you wish, you can invite him to your own server by clicking [here](https://di
 
 | Command | Description |
 | --- | --- |
-|Commands of the level system|
-|give level|Give a user a quantity you choose at level|
-|remove level|Remove a user a quantity of level chosen by you|
-
+|give XP|Gives a user a quantity of XP that you choose.|
+|remove XP|Removes a user a quantity of XP chosen by you.|
+|give level|Gives a user a quantity of level that you choose|
+|remove level|Removes a user a quantity of level chosen by you|
+|reset level|Setzt den vortschrit von allen usern auf den server auf 0 zurück|
+|rank|Zeigt den vortschrit eines users im level system mit hilfe einer rank card, für ein beispil [hier]()|
 
     
