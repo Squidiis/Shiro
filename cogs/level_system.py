@@ -1234,7 +1234,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "add-channel-level-blacklist", description = "Exclude channels from the level system!")
     @commands.has_permissions(administrator = True)
-    async def add_chanels_level_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel that you want to exclude from the level system!")):
+    async def add_channel_level_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel that you want to exclude from the level system!")):
         
         blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="level")
         check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")

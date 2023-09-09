@@ -10,7 +10,7 @@ import mysql.connector
 from datetime import *
 import requests
 from discord.ui import Select, View, Button, Modal
-from discord.commands import Option
+from discord.commands import Option, SlashCommandGroup
 from PIL import Image
 from sql_function import *
 import yaml
@@ -95,6 +95,10 @@ bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
 
 bot.remove_command("help")
 
+
+add = SlashCommandGroup(name = "add", description = "add something to someone", default_member_permissions = discord.Permissions(administrator=True))
+remove = SlashCommandGroup(name = "remove", description = "remove something away from someone", default_member_permissions = discord.Permissions(administrator=True))
+show = SlashCommandGroup(name = "show", description="Display something")
 
 # level up message
 def level_message(user_id:int, new_level:int):

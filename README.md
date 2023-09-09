@@ -36,6 +36,14 @@ If you wish, you can invite him to your own server by clicking [here](https://di
     - server-info, user-info commands
     - anti discord invite link system 
 
+* Fun commands
+    - RPS (Rock, Paper, Scissors)
+    - Tik Tak Toe
+    - Coin flip game with gifs
+    - cocktail command that gives you a random cocktail recipe 
+    - Anime gif commands (kiss, hug, lick, punch, idk, dance, slap, fbi, embarres, pet)
+    - Anime meme command with the [reddit API](https://www.reddit.com/dev/api/)
+
 ## 📝 Requirements
 
 - [mysql-connector-python 8.1.0](https://pypi.org/project/mysql-connector-python/)
@@ -56,5 +64,9 @@ If you wish, you can invite him to your own server by clicking [here](https://di
 |remove level|Removes a user a quantity of level chosen by you|
 |reset level|Resets the forward step of all users on the server to 0|
 |rank|Shows the progress of a user in the level system with the help of a rank card, for example [press here](https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/rank-card/example_rank_card.png?raw=true)|
+|leaderboard|Zeigt die 10 besten auf den server|
+|level system settings|Schaltet das level system aus oder ein|
+|add level blacklist channel|Fügt einen channel auf die Level system blacklist hinzu dieser wird dann vom level system ausgeschlossen und man erhält in diesen channel kein XP|
+|remove level blacklist channel|Streiche einen channel von der Blacklist und lasse in wieder am level system teilnehmen man erhält in diesen channel dann wieder XP|
 
     
