@@ -112,16 +112,16 @@ error_red = discord.Colour.brand_red()
 bot_colour = data["Bot_colour"]
 
 # Fail / error embeds
-no_permissions_emb = discord.Embed(title="Du bist nicht berechtigt", description=f"Du bist nicht berechtigt diesen Knopf zu drücken nur admins durfen mit diesen Command interagieren",color = error_red)
+no_permissions_emb = discord.Embed(title="You are not authorized", description=f"You are not allowed to press this button only admins are allowed to interact with this command {Emojis.fail_emoji}",color = error_red)
 
-user_bot_emb = discord.Embed(title=f"Der nutzer ist ein bot {Emojis.fail_emoji}", 
-    description=f"Der nutzer den du ausgewählt hast ist ein bot und kann nicht in diesen Command auswewählt werden!", color=error_red)
+user_bot_emb = discord.Embed(title=f"The user is a bot {Emojis.fail_emoji}", 
+    description=f"The user you have selected is a bot and cannot be selected in this command!", color=error_red)
 
-user_not_found_emb = discord.Embed(title=f"Der user wurde nicht gefunden {Emojis.fail_emoji}", 
-    description=f"{Emojis.dot_emoji} Es wurde kein eintrag gefunden der user befindet sich auch nicht mehr auf den server {Emojis.exclamation_mark_emoji}", color=error_red)
+user_not_found_emb = discord.Embed(title=f"The user was not found {Emojis.fail_emoji}", 
+    description=f"{Emojis.dot_emoji} No entry was found the user is also no longer on the server {Emojis.exclamation_mark_emoji}", color=error_red)
 
-no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} Es wurde kein Eintrag gefunden", 
-    description=f"{Emojis.dot_emoji} Daher wurde einer erstellt versuchen sie es einfach nochmal.", color=bot_colour) 
+no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", 
+    description=f"{Emojis.dot_emoji} Therefore, one was created just try again.", color=bot_colour) 
 # Help command
 class Help_menu(discord.Cog):
     def __init__(self, bot):
