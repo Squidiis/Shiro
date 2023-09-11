@@ -800,24 +800,24 @@ class LevelSystem(commands.Cog):
                                     await message.author.add_roles(level_role) 
 
                                     await levelup_channel.send(f"<@{message.author.id}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
-                                    await levelup_channel.send(level_message(user_id=message.author.id, new_level=new_level))
+                                    await levelup_channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
                                 
                                 elif levelup_channel_check[3] == None and level_role_check != None:
                                     
                                     level_role = message.guild.get_role(role_id)
                                     await message.author.add_roles(level_role)
 
-                                    await message.channel.send(level_message(user_id=message.author.id, new_level=new_level))
+                                    await message.channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
                                     await message.channel.send(f"<@{message.author.id}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
 
                                 elif levelup_channel_check[3] == None and level_role_check == None:
 
-                                    await message.channel.send(level_message(user_id=message.author.id, new_level=new_level)) 
+                                    await message.channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level)) 
 
                                 elif levelup_channel_check[3] != None and level_role_check == None:
                                         
                                     levelup_channel = bot.get_channel(levelup_channel_check[3])
-                                    await levelup_channel.send(level_message(user_id=message.author.id, new_level=new_level))
+                                    await levelup_channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
                          
                         else:
 
@@ -880,12 +880,12 @@ class LevelSystem(commands.Cog):
 
                         if levelup_channel_check != None:
 
-                            await ctx.send(level_message(user_id=user.id, new_level=new_level))
+                            await ctx.send(level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
                             
                         else:
                             
                             levelup_channel = bot.get_channel(levelup_channel_check[3])
-                            await levelup_channel.send(level_message(user_id=user.id, new_level=new_level))
+                            await levelup_channel.send(level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
                 else:
         
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The XP you want to give {user.name} is too high", 

@@ -101,8 +101,10 @@ remove = SlashCommandGroup(name = "remove", description = "remove something away
 show = SlashCommandGroup(name = "show", description="Display something")
 
 # level up message
-def level_message(user_id:int, new_level:int):
-    level_up_message = f"Oh nice <@{user_id}> you have a new level, your newlevel is {new_level}"
+def level_message(guild_id:int, user_id:int, level:int):
+
+    user = f"<@{user_id}>"
+    level_up_message = eval("f'{}'".format(DatabaseCheck.check_bot_settings(guild_id=guild_id)[4]))
     return level_up_message
 
 # The red colour for the fail / error embeds
