@@ -16,4 +16,6 @@ Marry system neu machen
 
 Heute zu erledigen:
 
+Inspezieren des anti link systems (Ist nicht das beste)
+Wenn möglich das anti link system überarbeiten mit db (Idee ein select menü das nach auswahl fragt wie lange time out)
 

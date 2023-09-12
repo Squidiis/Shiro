@@ -8,19 +8,10 @@
 ┗━━━┛    ┗┛ ┗━━━┛ ┗━━┛ ┗━━━┛ ┗━━┛
 """
 
-
-
-
-
-import aiohttp
 from datetime import * 
 from discord import ButtonStyle, Interaction
 import requests
 from Import_file import * 
-import mysql.connector
-import giphy_client
-
-
 
 
 
