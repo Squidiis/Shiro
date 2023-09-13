@@ -68,5 +68,5 @@ If you wish, you can invite him to your own server by clicking [here](https://di
 |level system settings|Schaltet das level system aus oder ein|
 |add level blacklist channel|Fügt einen channel auf die Level system blacklist hinzu dieser wird dann vom level system ausgeschlossen und man erhält in diesen channel kein XP|
 |remove level blacklist channel|Streiche einen channel von der Blacklist und lasse in wieder am level system teilnehmen man erhält in diesen channel dann wieder XP|
-
+|add level blacklist category|Fügt eine Kategorie auf die level blacklist hinzu alle aktivitäten in den channel der Kategorie werden nicht mit XP belohnt|
     
