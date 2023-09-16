@@ -6,7 +6,7 @@ Noch hinzufügen das man den status gleich am anfang sieht
 
 levelsystem: 
 
-hinzufügen das man auch global level aufsteigen kann
+rank card unter der aktuellen xp anzeige eine machen für das gesamte xp von diesen user
 
 Aktivster user Leaderbord 
 

@@ -104,7 +104,7 @@ show = SlashCommandGroup(name = "show", description="Display something")
 def level_message(guild_id:int, user_id:int, level:int):
 
     user = f"<@{user_id}>"
-    level_up_message = eval("f'{}'".format(DatabaseCheck.check_bot_settings(guild_id=guild_id)[4]))
+    level_up_message = eval("f'{}'".format((DatabaseCheck.check_bot_settings(guild_id=guild_id)[4])))
     return level_up_message
 
 # The red colour for the fail / error embeds

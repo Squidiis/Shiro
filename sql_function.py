@@ -548,10 +548,15 @@ class DatabaseUpdates():
 
         try:
 
-            if xp != None:
+            if xp != None and whole_xp != None:
 
-                update_stats = f"UPDATE LevelSystemStats SET userXp = %s, wholeXp = %s WHERE guildId = %s  AND userId = %s"
+                update_stats = f"UPDATE LevelSystemStats SET userXp = %s, wholeXp = %s WHERE guildId = %s AND userId = %s"
                 update_stats_values = [xp, whole_xp, guild_id, user_id]
+
+            elif xp != None and whole_xp == None:
+
+                update_stats = f"UPDATE LevelSystemStats SET userXp = %s WHERE guildId = %s AND userId = %s"
+                update_stats_values = [xp, guild_id, user_id]
 
             elif level != None:
 

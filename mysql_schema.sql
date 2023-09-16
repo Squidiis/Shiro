@@ -48,7 +48,7 @@ CREATE TABLE LevelSystemSettings (
     xpRate INT UNSIGNED DEFAULT 20,
     levelStatus VARCHAR(50) DEFAULT 'on',
     levelUpChannel BIGINT UNSIGNED NULL,
-    levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}'
+    levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
     bonusXpPercentage INT UNSIGNED DEFAULT 10
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

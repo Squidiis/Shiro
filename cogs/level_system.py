@@ -65,7 +65,7 @@ class CheckLevelSystem():
             
             for _, channel, category, role, user, percentage in check_bonus_xp_list:
 
-                new_percentage = percentage if percentage != 0 else check_settings[4]
+                new_percentage = percentage if percentage != 0 else check_settings[5]
 
                 if user == message.author.id:
                     return new_percentage
@@ -419,18 +419,18 @@ class LevelSystemSettings(discord.ui.View):
 
                 if check_status[2] == "on":
 
-                    new_status, status = "Switched off", "off"
-                    opposite_status = "Switch on"
+                    new_status, status = "switched off", "off"
+                    opposite_status = "turn on"
 
                 elif check_status[2] == "off":
 
-                    new_status, status = "Switch on", "on"
-                    opposite_status = "Switched off"
+                    new_status, status = "switched on", "on"
+                    opposite_status = "switch off"
 
                 DatabaseUpdates.update_level_settings(guild_id=guild_id, level_status=status)
                         
-                emb = discord.Embed(title=f"The level system has been {new_status}", 
-                    description=f"""{Emojis.dot_emoji} If you want to {opposite_status} the level system just use this command again {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                emb = discord.Embed(title=f"The level system was {new_status}", 
+                    description=f"""{Emojis.dot_emoji} If you want to {opposite_status} the level system, just use this command again {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
         
         else:
@@ -690,7 +690,7 @@ class LevelSystem(commands.Cog):
 
         settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
         check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message)
-
+        print(type(settings[1]), check_bonus_xp_system)
         if check_bonus_xp_system != 0:
             xp = settings[1] * (1 + (check_bonus_xp_system / 100))    
         else:
@@ -866,8 +866,8 @@ class LevelSystem(commands.Cog):
 
                     DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp)
                         
-                    emb = discord.Embed(title=f"You have successfully passed {user.name} to {xp} XP {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} You have transferred **{user.name}** {xp} XP **{user.names}** has from now on **{new_xp}** XP.
+                    emb = discord.Embed(title=f"You have successfully given {user.name} {xp} XP {Emojis.succesfully_emoji}", 
+                        description=f"""{Emojis.dot_emoji} You have transferred **{user.name}** {xp} XP **{user.name}** has from now on **{new_xp}** XP.
                         {Emojis.dot_emoji} If you want to remove **{user.name}** XP again use the:\n{remove_xp} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
@@ -1140,9 +1140,11 @@ class LevelSystem(commands.Cog):
             bar_offset_x_1 = bar_offset_x + progress_bar_length
            
             # Progress Bar
-            progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
-            progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255)
-            background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
+            if xp != 0:
+
+                progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
+                progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255) 
+                background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
 
             xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
             xp_display_line = self.round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
@@ -1166,8 +1168,23 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            await ctx.respond(embed=error_emb) 
+            await ctx.respond(embed=error_emb)
 
+    
+    @commands.slash_command(name = "set-rank-card-image", description = "Lege ein individuelles bild als Hintergrund für deine Rankcard fest!")
+    async def set_rank_card_image(self, ctx:commands.Context, image:Option(str, description = "Gib hier den link zu den bild an was du als custom rank card hintergrund nehmen möchtest max 900x400")):
+
+        emb = discord.Embed()
+
+        connect = DatabaseSetup.db_connector()
+        cursor = connect.cursor()
+
+        img = requests.get(image)
+
+        insert_img = "INSERT INTO LevelRankCardSettingsGuild (guildId, cardImage) VALUES (%s, %s)"
+        insert_img_values = [ctx.guild.id, img]
+        cursor.execute(insert_img, insert_img_values)
+        connect.commit()
 
 
     @commands.slash_command(name = "leaderboard-level", description = "Shows the highest ranks in the lavel system!")
@@ -1211,12 +1228,12 @@ class LevelSystem(commands.Cog):
         if level_settings:
 
             if level_settings[2] == "on":
-                active_deactive = "Enabled "
+                active_deactive = "enabled "
             elif level_settings[2] == "off":
-                active_deactive = "Deactivated"
+                active_deactive = "disabled"
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see all the settings of the level system", 
-                description=f"{Emojis.dot_emoji} With the lower button you can set the level system, You can activate or deactivate. At the moment it is: **{active_deactive}**",color=bot_colour)
+                description=f"{Emojis.dot_emoji} With the lower button you can set the level system, you can enable or disable it. At the moment it is: **{active_deactive}**",color=bot_colour)
             await ctx.respond(embed=emb, view=LevelSystemSettings())
 
         else:
