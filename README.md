@@ -41,7 +41,7 @@ If you wish, you can invite him to your own server by clicking [here](https://di
     - Tik Tak Toe
     - Coin flip game with gifs
     - cocktail command that gives you a random cocktail recipe 
-    - Anime gif commands (kiss, hug, lick, punch, idk, dance, slap, fbi, embarres, pet)
+    - Anime gif commands (kiss, hug, lick, punch, idk, dance, slap, fbi, embarres, pet) uses all the [tenor API](https://tenor.com/gifapi/documentation)
     - Anime meme command with the [reddit API](https://www.reddit.com/dev/api/)
 
 ## 📝 Requirements
