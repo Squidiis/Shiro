@@ -104,7 +104,7 @@ show = SlashCommandGroup(name = "show", description="Display something")
 def level_message(guild_id:int, user_id:int, level:int):
 
     user = f"<@{user_id}>"
-    level_up_message = eval("f'{}'".format((DatabaseCheck.check_bot_settings(guild_id=guild_id)[4])))
+    level_up_message = eval("f'{}'".format(DatabaseCheck.check_level_settings(guild_id=guild_id)[4]))
     return level_up_message
 
 # The red colour for the fail / error embeds
@@ -124,6 +124,8 @@ user_not_found_emb = discord.Embed(title=f"The user was not found {Emojis.fail_e
 
 no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", 
     description=f"{Emojis.dot_emoji} Therefore, one was created just try again.", color=bot_colour) 
+
+
 # Help command
 class Help_menu(discord.Cog):
     def __init__(self, bot):

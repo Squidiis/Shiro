@@ -960,8 +960,7 @@ class LevelSystem(commands.Cog):
 
             if check_stats:
                 
-                user_level = check_stats[2]
-                new_level = user_level + level
+                new_level = check_stats[2] + level
                 levels_to_maxlevel = 999 - level
                             
                 if level > 999 or new_level >= 999:
@@ -973,7 +972,7 @@ class LevelSystem(commands.Cog):
 
                 else:
 
-                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.idv, level=new_level)
+                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level)
 
                     emb = discord.Embed(title=f"You have successfully added {user.name} {level} level {Emojis.succesfully_emoji}",
                         description=f"""{Emojis.dot_emoji} You gave **{user.name}** {level} level **{user.name}** now has **{new_level}** level.
