@@ -713,6 +713,23 @@ class LevelSystem(commands.Cog):
         mask = mask_rectangle.resize(rectangle.size, Image.LANCZOS)
         rectangle.putalpha(mask)
         return (rectangle, mask)
+    
+    @staticmethod
+    def check_level_up_channel(guild_id:int, user_id:int, level:int, message:discord.Message):
+
+        check_level_up_channel = DatabaseCheck.check_level_settings(guild_id=guild_id)[3]
+
+        if check_level_up_channel:
+
+            channel = bot.get_channel(check_level_up_channel)
+            channel.send(level_message(guild_id=guild_id, user_id=user_id, level=level))
+        
+        else:
+
+            message.channel.send(level_message(guild_id=guild_id, user_id=user_id, level=level))
+
+        
+
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -781,44 +798,30 @@ class LevelSystem(commands.Cog):
                             finally:   
 
                                 # Checks if a level role or a level up channel is defined                                
-                                level_role_check = DatabaseCheck.check_level_system_levelroles(guild_id=message.guild.id, needed_level=new_level)
-                                levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
+                                check_level_role = DatabaseCheck.check_level_system_levelroles(guild_id=message.guild.id, needed_level=new_level)
+                                check_level_up_channel = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
 
-                                if level_role_check:
+                                if check_level_up_channel:
 
-                                    role_id, level_need = level_role_check[1], level_role_check[2]
+                                    channel = bot.get_channel(check_level_up_channel)
+                                    await channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
 
+                                    if check_level_role:
+
+                                        level_role = message.guild.get_role(check_level_role[1])
+                                        await message.author.add_roles(level_role)
+                                        await channel.send(f"<@{message.author.id}> du hast die rolle <@&{check_level_role[1]}> bekommen da du level **{check_level_role[2]}** ereicht hast")
+                                
                                 else:
 
-                                    role_id, level_need = None, None
-
-                                if level_role_check != None and levelup_channel_check[3] != None:
-
-                                    levelup_channel = bot.get_channel(levelup_channel_check[3])
-
-                                    level_role = message.guild.get_role(role_id)
-                                    await message.author.add_roles(level_role) 
-
-                                    await levelup_channel.send(f"<@{message.author.id}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
-                                    await levelup_channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
-                                
-                                elif levelup_channel_check[3] == None and level_role_check != None:
-                                    
-                                    level_role = message.guild.get_role(role_id)
-                                    await message.author.add_roles(level_role)
-
                                     await message.channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
-                                    await message.channel.send(f"<@{message.author.id}> du hast die rolle <@&{role_id}> bekommen da du level **{level_need}** ereicht hast")
 
-                                elif levelup_channel_check[3] == None and level_role_check == None:
+                                    if check_level_role:
 
-                                    await message.channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level)) 
-
-                                elif levelup_channel_check[3] != None and level_role_check == None:
-                                        
-                                    levelup_channel = bot.get_channel(levelup_channel_check[3])
-                                    await levelup_channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
-                         
+                                        level_role = message.guild.get_role(check_level_role[1])
+                                        await message.author.add_roles(level_role)
+                                        await message.channel.send(f"<@{message.author.id}> du hast die rolle <@&{check_level_role[1]}> bekommen da du level **{check_level_role[2]}** ereicht hast")
+                                                
                         else:
 
                             try:
