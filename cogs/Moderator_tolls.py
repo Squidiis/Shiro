@@ -10,7 +10,7 @@ class moderator_commands(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message:discord.Message):
         
         guild=bot.get_guild(977958841385902092)
 
@@ -23,37 +23,17 @@ class moderator_commands(commands.Cog):
             if message.author.guild_permissions.administrator:
                 return
             
-            if message == None:
-                return
-            
             else:
 
                 if 'discord.gg/' in message.content:
                     await message.delete()
-                    modembed = discord.Embed(title=f'Hey {message.author.name}!', description='Please do not send invitation links!', colour=0x0094ff)
+                    modembed = discord.Embed(title=f'Hey {message.author.name}!', description='Please do not send invitation links!', colour=bot_colour)
                     modembed.set_author(name=f'{message.author.name}', icon_url = guild.icon.url)
-                    modembed.set_footer(icon_url = guild.icon.url, text="Copyright © 2022 All Rights Reserved")
                     msg = await message.channel.send(embed=modembed, delete_after=5)
-                    duration = timedelta(minutes=5)
                     reason = "Send invitation link"
-                    await member.timeout_for(duration, reason = reason)
+                    await member.timeout(until=timedelta(minutes=5), reason = reason)
                     embed = discord.Embed(title=f"{member} You get a 5 minute time out", description=f"Grund: {reason}")
                     await member.send(embed=embed)
-                    try:
-                        reason="posts invitation links"
-                        first_warning = False
-                        bot.warnings[message.guild.id][member.id][0] += 1
-                        bot.warnings[message.guild.id][member.id][1].append((message.author.id, reason))
-
-                    except KeyError:
-                        first_warning = True
-                        bot.warnings[message.guild.id][member.id] = [1, [(message.author.id, reason)]]
-
-                    count = bot.warnings[message.guild.id][member.id][0]
-
-                    embed=discord.Embed(description=f"**reason:** posts invitation links", color=0x0094ff)
-                    embed.set_author(name=f'{member.display_name}#{member.discriminator} wurde gewarnt', icon_url=member.display_avatar)
-                    await message.channel.send(embed=embed)
 
         if message.author.bot:
             return
