@@ -16,7 +16,7 @@
 Shiro is a Discord bot that stands out for its wide range of commands and customization options. 
 You can customize pretty much anything, all commands are very user-friendly and always have explanations!
 
-If you wish, you can invite him to your own server by clicking [here](https://discord.com/oauth2/authorize?client_id=928073958891347989&scope=bot&permissions=8)
+If you wish, you can invite the bot to your own server by clicking [here](https://discord.com/oauth2/authorize?client_id=928073958891347989&scope=bot&permissions=8)
 
 ## ⌨ Functions
 

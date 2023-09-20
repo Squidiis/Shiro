@@ -35,10 +35,6 @@ class moderator_commands(commands.Cog):
                     embed = discord.Embed(title=f"{member} You get a 5 minute time out", description=f"Grund: {reason}")
                     await member.send(embed=embed)
 
-        if message.author.bot:
-            return
-    
-
 
     @commands.slash_command(name = "ban", description = "Bans a member!")
     @commands.has_permissions(ban_members = True, administrator = True)
