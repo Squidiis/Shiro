@@ -717,42 +717,6 @@ class DatabaseUpdates():
 
 
 
-####################################  Auto Reaction Systen  #################################################
-
-
-    # Inserts the parameters from the auto reaction system
-    def _insert_auto_reaction(guild_id:int, reaction_parameter:str):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        check_bot_settings = DatabaseCheck.check_bot_settings(guild_id=guild_id)
-
-        try:
-
-            if check_bot_settings:
-
-                auto_raction = "UPDATE AutoReactionSettings SET reactionParameter = %s WHERE guildId = %s"
-                auto_raction_values = [reaction_parameter, guild_id]
-
-            else:
-                
-                auto_raction = "INSERT INTO AutoReactionSettings (guildId, reactionParameter) VALUES (%s, %s)"
-                auto_raction_values = [guild_id, reaction_parameter]
-
-            cursor.execute(auto_raction, auto_raction_values)
-            db_connect.commit()
-        
-        except mysql.connector.Error as error:
-           print("parameterized query failed {}".format(error))
-
-        finally:
-
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-
-
-
-
 
 class DatabaseRemoveDatas():
 

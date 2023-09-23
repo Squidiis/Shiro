@@ -5,7 +5,7 @@ import calendar
 
 
 
-class moderator_commands(commands.Cog):
+class ModeratorCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -59,7 +59,7 @@ class moderator_commands(commands.Cog):
         if member.id == ctx.author.id: 
             await ctx.respond("**BRUH! You can't kick yourself!")
         elif member.guild_permissions.administrator:
-            await ctx.respond("**You can't kick an admin!** :rolling_eyes:")
+            await ctx.respond("**You can't kick an admin!**")
         else:
             if reason == None:
                 reason = f"**No reason was given by {ctx.author}!**"
@@ -124,9 +124,9 @@ class moderator_commands(commands.Cog):
 
     @commands.slash_command(name = "clear", description = "Delete messages in the channel!")
     @commands.has_permissions(manage_messages=True)
-    async def clear_slash(self, ctx, wieviele: Option(int , description = "How many messages do you want to delete?", required = True)):
+    async def clear_slash(self, ctx, quantity: Option(int , description = "How many messages do you want to delete?", required = True)):
         await ctx.defer()
-        z = await ctx.channel.purge(limit = wieviele)
+        z = await ctx.channel.purge(limit = quantity)
         await ctx.send(f"I have deleted {len(z)}.")
 
 
@@ -152,33 +152,6 @@ class moderator_commands(commands.Cog):
         embed.set_footer(text="⭐ • Squidi")
         embed.set_author(name=str(ctx.author.name), icon_url=ctx.author.avatar.url)
         await ctx.respond(embed=embed)
-
-
-
-    @commands.slash_command(name = "user-info", description = "Shows you information about individual users!")
-    async def userinfo_slash(self ,ctx ,user: Option(discord.Member)):
-        if user is None:
-            user = ctx.author      
-        date_format = "%a, %d %b %Y %I:%M %p"
-        embed = discord.Embed(color=0xdfa3ff, description=user.mention)
-        embed.set_author(name=str(user), icon_url=user.avatar.url)
-        embed.set_thumbnail(url=user.avatar.url)
-        embed.add_field(name="Joined", value=user.joined_at.strftime(date_format))
-        members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
-        embed.add_field(name="Registered", value=user.created_at.strftime(date_format))
-        embed.add_field(name="Join position", value=str(members.index(user)+1))
-        if len(user.roles) > 1:
-            role_string = ' '.join([r.mention for r in user.roles][1:])
-            embed.add_field(name="Roles [{}]".format(len(user.roles)-1), value=role_string, inline=False)
-        perms_to_show = [
-        'administrator', 'manage_messages', 'manage_roles', 'manage_channels',
-        'manage_messages', 'manage_webhooks', 'manage_nicknames', 'manage_emojis',
-        'manage_emojis_and_stickers', 'kick_members', 'ban_members', 'mention_everyone']
-        perm_string = ', '.join([str(p[0]).replace("_", " ").title() for p in user.guild_permissions if p[0] in perms_to_show])
-        embed.add_field(name="Guild permissions", value=perm_string, inline=False)
-        embed.set_footer(text='ID: ' + str(user.id))
-        return await ctx.respond(embed=embed)
-
 
 
     @commands.Cog.listener()
@@ -330,5 +303,5 @@ class AutoReaction(commands.Cog):
 
 def setup(bot):
     bot.add_cog(AutoReaction(bot))
-    bot.add_cog(moderator_commands(bot))
+    bot.add_cog(ModeratorCommands(bot))
 
