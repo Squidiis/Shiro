@@ -1,6 +1,5 @@
 
 from Hanime_Funpark import *
-from discord import ButtonStyle, Colour, Embed, Interaction, CategoryChannel
 from Import_file import *
 
 from cogs.level_system import *

@@ -415,6 +415,40 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
+    def update_bot_settings(guild_id:int, bot_colour:str = None, ghost_ping:int = None, back_to_none:int = None):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        column_name = ["botColour", "ghostPing"]
+        items = [bot_colour, ghost_ping]
+
+        try:
+            
+            if back_to_none == None:
+
+                for count in range(len(items)):
+
+                    update_settings = f"UPDATE BotSettings SET {column_name[count]} = %s WHERE guildId = %s"
+                    update_settings_values = (items[count], guild_id)
+                    cursor.execute(update_settings, update_settings_values)
+                    db_connect.commit()
+
+            else:
+
+                update_settings = f"UPDATE BotSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s"
+                update_settings_values = [guild_id]
+                cursor.execute(update_settings, update_settings_values)
+                db_connect.commit()
+            
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
 
 ########################################  Insert into / Update the Level System  ##################################################
 

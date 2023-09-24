@@ -797,17 +797,6 @@ class EconomySystem(commands.Cog):
         await ctx.respond(embed=emb)
     
 
-class Shop(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.slash_command(name="server-shop")
-    async def server_shop(self, ctx):
-
-        emb = discord.Embed(title=f"Hier siehst du den Shop von {ctx.guild.name}")
-        await ctx.respond(embed=emb)
-
-
 
 def setup(bot): 
     bot.add_cog(EconomySystem(bot))

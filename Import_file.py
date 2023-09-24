@@ -91,14 +91,7 @@ intent.members = True
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
-
-
 bot.remove_command("help")
-
-
-add = SlashCommandGroup(name = "add", description = "add something to someone", default_member_permissions = discord.Permissions(administrator=True))
-remove = SlashCommandGroup(name = "remove", description = "remove something away from someone", default_member_permissions = discord.Permissions(administrator=True))
-show = SlashCommandGroup(name = "show", description="Display something")
 
 # level up message
 def level_message(guild_id:int, user_id:int, level:int):
@@ -107,23 +100,23 @@ def level_message(guild_id:int, user_id:int, level:int):
     level_up_message = eval("f'{}'".format(DatabaseCheck.check_level_settings(guild_id=guild_id)[4]))
     return level_up_message
 
+
 # The red colour for the fail / error embeds
 error_red = discord.Colour.brand_red()
+
 
 # The bot color, each embed has this color
 bot_colour = data["Bot_colour"]
 
+
 # Fail / error embeds
-no_permissions_emb = discord.Embed(title="You are not authorized", description=f"You are not allowed to press this button only admins are allowed to interact with this command {Emojis.fail_emoji}",color = error_red)
+no_permissions_emb = discord.Embed(title="You are not authorized", description = f"You are not allowed to press this button only admins are allowed to interact with this command {Emojis.fail_emoji}",color = error_red)
 
-user_bot_emb = discord.Embed(title=f"The user is a bot {Emojis.fail_emoji}", 
-    description=f"The user you have selected is a bot and cannot be selected in this command!", color=error_red)
+user_bot_emb = discord.Embed(title = f"The user is a bot {Emojis.fail_emoji}", description = f"The user you have selected is a bot and cannot be selected in this command!", color = error_red)
 
-user_not_found_emb = discord.Embed(title=f"The user was not found {Emojis.fail_emoji}", 
-    description=f"{Emojis.dot_emoji} No entry was found the user is also no longer on the server {Emojis.exclamation_mark_emoji}", color=error_red)
+user_not_found_emb = discord.Embed(title=f"The user was not found {Emojis.fail_emoji}", description = f"{Emojis.dot_emoji} No entry was found the user is also no longer on the server {Emojis.exclamation_mark_emoji}", color = error_red)
 
-no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", 
-    description=f"{Emojis.dot_emoji} Therefore, one was created just try again.", color=bot_colour) 
+no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", description = f"{Emojis.dot_emoji} Therefore, one was created just try again.", color = bot_colour) 
 
 
 # Help command

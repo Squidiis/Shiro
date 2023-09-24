@@ -155,20 +155,35 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_message_delete(self, message: discord.Message):
-        if message.mentions != 0:
-            if len(message.mentions) < 3:
-                for m in message.mentions:
-                    if m == message.author or m.bot:
-                        pass
-                    else:
-                        embed=discord.Embed(title=f":ghost: | Ghost ping", description=f"**{m}** you were ghostping from {message.author.mention}.\n \n**message:** {message.content}", color=0xffb375)
-                        await message.channel.send(embed=embed)
-            else:
-                embed=discord.Embed(title=f":ghost: | Ghost ping", description=f"**{len(message.mentions)} User** have been ghostpinged.\n \n**message by {message.author.mention}:** {message.content}", color=0xffb375)
-                await message.channel.send(embed=embed)
+    async def on_message_delete(self, message:discord.Message):
 
-    
+        check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
+
+        if check_settings[2] != 0:
+
+            if message.mentions != 0:
+                if len(message.mentions) < 3:
+                    for m in message.mentions:
+                        if m == message.author or m.bot:
+                            pass
+                        else:
+                            embed=discord.Embed(title=f":ghost: | Ghost ping", description=f"{Emojis.dot_emoji} **{m}** you were ghostping from {message.author.mention}.\n \n**message:** {message.content}", color=bot_colour)
+                            await message.channel.send(embed=embed)
+                else:
+                    embed=discord.Embed(title=f":ghost: | Ghost ping", description=f"{Emojis.dot_emoji} **{len(message.mentions)} User** have been ghostpinged.\n \n**message by {message.author.mention}:** {message.content}", color=bot_colour)
+                    await message.channel.send(embed=embed)
+
+
+    @commands.slash_command(name = "ghost-ping-settings")
+    async def ghost_ping_settings(self, ctx:commands.Context):
+
+        check_settings = DatabaseCheck.check_bot_settings(guild_id=ctx.guild.id)
+
+        emb = discord.Embed(title=f"{Emojis.settings_emoji} Here you can set the anti ghost ping system ", 
+            description=f"""{Emojis.dot_emoji} Currently the anti ghost ping system {'**switched off**' if check_settings[2] == 0 else '**switched on**'}
+            {Emojis.dot_emoji} If you want it to {'**turn it on**' if check_settings[2] != 0 else '**turn it off**'} press the lower button""", color=bot_colour)
+        await ctx.respond(embed=emb, view=GhostPingButtons())
+
 
     @commands.slash_command()
     async def userinfo(ctx, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
@@ -305,3 +320,25 @@ def setup(bot):
     bot.add_cog(AutoReaction(bot))
     bot.add_cog(ModeratorCommands(bot))
 
+
+class GhostPingButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label=" Turn off / on the Ghost ping system ", style=discord.ButtonStyle.blurple, custom_id="turn_off_on")
+    async def on_off_ghost_ping(self, interaction:discord.Interaction):
+
+        check_settings = DatabaseCheck.check_bot_settings(guild_id=interaction.guild.id)
+        DatabaseUpdates.update_bot_settings(guild_id=interaction.guild.id, ghost_ping=1 if check_settings[2] == 0 else 0)
+
+        emb = discord.Embed(title=f"{Emojis.help_emoji} You have successfully switched the ghost ping system {'off' if check_settings[2] != 0 else 'on'}", 
+            description=f"""{Emojis.dot_emoji} The anti ghost ping system is now {'disabled' if check_settings[2] != 0 else f'''enabled.
+                {Emojis.dot_emoji} From now on a message is always sent when a user marks someone and deletes this message.'''}""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=None)
+
+    @discord.ui.button(label="Cancel from setting ghost ping system", style=discord.ButtonStyle.blurple, custom_id="cancel_ghost_ping")
+    async def cancel_ghost_ping_settings(self, interaction:discord.Interaction):
+
+        emb = discord.Embed(title=f"{Emojis.help_emoji} The setting of the anti ghost ping system was canceled", 
+            description=f"""{Emojis.dot_emoji} The setting was successfully canceled but you can change the settings at any time.""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=None)
