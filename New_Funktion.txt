@@ -1,18 +1,13 @@
-Econumy 
-
-Status: an / aus schalter für voice und messages dann noch machen das man mini games spielen kann aber dafür braucht man erstmal welche
-Noch hinzufügen das man den status gleich am anfang sieht 
-
 
 levelsystem: 
 
-rank card unter der aktuellen xp anzeige eine machen für das gesamte xp von diesen user
+Reset button für bonus xp sachen
+rank card unter der aktuellen xp anzeige eine machen für das gesamte xp von diesen user (fixen)
 
 Aktivster user Leaderbord 
 
 hinzufügen das man custom bilder hinzufügen kann für die rank card
 RPS game neu machen
-Marry system neu machen
 
 Heute zu erledigen:
 

@@ -776,10 +776,8 @@ class LevelSystem(commands.Cog):
 
                         XP = self.xp_generator(guild_id=message.guild.id, message=message)
                     
-                        xp_global = self.xp_generator_global()
-                        user_xp_global = xp_global + check_if_exists[6]
                         user_has_xp = check_if_exists[3] + XP 
-                                                                    
+                        whole_xp = check_if_exists[6] + XP                     
                         xp_need_next_level = 5 * (check_if_exists[2] ^ 2) + (50 * check_if_exists[2]) + 100 - check_if_exists[3]
                         final_xp = xp_need_next_level + check_if_exists[3]
                         
@@ -790,7 +788,7 @@ class LevelSystem(commands.Cog):
                             try:
                                 
                                 # Updates the XP
-                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, level=new_level)
+                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, level=new_level, whole_xp=whole_xp)
 
                             except mysql.connector.Error as error:
                                 print("parameterized query failed {}".format(error))
@@ -801,7 +799,7 @@ class LevelSystem(commands.Cog):
                                 check_level_role = DatabaseCheck.check_level_system_levelroles(guild_id=message.guild.id, needed_level=new_level)
                                 check_level_up_channel = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
 
-                                if check_level_up_channel:
+                                if check_level_up_channel[3]:
 
                                     channel = bot.get_channel(check_level_up_channel)
                                     await channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
@@ -826,7 +824,7 @@ class LevelSystem(commands.Cog):
 
                             try:
 
-                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp, whole_xp=user_xp_global)                       
+                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp, whole_xp=whole_xp)                       
                                 print("Data were changed")
 
                             except mysql.connector.Error as error:
@@ -866,8 +864,9 @@ class LevelSystem(commands.Cog):
                 if xp <= xp_need_next_level:
 
                     new_xp = user_xp + xp
+                    new_whole_xp = xp + check_stats[6]
 
-                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp)
+                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp, whole_xp=new_whole_xp)
                         
                     emb = discord.Embed(title=f"You have successfully given {user.name} {xp} XP {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} You have transferred **{user.name}** {xp} XP **{user.name}** has from now on **{new_xp}** XP.
@@ -881,7 +880,7 @@ class LevelSystem(commands.Cog):
                         DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level)
                         levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
-                        if levelup_channel_check != None:
+                        if levelup_channel_check[3] == None:
 
                             await ctx.send(level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
                             
@@ -1070,7 +1069,7 @@ class LevelSystem(commands.Cog):
 
         error_emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
             description=f"""{Emojis.dot_emoji} The user was not found, it may be that he is not yet participating in the level system.
-            {Emojis.help_emoji} You can only join the level system if you have sent at least one message to a channel that is not blacklisted {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            {Emojis.dot_emoji} You can only join the level system if you have sent at least one message to a channel that is not blacklisted {Emojis.exclamation_mark_emoji}""", color=bot_colour)
 
         check_user = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
         
@@ -1128,7 +1127,7 @@ class LevelSystem(commands.Cog):
             draw = ImageDraw.Draw(background)
 
             bar_offset_x = 304
-            bar_offset_y = 179
+            bar_offset_y = 155
         
             bar = Image.new('RGBA', (545, 36), (0, 0, 0))
             bar = self.round_corner_mask(radius=50, rectangle=bar, fill=160)
@@ -1150,17 +1149,22 @@ class LevelSystem(commands.Cog):
 
             xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
             xp_display_line = self.round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
-            offset_y = 247
+            offset_y = 200
             background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
 
             # Displays the level of the user
-            data_display = Image.new(mode="RGBA", size=(200, 33), color=(0, 0, 0))
+            data_display = Image.new(mode="RGBA", size=(196, 33), color=(0, 0, 0))
             data_display = self.round_corner_mask(radius=50, rectangle=data_display, fill=160)
             background.paste(data_display[0], (655, offset_y), data_display[1])
 
-            draw.text((304, 97), user.name, font=big_font, fill=(255, 255, 255))
-            draw.text((315, 249), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
-            draw.text((665, offset_y), f"#{rank} Lvl {check_user[2]}", font=small_font, fill=(255, 255, 255))
+            total_xp_display = Image.new(mode="RGBA", size=(547, 33), color=(0, 0, 0))
+            total_xp_display = self.round_corner_mask(radius=50, rectangle=total_xp_display, fill=160)
+            background.paste(total_xp_display[0], (304, (offset_y + 46)), total_xp_display[1])
+
+            draw.text((304, 75), user.name, font=big_font, fill=(255, 255, 255))
+            draw.text((315, (offset_y + 2)), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
+            draw.text((665, (offset_y + 1)), f"#{rank} Lvl {check_user[2]}", font=small_font, fill=(255, 255, 255))
+            draw.text((315, (offset_y + 48)), f"total XP: {check_user[6]:,} XP", font=small_font, fill=(255, 255, 255))
 
             bytes = BytesIO()
             background.save(bytes, format="PNG")

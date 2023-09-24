@@ -295,29 +295,9 @@ class ModeratorCommands(commands.Cog):
 
         await ctx.reply(embed=embed)
 
-        
-
-
-
-class AutoReaction(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-
-        if message.guild:
-            if message.guild.id == 865899808183287848:
-                categorys = [996846958536835203, 927683692695027772, 998934946708205598, 930157270275350598, 897544467266011177, 873622071484252200, 927668688239353926]
-                if message.channel.category_id in categorys:
-                    if len(message.attachments) > 0 or message.content.startswith("https://"):
-                        await message.add_reaction("❤")
-        else:
-            return
 
 
 def setup(bot):
-    bot.add_cog(AutoReaction(bot))
     bot.add_cog(ModeratorCommands(bot))
 
 
@@ -331,8 +311,8 @@ class GhostPingButtons(discord.ui.View):
         check_settings = DatabaseCheck.check_bot_settings(guild_id=interaction.guild.id)
         DatabaseUpdates.update_bot_settings(guild_id=interaction.guild.id, ghost_ping=1 if check_settings[2] == 0 else 0)
 
-        emb = discord.Embed(title=f"{Emojis.help_emoji} You have successfully switched the ghost ping system {'off' if check_settings[2] != 0 else 'on'}", 
-            description=f"""{Emojis.dot_emoji} The anti ghost ping system is now {'disabled' if check_settings[2] != 0 else f'''enabled.
+        emb = discord.Embed(title=f"{Emojis.help_emoji} You have successfully switched the ghost ping system {'**off**' if check_settings[2] != 0 else '**on**'}", 
+            description=f"""{Emojis.dot_emoji} The anti ghost ping system is now {'**disabled**.' if check_settings[2] != 0 else f'''**enabled**.
                 {Emojis.dot_emoji} From now on a message is always sent when a user marks someone and deletes this message.'''}""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
 
