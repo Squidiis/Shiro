@@ -251,7 +251,6 @@ class DatabaseCheck():
         return levelsys_levelroles
     
 
-    # Eingestellt
     def check_xp_bonus_list(guild_id:int, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
@@ -336,51 +335,6 @@ class DatabaseCheck():
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return bot_settings
-
-
-
-###########################################################  Checks stats or values in the economic system  ###############################################
-
-
-    def check_economy_settings(guild_id:int):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        economy_settings_check = f"SELECT * FROM EconomySystemSettings WHERE guildId = %s"
-        economy_settings_check_values = [guild_id]
-        cursor.execute(economy_settings_check, economy_settings_check_values)
-        economy_settings = cursor.fetchone()
-
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        return economy_settings
-        
-
-    # Checks the stats from a user in the economic system
-    def check_economy_system_stats(guild_id:int, user:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        if user == None:
-
-            economy_system_check = "SELECT * FROM EconomySystemStats WHERE guildId = %s"
-            economy_system_check_values = [guild_id]
-
-        else:
-
-            economy_system_check = "SELECT * FROM EconomySystemStats WHERE guildId = %s AND userId = %s"
-            economy_system_check_values = [guild_id, user]
-        
-        cursor.execute(economy_system_check, economy_system_check_values)
-
-        if user == None:
-            economy_system_stats = cursor.fetchall()
-        else:
-            economy_system_stats = cursor.fetchone()
-
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        return economy_system_stats
 
 
 
@@ -683,75 +637,6 @@ class DatabaseUpdates():
 
 
 
-###################################  Insert into / Update the economic system  ########################################################
-
-
-    # Inserting the stats for new users
-    def _insert_user_stats_economy(guild_id:int, user_id:int, user_name:str):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        try:
-
-            insert_user_stats = "INSERT INTO EconomySystemStats (guildId, userId, userName) VALUES (%s, %s, %s)"
-            insert_user_stats_values = [guild_id, user_id, user_name]
-            cursor.execute(insert_user_stats, insert_user_stats_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-
-        finally:
-
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        
-
-    # Update the amount of money from a user
-    def _update_user_money_economy(guild_id:int, user_id:int, money:int):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        try:
-
-            update_money_count = "UPDATE EconomySystemStats SET moneyCount = %s WHERE guildId = %s AND userId = %s"
-            update_money_count_values = [money, guild_id, user_id]
-            cursor.execute(update_money_count, update_money_count_values)
-            db_connect.commit()
-            
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-
-        finally:
-
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-
-
-    # Update the status from the economic system
-    def _update_status_economy(guild_id:int, status:str):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        try:
-            
-            update_status_economy = "UPDATE EconomySystemSettings SET econemyStatus = %s WHERE guildId = %s"
-            update_status_economy_values = [status, guild_id]
-            cursor.execute(update_status_economy, update_status_economy_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-
-        finally:
-
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-    
-
-
-
-
 class DatabaseRemoveDatas():
 
 ###########################################################  Removes values from the level system  #######################################
@@ -812,33 +697,6 @@ class DatabaseRemoveDatas():
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
-
-
-
-##############################################  Removes values from the economy system  ######################################
-
-
-    # Removes economy system stats
-    def _remove_economy_system_stats(guild_id:int, user_id:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        try:
-
-            remove_stats = "DELETE FROM EconomySystemStats WHERE guildId = %s AND userId = %s" if user_id != None else "DELETE FROM EconomySystemStats WHERE guildId = %s"              
-            remove_stats_values = [guild_id, user_id] if user_id != None else [guild_id]
-
-            cursor.execute(remove_stats, remove_stats_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-        
-        finally:
-            
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
-            return True
 
 
 

@@ -107,7 +107,7 @@ DROP TABLE IF EXISTS `BotSettings`;
 CREATE TABLE BotSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     botColour VARCHAR(20) NULL,
-    ghostPing BIT UNSIGNED DEFAULT 0
+    ghostPing BIT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -133,49 +133,6 @@ CREATE TABLE AutoReactionSettings (
     mainReactionEmoji VARCHAR(255) NOT NULL,
     reactionKeyWords VARCHAR(4000) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
---------------- Table for Econemy System ------------
-
-DROP TABLE IF EXISTS `EconomySystemStats`;
-
-CREATE TABLE EconomySystemStats (
-    guildId BIGINT UNSIGNED NOT NULL,
-    userId BIGINT UNSIGNED NOT NULL,
-    moneyCount BIGINT UNSIGNED DEFAULT 0,
-    userName VARCHAR(255) NOT NULL,
-    voiceTime TIMESTAMP(6) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-DROP TABLE IF EXISTS `EconomySystemBlacklist`;
-
-CREATE TABLE EconomySystemBlacklist (
-    guildId BIGINT UNSIGNED NOT NULL,
-    guildName VARCHAR(255) NOT NULL,
-    channelId BIGINT UNSIGNED NULL,
-    categoryId BIGINT UNSIGNED NULL,
-    roleId BIGINT UNSIGNED NULL,
-    userId BIGINT UNSIGNED NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-DROP TABLE IF EXISTS `EconomySystemShop`;
-
-CREATE TABLE EconomySystemShopRolles (
-    guildId BIGINT UNSIGNED NOT NULL,
-    rolesId BIGINT UNSIGNED NULL,
-    itemPrice INT UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-DROP TABLE IF EXISTS `EconomySystemSettings`;
-
-CREATE TABLE EconomySystemSettings (
-    guildId BIGINT UNSIGNED NOT NULL,
-    econemyStatus VARCHAR(50) DEFAULT 'on_all'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 
 

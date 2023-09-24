@@ -180,7 +180,7 @@ class ModeratorCommands(commands.Cog):
         check_settings = DatabaseCheck.check_bot_settings(guild_id=ctx.guild.id)
 
         emb = discord.Embed(title=f"{Emojis.settings_emoji} Here you can set the anti ghost ping system ", 
-            description=f"""{Emojis.dot_emoji} Currently the anti ghost ping system {'**switched off**' if check_settings[2] == 0 else '**switched on**'}
+            description=f"""{Emojis.dot_emoji} Currently the anti ghost ping system is {'**enabled**' if check_settings[2] == 0 else '**disabled**'}
             {Emojis.dot_emoji} If you want it to {'**turn it on**' if check_settings[2] != 0 else '**turn it off**'} press the lower button""", color=bot_colour)
         await ctx.respond(embed=emb, view=GhostPingButtons())
 
@@ -325,8 +325,8 @@ class GhostPingButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label=" Turn off / on the Ghost ping system ", style=discord.ButtonStyle.blurple, custom_id="turn_off_on")
-    async def on_off_ghost_ping(self, interaction:discord.Interaction):
+    @discord.ui.button(label="Turn off / on the Ghost ping system", style=discord.ButtonStyle.blurple, custom_id="turn_off_on", row=1)
+    async def on_off_ghost_ping(self, button, interaction:discord.Interaction):
 
         check_settings = DatabaseCheck.check_bot_settings(guild_id=interaction.guild.id)
         DatabaseUpdates.update_bot_settings(guild_id=interaction.guild.id, ghost_ping=1 if check_settings[2] == 0 else 0)
@@ -336,8 +336,8 @@ class GhostPingButtons(discord.ui.View):
                 {Emojis.dot_emoji} From now on a message is always sent when a user marks someone and deletes this message.'''}""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
 
-    @discord.ui.button(label="Cancel from setting ghost ping system", style=discord.ButtonStyle.blurple, custom_id="cancel_ghost_ping")
-    async def cancel_ghost_ping_settings(self, interaction:discord.Interaction):
+    @discord.ui.button(label="Cancel from setting ghost ping system", style=discord.ButtonStyle.blurple, custom_id="cancel_ghost_ping", row=2)
+    async def cancel_ghost_ping_settings(self, button, interaction:discord.Interaction):
 
         emb = discord.Embed(title=f"{Emojis.help_emoji} The setting of the anti ghost ping system was canceled", 
             description=f"""{Emojis.dot_emoji} The setting was successfully canceled but you can change the settings at any time.""", color=bot_colour)

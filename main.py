@@ -3,7 +3,7 @@ from Hanime_Funpark import *
 from Import_file import *
 
 from cogs.level_system import *
-from cogs.economy import *
+from cogs.Moderator_tolls import *
 from Liest import * 
 from dotenv import load_dotenv
 
@@ -51,16 +51,14 @@ class main(commands.Cog):
         # Applycation
         self.bot.add_view(ApplicationButton())
 
+        self.bot.add_view(GhostPingButtons())
+
         # self roles 
         self.bot.add_view(DropdownColours())
         self.bot.add_view(DropdownHoppys())
         view.add_item(Genderbutton_Female())
         view.add_item(Genderbutton_Divers())
         view.add_item(Genderbutton_Male())
-
-        # Economy
-        self.bot.add_view(EconomySystemSettings())
-        self.bot.add_view(ResetBlacklistEconomyButton())
 
         self.bot.add_view(view)
         
