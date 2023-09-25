@@ -35,18 +35,6 @@ show_level_role = ""
 add_level_role = ""
 remove_level_role = ""
 
-economy_settings = ""
-# Blacklist
-add_blacklist_economy_channel = "</add-channel-economy-blacklist:1095096748323635261>"
-remove_blacklist_economy_channel = "</remove-channel-economy-blacklist:1095421561839816786>"
-add_blacklist_economy_category = "</add_category_economy_blacklist:1095443187562192987>" # Ändern
-remove_blacklist_economy_category = "</remove-category-economyblacklist:1095699949963989073>"
-add_blacklist_economy_role = "</add-role-economy-blacklist:1096038008534351962>"
-remove_blacklist_economy_role = "</remove-role-economy-blacklist:1096038008534351964>"
-add_blacklist_economy_user = "</add-user-economy-blacklist:1096038008534351965>"
-remove_blacklist_economy_user = "</remove-user-economy-blacklist:1096038008534351966>"
-show_blacklist_economy = "</show-economy-blacklist:1095437293143195658>"
-
 # Blacklist level
 add_blacklist_level_channel = ""
 remove_blacklist_level_channel = ""
@@ -57,11 +45,6 @@ remove_blacklist_level_role = ""
 add_blacklist_level_user = ""
 remove_blacklist_level_user = ""
 show_blacklist_level = ""
-
-# Give/Remove money
-
-give_money = ""
-remove_money = ""
 
 
 # These are all emojis used in this bot the individual eimojis are stored again in this folder: discord_bot/emojis

@@ -548,7 +548,7 @@ class DatabaseUpdates():
 
             elif level != None:
 
-                update_stats = f"UPDATE LevelSystemStats SET userLevel = %s, userXp = %s wholeXp = %s, WHERE guildId = %s AND userId = %s"
+                update_stats = f"UPDATE LevelSystemStats SET userLevel = %s, userXp = %s, wholeXp = %s WHERE guildId = %s AND userId = %s"
                 update_stats_values = [level, 0, whole_xp, guild_id, user_id]
             
             cursor.execute(update_stats, update_stats_values)

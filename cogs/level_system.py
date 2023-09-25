@@ -690,7 +690,7 @@ class LevelSystem(commands.Cog):
 
         settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
         check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message)
-        print(type(settings[1]), check_bonus_xp_system)
+
         if check_bonus_xp_system != 0:
             xp = settings[1] * (1 + (check_bonus_xp_system / 100))    
         else:
@@ -877,7 +877,7 @@ class LevelSystem(commands.Cog):
 
                         new_level = user_level + 1
                                             
-                        DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level)
+                        DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level, whole_xp=new_whole_xp)
                         levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
                         if levelup_channel_check[3] == None:
@@ -2112,7 +2112,11 @@ class LevelSystem(commands.Cog):
             You also get this bonus if you have a role that is on the list for the bonus XP system or if you are a user that is listed on the bonus XP list.""", color=bot_colour)
         await ctx.respond(embed=emb)
 
-    
+
+
+##########################################  Custom level up message  ########################################
+
+
     @commands.slash_command(name = "set-level-up-message", description = "Set a custom level up message for your server!")
     @commands.has_permissions(administrator = True)
     async def set_level_up_message(self, ctx:discord.ApplicationContext):

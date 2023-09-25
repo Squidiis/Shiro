@@ -2,9 +2,8 @@
 levelsystem: 
 
 Reset button für bonus xp sachen
+reset command für einzelne user
 rank card unter der aktuellen xp anzeige eine machen für das gesamte xp von diesen user (fixen)
-
-Aktivster user Leaderbord 
 
 hinzufügen das man custom bilder hinzufügen kann für die rank card
 RPS game neu machen
