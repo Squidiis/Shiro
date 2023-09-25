@@ -32,7 +32,7 @@ class DatabaseStatusCheck():
 
         if isinstance(message_check.channel, discord.TextChannel):
 
-            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="level")
+            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
 
             if levelsystem_blacklist:
 
@@ -72,66 +72,7 @@ class DatabaseStatusCheck():
             
         else:
             return None
-        
 
-    def _economy_system_blacklist_check(guild_id:int, message_check:discord.Message):
-
-        if isinstance(message_check.channel, discord.TextChannel):
-            
-            economy_system_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="economy")
-
-            if economy_system_blacklist:
-                
-                user_id = message_check.author.id
-
-                for _, _, channel_blacklist, category_blacklist, role_blacklist, user_blacklist in economy_system_blacklist:
-                    
-                    if user_blacklist == user_id:
-                        return True
-
-                    if role_blacklist != None:
-                        
-                        blacklist_role = message_check.guild.get_role(role_blacklist)
-                        if blacklist_role in message_check.author.roles:
-                            return True
-                                
-                    if message_check.channel.category.id == category_blacklist:
-                        return True
-
-                    if message_check.channel.id == channel_blacklist:
-                        return True
-                        
-            else:
-                return None
-
-
-    def _economy_system_status(guild_id:int, text:int = None, voice:int = None):
-
-        check_status = DatabaseCheck.check_economy_settings(guild_id=guild_id)
-
-        if check_status:
-
-            if check_status[1] == "off":
-                return False
-            else:
-
-                if text != None:
-
-                    if check_status[1] == "on_all" or check_status[1] == "on_message":
-                        return True
-                    
-                    else:
-                        return False
-                    
-                if voice != None:
-
-                    if check_status[1] == "on_all" or "on_voice":
-                        return True
-                    else:
-                        return False
-            
-        else:
-            return None
 
 
 #######################  Database Statemants  ############################
@@ -142,19 +83,18 @@ class DatabaseCheck():
 
 
     # Checks the Blacklist from the level system
-    def check_blacklist(guild_id:int, table:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def check_blacklist(guild_id:int, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         
-        table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
         all_items = [channel_id, category_id, role_id, user_id]
         
         if all(x is None for x in all_items):
             
-            check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s"
+            check_blacklist = f"SELECT * FROM LevelSystemBlacklist WHERE guildId = %s"
             check_blacklist_values = [guild_id]
 
         else:
@@ -162,7 +102,7 @@ class DatabaseCheck():
             for count in range(len(all_items)):
                 if all_items[count] != None:
                     
-                    check_blacklist = f"SELECT * FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
+                    check_blacklist = f"SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name[count]} = %s"
                     check_blacklist_values = [guild_id, all_items[count]]
 
         cursor.execute(check_blacklist, check_blacklist_values)
@@ -350,7 +290,7 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        sql_tables = ["BotSettings", "LevelSystemSettings", "EconomySystemSettings"]
+        sql_tables = ["BotSettings", "LevelSystemSettings"]
 
         try:
 

@@ -11,7 +11,7 @@ class CheckLevelSystem():
 
     def show_blacklist_level(guild_id:int):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
         
         if blacklist:
 
@@ -140,7 +140,7 @@ class BlacklistManagerButtons(discord.ui.View):
 class BlacklistManagerChecks():
 
     # Checks each entry to see if any of them are blacklisted.
-    def check_items_blacklist_manager(guild_id:str, table:str, channels = None, categories = None, roles = None, users = None, operation = None):
+    def check_items_blacklist_manager(guild_id:str, channels = None, categories = None, roles = None, users = None, operation = None):
         
         sorted_list = []
         item_list = channels or categories or roles or users
@@ -148,13 +148,13 @@ class BlacklistManagerChecks():
         for item in item_list:
                 
             if channels != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=item.id, table=table)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=item.id)
             if categories != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=item.id, table=table)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=item.id)
             if roles != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role_id=item.id, table=table)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role_id=item.id)
             if users != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user_id=item.id, table=table)
+                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user_id=item.id)
 
             if operation == "add":
 
@@ -1259,8 +1259,8 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def add_channel_level_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel that you want to exclude from the level system!")):
         
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="level")
-        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id)
+        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
         show_blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
         
         check_channel = [1 if channel.category.id == i[2] else None for i in check_blacklist]
@@ -1295,7 +1295,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_channel_blacklist(self, ctx:commands.Context, channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Select a channel to remove from the blacklist!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id)
 
         if blacklist:
                 
@@ -1320,8 +1320,8 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def add_category_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Select a category that you want to exclude from the level system!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id, table="level")
-        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id)
+        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
 
         if blacklist:
             
@@ -1368,7 +1368,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_category_blacklist(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Select a category to remove from the blacklist!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id)
 
         if blacklist:
             
@@ -1393,7 +1393,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def add_role_blacklist(self, ctx:commands.Context, role:Option(discord.Role, description="Select a role that you want to exclude from the level system!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id)
 
         if blacklist:
      
@@ -1418,7 +1418,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_role_blacklist(self, ctx:commands.Context, role:Option(discord.Role, description="Select a role you want to remove from the blacklist!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id)
 
         if blacklist:
 
@@ -1443,7 +1443,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def add_user_level_blacklsit(self, ctx:commands.Context, user:Option(discord.User, description="Select a user that you want to exclude from the level system!")):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id)
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb, view=None)
@@ -1473,7 +1473,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_user_level_blacklist(self, ctx:commands.Context, user:Option(discord.User, description="Select a user you want to remove from the blacklist!")):
         
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id)
 
         if blacklist:
             
@@ -1498,7 +1498,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_blacklist(self, ctx:commands.Context):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, table="level")
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
 
         if blacklist:
 
