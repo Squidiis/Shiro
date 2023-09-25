@@ -26,11 +26,8 @@ class UserLeavesServer(commands.Cog):
                   "LevelSystemSettings",  
                   "BotSettings", 
                   "AutoReactionSetup", 
-                  "AutoReactionSettings", 
-                  "EconomySystemStats", 
-                  "EconomySystemBlacklist", 
-                  "EconomySystemShop",
-                  "EconomySystemSettings"]
+                  "AutoReactionSettings"
+                  ]
 
         try:
 
@@ -59,9 +56,7 @@ class UserLeavesServer(commands.Cog):
             db_connect = DatabaseSetup.db_connector()
             cursor = db_connect.cursor()
 
-            tables = ["EconomySystemBlacklist", 
-                      "EconomySystemStats", 
-                      "LevelSystemBlacklist", 
+            tables = ["LevelSystemBlacklist", 
                       "LevelSystemStats"]
             
             try:
@@ -100,7 +95,7 @@ class DeleteData(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
 
-        tables = ["LevelSystemBlacklist", "ManageBlacklistTemp", "AutoReactionSetup", "LevelSystemSettings", "EconomySystemBlacklist", "EconomySystemSettings", "BonusXpList"]
+        tables = ["LevelSystemBlacklist", "ManageBlacklistTemp", "AutoReactionSetup", "LevelSystemSettings", "BonusXpList"]
         for table in tables:
 
             DeleteData.delete_data(table=table, column="channelId", item=channel)

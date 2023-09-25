@@ -330,7 +330,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                             
                         mention.append(f"{Emojis.dot_emoji} <#{channel}>")
                         
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, channel_id=channel, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, channel_id=channel)
 
                 if temp_blacklist[2]: 
 
@@ -339,7 +339,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
 
                         mention.append(f"{Emojis.dot_emoji} <#{category}>")
 
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, category_id=category, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, category_id=category)
                       
                 if temp_blacklist[3]:
                         
@@ -348,7 +348,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
                             
                         mention.append(f"{Emojis.dot_emoji} <@&{role}>")
                         
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, role_id=role, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, role_id=role)
                                 
                 if temp_blacklist[4]:
                         
@@ -357,7 +357,7 @@ class TempBlackklistLevelSaveButton(discord.ui.Button):
 
                         mention.append(f"{Emojis.dot_emoji} <@{user}>")
                         
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, user_id=user, table="level")
+                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, user_id=user)
 
                 BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
                     
@@ -618,7 +618,7 @@ class ResetBlacklistLevelButton(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
             guild_id = interaction.guild.id
 
-            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove")
 
             emb = discord.Embed(title=f"The blacklist has been reset {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.arrow_emoji} All channels, users, roles and categories have been removed from the blacklist.
@@ -1283,7 +1283,7 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", channel_id=channel.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", channel_id=channel.id)
 
             emb = discord.Embed(title=f"This channel was successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was successfully blacklisted.
@@ -1299,7 +1299,7 @@ class LevelSystem(commands.Cog):
 
         if blacklist:
                 
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channel.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channel.id)
 
             emb = discord.Embed(title=f"The channel was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_channel} command.
@@ -1340,13 +1340,13 @@ class LevelSystem(commands.Cog):
 
                 if bot.get_channel(channel).category.id == category.id:
 
-                    DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channel, table="level")
+                    DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channel)
                     filtered_list.append(f"{Emojis.dot_emoji} <#{channel}>\n")
 
         if filtered_list != []:  
             
             channel_list = "\n".join(filtered_list)
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id)
                 
             emb = discord.Embed(title=f"{Emojis.help_emoji} {'One channel' if len(filtered_list) == 1 else 'Several channels'} in this category is already blacklisted", 
                 description=f"""{Emojis.dot_emoji} The following {'channel is' if len(filtered_list) == 1 else 'channels are'} already blacklisted \n\n{channel_list}
@@ -1356,7 +1356,7 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id)
             
             emb = discord.Embed(title=f"This category was successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The category <#{category.id}> was successfully blacklisted.
@@ -1372,7 +1372,7 @@ class LevelSystem(commands.Cog):
 
         if blacklist:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", category_id=category.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", category_id=category.id)
             
             emb = discord.Embed(title=f"The category was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The category <#{category.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_category} command.
@@ -1406,7 +1406,7 @@ class LevelSystem(commands.Cog):
         
         else:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", role_id=role.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", role_id=role.id)
             
             emb = discord.Embed(title=f"This role has been successfully blacklisted {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role <@&{role.id}> has been successfully blacklisted.
@@ -1422,7 +1422,7 @@ class LevelSystem(commands.Cog):
 
         if blacklist:
 
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", role_id=role.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", role_id=role.id)
             
             emb = discord.Embed(title=f"The role was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role <@&{role.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_role} command.
@@ -1461,7 +1461,7 @@ class LevelSystem(commands.Cog):
 
             else:   
 
-                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", user_id=user.id, table="level")
+                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", user_id=user.id)
 
                 emb = discord.Embed(title=f"This user was successfully blacklisted {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} The user <@{user.id}> was successfully blacklisted.
@@ -1477,7 +1477,7 @@ class LevelSystem(commands.Cog):
 
         if blacklist:
             
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", user_id=user.id, table="level")
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", user_id=user.id)
 
             emb = discord.Embed(title=f"The user was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The user <@{user.id}> has been successfully removed from the blacklist if you want to add him again use the: {add_blacklist_level_user} command.

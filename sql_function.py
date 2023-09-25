@@ -450,12 +450,11 @@ class DatabaseUpdates():
         
 
     # Function that adds all specified data to the blacklist 
-    def manage_blacklist(guild_id:int, table:str, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def manage_blacklist(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         
-        table_name = "LevelSystemBlacklist" if table == "level" else "EconomySystemBlacklist"
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
         
@@ -469,17 +468,17 @@ class DatabaseUpdates():
 
                         if operation == "add":
 
-                            level_sys_blacklist = f"INSERT INTO {table_name} (guildId, {column_name[count]}) VALUES (%s, %s)"
+                            level_sys_blacklist = f"INSERT INTO LevelSystemBlacklist (guildId, {column_name[count]}) VALUES (%s, %s)"
                             level_sys_blacklist_values = [guild_id, items[count]]
                         
                         elif operation == "remove":
 
-                            level_sys_blacklist = f"DELETE FROM {table_name} WHERE guildId = %s AND {column_name[count]} = %s"
+                            level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name[count]} = %s"
                             level_sys_blacklist_values = [guild_id, items[count]]
 
             else:
 
-                level_sys_blacklist = f"DELETE FROM {table_name} WHERE guildId = %s"
+                level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
                 level_sys_blacklist_values = [guild_id]
         
             cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
