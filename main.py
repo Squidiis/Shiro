@@ -48,6 +48,7 @@ class main(commands.Cog):
         # Applycation
         self.bot.add_view(ApplicationButton())
 
+        # Other Systems
         self.bot.add_view(GhostPingButtons())
 
         self.bot.add_view(view)
@@ -74,7 +75,7 @@ class ApplicationButton(discord.ui.View):
         discord.SelectOption(label="Developer", description="Click here to apply as a developer", value="developer"),
         discord.SelectOption(label="Hentai Konzern", description="Click here to apply as a Hentai Group member", value="hentai_konzern"),
         discord.SelectOption(label="Artist", description="Click here to apply as an artist", value="artist"),
-        discord.SelectOption(label="Assistant", description="Click here to apply as an assistant", value="sssistant"),
+        discord.SelectOption(label="Assistant", description="Click here to apply as an assistant", value="assistant"),
     ])
 
     async def callback(self, select, interaction: discord.Interaction): 

@@ -12,48 +12,13 @@ class CheckLevelSystem():
     def show_blacklist_level(guild_id:int):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
-        
-        if blacklist:
 
-            all_channels, all_categories, all_roles, all_users = [], [], [], []
-            for _, blacklist_channel, blacklist_category, blacklist_role, blacklist_user in blacklist:
-
-                None if None == blacklist_channel else all_channels.append(f"{Emojis.dot_emoji} <#{blacklist_channel}>\n")
-
-                None if None == blacklist_category else all_categories.append(f"{Emojis.dot_emoji} <#{blacklist_category}>\n")
-
-                None if None == blacklist_role else all_roles.append(f"{Emojis.dot_emoji} <@&{blacklist_role}>\n")
-
-                None if None == blacklist_user else all_users.append(f"{Emojis.dot_emoji} <@{blacklist_user}>\n")
-                
-            if all_channels == []:
-                channels_mention = f"{Emojis.dot_emoji} There are no channels on the blacklist"
-            else:
-                channels_mention = "".join(all_channels)
-                
-            if all_categories == []:
-                categories_mention = f"{Emojis.dot_emoji} There are no categories on the blacklist"
-            else:
-                categories_mention = "".join(all_categories)
-                
-            if all_roles == []:
-                roles_mention = f"{Emojis.dot_emoji} There are no roles on the blacklist"
-            else:
-                roles_mention = "".join(all_roles)
-                
-            if all_users == []:
-                users_mention = f"{Emojis.dot_emoji} There are no users on the blacklist"
-            else:
-                users_mention = "".join(all_users)
-        
-        else:
-
-            channels_mention = f"{Emojis.dot_emoji} There are no channels on the blacklist"
-            categories_mention = f"{Emojis.dot_emoji} There are no categories on the blacklist"
-            roles_mention = f"{Emojis.dot_emoji} There are no roles on the blacklist"
-            users_mention = f"{Emojis.dot_emoji} There are no users on the blacklist"
-
-        return [channels_mention, categories_mention, roles_mention, users_mention]
+        check_channel = [f"{Emojis.dot_emoji} <#{i}>" if i != [] else "There are no channels on the blacklist" for _, i, _, _, _ in blacklist if i is not None]
+        check_category = [f"{Emojis.dot_emoji} <#{i}>" if i != [] else "There are no categories on the blacklist" for _, _, i, _, _ in blacklist if i is not None]
+        check_role = [f"{Emojis.dot_emoji} <@&{i}>" if i != [] else "There are no roles on the blacklist" for _, _, _, i, _ in blacklist if i is not None]
+        check_user = [f"{Emojis.dot_emoji} <@{i}>" if i != [] else "There are no users on the blacklist" for _, _, _, _, i in blacklist if i is not None]
+        print([f"{Emojis.dot_emoji} <@{i}>" if i != [] else "There are no users on the blacklist" for _, _, _, _, i in blacklist if i is not None])
+        return ["\n".join(check_channel), "\n".join(check_category), "\n".join(check_role), "\n".join(check_user)]
     
 
     def check_bonus_xp(guild_id:int, message:discord.Message):

@@ -5,11 +5,7 @@ import aiohttp
 import json
 
 
-test = SlashCommandGroup()
 
-@test.command(name = "test2")
-async def testtry(ctx:discord.ApplicationContext):
-    await ctx.send(ctx.respond(ctx.author.name))
 class ApiSearchCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
