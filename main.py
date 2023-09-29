@@ -1,10 +1,8 @@
 
-from Hanime_Funpark import *
 from Import_file import *
 
 from cogs.level_system import *
 from cogs.Moderator_tolls import *
-from Liest import * 
 from dotenv import load_dotenv
 
 
@@ -52,15 +50,16 @@ class main(commands.Cog):
 
         self.bot.add_view(GhostPingButtons())
 
-        # self roles 
-        self.bot.add_view(DropdownColours())
-        self.bot.add_view(DropdownHoppys())
-        view.add_item(Genderbutton_Female())
-        view.add_item(Genderbutton_Divers())
-        view.add_item(Genderbutton_Male())
-
         self.bot.add_view(view)
         
+
+async def status_task():
+    while True:
+        await bot.change_presence(activity=discord.Game('?help to see all commands'), status=discord.Status.online)
+        await asyncio.sleep(15)
+        await bot.change_presence(activity=discord.Game('Funpark.net'), status=discord.Status.online)
+        await asyncio.sleep(15)
+
 
 bot.add_cog(main(bot))
 
