@@ -12,12 +12,14 @@ class CheckLevelSystem():
     def show_blacklist_level(guild_id:int):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
-
+    
         check_channel = [f"{Emojis.dot_emoji} <#{i}>" if i != [] else "There are no channels on the blacklist" for _, i, _, _, _ in blacklist if i is not None]
         check_category = [f"{Emojis.dot_emoji} <#{i}>" if i != [] else "There are no categories on the blacklist" for _, _, i, _, _ in blacklist if i is not None]
         check_role = [f"{Emojis.dot_emoji} <@&{i}>" if i != [] else "There are no roles on the blacklist" for _, _, _, i, _ in blacklist if i is not None]
-        check_user = [f"{Emojis.dot_emoji} <@{i}>" if i != [] else "There are no users on the blacklist" for _, _, _, _, i in blacklist if i is not None]
-        print([f"{Emojis.dot_emoji} <@{i}>" if i != [] else "There are no users on the blacklist" for _, _, _, _, i in blacklist if i is not None])
+        check_user = [i for _, i, _, _, _ in blacklist if i is not None]; check = "There are no channels on the blacklist" if check_user == [] else [f"{Emojis.dot_emoji} <@{i}>" for i in check_user]
+        print(check_user)
+        print(check)
+
         return ["\n".join(check_channel), "\n".join(check_category), "\n".join(check_role), "\n".join(check_user)]
     
 
