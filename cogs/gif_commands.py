@@ -66,6 +66,16 @@ class ApiSearchCommands(commands.Cog):
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)
 
+    
+    @gif.command(description = "Send a anime feed gif you can also mention someone!")
+    async def feed(self, ctx, user:discord.Member = None):
+
+        url = await self.search_gif(tags="anime_feed")
+
+        emb = discord.Embed(title="Feed", description=f"**{ctx.author.mention} feeds... himself? ok" if user == None else f"{ctx.author.mention} feeds {user.mention} how cute", color=bot_colour)
+        emb.set_image(url=url)
+        await ctx.respond(text="Via Tenor")
+
 
     @gif.command(description = "Send a anime punch gif you also mention someone!")
     async def punch(self, ctx, user:discord.Member = None):
