@@ -13,14 +13,12 @@ class CheckLevelSystem():
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
     
-        check_channel = [f"{Emojis.dot_emoji} <#{i}>" if i != [] else "There are no channels on the blacklist" for _, i, _, _, _ in blacklist if i is not None]
-        check_category = [f"{Emojis.dot_emoji} <#{i}>" if i != [] else "There are no categories on the blacklist" for _, _, i, _, _ in blacklist if i is not None]
-        check_role = [f"{Emojis.dot_emoji} <@&{i}>" if i != [] else "There are no roles on the blacklist" for _, _, _, i, _ in blacklist if i is not None]
-        check_user = [i for _, i, _, _, _ in blacklist if i is not None]; check = "There are no channels on the blacklist" if check_user == [] else [f"{Emojis.dot_emoji} <@{i}>" for i in check_user]
-        print(check_user)
-        print(check)
-
-        return ["\n".join(check_channel), "\n".join(check_category), "\n".join(check_role), "\n".join(check_user)]
+        check_channel = [i for _, i, _, _, _ in blacklist if i is not None]; checked_channel = [f"{Emojis.dot_emoji} There are no channels on the blacklist"] if check_channel == [] else [f"{Emojis.dot_emoji} <#{i}>" for i in check_channel]
+        check_category = [i for _, _, i, _, _ in blacklist if i is not None]; checked_category = [f"{Emojis.dot_emoji} There are no categories on the blacklist"] if check_category == [] else [f"{Emojis.dot_emoji} <#{i}>" for i in check_category]
+        check_role = [i for _, _, _, i, _ in blacklist if i is not None]; checked_role = [f"{Emojis.dot_emoji} There are no roles on the blacklist"] if check_role == [] else [f"{Emojis.dot_emoji} <@&{i}>" for i in check_role]
+        check_user = [i for _, _, _, _, i in blacklist if i is not None]; checked_user = [f"{Emojis.dot_emoji} There are no users on the blacklist"] if check_user == [] else [f"{Emojis.dot_emoji} <@{i}>" for i in check_user]
+        
+        return ["\n".join(checked_channel), "\n".join(checked_category), "\n".join(checked_role), "\n".join(checked_user)]
     
 
     def check_bonus_xp(guild_id:int, message:discord.Message):
@@ -621,16 +619,14 @@ class ShowBlacklistLevelSystemButton(discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
 
             guild_id = interaction.guild.id
-            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=guild_id)
-            
-            channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
+            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=guild_id) 
 
             emb = discord.Embed(title=f"Here you can see all the elements that are on the blacklist of the level system {Emojis.exclamation_mark_emoji}", 
                 description=f"""Here are listed all the elements that are on the level system blacklist.""", color=bot_colour)
-            emb.add_field(name="Channels:", value=f"{channel}", inline=False)
-            emb.add_field(name="Categories:", value=f"{category}", inline=False)
-            emb.add_field(name="Roles", value=f"{role}", inline=False)
-            emb.add_field(name="Users", value=f"{user}", inline=False)
+            emb.add_field(name="Channels:", value=f"{blacklist[0]}", inline=False)
+            emb.add_field(name="Categories:", value=f"{blacklist[1]}", inline=False)
+            emb.add_field(name="Roles", value=f"{blacklist[2]}", inline=False)
+            emb.add_field(name="Users", value=f"{blacklist[3]}", inline=False)
             emb.set_footer(icon_url=bot.user.avatar ,text="This message is only visible to you")
             await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
@@ -1507,15 +1503,14 @@ class LevelSystem(commands.Cog):
     async def show_blacklist(self, ctx:commands.Context):
 
         blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
-        channel, category, role, user = blacklist[0], blacklist[1], blacklist[2], blacklist[3] 
 
         emb = discord.Embed(title=f"Here you can see the complete level system blacklist", 
             description=f"""Here you can see everything that is on the level system blacklist:{Emojis.exclamation_mark_emoji}
             """, color=bot_colour)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Channels on the Blacklist", value=f"{channel}", inline=False)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Categories on the Blacklist", value=f"{category}", inline=False)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Roles on the Blacklist", value=f"{role}", inline=False)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Users on the Blacklist", value=f"{user}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Channels on the Blacklist", value=f"{blacklist[0]}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Categories on the Blacklist", value=f"{blacklist[1]}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Roles on the Blacklist", value=f"{blacklist[2]}", inline=False)
+        emb.add_field(name=f"{Emojis.arrow_emoji} All Users on the Blacklist", value=f"{blacklist[3]}", inline=False)
         await ctx.respond(embed=emb)
 
 
