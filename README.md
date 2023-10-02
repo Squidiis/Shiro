@@ -9,6 +9,7 @@
 
 <h4 align="center">
     <a href="https://discord.gg/Zv5JtYhd9r"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
+    Start of development Tue, Jan 04, 2022
 </h4>
 
 ## 👋 About
@@ -17,6 +18,7 @@ Shiro is a Discord bot that stands out for its wide range of commands and custom
 You can customize pretty much anything, all commands are very user-friendly and always have explanations!
 
 If you wish, you can invite the bot to your own server by clicking [here](https://discord.com/oauth2/authorize?client_id=928073958891347989&scope=bot&permissions=8)
+
 
 ## ⌨ Functions
 

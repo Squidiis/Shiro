@@ -998,13 +998,11 @@ class LevelSystem(commands.Cog):
                 await ctx.respond(embed=emb)    
     
 
-    @commands.slash_command(name = "reset-level-system", description = "Reset all levels and xp of everyone!")
+    @commands.slash_command(name = "reset-level-system-stats", description = "Reset all levels and xp of everyone!")
     @commands.has_permissions(administrator = True)
     async def reset_level(self, ctx:commands.Context):
 
-        guild_id = ctx.guild.id
-
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=guild_id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id)
 
         if check_stats:
 
@@ -1019,6 +1017,27 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title=f"{Emojis.help_emoji} No data found for this server", 
                 description=f"""{Emojis.dot_emoji} No data was found for this server, so nothing could be deleted.
                 {Emojis.dot_emoji} Data is created automatically as soon as messages are sent and the level system is switched on.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+    
+    @commands.slash_command(name = "reset-user-stats", description = "Resets all stats of the specified user in the level system!")
+    @commands.has_permissions(administrator = True)
+    async def reset_user_stats(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user whose stats you want to reset!")):
+
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
+
+        if check_stats:
+
+            DatabaseRemoveDatas._remove_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+
+            emb = discord.Embed(title=f"The user data of {user.name} has been reset {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} {user.mention} is now level 0 again with 0 XP.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Dieser user hat noch kein XP gesammelt", 
+                description=f"""{Emojis.dot_emoji} Dieser user hat noch kein XP gesammtelt daher könnene seine Daten nicht zurück gesetzt werden.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
