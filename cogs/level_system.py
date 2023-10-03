@@ -2038,6 +2038,20 @@ class LevelSystem(commands.Cog):
         await ctx.respond(embed=emb)
 
 
+    @commands.slash_command(name = "reset-bonus-xp-list")
+    async def reset_bonus_xp_list(self, ctx:commands.Context):
+
+        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
+
+        if check_list:
+
+            emb = discord.Embed(title="")
+
+        else:
+
+            emb = discord.Embed()
+
+
     @commands.slash_command(name = "set-bonus-xp-percentage", description = "Set a default percentage for the bonus XP system (this is set to 10 % by default)!")
     @commands.has_permissions(administrator = True)
     async def set_bonus_xp_percentage(self, ctx:commands.Context, percentage:Option(int, description="Specify a percentage to be used as the default percentage for the bonus XP system!",max_value=100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
