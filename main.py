@@ -11,6 +11,23 @@ async def ping(ctx):
     await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
 
+@bot.command()
+async def halloween_edit(ctx):
+
+    emb = discord.Embed(description=f""" 
+    # 👻 Happy Halloween 👻 
+    Hello from today we unlock the limited Halloween Hentai channel <#1026188774440448100> and the limited Halloween Porn channel <#1159930795025244220> for you.
+    There you can watch exclusive Halloween content 🎃.
+
+    Scary Spooktober wishes you the Hanime Funpark Team
+    @everyone""", color=0xbf9228)
+    emb.set_image(url="https://cdn.discordapp.com/attachments/1000427727691718806/1159929465049206854/157c5387b6124e8544908864b4dd7483.png?ex=6532cf7e&is=65205a7e&hm=f1ba0fc03c49b59eb02069ae1e62baf6a2920150a1dc9573537c257cdea8bed4&")
+
+    channel = bot.get_channel(865908348666511400)
+    message = await channel.fetch_message(1159934234501337198)
+    await message.edit(embed=emb)
+
+
 class main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -147,7 +164,6 @@ class AutoReaction(commands.Cog):
             return
         
 bot.add_cog(AutoReaction(bot)) 
-    
 
 if __name__ == "__main__":
     for filename in os.listdir("cogs"):

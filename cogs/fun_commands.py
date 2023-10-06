@@ -240,7 +240,7 @@ class Fun(commands.Cog):
         emb.set_image(url=DrinkThumb)
         await ctx.respond(embed=emb)
 
-
+    
 
 class TicTacToeButton(discord.ui.Button['TicTacToe']):
     def __init__(self, x: int, y: int):

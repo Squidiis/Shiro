@@ -662,11 +662,6 @@ class LevelSystem(commands.Cog):
         return xp
     
     @staticmethod
-    def xp_generator_global():
-        xp = 20
-        return xp
-    
-    @staticmethod
     def round_corner_mask(radius, rectangle, fill):
     
         bigsize = (rectangle.size[0] * 3, rectangle.size[1] * 3)
@@ -2045,11 +2040,21 @@ class LevelSystem(commands.Cog):
 
         if check_list:
 
-            emb = discord.Embed(title="")
+            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove")
+            emb = discord.Embed(title=f"The bonus xp list was reset {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} All channels, users, roles and categories have been deleted from the xp bonus list.
+                {Emojis.dot_emoji} So every activity will be rewarded with {self.xp_generator(guild_id=ctx.guild.id, message=None)} XP.""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
         else:
 
-            emb = discord.Embed()
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The bonus XP list cannot be reset", 
+                description=f"""{Emojis.dot_emoji} The bonus XP list cannot be reset because it does not contain any entries.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+
+
+#################################################  Bonus XP percentage  ###########################################
 
 
     @commands.slash_command(name = "set-bonus-xp-percentage", description = "Set a default percentage for the bonus XP system (this is set to 10 % by default)!")
