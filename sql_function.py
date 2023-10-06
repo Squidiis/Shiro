@@ -541,7 +541,7 @@ class DatabaseUpdates():
         
         try:
             
-            if items:
+            if any(elem is not None for elem in items):
 
                 for count in range(len(items)):
                     
@@ -549,26 +549,26 @@ class DatabaseUpdates():
 
                         if operation == "add":
 
-                            level_sys_blacklist = f"INSERT INTO BonusXpList (guildId, {column_name[count]}) VALUES (%s, %s)" if bonus == None else f"INSERT INTO BonusXpList (guildId, {column_name[count]}, PercentBonusXp) VALUES (%s, %s, %s)"
-                            level_sys_blacklist_values = [guild_id, items[count]] if bonus == None else [guild_id, items[count], bonus]
+                            bonus_list = f"INSERT INTO BonusXpList (guildId, {column_name[count]}) VALUES (%s, %s)" if bonus == None else f"INSERT INTO BonusXpList (guildId, {column_name[count]}, PercentBonusXp) VALUES (%s, %s, %s)"
+                            bonus_list_values = [guild_id, items[count]] if bonus == None else [guild_id, items[count], bonus]
                         
                         elif operation == "remove":
 
-                            level_sys_blacklist = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
-                            level_sys_blacklist_values = [guild_id, items[count]]
+                            bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
+                            bonus_list_values = [guild_id, items[count]]
 
             else:
 
-                level_sys_blacklist = f"DELETE FROM BonusXpList WHERE guildId = %s"
-                level_sys_blacklist_values = [guild_id]
-        
-            cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-            db_connect.commit()
+                bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s"
+                bonus_list_values = [guild_id]
 
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
+
+            cursor.execute(bonus_list, bonus_list_values)
+            db_connect.commit()
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 

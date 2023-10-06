@@ -1,7 +1,6 @@
 
 levelsystem: 
 
-Reset button für bonus xp sachen
 rank card unter der aktuellen xp anzeige eine machen für das gesamte xp von diesen user (fixen)
 
 hinzufügen das man custom bilder hinzufügen kann für die rank card

@@ -65,19 +65,13 @@ class BlacklistManagerButtons(discord.ui.View):
         view.add_item(TempBlackklistLevelSaveButton())
         view.add_item(ShowBlacklistLevelSystemButton())
 
-        if interaction.user.guild_permissions.administrator:
-
-            emb = discord.Embed(title=f"Here you can select what you want to blacklist", 
-                description=f"""{Emojis.dot_emoji} With the lower select menus you can choose what you want to put on the blacklist!
-                {Emojis.dot_emoji} You can freely choose what you want, but you can only select a maximum of 5 items per menu.
-                {Emojis.dot_emoji} When you have selected everything you want, confirm your selection by pressing the safe configuration button.
-                {Emojis.dot_emoji} If you want to see already everything on the blacklist use the show blacklist button.
-                {Emojis.help_emoji} If you select something that is already on the blacklist it will be automatically sorted out. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=view)
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+        emb = discord.Embed(title=f"Here you can select what you want to blacklist", 
+            description=f"""{Emojis.dot_emoji} With the lower select menus you can choose what you want to put on the blacklist!
+            {Emojis.dot_emoji} You can freely choose what you want, but you can only select a maximum of 5 items per menu.
+            {Emojis.dot_emoji} When you have selected everything you want, confirm your selection by pressing the safe configuration button.
+            {Emojis.dot_emoji} If you want to see already everything on the blacklist use the show blacklist button.
+            {Emojis.help_emoji} If you select something that is already on the blacklist it will be automatically sorted out. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=view)
 
 
     # Button for removing items from the Blacklist Manager
@@ -649,16 +643,16 @@ class LevelSystem(commands.Cog):
         return bucket.update_rate_limit()
 
     @staticmethod
-    def xp_generator(guild_id:int, message:discord.Message):
+    def xp_generator(guild_id:int, message:discord.Message = None):
 
-        settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
-        check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message)
-
+        settings = DatabaseCheck.check_level_settings(guild_id=guild_id) 
+        check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message) if message != None else 0
+     
         if check_bonus_xp_system != 0:
             xp = settings[1] * (1 + (check_bonus_xp_system / 100))    
         else:
             xp = settings[1]
-
+        
         return xp
     
     @staticmethod
@@ -1503,6 +1497,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "manage-level-blacklist", description = "Add or remove anything you want from the blacklist!")
+    @commands.has_permissions(administrator = True)
     async def manage_level_blacklist(self, ctx:commands.Context):
 
         emb = discord.Embed(title=f"Welcome to the blacklist manager for the level system {Emojis.settings_emoji}", 
@@ -2033,7 +2028,8 @@ class LevelSystem(commands.Cog):
         await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "reset-bonus-xp-list")
+    @commands.slash_command(name = "reset-bonus-xp-list", description = "Reset the bonus XP list!")
+    @commands.has_permissions(administrator = True)
     async def reset_bonus_xp_list(self, ctx:commands.Context):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
