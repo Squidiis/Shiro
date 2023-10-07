@@ -900,7 +900,7 @@ class LevelSystem(commands.Cog):
                 await ctx.respond(embed=emb)  
 
 
-    @commands.slash_command(name = "give-levels", description = "Give a user a selected amount of levels!")
+    @commands.slash_command(name = "give-level", description = "Give a user a selected amount of levels!")
     @commands.has_permissions(administrator = True)
     async def give_level(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
         level:Option(int, description="Specify a set of levels that you want to assign!")):
@@ -956,15 +956,14 @@ class LevelSystem(commands.Cog):
         else:
 
             if check_stats:
+    
+                new_level = check_stats[2]  - level 
 
-                user_level = check_stats[2]     
-                new_level = user_level - level 
-
-                if level > user_level:
+                if level > check_stats[2] :
 
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The number of levels you want to remove from {user.name} is too high", 
                         description=f"""{Emojis.dot_emoji} The number of levels you want to remove from {user.name} is too high.
-                        {Emojis.dot_emoji} You can remove **{user.name}** only up to **{user_level}** level.""", color=bot_colour)
+                        {Emojis.dot_emoji} You can remove **{user.name}** only up to **{check_stats[2] }** level.""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                 
@@ -1146,22 +1145,6 @@ class LevelSystem(commands.Cog):
         else:
 
             await ctx.respond(embed=error_emb)
-
-    
-    @commands.slash_command(name = "set-rank-card-image", description = "Lege ein individuelles bild als Hintergrund für deine Rankcard fest!")
-    async def set_rank_card_image(self, ctx:commands.Context, image:Option(str, description = "Gib hier den link zu den bild an was du als custom rank card hintergrund nehmen möchtest max 900x400")):
-
-        emb = discord.Embed()
-
-        connect = DatabaseSetup.db_connector()
-        cursor = connect.cursor()
-
-        img = requests.get(image)
-
-        insert_img = "INSERT INTO LevelRankCardSettingsGuild (guildId, cardImage) VALUES (%s, %s)"
-        insert_img_values = [ctx.guild.id, img]
-        cursor.execute(insert_img, insert_img_values)
-        connect.commit()
 
 
     @commands.slash_command(name = "leaderboard-level", description = "Shows the highest ranks in the lavel system!")

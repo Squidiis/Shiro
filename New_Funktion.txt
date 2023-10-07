@@ -1,9 +1,7 @@
 
-gif commands zeiten überarbeiten
-rank card unter der aktuellen xp anzeige eine machen für das gesamte xp von diesen user (fixen)
 
-hinzufügen das man custom bilder hinzufügen kann für die rank card
 RPS game neu machen
+Die Buttons nicht löschen sondern warten lassen db
 
 Heute zu erledigen:
 

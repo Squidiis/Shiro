@@ -16,10 +16,92 @@ from typing import List
 
 
 
+class RPSButtons(discord.ui.View):
+    def __init__(self, second_user, game_mode):
+        self.second_user = second_user
+        self.game_mode = game_mode
+        super().__init__(timeout=None)
+    
+    @staticmethod
+    def get_choice():
+
+        choices = ["rock", "paper", "scissors"]
+        choice = random.choice(choices)
+        return choice
+    
+    @classmethod
+    def rps_analysis(cls, choice_user:str, first_user:str, second_user = None, second_user_choice:str = None):
+
+        choice_bot = cls.get_choice()
+
+        win_emb = discord.Embed(title=f"{'Du hast gewonnen!' if second_user_choice == None else f'{first_user} hat gegen {second_user} gewonnen'}", 
+            description=f"""{f'Du hast mit {choice_user} gegen den bot mit {choice_bot} gewonnen' if second_user_choice == None else f'{Emojis.dot_emoji} {first_user} hat mit {choice_user} gegen {second_user} mit {second_user_choice} gewonnen'}""", color=bot_colour)
+
+        lose_emb = discord.Embed()
+
+        tie_emb = discord.Embed()
+
+        if second_user_choice == None:
+
+            if choice_user == "rock":
+
+                if choice_bot == "scissors":
+                    return win_emb
+                
+                elif choice_bot == "paper":
+                    return lose_emb
+
+                elif choice_bot == "rock":
+                    return tie_emb
+                
+            elif choice_user == "paper":
+
+                if choice_bot == "rock":
+                    return win_emb
+
+                elif choice_bot == "scissors":
+                    return lose_emb
+                
+                elif choice_bot == "paper":
+                    return tie_emb
+
+            elif choice_user == "scissors":
+
+                if choice_bot == "paper":
+                    return win_emb
+
+                elif choice_bot == "rock":
+                    return lose_emb
+                
+                elif choice_bot == "scissors":
+                    return tie_emb
+            
+
+    @discord.ui.button()
+    async def rock_callback(self, interaction:discord.Interaction, button):
+
+        emb = self.rps_analysis(choice_user="rock", first_user = interaction.user.name, second_user = self.second_user)
+        await interaction.response.send_message(embed=emb, view=None)
+
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
       
+
+    @commands.slash_command(name = "rps")
+    async def rps(self, ctx:commands.Context, user:Option(discord.Member, description="Wähle einen user mit den herausfordern möchtest du kann auch gegen einen bot spielen") = None):
+
+        if user == None or user == user.bot:
+
+            emb = discord.Embed()
+            await ctx.respond(embed=emb, view=RPSButtons(game_mode=0))
+
+        else:
+
+            emb = discord.Embed()
+        await ctx.respond(embed=emb)
+
+    
     @commands.command()
     async def RPS(self, ctx, user:discord.User = None):
 

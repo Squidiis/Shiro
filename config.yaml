@@ -3,9 +3,5 @@ Prefix: "$"
 Bot_colour: 0x89d7ff
 
 
-#####################  Rank settings  ######################
-
-# This is the default value of the blur effect of the Rank card
-Blur_effect: 4
 
 

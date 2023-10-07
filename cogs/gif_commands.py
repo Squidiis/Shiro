@@ -11,7 +11,6 @@ class ApiSearchCommands(commands.Cog):
         self.bot = bot
     
     anime = SlashCommandGroup(name="anime", description="Group for anime content")
-
     gif = anime.create_subgroup(name="gif", description="Group for gifs")
 
     async def search_gif(self, tags:str):
@@ -39,7 +38,7 @@ class ApiSearchCommands(commands.Cog):
         
         url = await self.search_gif(tags="anime kiss")
 
-        emb = discord.Embed(title=f"Kiss", description=f"**{ctx.author.mention} kissed himself? ok**" if user == None else f"**{ctx.author.mention} has kissed {user.mention}**", color=bot_colour)
+        emb = discord.Embed(title=f"Kiss", description=f"**{ctx.author.mention} kisses himself? ok**" if user == None else f"**{ctx.author.mention} has kisses {user.mention}** ", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="via Tenor")
         await ctx.respond(embed=emb)
@@ -50,7 +49,7 @@ class ApiSearchCommands(commands.Cog):
        
         url = await self.search_gif(tags="anime hug")
 
-        emb = discord.Embed(title="Hug", description=f"**There you go {ctx.author.mention} hugs**" if user == None else f"**{ctx.author.mention} has hug {user.mention}**", color=bot_colour)
+        emb = discord.Embed(title="Hug", description=f"**There you go {ctx.author.mention} hugs**" if user == None else f"**{ctx.author.mention} hugs {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)
@@ -61,7 +60,7 @@ class ApiSearchCommands(commands.Cog):
         
         url = await self.search_gif(tags="anime lick")
     
-        emb = discord.Embed(title="Lick", description=f"**{ctx.author.mention} is licking... themselves?**" if user == None else f"**{ctx.author.mention} has licked {user.mention}**", color=bot_colour)
+        emb = discord.Embed(title="Lick", description=f"**{ctx.author.mention} is licking... themselves?**" if user == None else f"**{ctx.author.mention} has licked {user.mention}**, ok?", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)
@@ -75,17 +74,6 @@ class ApiSearchCommands(commands.Cog):
         emb = discord.Embed(title="Feed", description=f"**{ctx.author.mention} feeds... himself? ok" if user == None else f"{ctx.author.mention} feeds {user.mention} how cute", color=bot_colour)
         emb.set_image(url=url)
         await ctx.respond(text="Via Tenor")
-
-
-    @gif.command(description = "Send a anime punch gif you also mention someone!")
-    async def punch(self, ctx, user:discord.Member = None):
-
-        url = await self.search_gif(tags="anime punch")
-
-        emb = discord.Embed(title="Punch", description=f"**{ctx.author.mention} punch himself?**" if user == None else f"**{ctx.author.mention} has punch {user.mention}**", color=bot_colour)
-        emb.set_image(url=url)
-        emb.set_footer(text="Via Tenor")
-        await ctx.respond(embed=emb)
 
 
     @gif.command(description = "Send a anime idk gif you can also mention someone!")
@@ -104,7 +92,7 @@ class ApiSearchCommands(commands.Cog):
 
         url = await self.search_gif(tags="anime dance")
 
-        emb = discord.Embed(title="Dance", description=f"**{ctx.author.mention} shows his moves! Nice**" if user == None else f"**Cute {ctx.author.mention} dancing with {user.mention}**", color=bot_colour)
+        emb = discord.Embed(title="Dance", description=f"**{ctx.author.mention} shows his moves! Nice**" if user == None else f"**Cute, {ctx.author.mention} dancing with {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)
@@ -126,7 +114,7 @@ class ApiSearchCommands(commands.Cog):
     
         url = await self.search_gif(tags="anime fbi")
         
-        emb = discord.Embed(title="FBI", description=f"**{ctx.author.mention} calls the Fbi!**" if user == None else f"**{ctx.author.mention} calls the FBI about {user.mention}**", color=bot_colour)
+        emb = discord.Embed(title="FBI", description=f"**{ctx.author.mention} calls the FBI!**" if user == None else f"**{ctx.author.mention} calls the FBI about {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)
@@ -148,7 +136,7 @@ class ApiSearchCommands(commands.Cog):
         
         url = await self.search_gif(tags="anime pet")
       
-        emb = discord.Embed(title="Pet", description=f"**{ctx.author.mention} will you pet someone, I wonder who it will be?**" if user == None else f"**{ctx.author.mention} pats {user.mention}** how cute UwU", color=bot_colour)
+        emb = discord.Embed(title="Pet", description=f"**{ctx.author.mention} will you pet someone?, I wonder who it will be?**" if user == None else f"**{ctx.author.mention} pats {user.mention}** how cute UwU", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)
