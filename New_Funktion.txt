@@ -1,6 +1,5 @@
 
-levelsystem: 
-
+gif commands zeiten überarbeiten
 rank card unter der aktuellen xp anzeige eine machen für das gesamte xp von diesen user (fixen)
 
 hinzufügen das man custom bilder hinzufügen kann für die rank card

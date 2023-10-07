@@ -1025,8 +1025,8 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Dieser user hat noch kein XP gesammelt", 
-                description=f"""{Emojis.dot_emoji} Dieser user hat noch kein XP gesammtelt daher könnene seine Daten nicht zurück gesetzt werden.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This user has not yet collected XP", 
+                description=f"""{Emojis.dot_emoji} This user has not yet collected XP, so his data cannot be reset.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
