@@ -17,9 +17,9 @@ from typing import List
 
 
 class RPSButtons(discord.ui.View):
-    def __init__(self, second_user, game_mode):
-        self.second_user = second_user
+    def __init__(self, game_mode, second_user):
         self.game_mode = game_mode
+        self.second_user = second_user
         super().__init__(timeout=None)
     
     @staticmethod
@@ -29,19 +29,19 @@ class RPSButtons(discord.ui.View):
         choice = random.choice(choices)
         return choice
     
-    @classmethod
-    def rps_analysis(cls, choice_user:str, first_user:str, second_user = None, second_user_choice:str = None):
+    def rps_analysis(self, choice_user:str, first_user:str, second_user = None, second_user_choice:str = None):
 
-        choice_bot = cls.get_choice()
+        choice_bot = self.get_choice()
 
         win_emb = discord.Embed(title=f"{'Du hast gewonnen!' if second_user_choice == None else f'{first_user} hat gegen {second_user} gewonnen'}", 
-            description=f"""{f'Du hast mit {choice_user} gegen den bot mit {choice_bot} gewonnen' if second_user_choice == None else f'{Emojis.dot_emoji} {first_user} hat mit {choice_user} gegen {second_user} mit {second_user_choice} gewonnen'}""", color=bot_colour)
+            description=f"""{Emojis.dot_emoji} Deine wahl: {choice_user}
+            {Emojis.dot_emoji} {f'Die Wahl des bots: {choice_bot}' if second_user_choice == None else f'Die wahl von {second_user}: {second_user_choice}'}""", color=bot_colour)
 
         lose_emb = discord.Embed()
 
         tie_emb = discord.Embed()
 
-        if second_user_choice == None:
+        if self.game_mode == None:
 
             if choice_user == "rock":
 
@@ -77,11 +77,22 @@ class RPSButtons(discord.ui.View):
                     return tie_emb
             
 
-    @discord.ui.button()
+    @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock")
     async def rock_callback(self, interaction:discord.Interaction, button):
 
         emb = self.rps_analysis(choice_user="rock", first_user = interaction.user.name, second_user = self.second_user)
         await interaction.response.send_message(embed=emb, view=None)
+
+    @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper")
+    async def paper_callback(self, interaction:discord.Interaction, button):
+
+        emb = self.rps_analysis()
+
+    @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors")
+    async def scissors_callback(self, interaction:discord.Interaction, button):
+
+        emb = self.rps_analysis()
+
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -99,162 +110,7 @@ class Fun(commands.Cog):
         else:
 
             emb = discord.Embed()
-        await ctx.respond(embed=emb)
-
-    
-    @commands.command()
-    async def RPS(self, ctx, user:discord.User = None):
-
-        view = View(timeout=10)
-
-        author_ID = ctx.author.id
-        
-        button = Button(label="Scissors", style=discord.ButtonStyle.blurple, emoji="✂️", custom_id="scissors")
-        button1 = Button(label="Rock", style=discord.ButtonStyle.blurple, emoji="🪨", custom_id="rock")
-        button2 = Button(label="Paper", style=discord.ButtonStyle.blurple, emoji="🧻", custom_id="paper")
-        Repeat_game = Button(label="Play again",style=discord.ButtonStyle.grey, emoji="🔄", custom_id="Paly_again")
-
-        color1=discord.Colour.random()
-
-        anime_Rock_Paper_Scissors_gif = ["https://c.tenor.com/NuJegnXdEmkAAAAC/dragon-ball-z-rock-paper-scissors.gif", "https://c.tenor.com/Ak6YQ5-DT7kAAAAd/megumin-konosuba.gif", 
-            "https://c.tenor.com/KuaWztRBQ2UAAAAM/anime-takagi-san.gif", "https://c.tenor.com/fB3dSgnhM8YAAAAC/toaru-kagaku-no-railgun-t-a-certain-scientific-railgun-t.gif", 
-            "https://c.tenor.com/jGc8F6thm10AAAAC/liella-sumire-heanna.gif"]
-
-        random_anime_Rock_Paper_Scissors_gif = random.choice(anime_Rock_Paper_Scissors_gif)
-        
-        if user == None:
-
-            botchoices = ["Rock", "Paper", "Scissors"]
-            bot_choices = random.choice(botchoices)
-
-            emb = discord.Embed(
-                title="Rock Paper Scissors", description=f"{ctx.author.mention} Choose a button to play scissors stone paper\nIf you want to continue playing wait 10 seconds after the game is over", color=color1)
-            emb.set_image(url=random_anime_Rock_Paper_Scissors_gif)
-
-            async def button_callback(interaction: discord.InteractionResponse):
-                
-                if interaction.user.id == author_ID: 
-                    
-                    
-                    Game = False
-                    Gamechoice = ""
-                    Stone_png = "https://cdn.discordapp.com/attachments/976935263802650674/997547263104663714/rock-g84470a236_640.png"
-                    Paper_png = "https://cdn.discordapp.com/attachments/976935263802650674/997547262743949456/paper_drawing_tutorial-removebg-preview.png"
-                    Scissors_png = "https://cdn.discordapp.com/attachments/976935263802650674/997547264086114464/Scissors-clipart-2-clipartix.png"
-                    
-                    
-                    if interaction.custom_id == "scissors":
-                        
-                        view1=View()
-                        Game = True
-                        
-                        if bot_choices == "Scissors" :
-                            Gamechoice = "It is a Tie!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Scissors_png)
-                            choice_emb = await embed1.edit(embed=emb, view=None)
-                            
-                        if bot_choices == "Paper":
-                            Gamechoice = "You Win!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Paper_png)
-                            choice_emb = await embed1.edit(embed=emb, view=None)
-                        
-                        if bot_choices == "Rock":
-                            Gamechoice = "You lost!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Stone_png)
-                            choice_emb = await embed1.edit(embed=emb, view=None)
-                        
-
-                    elif interaction.custom_id == "rock":
-                        
-                        view1=View()
-                        Game = True
-                    
-                        if bot_choices == "Rock" :
-                            Gamechoice = "It is a Tie!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Stone_png)
-                            choice_emb = await embed1.edit(embed=emb, view=None)
-                            
-                        if bot_choices == "Paper":
-                            Gamechoice = "You lost!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Paper_png)
-                            choice_emb = await embed1.edit(embed=emb, view=None)
-                        
-                        if bot_choices == "Scissors":
-                            Gamechoice = "You Win!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Scissors_png)
-                            choice_emb = await embed1.edit(embed=emb, view=None)
-
-
-                    elif interaction.custom_id == "paper":
-                        
-                        view1=View()
-                        Game = True
-                    
-                        if bot_choices == "Paper" :
-                            Gamechoice = "It is a Tie!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Paper_png)
-                            await embed1.edit(embed=emb, view=None)
-                        
-                        if bot_choices == "Rock":
-                            Gamechoice = "You Win!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Stone_png)
-                            await embed1.edit(embed=emb, view=None) 
-                        
-                        if bot_choices == "Scissors":
-                            Gamechoice = "You lost!"
-                            emb = discord.Embed(title=Gamechoice, description="Wait 10 seconds for a new round", color=color1)
-                            emb.set_image(url=Scissors_png)
-                            await embed1.edit(embed=emb, view=None)
-                    
-                    emb1 = discord.Embed(title="Rock Paper Scissors", description=f"{ctx.author.mention} Do you want to play again?\nThis message is automatically deleted", color=color1)
-
-                    if Game == True:
-                        await interaction.response.defer()
-                        view1.add_item(Repeat_game)
-                        await asyncio.sleep(10)
-
-                        await choice_emb.edit (embed=emb1, view=view1, delete_after=10)
-                        
-                    if interaction.custom_id == "Paly_again":
-
-                        await interaction.response.edit_message(view=None, delete_after=5)        
-                        await self.RPS(ctx)
-
-                else:     
-
-                    emb = discord.Embed(title="You are not the person who executed this command! ", description="", color=error_red)
-                    await interaction.response.send_message(embed=emb, ephemeral=True)
-
-
-            async def button_callback10sec():
-
-                emb_after = discord.Embed(title="Sorry you they are too slow ", description="If you want to try again use the command again", color=color1)
-                await embed1.edit(embed=emb_after, view=None)
-
-            view.on_timeout = button_callback10sec
-
-            button.callback = button_callback
-            button1.callback = button_callback
-            button2.callback = button_callback
-            Repeat_game.callback = button_callback
-            view.add_item(button)
-            view.add_item(button1)
-            view.add_item(button2)
-            
-            embed1 = await ctx.send(embed=emb, view=view)
-            
-        else:
-            emb = discord.Embed(title="You can play this game only alone", description="If you want to play the game execute the command again", color=color1)
-            await ctx.respond(embed=emb)
-                     
+        await ctx.respond(embed=emb, view=RPSButtons(game_mode=0))
 
 
     @commands.command()
