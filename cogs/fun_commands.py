@@ -80,7 +80,7 @@ class RPSButtons(discord.ui.View):
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock")
     async def rock_callback(self, interaction:discord.Interaction, button):
 
-        emb = self.rps_analysis(choice_user="rock", first_user = interaction.user.name, second_user = self.second_user)
+        emb = self.rps_analysis(choice_user="rock", first_user = interaction.user.name)
         await interaction.response.send_message(embed=emb, view=None)
 
     @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper")
@@ -102,7 +102,7 @@ class Fun(commands.Cog):
     @commands.slash_command(name = "rps")
     async def rps(self, ctx:commands.Context, user:Option(discord.Member, description="Wähle einen user mit den herausfordern möchtest du kann auch gegen einen bot spielen") = None):
 
-        if user == None or user == user.bot:
+        if user == None or user.bot:
 
             emb = discord.Embed()
             await ctx.respond(embed=emb, view=RPSButtons(game_mode=0))
@@ -110,7 +110,7 @@ class Fun(commands.Cog):
         else:
 
             emb = discord.Embed()
-        await ctx.respond(embed=emb, view=RPSButtons(game_mode=0))
+            await ctx.respond(embed=emb, view=RPSButtons(game_mode=1))
 
 
     @commands.command()

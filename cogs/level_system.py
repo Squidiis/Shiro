@@ -1134,7 +1134,7 @@ class LevelSystem(commands.Cog):
             draw.text((304, 75), user.name, font=big_font, fill=(255, 255, 255))
             draw.text((315, (offset_y + 2)), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
             draw.text((665, (offset_y + 1)), f"#{rank} Lvl {check_user[2]}", font=small_font, fill=(255, 255, 255))
-            draw.text((315, (offset_y + 48)), f"total XP: {check_user[6]:,} XP", font=small_font, fill=(255, 255, 255))
+            draw.text((315, (offset_y + 48)), f"total: {check_user[6]:,} XP", font=small_font, fill=(255, 255, 255))
 
             bytes = BytesIO()
             background.save(bytes, format="PNG")
@@ -1613,8 +1613,8 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "show-all-level-roles", description = "View all rolls that are available with a level!")
-    async def show_all_level_roles(self, ctx:commands.Context):
+    @commands.slash_command(name = "show-level-roles", description = "View all rolls that are available with a level!")
+    async def show_level_roles(self, ctx:commands.Context):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
         
@@ -1732,9 +1732,9 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "set-xp-rate-back-to-default", description = "Set the XP you get per message back to default settings!")
+    @commands.slash_command(name = "default-xp-rate", description = "Set the XP you get per message back to default settings!")
     @commands.has_permissions(administrator = True)
-    async def set_xp_rate_default(self, ctx:commands.Context):
+    async def default_xp_rate(self, ctx:commands.Context):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 

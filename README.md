@@ -60,15 +60,48 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 
 | Command | Description |
 | --- | --- |
-|give XP|Gives a user a quantity of XP that you choose.|
-|remove XP|Removes a user a quantity of XP chosen by you.|
-|give level|Gives a user a quantity of level that you choose|
-|remove level|Removes a user a quantity of level chosen by you|
-|reset level|Resets the forward step of all users on the server to 0|
+|give-xp|Gives a user a quantity of XP that you choose.|
+|remove-xp|Removes a user a quantity of XP chosen by you.|
+|give-level|Gives a user a quantity of level that you choose|
+|remove-level|Removes a user a quantity of level chosen by you|
+|reset-level|Resets the forward step of all users on the server to 0|
+|reset-user-stats||
 |rank|Shows the progress of a user in the level system with the help of a rank card, for example [press here](https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/rank-card/example_rank_card.png?raw=true)|
 |leaderboard|Zeigt die 10 besten auf den server|
-|level system settings|Schaltet das level system aus oder ein|
-|add level blacklist channel|Fügt einen channel auf die Level system blacklist hinzu dieser wird dann vom level system ausgeschlossen und man erhält in diesen channel kein XP|
-|remove level blacklist channel|Streiche einen channel von der Blacklist und lasse in wieder am level system teilnehmen man erhält in diesen channel dann wieder XP|
-|add level blacklist category|Fügt eine Kategorie auf die level blacklist hinzu alle aktivitäten in den channel der Kategorie werden nicht mit XP belohnt|
-    
+|level-system-settings|Schaltet das level system aus oder ein|
+|add-level-blacklist channel|Fügt einen channel auf die Level system blacklist hinzu dieser wird dann vom level system ausgeschlossen und man erhält in diesen channel kein XP|
+|remove-level-blacklist-channel|Streiche einen channel von der Blacklist und lasse in wieder am level system teilnehmen man erhält in diesen channel dann wieder XP|
+|add-level-blacklist-category|Fügt eine Kategorie auf die level blacklist hinzu alle aktivitäten in den channel der Kategorie werden nicht mit XP belohnt|
+|remove-level-blacklist-category||
+|add-level-blacklist-role||
+|remove-level-blacklist-role||
+|add-level-blacklist-user||
+|remove-level-blacklist-user||
+|manage-level-blacklist||
+|show-level-blacklist||
+|reset-level-blacklist||
+|add-level-role||
+|remove-level-role||
+|show-level-roles||
+|set-level-up-channel||
+|disable-level-up-channel||
+|show-level-up-channel||
+|set-xp-rate||
+|default-xp-rate||
+|show-xp-rate||
+|add-bonus-xp-channel||
+|remove-bonus-xp-channel||
+|add-bonus-xp-category||
+|remove-bonus-xp-category||
+|add-bonus-xp-role||
+|remove-bonus-xp-role||
+|add-bonus-xp-user||
+|remove-bonus-xp-user||
+|show-bonus-xp-list||
+|reset-bonus-xp-list||
+|set-bonus-xp-percentage||
+|default-bonus-xp-percentage||
+|show-bonus-xp-percentage||
+|set-level-up-message||
+|default-level-up-message||
+|show-level-up-message||
