@@ -1,4 +1,6 @@
 
+commands minimieren in dem man verwaltungs commands macht
+
 
 RPS game neu machen
 Die Buttons nicht löschen sondern warten lassen db

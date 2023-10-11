@@ -17,11 +17,14 @@ from typing import List
 
 
 class RPSButtons(discord.ui.View):
-    def __init__(self, game_mode, second_user):
+    def __init__(self, game_mode, second_user, first_user):
         self.game_mode = game_mode
         self.second_user = second_user
+        self.first_user = first_user
         super().__init__(timeout=None)
-    
+
+        check_useres = {"first_user":self.first_user, "second_user":self.second_user}
+
     @staticmethod
     def get_choice():
 
