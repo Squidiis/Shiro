@@ -1,3 +1,6 @@
+<img draggable="false" src="https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/images/Shiro_banner4.png"></a>
+
+
 <h1 align="center">
     This project is currently in development!<br>
 </h1>
