@@ -648,7 +648,8 @@ class LevelSystem(commands.Cog):
         settings = DatabaseCheck.check_level_settings(guild_id=guild_id) 
         check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message) if message != None else 0
      
-        if check_bonus_xp_system != 0:
+        if check_bonus_xp_system != 0 and check_bonus_xp_system != None:
+            print(check_bonus_xp_system)
             xp = settings[1] * (1 + (check_bonus_xp_system / 100))    
         else:
             xp = settings[1]
