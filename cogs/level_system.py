@@ -3,7 +3,6 @@ from Import_file import *
 from typing import Union
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from io import BytesIO
-from check import *
 import re
 
 
