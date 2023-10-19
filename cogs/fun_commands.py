@@ -28,95 +28,26 @@ class RPSButtons(discord.ui.View):
             description=f"""{Emojis.dot_emoji} Du kannst hier nichts auswählen da du nicht zu dieser Partie eingeladen wurdest.""", color=bot_colour)
         self.wait_emb = discord.Embed(title=f"{Emojis.help_emoji} Warte nocht etwas", 
             description=f"""{Emojis.dot_emoji} Warte auf die antwort deines Spiel partners""", color=bot_colour)
-
-    @staticmethod
-    def get_choice():
-
-        choices = ["rock", "paper", "scissors"]
-        choice = random.choice(choices)
-        return choice
     
     def rps_analysis(self):
 
-        choice_bot = self.get_choice()
-
+        bot_choice = random.choice(["rock", "paper", "scissors"])
+    
         win_emb = discord.Embed(title=f"{'Du hast gewonnen!' if self.game_mode == 0 else f'{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}", 
             description=f"""{Emojis.dot_emoji} Deine wahl: {self.user_choice["first_user_choice"]}
-            {Emojis.dot_emoji} {f'Die Wahl des bots: {choice_bot}' if self.user_choice["second_user_choice"] == None else f'Die wahl von {self.second_user.name}: {self.user_choice["second_user_choice"]}'}""", color=bot_colour)
+            {Emojis.dot_emoji} {f'Die Wahl des bots: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Die wahl von {self.second_user.name}: {self.user_choice["second_user_choice"]}'}""", color=bot_colour)
 
         lose_emb = discord.Embed(title="Verloren")
 
         tie_emb = discord.Embed(title="Unentschieden!")
 
-        if self.game_mode == 0:
+        results = {
+        "rock": {"rock": tie_emb, "paper": lose_emb, "scissors": win_emb},
+        "paper": {"rock": win_emb, "paper": tie_emb, "scissors": lose_emb},
+        "scissors": {"rock": lose_emb, "paper": win_emb, "scissors": tie_emb}}
 
-            if self.user_choice["first_user_choice"] == "rock":
+        return results[self.user_choice["first_user_choice"]][self.user_choice["second_user_choice"]] if self.game_mode == 1 else results[self.user_choice["first_user_choice"]][bot_choice]
 
-                if choice_bot == "scissors":
-                    return win_emb
-                
-                elif choice_bot == "paper":
-                    return lose_emb
-
-                elif choice_bot == "rock":
-                    return tie_emb
-                
-            elif self.user_choice["first_user_choice"] == "paper":
-
-                if choice_bot == "rock":
-                    return win_emb
-
-                elif choice_bot == "scissors":
-                    return lose_emb
-                
-                elif choice_bot == "paper":
-                    return tie_emb
-
-            elif self.user_choice["first_user_choice"] == "scissors":
-
-                if choice_bot == "paper":
-                    return win_emb
-
-                elif choice_bot == "rock":
-                    return lose_emb
-                
-                elif choice_bot == "scissors":
-                    return tie_emb
-        
-        elif self.game_mode == 1:
-
-            if self.user_choice["first_user_choice"] == "rock":
-
-                if self.user_choice["second_user_choice"] == "scissors":
-                    return win_emb
-                
-                elif self.user_choice["second_user_choice"] == "paper":
-                    return lose_emb
-
-                elif self.user_choice["second_user_choice"] == "rock":
-                    return tie_emb
-            
-            elif self.user_choice["first_user_choice"] == "paper":
-
-                if self.user_choice["second_user_choice"] == "rock":
-                    return win_emb
-
-                elif self.user_choice["second_user_choice"] == "scissors":
-                    return lose_emb
-                
-                elif self.user_choice["second_user_choice"] == "paper":
-                    return tie_emb
-
-            elif self.user_choice["first_user_choice"] == "scissors":
-
-                if self.user_choice["second_user_choice"] == "paper":
-                    return win_emb
-
-                elif self.user_choice["second_user_choice"] == "rock":
-                    return lose_emb
-                
-                elif self.user_choice["second_user_choice"] == "scissors":
-                    return tie_emb
 
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock")
     async def rock_callback(self, button, interaction:discord.Interaction):
