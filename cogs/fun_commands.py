@@ -33,7 +33,7 @@ class RPSButtons(discord.ui.View):
     
     def rps_analysis(self):
 
-        bot_choice = random.choice(["rock", "paper", "scissors"])
+        bot_choice = random.choice(["rock 🪨", "paper 🧻", "scissors ✂️"])
         choice_line = f"""{Emojis.dot_emoji} {f'Wahl vom Bot: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Wahl von {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
     
         win_emb = discord.Embed(title=f"{'Du hast gewonnen!' if self.game_mode == 0 else f'{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}", 
@@ -123,7 +123,8 @@ class Fun(commands.Cog):
 
         else:
 
-            emb = discord.Embed(title="Multi")
+            emb = discord.Embed(title=f"Multiplayer", description=f"""{Emojis.dot_emoji} {ctx.author.name} vordert {user.name} zu einer runde Schere ✂️, Stein 🪨, Papier 🧻 heraus {Emojis.exclamation_mark_emoji}
+            {user.mention} Nimmst du die herausvoerderun an?""")
             await ctx.respond(embed=emb, view=RPSButtons(game_mode=1, second_user=user, first_user=ctx.author))
 
 
