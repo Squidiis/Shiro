@@ -22,8 +22,10 @@ class RPSButtons(discord.ui.View):
         self.second_user = second_user
         self.first_user = first_user
         super().__init__(timeout=None)
+
         self.check_useres = {"first_user":self.first_user.id, "second_user":self.second_user.id}
         self.user_choice = {"first_user_choice":"", "second_user_choice":""}
+
         self.false_user_emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst nicht an diesem Spiel Teilnehmen {Emojis.exclamation_mark_emoji}", 
             description=f"""{Emojis.dot_emoji} Du kannst hier nichts auswählen da du nicht zu dieser Partie eingeladen wurdest.""", color=bot_colour)
         self.wait_emb = discord.Embed(title=f"{Emojis.help_emoji} Warte nocht etwas", 
@@ -32,14 +34,16 @@ class RPSButtons(discord.ui.View):
     def rps_analysis(self):
 
         bot_choice = random.choice(["rock", "paper", "scissors"])
+        choice_line = f"""{Emojis.dot_emoji} {f'Wahl vom Bot: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Wahl von {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
     
         win_emb = discord.Embed(title=f"{'Du hast gewonnen!' if self.game_mode == 0 else f'{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}", 
-            description=f"""{Emojis.dot_emoji} Deine wahl: {self.user_choice["first_user_choice"]}
-            {Emojis.dot_emoji} {f'Die Wahl des bots: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Die wahl von {self.second_user.name}: {self.user_choice["second_user_choice"]}'}""", color=bot_colour)
+            description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""",color=bot_colour)
 
-        lose_emb = discord.Embed(title="Verloren")
+        lose_emb = discord.Embed(title=f"{'Du hast verloren!' if self.game_mode == 0 else f'{self.second_user.name} hat gegen {self.first_user.name} gewonnen'}", 
+            description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
-        tie_emb = discord.Embed(title="Unentschieden!")
+        tie_emb = discord.Embed(title="Unentschieden!", 
+            description=f"""{Emojis.dot_emoji} {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
         results = {
         "rock": {"rock": tie_emb, "paper": lose_emb, "scissors": win_emb},
@@ -48,59 +52,60 @@ class RPSButtons(discord.ui.View):
 
         return results[self.user_choice["first_user_choice"]][self.user_choice["second_user_choice"]] if self.game_mode == 1 else results[self.user_choice["first_user_choice"]][bot_choice]
 
+    def rps_check(self, choice:str, user_id:int):
+
+        if self.game_mode == 1:
+            print(choice)
+            print(user_id)
+            if user_id == self.second_user.id and self.check_useres["second_user"] == user_id:
+
+                self.check_useres["second_user"], self.user_choice["second_user_choice"] = True, choice
+
+                if self.user_choice["first_user_choice"] != "":
+
+                    return [self.rps_analysis(), None]
+
+            elif user_id == self.second_user.id and self.check_useres["second_user"] == True:
+                
+                return  [self.wait_emb, True]
+
+            elif user_id == self.first_user.id and self.check_useres["first_user"] == user_id:
+
+                self.check_useres["first_user"], self.user_choice["first_user_choice"] = True, choice
+
+                if self.user_choice["second_user_choice"] != "":
+                    
+                    return [self.rps_analysis(), None]
+
+            elif user_id == self.first_user.id and self.check_useres["first_user"] == True:
+
+                return [self.wait_emb, True]
+
+            else:
+
+                return [self.false_user_emb, True]
+            
+        else:
+
+            return [self.rps_analysis(choice_user=choice), None]
 
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock")
     async def rock_callback(self, button, interaction:discord.Interaction):
 
-        if self.game_mode == 1:
-
-            if interaction.user.id == self.second_user.id and self.check_useres["second_user"] == interaction.user.id:
-
-                self.check_useres["second_user"], self.user_choice["second_user_choice"] = True, "rock"
-
-                if self.user_choice["first_user_choice"] != "":
-
-                    emb = self.rps_analysis()
-                    await interaction.response.edit_message(embed=emb, view=None)
-
-            elif interaction.user.id == self.second_user.id and self.check_useres["second_user"] == True:
-
-                await interaction.response.send_message(embed=self.wait_emb, ephemeral=True)
-
-            elif interaction.user.id == self.first_user.id and self.check_useres["first_user"] == interaction.user.id:
-
-                self.check_useres["first_user"], self.user_choice["first_user_choice"] = True, "rock"
-
-                if self.user_choice["second_user_choice"] != "":
-                    
-                    emb = self.rps_analysis()
-                    await interaction.response.edit_message(embed=emb, view=None)
-
-            elif interaction.user.id == self.first_user.id and self.check_useres["first_user"] == True:
-
-                await interaction.response.send_message(embed=self.wait_emb, ephemeral=True)
-
-            else:
-
-                await interaction.response.send_message(embed=self.false_user_emb, ephemeral=True)
-            
-            
-        else:
-
-            emb = self.rps_analysis(choice_user="rock")
-            await interaction.response.edit_message(embed=emb, view=None)
-
+        emb = self.rps_check(user_id=interaction.user.id, choice="rock")
+        await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
+           
     @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper")
-    async def paper_callback(self, interaction:discord.Interaction, button):
+    async def paper_callback(self, button, interaction:discord.Interaction):
 
-        emb = self.rps_analysis()
-        await interaction.response.edit_message(embed=emb, view=None)
+        emb = self.rps_check(user_id=interaction.user.id, choice="paper")
+        await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
 
     @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors")
-    async def scissors_callback(self, interaction:discord.Interaction, button):
+    async def scissors_callback(self, button, interaction:discord.Interaction):
 
-        emb = self.rps_analysis()
-        await interaction.response.edit_message(embed=emb, view=None)
+        emb = self.rps_check(user_id=interaction.user.id, choice="scissors")
+        await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
 
 
 class Fun(commands.Cog):
