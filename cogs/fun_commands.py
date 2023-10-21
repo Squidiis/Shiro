@@ -89,19 +89,19 @@ class RPSButtons(discord.ui.View):
 
             return [self.rps_analysis(choice_user=choice), None]
 
-    @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock")
+    @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock 🪨")
     async def rock_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="rock")
         await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
            
-    @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper")
+    @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper 🧻")
     async def paper_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="paper")
         await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
 
-    @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors")
+    @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors ✂️")
     async def scissors_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="scissors")
