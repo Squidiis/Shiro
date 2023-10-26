@@ -4,6 +4,7 @@ from Import_file import *
 from cogs.level_system import *
 from cogs.Moderator_tolls import *
 from dotenv import load_dotenv
+from cogs.fun_commands import *
 
 
 @bot.slash_command(description="Shows you the ping.")

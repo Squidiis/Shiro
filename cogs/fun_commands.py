@@ -33,8 +33,8 @@ class RPSButtons(discord.ui.View):
     
     def rps_analysis(self):
 
-        bot_choice = random.choice(["rock 🪨", "paper 🧻", "scissors ✂️"])
-        choice_line = f"""{Emojis.dot_emoji} {f'Wahl vom Bot: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Wahl von {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
+        bot_choice = random.choice(["rock", "paper", "scissors"])
+        choice_line = f"""{Emojis.dot_emoji} {f'Wahl von {self.second_user.mention}: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Wahl von {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
     
         win_emb = discord.Embed(title=f"{'Du hast gewonnen!' if self.game_mode == 0 else f'{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}", 
             description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""",color=bot_colour)
@@ -55,8 +55,7 @@ class RPSButtons(discord.ui.View):
     def rps_check(self, choice:str, user_id:int):
 
         if self.game_mode == 1:
-            print(choice)
-            print(user_id)
+            
             if user_id == self.second_user.id and self.check_useres["second_user"] == user_id:
 
                 self.check_useres["second_user"], self.user_choice["second_user_choice"] = True, choice
@@ -87,21 +86,22 @@ class RPSButtons(discord.ui.View):
             
         else:
 
-            return [self.rps_analysis(choice_user=choice), None]
+            self.check_useres["first_user"], self.user_choice["first_user_choice"], self.user_choice["second_user_choice"] = True, choice, None
+            return [self.rps_analysis(), None]
 
-    @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock 🪨")
+    @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock", emoji="🪨")
     async def rock_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="rock")
         await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
            
-    @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper 🧻")
+    @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper", emoji="🧻")
     async def paper_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="paper")
         await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
 
-    @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors ✂️")
+    @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors", emoji="✂️")
     async def scissors_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="scissors")
@@ -117,13 +117,13 @@ class Fun(commands.Cog):
     async def rps(self, ctx:commands.Context, user:Option(discord.Member, description="Wähle einen user mit den herausfordern möchtest du kann auch gegen einen bot spielen") = None):
 
         if user == None or user.bot:
-
-            emb = discord.Embed()
-            await ctx.respond(embed=emb, view=RPSButtons(game_mode=0))
+            user = user if user != None else bot.get_user(928073958891347989)
+            emb = discord.Embed(title="Single player", description=f"""{Emojis.dot_emoji} {ctx.author.name} gegen {user.name}\n {ctx.author.mention} wähle aus Stein 🪨, Papier 🧻 oder Schere ✂️ {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            await ctx.respond(embed=emb, view=RPSButtons(game_mode=0, second_user=user, first_user=ctx.author))
 
         else:
 
-            emb = discord.Embed(title=f"Multiplayer", description=f"""{Emojis.dot_emoji} {ctx.author.name} vordert {user.name} zu einer runde Schere ✂️, Stein 🪨, Papier 🧻 heraus {Emojis.exclamation_mark_emoji}
+            emb = discord.Embed(title=f"Multiplayer", description=f"""{Emojis.dot_emoji} {ctx.author.name} vordert {user.name} zu einer runde Stein 🪨, Papier 🧻, Schere ✂️, heraus {Emojis.exclamation_mark_emoji}
             {user.mention} Nimmst du die herausvoerderun an?""")
             await ctx.respond(embed=emb, view=RPSButtons(game_mode=1, second_user=user, first_user=ctx.author))
 
@@ -192,122 +192,6 @@ class Fun(commands.Cog):
         """, color=discord.Colour.random())
         emb.set_image(url=DrinkThumb)
         await ctx.respond(embed=emb)
-
-    
-
-class TicTacToeButton(discord.ui.Button['TicTacToe']):
-    def __init__(self, x: int, y: int):
-        super().__init__(style=discord.ButtonStyle.secondary, label='\u200b', row=y)
-        self.x = x
-        self.y = y
-
-    async def callback(self, interaction: discord.Interaction):
-        assert self.view is not None
-        view: TicTacToe = self.view
-        state = view.board[self.y][self.x]
-        if state in (view.X, view.O):
-            return
-
-        if view.current_player == view.X:
-            self.style = discord.ButtonStyle.danger
-            self.label = 'X'
-            self.disabled = True
-            view.board[self.y][self.x] = view.X
-            view.current_player = view.O
-            content = "It is now O's turn"
-        else:
-            self.style = discord.ButtonStyle.success
-            self.label = 'O'
-            self.disabled = True
-            view.board[self.y][self.x] = view.O
-            view.current_player = view.X
-            content = "It is now X's turn"
-
-        winner = view.check_board_winner()
-        if winner is not None:
-            if winner == view.X:
-                content = 'X won!'
-            elif winner == view.O:
-                content = 'O won!'
-            else:
-                content = "It's a tie!"
-
-            for child in view.children:
-                child.disabled = True
-
-            view.stop()
-
-        await interaction.response.edit_message(content=content, view=view)
-
-class TicTacToe(discord.ui.View):
-
-    children: List[TicTacToeButton]
-    X = -1
-    O = 1
-    Tie = 2
-
-    def __init__(self):
-        super().__init__()
-        self.current_player = self.X
-        self.board = [
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-        ]
-
-        
-        for x in range(3):
-            for y in range(3):
-                self.add_item(TicTacToeButton(x, y))
-
-    # This method checks for the board winner -- it is used by the TicTacToeButton
-    def check_board_winner(self):
-        for across in self.board:
-            value = sum(across)
-            if value == 3:
-                return self.O
-            elif value == -3:
-                return self.X
-
-        # Check vertical
-        for line in range(3):
-            value = self.board[0][line] + self.board[1][line] + self.board[2][line]
-            if value == 3:
-                return self.O
-            elif value == -3:
-                return self.X
-
-        # Check diagonals
-        diag = self.board[0][2] + self.board[1][1] + self.board[2][0]
-        if diag == 3:
-            return self.O
-        elif diag == -3:
-            return self.X
-
-        diag = self.board[0][0] + self.board[1][1] + self.board[2][2]
-        if diag == 3:
-            return self.O
-        elif diag == -3:
-            return self.X
-
-        # If we're here, we need to check if a tie was made
-        if all(i != 0 for row in self.board for i in row):
-            return self.Tie
-
-        return None
-
-
-class TicTacToeBot(commands.Bot):
-    def __init__(self):
-        super().__init__(command_prefix=commands.when_mentioned_or('?'))
-
-
-bott = TicTacToeBot()
-
-@bot.command()
-async def tic(ctx: commands.Context):
-    """Starts a tic-tac-toe game with yourself."""
-    await ctx.send('Tic Tac Toe: X goes first', view=TicTacToe())
 
 
 
