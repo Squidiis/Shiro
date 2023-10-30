@@ -36,14 +36,14 @@ class RPSButtons(discord.ui.View):
         bot_choice = random.choice(["rock", "paper", "scissors"])
         choice_line = f"""{Emojis.dot_emoji} {f'Wahl von {self.second_user.mention}: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Wahl von {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
     
-        win_emb = discord.Embed(title=f"{'Du hast gewonnen!' if self.game_mode == 0 else f'{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}", 
-            description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""",color=bot_colour)
+        win_emb = discord.Embed(description=f"""{'#Du hast gewonnen!' if self.game_mode == 0 else f'#{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}
+            {Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""",color=bot_colour)
 
         lose_emb = discord.Embed(title=f"{'Du hast verloren!' if self.game_mode == 0 else f'{self.second_user.name} hat gegen {self.first_user.name} gewonnen'}", 
             description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
         tie_emb = discord.Embed(title="Unentschieden!", 
-            description=f"""{Emojis.dot_emoji} {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
+            description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
         results = {
         "rock": {"rock": tie_emb, "paper": lose_emb, "scissors": win_emb},
@@ -80,7 +80,7 @@ class RPSButtons(discord.ui.View):
 
                 return [self.wait_emb, True]
 
-            else:
+            elif all(x != user_id for x in [self.first_user.id, self.check_useres["first_user"], self.second_user.id, self.check_useres["second_user"]]):
 
                 return [self.false_user_emb, True]
             
@@ -93,19 +93,28 @@ class RPSButtons(discord.ui.View):
     async def rock_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="rock")
-        await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
+        if emb == None:
+            await interaction.response.defer()
+        else:
+            await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
            
     @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper", emoji="🧻")
     async def paper_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="paper")
-        await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
+        if emb == None:
+            await interaction.response.defer()
+        else:
+            await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
 
     @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors", emoji="✂️")
     async def scissors_callback(self, button, interaction:discord.Interaction):
 
         emb = self.rps_check(user_id=interaction.user.id, choice="scissors")
-        await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
+        if emb == None:
+            await interaction.response.defer()
+        else:
+            await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
 
 
 class Fun(commands.Cog):
