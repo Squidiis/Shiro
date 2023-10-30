@@ -39,11 +39,11 @@ class RPSButtons(discord.ui.View):
         win_emb = discord.Embed(description=f"""{'#Du hast gewonnen!' if self.game_mode == 0 else f'#{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}
             {Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""",color=bot_colour)
 
-        lose_emb = discord.Embed(title=f"{'Du hast verloren!' if self.game_mode == 0 else f'{self.second_user.name} hat gegen {self.first_user.name} gewonnen'}", 
-            description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
+        lose_emb = discord.Embed(description=f"""{'#Du hast verloren!' if self.game_mode == 0 else f'#{self.second_user.name} hat gegen {self.first_user.name} gewonnen'}
+            {Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
-        tie_emb = discord.Embed(title="Unentschieden!", 
-            description=f"""{Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
+        tie_emb = discord.Embed(description=f"""#Unentschieden!
+            {Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
         results = {
         "rock": {"rock": tie_emb, "paper": lose_emb, "scissors": win_emb},
