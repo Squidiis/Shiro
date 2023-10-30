@@ -122,18 +122,18 @@ class Fun(commands.Cog):
         self.bot = bot
       
 
-    @commands.slash_command(name = "rps")
-    async def rps(self, ctx:commands.Context, user:Option(discord.Member, description="Wähle einen user mit den herausfordern möchtest du kann auch gegen einen bot spielen") = None):
+    @commands.slash_command(name = "rps", description = "Play scissors, stone, paper against your friends or a bot!")
+    async def rps(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user with whom you want to challenge you can also play against a bot") = None):
 
         if user == None or user.bot:
             user = user if user != None else bot.get_user(928073958891347989)
-            emb = discord.Embed(title="Single player", description=f"""{Emojis.dot_emoji} {ctx.author.name} gegen {user.name}\n {ctx.author.mention} wähle aus Stein 🪨, Papier 🧻 oder Schere ✂️ {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(title="Single player", description=f"""{Emojis.dot_emoji} {ctx.author.name} against {user.name}\n {ctx.author.mention} choose from stone 🪨, paper 🧻 or scissors ✂️ {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await ctx.respond(embed=emb, view=RPSButtons(game_mode=0, second_user=user, first_user=ctx.author))
 
         else:
 
-            emb = discord.Embed(title=f"Multiplayer", description=f"""{Emojis.dot_emoji} {ctx.author.name} vordert {user.name} zu einer runde Stein 🪨, Papier 🧻, Schere ✂️, heraus {Emojis.exclamation_mark_emoji}
-            {user.mention} Nimmst du die herausvoerderun an?""")
+            emb = discord.Embed(title=f"Multiplayer", description=f"""{Emojis.dot_emoji} {ctx.author.name} challenges {user.name} to a round stone 🪨, paper 🧻, scissors ✂️, out {Emojis.exclamation_mark_emoji}
+            {user.mention} Are you up for the challenge?""")
             await ctx.respond(embed=emb, view=RPSButtons(game_mode=1, second_user=user, first_user=ctx.author))
 
 

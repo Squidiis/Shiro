@@ -42,7 +42,7 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - anti discord invite link system 
 
 * Fun commands
-    - RPS (Rock, Paper, Scissors)
+    - RPS (Rock, Paper, Scissors) alone against a bot or against your friends
     - Tik Tak Toe
     - Coin flip game with gifs
     - cocktail command that gives you a random cocktail recipe 
