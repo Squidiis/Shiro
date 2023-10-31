@@ -760,7 +760,7 @@ class LevelSystem(commands.Cog):
 
                                         level_role = message.guild.get_role(check_level_role[1])
                                         await message.author.add_roles(level_role)
-                                        await channel.send(f"<@{message.author.id}> du hast die rolle <@&{check_level_role[1]}> bekommen da du level **{check_level_role[2]}** ereicht hast")
+                                        await channel.send(f"<@{message.author.id}> you have received the role <@&{check_level_role[1]}> because you have reached level **{check_level_role[2]}**. ")
                                 
                                 else:
 
@@ -770,7 +770,7 @@ class LevelSystem(commands.Cog):
 
                                         level_role = message.guild.get_role(check_level_role[1])
                                         await message.author.add_roles(level_role)
-                                        await message.channel.send(f"<@{message.author.id}> du hast die rolle <@&{check_level_role[1]}> bekommen da du level **{check_level_role[2]}** ereicht hast")
+                                        await message.channel.send(f"<@{message.author.id}> you have received the role <@&{check_level_role[1]}> because you have reached level **{check_level_role[2]}**. ")
                                                 
                         else:
 

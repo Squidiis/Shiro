@@ -67,7 +67,7 @@ class main(commands.Cog):
 
         # Other Systems
         self.bot.add_view(GhostPingButtons())
-
+        self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
         self.bot.add_view(view)
         
 

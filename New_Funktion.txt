@@ -1,9 +1,6 @@
 
 commands minimieren in dem man verwaltungs commands macht
-
-
-RPS game neu machen
-Die Buttons nicht löschen sondern warten lassen db
+(Ein settings command mit dem man dann steuern kann wie sich der command verhalten soll)
 
 Heute zu erledigen:
 

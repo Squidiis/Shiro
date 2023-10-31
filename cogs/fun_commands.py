@@ -26,23 +26,23 @@ class RPSButtons(discord.ui.View):
         self.check_useres = {"first_user":self.first_user.id, "second_user":self.second_user.id}
         self.user_choice = {"first_user_choice":"", "second_user_choice":""}
 
-        self.false_user_emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst nicht an diesem Spiel Teilnehmen {Emojis.exclamation_mark_emoji}", 
-            description=f"""{Emojis.dot_emoji} Du kannst hier nichts auswählen da du nicht zu dieser Partie eingeladen wurdest.""", color=bot_colour)
-        self.wait_emb = discord.Embed(title=f"{Emojis.help_emoji} Warte nocht etwas", 
-            description=f"""{Emojis.dot_emoji} Warte auf die antwort deines Spiel partners""", color=bot_colour)
+        self.false_user_emb = discord.Embed(title=f"{Emojis.help_emoji} You can not participate in this game {Emojis.exclamation_mark_emoji}", 
+            description=f"""{Emojis.dot_emoji} You can't select anything here because you are not invited to this game.""", color=bot_colour)
+        self.wait_emb = discord.Embed(title=f"{Emojis.help_emoji} Wait a little longer", 
+            description=f"""{Emojis.dot_emoji} Wait for the answer from your opponent""", color=bot_colour)
     
     def rps_analysis(self):
 
         bot_choice = random.choice(["rock", "paper", "scissors"])
         choice_line = f"""{Emojis.dot_emoji} {f'Wahl von {self.second_user.mention}: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Wahl von {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
     
-        win_emb = discord.Embed(description=f"""{'#Du hast gewonnen!' if self.game_mode == 0 else f'#{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}
+        win_emb = discord.Embed(description=f"""{'## :tada:Du hast gewonnen!' if self.game_mode == 0 else f'## :tada:{self.first_user.name} hat gegen {self.second_user.name} gewonnen'}
             {Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""",color=bot_colour)
 
-        lose_emb = discord.Embed(description=f"""{'#Du hast verloren!' if self.game_mode == 0 else f'#{self.second_user.name} hat gegen {self.first_user.name} gewonnen'}
+        lose_emb = discord.Embed(description=f"""{'## Du hast verloren!' if self.game_mode == 0 else f'## :tada:{self.second_user.name} hat gegen {self.first_user.name} gewonnen'}
             {Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
-        tie_emb = discord.Embed(description=f"""#Unentschieden!
+        tie_emb = discord.Embed(description=f"""## Unentschieden!
             {Emojis.dot_emoji} Wahl von {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
         results = {
@@ -84,10 +84,16 @@ class RPSButtons(discord.ui.View):
 
                 return [self.false_user_emb, True]
             
-        else:
+        elif self.game_mode == 0:
 
             self.check_useres["first_user"], self.user_choice["first_user_choice"], self.user_choice["second_user_choice"] = True, choice, None
             return [self.rps_analysis(), None]
+        
+        else:
+            
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Das Spiel ist abgelaufen", 
+                description=f"""{Emojis.dot_emoji} Die Spiel herausvorderung ist abgelaufen, fordere einfach erneut jemanden zu Stein, Papier, Schere heraus""", color=bot_colour)
+            return [emb, None]
 
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock", emoji="🪨")
     async def rock_callback(self, button, interaction:discord.Interaction):
