@@ -91,8 +91,8 @@ class RPSButtons(discord.ui.View):
         
         else:
             
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Das Spiel ist abgelaufen", 
-                description=f"""{Emojis.dot_emoji} Die Spiel herausvorderung ist abgelaufen, fordere einfach erneut jemanden zu Stein, Papier, Schere heraus""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The game has expired", 
+                description=f"""{Emojis.dot_emoji} The game challenge has expired, just challenge someone again to rock, paper, scissors""", color=bot_colour)
             return [emb, None]
 
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock", emoji="🪨")
