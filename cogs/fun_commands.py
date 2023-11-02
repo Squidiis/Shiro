@@ -16,6 +16,9 @@ from typing import List
 
 
 
+##########################################  RPS Game  #############################################
+
+
 class RPSButtons(discord.ui.View):
     def __init__(self, game_mode, second_user, first_user):
         self.game_mode = game_mode
@@ -23,14 +26,16 @@ class RPSButtons(discord.ui.View):
         self.first_user = first_user
         super().__init__(timeout=None)
 
-        self.check_useres = {"first_user":self.first_user.id, "second_user":self.second_user.id}
-        self.user_choice = {"first_user_choice":"", "second_user_choice":""}
+        if any(x is not None for x in [self.second_user, self.first_user]):
+            self.check_useres = {"first_user":self.first_user.id, "second_user":self.second_user.id}
+            self.user_choice = {"first_user_choice":"", "second_user_choice":""}
 
         self.false_user_emb = discord.Embed(title=f"{Emojis.help_emoji} You can not participate in this game {Emojis.exclamation_mark_emoji}", 
             description=f"""{Emojis.dot_emoji} You can't select anything here because you are not invited to this game.""", color=bot_colour)
         self.wait_emb = discord.Embed(title=f"{Emojis.help_emoji} Wait a little longer", 
             description=f"""{Emojis.dot_emoji} Wait for the answer from your opponent""", color=bot_colour)
     
+
     def rps_analysis(self):
 
         bot_choice = random.choice(["rock", "paper", "scissors"])
@@ -51,6 +56,7 @@ class RPSButtons(discord.ui.View):
         "scissors": {"rock": lose_emb, "paper": win_emb, "scissors": tie_emb}}
 
         return results[self.user_choice["first_user_choice"]][self.user_choice["second_user_choice"]] if self.game_mode == 1 else results[self.user_choice["first_user_choice"]][bot_choice]
+
 
     def rps_check(self, choice:str, user_id:int):
 
@@ -95,6 +101,7 @@ class RPSButtons(discord.ui.View):
                 description=f"""{Emojis.dot_emoji} The game challenge has expired, just challenge someone again to rock, paper, scissors""", color=bot_colour)
             return [emb, None]
 
+
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock", emoji="🪨")
     async def rock_callback(self, button, interaction:discord.Interaction):
 
@@ -104,6 +111,7 @@ class RPSButtons(discord.ui.View):
         else:
             await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
            
+
     @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper", emoji="🧻")
     async def paper_callback(self, button, interaction:discord.Interaction):
 
@@ -113,6 +121,7 @@ class RPSButtons(discord.ui.View):
         else:
             await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
 
+
     @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors", emoji="✂️")
     async def scissors_callback(self, button, interaction:discord.Interaction):
 
@@ -121,6 +130,9 @@ class RPSButtons(discord.ui.View):
             await interaction.response.defer()
         else:
             await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
+
+
+
 
 
 class Fun(commands.Cog):

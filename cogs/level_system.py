@@ -853,7 +853,7 @@ class LevelSystem(commands.Cog):
                 
                 emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
                     description=f"""{Emojis.dot_emoji} No entry was found for **{user.name}**, so one was created.
-                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp""", color=bot_colour)
+                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp.""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
 
@@ -896,7 +896,7 @@ class LevelSystem(commands.Cog):
                     
                 emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
                     description=f"""{Emojis.dot_emoji} No entry was found for **{user.name}**, so one was created.
-                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp""", color=bot_colour)
+                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp.""", color=bot_colour)
                 await ctx.respond(embed=emb)  
 
 
@@ -939,7 +939,7 @@ class LevelSystem(commands.Cog):
 
                 emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
                     description=f"""{Emojis.dot_emoji} No entry was found for **{user.name}**, so one was created.
-                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp""", color=bot_colour)
+                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp.""", color=bot_colour)
                 await ctx.respond(embed=emb)
                 
 
@@ -1201,7 +1201,7 @@ class LevelSystem(commands.Cog):
             DatabaseUpdates._create_bot_settings(guild_id=ctx.guild.id)
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", 
-                description=f"{Emojis.dot_emoji} No entry was found so one was created the level system was also activated immediately", color=bot_colour)
+                description=f"{Emojis.dot_emoji} No entry was found so one was created the level system was also activated immediately.", color=bot_colour)
             await ctx.respond(embed=emb)
 
     
@@ -1257,7 +1257,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The channel was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_channel} command.
-                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} command""", color=bot_colour)
+                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} command.""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -1380,7 +1380,7 @@ class LevelSystem(commands.Cog):
             
             emb = discord.Embed(title=f"The role was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role <@&{role.id}> has been successfully removed from the blacklist if you want to add it again use the: {add_blacklist_level_role} command.
-                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
+                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1435,14 +1435,14 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The user was removed from the blacklist {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The user <@{user.id}> has been successfully removed from the blacklist if you want to add him again use the: {add_blacklist_level_user} command.
-                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd""", color=bot_colour)
+                {Emojis.dot_emoji} If you want to see what else is on the blacklist then use that: {show_blacklist_level} comamnd.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This user is not on the blacklist.",
+            emb = discord.Embed(title=f"{Emojis.help_emoji} This user is not on the blacklist",
                 description=f"""The user <@{user.id}> is not on the blacklist.
                 The following users are on the blacklist:\n\n{blacklist[3]}""", color=bot_colour)
             await ctx.respond(embed=emb)
@@ -1460,7 +1460,7 @@ class LevelSystem(commands.Cog):
             view.add_item(ShowBlacklistLevelSystemButton())
 
             emb = discord.Embed(title="Are you sure you want to remove everything from the blacklist?", 
-                description=f"""{Emojis.help_emoji} With the buttuns you can confirm your decision!!
+                description=f"""{Emojis.help_emoji} With the buttons you can confirm your decisions!
                 {Emojis.dot_emoji} If you press the **Yes button** all channels, categories, users and roles will be removed from the blacklist.
                 {Emojis.dot_emoji} If you press the **No button** the process will be aborted.
                 {Emojis.dot_emoji} The **Shows all elements button** shows you what is currently on the blacklist.""", color=bot_colour)
@@ -1538,7 +1538,7 @@ class LevelSystem(commands.Cog):
 
                     emb = discord.Embed(title=f"The role was assigned successfully {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} The role {role.mention} was successfully assigned to the level {level}.
-                        {Emojis.dot_emoji} As soon as a user reaches {level} he gets the <@&{role.mention}> role. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                        {Emojis.dot_emoji} As soon as a user reaches {level} he gets the <@&{role.mention}> role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                 await ctx.respond(embed=emb_level_0) if level == 0 else None
@@ -1629,7 +1629,7 @@ class LevelSystem(commands.Cog):
 
         else:
             emb = discord.Embed(title=f"No level rolls have been added yet", 
-                description=f"{Emojis.help_emoji} There are no level rolls added yet if you want to add some use the {add_level_role} command", color=bot_colour)
+                description=f"{Emojis.help_emoji} There are no level rolls added yet if you want to add some use the {add_level_role} command.", color=bot_colour)
             await ctx.respond(embed=emb)
        
     
@@ -1704,7 +1704,7 @@ class LevelSystem(commands.Cog):
         else:
             
             emb = discord.Embed(title=f"{Emojis.help_emoji} No level up channel has been set", 
-                description=f"""{Emojis.dot_emoji} No level up channel has been set if you want to set one use that:\n{add_level_up_channel} command""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} No level up channel has been set if you want to set one use that:\n{add_level_up_channel} command.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1793,7 +1793,7 @@ class LevelSystem(commands.Cog):
         if check_list: 
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} This channel has already been set as XP bonus channel", 
-                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> has already been set as XP bonus channel therefore all activities in this channel will be rewarded with extra XP""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> has already been set as XP bonus channel therefore all activities in this channel will be rewarded with extra XP.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1802,7 +1802,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The bonus xp channel was successfully set {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was set as XP bonus channel.
-                {Emojis.dot_emoji} Messages or activities in this channel will be rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP """, color=bot_colour)
+                {Emojis.dot_emoji} Messages or activities in this channel will be rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1904,7 +1904,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The bonus xp role was successfully set {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The role <@&{role.id}> was set as XP bonus role.
-                {Emojis.dot_emoji} Messages or activities from users with this role are rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP""", color=bot_colour)
+                {Emojis.dot_emoji} Messages or activities from users with this role are rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1955,7 +1955,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The bonus xp user was successfully set {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The user <@{user.id}> was set as XP bonus user.
-                {Emojis.dot_emoji} Messages or activities from <@{user.id}> are rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP""", color=bot_colour)
+                {Emojis.dot_emoji} Messages or activities from <@{user.id}> are rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         
@@ -2112,7 +2112,7 @@ class LevelSystem(commands.Cog):
 
                 {Emojis.arrow_emoji} `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
 
-                {Emojis.dot_emoji} If you want to set the custom message for your server, press the button located just below this message""", color=bot_colour)
+                {Emojis.dot_emoji} If you want to set the custom message for your server, press the button located just below this message.""", color=bot_colour)
             await ctx.respond(embed=emb, view=ModalButtonLevelUpMessage())
         
         else:
@@ -2134,7 +2134,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(title=f"The level-up message was set back to default settings {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} The level-up message for this server was reset to default.
-                {Emojis.dot_emoji} Here you can see the current level-up message: `{level_up_message[4]}`""", color=bot_colour)
+                {Emojis.dot_emoji} Here you can see the current level-up message: `{level_up_message[4]}`.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:

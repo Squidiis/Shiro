@@ -40,9 +40,9 @@ class ModeratorCommands(commands.Cog):
     @commands.has_permissions(ban_members = True, administrator = True)
     async def ban_slash(self, ctx, member: Option(discord.Member, description = "Who do you want to ban?"), reason: Option(str, description = "Why?", required = False)):
         if member.id == ctx.author.id:
-            await ctx.respond("**BRUH! You can't banish yourself!")
+            await ctx.respond("**You can't banish yourself!")
         elif member.guild_permissions.administrator:
-            await ctx.respond("**You can't ban an admin!** :rolling_eyes:")
+            await ctx.respond("**You can't ban an admin!**")
         else:
             if reason == None:
                 reason = f"**No reason was given by {ctx.author}!**"
@@ -72,12 +72,23 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "unban", description = "Unbanned a member")
     @commands.has_permissions(ban_members = True)
-    async def unban_slash(self, ctx, id: Option(discord.Member, description = "The user ID of the member you want to unban.", required = True)):
-        await ctx.defer()
-        member = await bot.get_or_fetch_user(id)
-        await ctx.guild.unban(member)
-        await ctx.respond(f"**I have unbanned {member.mention}.**")
+    async def unban_slash(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!")):
+        
+        try:
 
+            member = await bot.get_or_fetch_user(int(id))
+
+            await ctx.guild.unban(member)
+
+            emb = discord.Embed(title=f"Der user wurde erfolgreich entbannt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} Der user: {member.mention} wurde erfolgreich enbannt und kann ab jetzt den server wieder betreten.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        except:    
+            
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Der user dessen ID du angegeben hast wurde nicht gebannt", 
+                description=f"""{Emojis.dot_emoji} Die ID die du angegeben hast gehört zu keinen user der auf diesen Server gebannt wurde.""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = 'mute', description = "Mutes a member!")
@@ -124,7 +135,7 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "clear", description = "Delete messages in the channel!")
     @commands.has_permissions(manage_messages=True)
-    async def clear_slash(self, ctx, quantity: Option(int , description = "How many messages do you want to delete?", required = True)):
+    async def clear_slash(self, ctx, quantity: Option(int, description = "How many messages do you want to delete?", required = True)):
         await ctx.defer()
         z = await ctx.channel.purge(limit = quantity)
         await ctx.send(f"I have deleted {len(z)}.")
