@@ -71,7 +71,7 @@ class ModeratorCommands(commands.Cog):
 
         elif member.guild_permissions.administrator:
             
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keinen Admin Kicken",
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keinen Admin Kicken!",
                 description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du kicken willst der kein Admin ist.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -83,7 +83,7 @@ class ModeratorCommands(commands.Cog):
 
 
 
-    @commands.slash_command(name = "unban", description = "Unbanned a member")
+    @commands.slash_command(name = "unban", description = "Unbanned a member!")
     @commands.has_permissions(ban_members = True)
     async def unban(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!")):
         
@@ -105,27 +105,39 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = 'mute', description = "Mutes a member!")
     @commands.has_permissions(moderate_members = True)
-    async def mute_slash(self, ctx, member: Option(discord.Member, required = True), reason: Option(str, required = False), days: Option(int, max_value = 27, default = 0, required = False), hours: Option(int, default = 0, required = False), minutes: Option(int, default = 0, required = False), seconds: Option(int, default = 0, required = False)): #setting each value with a default value of 0 reduces a lot of the code
-        if member.id == ctx.author.id:
-            await ctx.respond("**You can't mute yourself!**")
-            return
-        if member.guild_permissions.moderate_members:
-            await ctx.respond("**You can't mute an admin!**")
-            return
+    async def mute(self, ctx:discord.ApplicationContext, 
+        user:Option(discord.Member, required = True), 
+        reason:Option(str, required = False), 
+        days: Option(int, max_value = 27, default = 0, required = False), 
+        hours: Option(int, default = 0, required = False), 
+        minutes: Option(int, default = 0, required = False), 
+        seconds: Option(int, default = 0, required = False)): #setting each value with a default value of 0 reduces a lot of the code
+
         duration = timedelta(days = days, hours = hours, minutes = minutes, seconds = seconds)
-        if duration >= timedelta(days = 28):
-            await ctx.respond("**I can't mute anyone for more than 28 days!**", ephemeral = True) 
-            return
-        if reason == None:
-            await member.timeout_for(duration)
-            await ctx.respond(f"**<@{member.id}> was muted for** `{days}` **days,** `{hours}` **hours,** `{minutes}` **minutes, and** `{seconds}` **seconds by <@{ctx.author.id}>! Reason:** `No reason was given!`")
-            embed=discord.Embed(title=f"{member} you have been muted on your server name!", description=f"Follow the rules! Please do not send any more links!\nDuration: {days} days, {hours} hours, {minutes} minutes and {seconds} seconds\nReason: `No reason was given!`", color=0x0094ff)
-            await member.send(embed=embed)
+
+        if user.id == ctx.author.id:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst dich nicht selbst timeouten!", 
+                description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du timeouten möchtest.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+            
+        elif user.guild_permissions.moderate_members:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keine Admins timeouten!", 
+                description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du timeouten möchtest der kein Admin ist.""")
+            await ctx.respond(embed=emb)
+            
+        #if duration >= timedelta(days = 28):
+        #    await ctx.respond("**I can't mute anyone for more than 28 days!**", ephemeral = True) 
+            
         else:
-            await member.timeout_for(duration, reason = reason)
-            await ctx.respond(f"**<@{member.id}> has been muted for** `{days}` **days,** `{hours}` **hours,** `{minutes}` **minutes, and** `{seconds}` **seconds by <@{ctx.author.id}>! Reason:**`{reason}`")
-            embed=discord.Embed(title=f"{member} you have been released on your server name again!", description=f"Follow the rules! Please do not send any more links!\nDuration: {days} days, {hours} hours, {minutes} minutes and {seconds} seconds\nReason: `{reason}!`", color=0x0094ff)
-            await member.send(embed=embed)
+            await user.timeout_for(duration)
+
+            x = [i for i in [days, hours, minutes, seconds]]
+            emb = discord.Embed(title=f"{user.name} wurde erfolgreuch getimeoutet", 
+                description=f"{Emojis.dot_emoji} {user.mention} wurde für: ", color=bot_colour)
+            await ctx.respond(embed=emb)
+
 
 
 
