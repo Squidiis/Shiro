@@ -92,8 +92,8 @@ class ModeratorCommands(commands.Cog):
             member = await bot.get_or_fetch_user(int(id))
             await ctx.guild.unban(member)
 
-            emb = discord.Embed(title=f"Der user wurde erfolgreich entbannt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Der user: {member.mention} wurde erfolgreich enbannt und kann ab jetzt den server wieder betreten.""", color=bot_colour)
+            emb = discord.Embed(title=f"{member.name} wurde erfolgreich entbannt {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} {member.mention} wurde erfolgreich enbannt und kann ab jetzt den server wieder betreten.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         except:    
@@ -106,12 +106,12 @@ class ModeratorCommands(commands.Cog):
     @commands.slash_command(name = 'timeout', description = "Mutes a member!")
     @commands.has_permissions(moderate_members = True)
     async def timeout(self, ctx:discord.ApplicationContext, 
-        user:Option(discord.Member, required = True), 
-        reason:Option(str, required = False), 
-        days: Option(int, max_value = 27, default = 0, required = False), 
-        hours: Option(int, default = 0, required = False), 
-        minutes: Option(int, default = 0, required = False), 
-        seconds: Option(int, default = 0, required = False)): #setting each value with a default value of 0 reduces a lot of the code
+        user:Option(discord.Member, required = True, description="Wähle den user aus den du timeouten möchtest!"), 
+        reason:Option(str, required = False, description="Gib einen grund an warum du diesen user Timeouten möchtest! (optional)"), 
+        days: Option(int, max_value = 27, default = 0, required = False, description="Gib an wie viele tage du diesen user tiemouten möchtest! (optional)"), 
+        hours: Option(int, max_value = 24, default = 0, required = False, description="Gib an wie viele stunden du diesen user tiemouten möchtest! (optional)"), 
+        minutes: Option(int, max_value = 60, default = 0, required = False, description="Gib an wie viele minuten du diesen user tiemouten möchtest! (optional)"), 
+        seconds: Option(int, max_value  = 60, default = 0, required = False, description="Gib an wie viele sekunden du diesen user tiemouten möchtest! (optional)")):
 
         duration = timedelta(days = days, hours = hours, minutes = minutes, seconds = seconds)
 
@@ -131,26 +131,29 @@ class ModeratorCommands(commands.Cog):
 
             await user.timeout_for(duration)
             emb = discord.Embed(title=f"{user.name} wurde erfolgreuch getimeoutet", 
-                description=f"{Emojis.dot_emoji} {user.mention} wurde für: {days} tage, {hours} stunden, {minutes} minuten und {seconds} secunden getimeoutet.
-                {Emojis.dot_emoji} Grund für den Timeout: {reason if reason != None else 'kein grund angegeben'}", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} {user.mention} wurde für: {days} tage, {hours} stunden, {minutes} minuten und {seconds} secunden getimeoutet.
+                {Emojis.dot_emoji} Grund für den Timeout: {reason if reason != None else 'kein grund angegeben'}.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
 
 
-    @commands.slash_command(name = 'unmute', description = "unmute a Member!")
+    @commands.slash_command(name = 'remove-timeout', description = "unmute a Member!")
     @commands.has_permissions(moderate_members = True)
-    async def unmute_slash(self, ctx, member: Option(discord.Member, required = True), reason: Option(str, required = False)):
-        if reason == None:
+    async def remove_timeout(self, ctx:discord.ApplicationContext, member:Option(discord.Member, required = True, description="Wähle einen user aus von dem du den Timeout aufheben möchtest")):
+
+        try:
+
             await member.remove_timeout()
-            await ctx.respond(f"**<@{member.id}> was Released by <@{ctx.author.id}>.**")
-            embed=discord.Embed(title=f"{member} you have been released again!", description="Stick to the rules! Please do not send any more links!", color=0x0094ff)
-            await member.send(embed=embed)
-        else:
-            await member.remove_timeout(reason = reason)
-            await ctx.respond(f"**<@{member.id}> was released by <@{ctx.author.id}>. Reason:** `{reason}`")
-            embed=discord.Embed(title=f"{member} you have been released again!", description="Stick to the rules! Please do not send any more links!", color=0x0094ff)
-            await member.send(embed=embed)
+            emb = discord.Embed(title=f"{member.name}'s timeout wurde erfolgreich aufgehoben {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} {member.mention} kann ab jetzt wieder nachrichten schreiben und sich aktiv an unterhaltungen beteiligen.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        except:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} {member.name} wurde nicht getimeoutet!", 
+                description=f"{Emojis.dot_emoji} Wähle einen anderen user dessen timeout du aufheben möchtest.", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 
 
@@ -191,6 +194,7 @@ class ModeratorCommands(commands.Cog):
 
         check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
 
+        # If the value is above 0, the ghost ping system is deactivated
         if check_settings[2] != 0:
 
             if message.mentions != 0:
