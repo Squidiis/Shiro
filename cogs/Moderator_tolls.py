@@ -35,7 +35,7 @@ class ModeratorCommands(commands.Cog):
                     await member.send(embed=embed)
 
 
-    @commands.slash_command(name = "ban", description = "Bans a member!")
+    @commands.slash_command(name = "ban", description = "Bane einen user so das er nicht mehr den server beitreten kann!")
     @commands.has_permissions(ban_members = True, administrator = True)
     async def ban(self, ctx:discord.ApplicationContext, member: Option(discord.Member, description = "Choose the user you want to ban!"), reason:Option(str, description = "Give a reason why this user should be banned! (optional)", required = False)):
         
@@ -60,7 +60,7 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "kick", description = "Kicks a member!")
+    @commands.slash_command(name = "kick", description = "Kicke einen Member vom server!")
     @commands.has_permissions(kick_members = True, administrator = True)
     async def kick(self, ctx:discord.ApplicationContext, member:Option(discord.Member, description = "Enter a user you want to remove from the server!")):
 
@@ -83,7 +83,7 @@ class ModeratorCommands(commands.Cog):
 
 
 
-    @commands.slash_command(name = "unban", description = "Unbanned a member!")
+    @commands.slash_command(name = "unban", description = "Hebe den ban eines users auf!")
     @commands.has_permissions(ban_members = True)
     async def unban(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!")):
         
@@ -103,7 +103,7 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = 'timeout', description = "Mutes a member!")
+    @commands.slash_command(name = 'timeout', description = "Schicke einen user in den Timeout!")
     @commands.has_permissions(moderate_members = True)
     async def timeout(self, ctx:discord.ApplicationContext, 
         user:Option(discord.Member, required = True, description="Wähle den user aus den du timeouten möchtest!"), 
@@ -138,7 +138,7 @@ class ModeratorCommands(commands.Cog):
 
 
 
-    @commands.slash_command(name = 'remove-timeout', description = "unmute a Member!")
+    @commands.slash_command(name = 'remove-timeout', description = "Hebe den Timeout eines users auf!")
     @commands.has_permissions(moderate_members = True)
     async def remove_timeout(self, ctx:discord.ApplicationContext, member:Option(discord.Member, required = True, description="Wähle einen user aus von dem du den Timeout aufheben möchtest")):
 
