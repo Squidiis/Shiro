@@ -103,9 +103,9 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = 'mute', description = "Mutes a member!")
+    @commands.slash_command(name = 'timeout', description = "Mutes a member!")
     @commands.has_permissions(moderate_members = True)
-    async def mute(self, ctx:discord.ApplicationContext, 
+    async def timeout(self, ctx:discord.ApplicationContext, 
         user:Option(discord.Member, required = True), 
         reason:Option(str, required = False), 
         days: Option(int, max_value = 27, default = 0, required = False), 
@@ -127,15 +127,12 @@ class ModeratorCommands(commands.Cog):
                 description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du timeouten möchtest der kein Admin ist.""")
             await ctx.respond(embed=emb)
             
-        #if duration >= timedelta(days = 28):
-        #    await ctx.respond("**I can't mute anyone for more than 28 days!**", ephemeral = True) 
-            
         else:
-            await user.timeout_for(duration)
 
-            x = [i for i in [days, hours, minutes, seconds]]
+            await user.timeout_for(duration)
             emb = discord.Embed(title=f"{user.name} wurde erfolgreuch getimeoutet", 
-                description=f"{Emojis.dot_emoji} {user.mention} wurde für: ", color=bot_colour)
+                description=f"{Emojis.dot_emoji} {user.mention} wurde für: {days} tage, {hours} stunden, {minutes} minuten und {seconds} secunden getimeoutet.
+                {Emojis.dot_emoji} Grund für den Timeout: {reason if reason != None else 'kein grund angegeben'}", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
