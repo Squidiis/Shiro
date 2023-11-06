@@ -35,75 +35,75 @@ class ModeratorCommands(commands.Cog):
                     await member.send(embed=embed)
 
 
-    @commands.slash_command(name = "ban", description = "Bane einen user so das er nicht mehr den server beitreten kann!")
+    @commands.slash_command(name = "ban", description = "Ban a user so that he can no longer join the server!")
     @commands.has_permissions(ban_members = True, administrator = True)
     async def ban(self, ctx:discord.ApplicationContext, member: Option(discord.Member, description = "Choose the user you want to ban!"), reason:Option(str, description = "Give a reason why this user should be banned! (optional)", required = False)):
         
         if member.id == ctx.author.id:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst dich nicht selbst bannen!",
-                description=f"""{Emojis.dot_emoji} Wähle einen anderen User aus den du bannen willst.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You can't ban yourself!",
+                description=f"""{Emojis.dot_emoji} Select another user you want to ban.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         elif member.guild_permissions.administrator:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keinen Admin banen", 
-                description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du bannen willst der kein Admin ist.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You can't ban an admin", 
+                description=f"""{Emojis.dot_emoji} Choose another user you want to ban who is not an admin.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             if reason == None:
-                reason = f"Es wurde kein grund angegeben"
-            emb=discord.Embed(title=f"{member.name} wurde erfolgreich gebannt {Emojis.succesfully_emoji}", description=f"{Emojis.dot_emoji} {reason}", color=bot_colour)
+                reason = f"No reason was given"
+            emb=discord.Embed(title=f"{member.name} was successfully banned {Emojis.succesfully_emoji}", description=f"{Emojis.dot_emoji} {reason}", color=bot_colour)
             await member.ban(reason = reason)
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "kick", description = "Kicke einen Member vom server!")
+    @commands.slash_command(name = "kick", description = "Kick a member off the server!")
     @commands.has_permissions(kick_members = True, administrator = True)
     async def kick(self, ctx:discord.ApplicationContext, member:Option(discord.Member, description = "Enter a user you want to remove from the server!")):
 
         if member.id == ctx.author.id:
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst dich nicht selber kicken!", 
-                description=f"""{Emojis.dot_emoji} Wähle einen anderen User aus den du Kicken möchtest.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You can't kick yourself!", 
+                description=f"""{Emojis.dot_emoji} Select another user you want to kick.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         elif member.guild_permissions.administrator:
             
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keinen Admin Kicken!",
-                description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du kicken willst der kein Admin ist.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You can't kick an admin!",
+                description=f"""{Emojis.dot_emoji} Choose another user you want to kick who is not an admin.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
             
-            emb=discord.Embed(title=f"{member.name} wurde erfolgreich gekickt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Du hast den user {member.mention} erfolgreich gekickt.""", color=bot_colour)
+            emb=discord.Embed(title=f"{member.name} was successfully kicked {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} You have successfully kicked {member.mention}.""", color=bot_colour)
             await ctx.respond(embed=emb)
+            await member.kick()
 
 
-
-    @commands.slash_command(name = "unban", description = "Hebe den ban eines users auf!")
+    @commands.slash_command(name = "unban", description = "Pick up the ban of a user!")
     @commands.has_permissions(ban_members = True)
-    async def unban(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!")):
+    async def unban(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!", required = True)):
         
         try:
 
             member = await bot.get_or_fetch_user(int(id))
             await ctx.guild.unban(member)
 
-            emb = discord.Embed(title=f"{member.name} wurde erfolgreich entbannt {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} {member.mention} wurde erfolgreich enbannt und kann ab jetzt den server wieder betreten.""", color=bot_colour)
+            emb = discord.Embed(title=f"{member.name} was successfully unbanned {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} {member.mention} has been successfully unbanned and can now enter the server again.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         except:    
             
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Der user dessen ID du angegeben hast wurde nicht gebannt", 
-                description=f"""{Emojis.dot_emoji} Die ID die du angegeben hast gehört zu keinen user der auf diesen Server gebannt wurde.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The user whose ID you entered was not banned", 
+                description=f"""{Emojis.dot_emoji} The ID you entered does not belong to a user who has been banned on this server.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = 'timeout', description = "Schicke einen user in den Timeout!")
+    @commands.slash_command(name = 'timeout', description = "Send a user to timeout!")
     @commands.has_permissions(moderate_members = True)
     async def timeout(self, ctx:discord.ApplicationContext, 
         user:Option(discord.Member, required = True, description="Wähle den user aus den du timeouten möchtest!"), 
@@ -136,8 +136,6 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-
-
     @commands.slash_command(name = 'remove-timeout', description = "Hebe den Timeout eines users auf!")
     @commands.has_permissions(moderate_members = True)
     async def remove_timeout(self, ctx:discord.ApplicationContext, member:Option(discord.Member, required = True, description="Wähle einen user aus von dem du den Timeout aufheben möchtest")):
@@ -156,14 +154,12 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-
     @commands.slash_command(name = "clear", description = "Delete messages in the channel!")
     @commands.has_permissions(manage_messages=True)
-    async def clear_slash(self, ctx, quantity: Option(int, description = "How many messages do you want to delete?", required = True)):
+    async def clear_slash(self, ctx, quantity:Option(int, description = "How many messages do you want to delete?", required = True)):
         await ctx.defer()
         z = await ctx.channel.purge(limit = quantity)
-        await ctx.send(f"I have deleted {len(z)}.")
-
+        await ctx.send(f"I have deleted {len(z)} messages.")
 
 
     @commands.slash_command(name = "server-info", description="Server info!")
@@ -175,16 +171,10 @@ class ModeratorCommands(commands.Cog):
         embed.add_field(name='👑Owner', value=f"{ctx.guild.owner.mention}")
         embed.add_field(name='👥Members', value=f'{ctx.guild.member_count} Members')
         embed.add_field(name='🌎Region', value=f'{ctx.guild.preferred_locale}')
-        #embed.add_field(name='💬 Text Channels', value=f'{len(ctx.guild.text_channels)}', inline=True)
-        #embed.add_field(name='💬 Voice Channels', value=f'{len(ctx.guild.voice_channels)} Voice', inline=True)
-        #embed.add_field(name='💬 Categories', value=f'{len(ctx.guild.categories)} Categories', inline=True)
-        #embed.add_field(name='💬 Threads', value=f'{len(ctx.guild.threads)}', inline=True)
-        #embed.add_field(name='💬 Stage Channels', value=f'{len(ctx.guild.stage_channels)}', inline=True)
         embed.add_field(name='🌎Roles', value=f'{len(ctx.guild.roles)}')
         embed.add_field(name='🌎Boosts', value=f'{len(ctx.guild.premium_subscribers)}')
         embed.add_field(name='💬 Channels', value=f'Text [{len(ctx.guild.text_channels)}], Voice [{len(ctx.guild.voice_channels)}], \nCategories [{len(ctx.guild.categories)}], \nThreads [{len(ctx.guild.threads)}], Stage [{len(ctx.guild.stage_channels)}]', inline=False)
         embed.set_thumbnail(url=ctx.guild.icon.url)
-        embed.set_footer(text="⭐ • Squidi")
         embed.set_author(name=str(ctx.author.name), icon_url=ctx.author.avatar.url)
         await ctx.respond(embed=embed)
 
@@ -210,7 +200,7 @@ class ModeratorCommands(commands.Cog):
                     await message.channel.send(embed=embed)
 
 
-    @commands.slash_command(name = "ghost-ping-settings")
+    @commands.slash_command(name = "ghost-ping-settings", description = "Schalte das ghost ping system ein oder aus!")
     async def ghost_ping_settings(self, ctx:commands.Context):
 
         check_settings = DatabaseCheck.check_bot_settings(guild_id=ctx.guild.id)
@@ -330,7 +320,6 @@ class ModeratorCommands(commands.Cog):
         embed.set_thumbnail(url=f'{member.avatar.url}')
 
         await ctx.reply(embed=embed)
-
 
 
 def setup(bot):

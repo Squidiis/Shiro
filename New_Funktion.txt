@@ -8,3 +8,5 @@ Inspezieren des anti link systems (Ist nicht das beste)
 Wenn möglich das anti link system überarbeiten mit db (Idee ein select menü das nach auswahl fragt wie lange time out)
 
 texte in Moderator tolls überarbeiten
+Mute und unmute commands machen
+und in remove-timeout nochmal überlegen mit dem 's
