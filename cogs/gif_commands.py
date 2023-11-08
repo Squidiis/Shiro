@@ -1,4 +1,4 @@
-from Import_file import requests, discord, os, random, bot_colour
+from import_file import requests, discord, os, random, bot_colour
 from discord.ext import commands
 from discord.commands import Option, slash_command, SlashCommandGroup
 import aiohttp

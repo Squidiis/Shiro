@@ -11,7 +11,7 @@
 from datetime import * 
 from discord import ButtonStyle, Interaction
 import requests
-from Import_file import * 
+from import_file import * 
 from typing import List
 
 

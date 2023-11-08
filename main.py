@@ -1,8 +1,8 @@
 
-from Import_file import *
+from import_file import *
 
 from cogs.level_system import *
-from cogs.Moderator_tolls import *
+from cogs.mod_tools import *
 from dotenv import load_dotenv
 from cogs.fun_commands import *
 
