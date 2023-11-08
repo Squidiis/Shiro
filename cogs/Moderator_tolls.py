@@ -10,8 +10,6 @@ class ModeratorCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-        
-        guild=bot.get_guild(977958841385902092)
 
         member=message.author
         if message.author.bot:
@@ -25,14 +23,12 @@ class ModeratorCommands(commands.Cog):
             else:
 
                 if 'discord.gg/' in message.content:
+                
+                    emb = discord.Embed(title=f'Hey {message.author.name}!', 
+                        description=f"""{Emojis.dot_emoji} Please do not send any more discord invitation links as a punishment you will get a 10 minute timeout and a warning on the third warning you will be banned from the server!""", colour=bot_colour)
                     await message.delete()
-                    modembed = discord.Embed(title=f'Hey {message.author.name}!', description='Please do not send invitation links!', colour=bot_colour)
-                    modembed.set_author(name=f'{message.author.name}', icon_url = guild.icon.url)
-                    msg = await message.channel.send(embed=modembed, delete_after=5)
-                    reason = "Send invitation link"
-                    await member.timeout(until=timedelta(minutes=5), reason = reason)
-                    embed = discord.Embed(title=f"{member} You get a 5 minute time out", description=f"Grund: {reason}")
-                    await member.send(embed=embed)
+                    await message.channel.send(embed=emb, delete_after=10)
+                    await member.timeout_for(timedelta(minutes = 10))
 
 
     @commands.slash_command(name = "ban", description = "Ban a user so that he can no longer join the server!")

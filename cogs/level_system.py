@@ -1521,8 +1521,8 @@ class LevelSystem(commands.Cog):
             description=f"""{Emojis.dot_emoji} The level to vest a level role must be at least **1**.""", color=bot_colour)
         emb_higher = discord.Embed(title=f"{Emojis.help_emoji} The level you want to set for the level role is too high", 
             description=f"""{Emojis.dot_emoji} The level you want to set for the level role is too high you can only set a value that is below or equal to **999**.""", color=bot_colour)
-
-        if role.permissions.administrator:
+        
+        if role.permissions.administrator or role.permissions.moderate_members:
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} This role cannot be assigned as a level role", 
                 description=f"""{Emojis.dot_emoji} This role has administration rights and therefore cannot be assigned as a level role. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
