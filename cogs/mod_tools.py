@@ -23,11 +23,11 @@ class ModeratorCommands(commands.Cog):
             else:
 
                 if 'discord.gg/' in message.content:
-                
+                    channel = message.channel
                     emb = discord.Embed(title=f'Hey {message.author.name}!', 
                         description=f"""{Emojis.dot_emoji} Please do not send any more discord invitation links as a punishment you will get a 10 minute timeout and a warning on the third warning you will be banned from the server!""", colour=bot_colour)
                     await message.delete()
-                    await message.channel.send(embed=emb, delete_after=10)
+                    await channel.send(embed=emb, delete_after=5)
                     await member.timeout_for(timedelta(minutes = 10))
 
 
@@ -102,51 +102,51 @@ class ModeratorCommands(commands.Cog):
     @commands.slash_command(name = 'timeout', description = "Send a user to timeout!")
     @commands.has_permissions(moderate_members = True)
     async def timeout(self, ctx:discord.ApplicationContext, 
-        user:Option(discord.Member, required = True, description="Wähle den user aus den du timeouten möchtest!"), 
-        reason:Option(str, required = False, description="Gib einen grund an warum du diesen user Timeouten möchtest! (optional)"), 
-        days: Option(int, max_value = 27, default = 0, required = False, description="Gib an wie viele tage du diesen user tiemouten möchtest! (optional)"), 
-        hours: Option(int, max_value = 24, default = 0, required = False, description="Gib an wie viele stunden du diesen user tiemouten möchtest! (optional)"), 
-        minutes: Option(int, max_value = 60, default = 0, required = False, description="Gib an wie viele minuten du diesen user tiemouten möchtest! (optional)"), 
-        seconds: Option(int, max_value  = 60, default = 0, required = False, description="Gib an wie viele sekunden du diesen user tiemouten möchtest! (optional)")):
+        user:Option(discord.Member, required = True, description="Select the user you want to timeout!"), 
+        reason:Option(str, required = False, description="Enter a reason why you want to timeout this user! (optional)"), 
+        days: Option(int, max_value = 27, default = 0, required = False, description="Enter how many days you want to timeout this user! (optional)"), 
+        hours: Option(int, max_value = 24, default = 0, required = False, description="Enter how many hours you want to timeout this user! (optional)"), 
+        minutes: Option(int, max_value = 60, default = 0, required = False, description="Enter how many minutes you want to timeout this user! (optional)"), 
+        seconds: Option(int, max_value  = 60, default = 0, required = False, description="Enter how many seconds you want to timeout this user! (optional)")):
 
         duration = timedelta(days = days, hours = hours, minutes = minutes, seconds = seconds)
 
         if user.id == ctx.author.id:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst dich nicht selbst timeouten!", 
-                description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du timeouten möchtest.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You can't timeout yourself!", 
+                description=f"""{Emojis.dot_emoji} Select another user that you want to timeout.""", color=bot_colour)
             await ctx.respond(embed=emb)
             
         elif user.guild_permissions.moderate_members:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keine Admins timeouten!", 
-                description=f"""{Emojis.dot_emoji} Wähle einen anderen user aus den du timeouten möchtest der kein Admin ist.""")
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You can't timeout admins!", 
+                description=f"""{Emojis.dot_emoji} Select another user you want to timeout who is not an admin.""")
             await ctx.respond(embed=emb)
             
         else:
 
             await user.timeout_for(duration)
-            emb = discord.Embed(title=f"{user.name} wurde erfolgreuch getimeoutet", 
-                description=f"""{Emojis.dot_emoji} {user.mention} wurde für: {days} tage, {hours} stunden, {minutes} minuten und {seconds} secunden getimeoutet.
-                {Emojis.dot_emoji} Grund für den Timeout: {reason if reason != None else 'kein grund angegeben'}.""", color=bot_colour)
+            emb = discord.Embed(title=f"{user.name} Has been successfully timed out", 
+                description=f"""{Emojis.dot_emoji} {user.mention} was timed out for: {days} days, {hours} hours, {minutes} minutes and {seconds} seconds.
+                {Emojis.dot_emoji} Reason for the timeout: {reason if reason != None else 'no reason given'}.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = 'remove-timeout', description = "Hebe den Timeout eines users auf!")
+    @commands.slash_command(name = 'remove-timeout', description = "Cancel the timeout of a user!")
     @commands.has_permissions(moderate_members = True)
-    async def remove_timeout(self, ctx:discord.ApplicationContext, member:Option(discord.Member, required = True, description="Wähle einen user aus von dem du den Timeout aufheben möchtest")):
+    async def remove_timeout(self, ctx:discord.ApplicationContext, member:Option(discord.Member, required = True, description="Select a user from whom you want to cancel the timeout!")):
 
         try:
 
             await member.remove_timeout()
-            emb = discord.Embed(title=f"{member.name}'s timeout wurde erfolgreich aufgehoben {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} {member.mention} kann ab jetzt wieder nachrichten schreiben und sich aktiv an unterhaltungen beteiligen.""", color=bot_colour)
+            emb = discord.Embed(title=f"The timeout of {member.name} was successfully canceled {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} {member.mention} can now write messages again and actively participate in conversations.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         except:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} {member.name} wurde nicht getimeoutet!", 
-                description=f"{Emojis.dot_emoji} Wähle einen anderen user dessen timeout du aufheben möchtest.", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} {member.name} was not timed out!", 
+                description=f"{Emojis.dot_emoji} Select another user whose timeout you want to cancel.", color=bot_colour)
             await ctx.respond(embed=emb)
 
 

@@ -70,6 +70,7 @@ class main(commands.Cog):
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
         self.bot.add_view(view)
         
+        
 
 async def status_task():
     while True:
