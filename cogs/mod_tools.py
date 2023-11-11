@@ -32,10 +32,11 @@ class ModeratorCommands(commands.Cog):
                     await member.timeout_for(timedelta(minutes = 10))
 
     @set.command(name = "anti-link", description = "Stelle das anti-link system ein so wie du es möchtest!")
-    async def set_anti_link(ctx:discord.ApplicationContext, settings:Option(description="Wähle wie sich das anti-link system verhalten soll!", min_value = 1, max_value = 3,
-        choices = {"1": "Alle nachrichten mit einem discord einladungslinks werden gelöscht", 
-        "2":"Alle nachrichten mit einem lik die keine Bilder oder video sind werden gelöscht",
-        "3":"Alle nachrichten mit einem link werden gelscht"})):
+    async def set_anti_link(ctx:discord.ApplicationContext, settings:Option(required = True, description="Wähle wie sich das anti-link system verhalten soll!",
+        choices = ["Alle nachrichten mit einem discord einladungslinks werden gelöscht", 
+        "Alle nachrichten mit einem lik die keine Bilder oder video sind werden gelöscht",
+        "Alle nachrichten mit einem link werden gelöscht"]), 
+        timeout:Option(int, max_value = 60, required = True, description="Wähle wie lange der user getimeoutet werden soll der gegen das anti link system verstöhst!", choices = [0, 5, 10, 20, 30, 40, 50, 60])):
 
         emb = discord.Embed(title=f"{Emojis.settings_emoji} Stelle das anti-link system ein", 
             description=f"""{Emojis.dot_emoji} Wähle aus dem selectmenü aus wie du das anti-link system einstellen möchtest.
