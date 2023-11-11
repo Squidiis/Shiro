@@ -68,6 +68,7 @@ class Emojis:
 with open("config.yaml", 'r') as f:
     data = yaml.safe_load(f)
 
+
 #Intents
 intent = discord.Intents.default()
 intent.members = True

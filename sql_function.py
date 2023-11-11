@@ -309,13 +309,13 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
-    def update_bot_settings(guild_id:int, bot_colour:str = None, ghost_ping:int = None, back_to_none:int = None):
+    def update_bot_settings(guild_id:int, bot_colour:str = None, ghost_ping:int = None, anti_link:int = None,back_to_none:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        column_name = ["botColour", "ghostPing"]
-        items = [bot_colour, ghost_ping]
+        column_name = ["botColour", "ghostPing", "antiLink"]
+        items = [bot_colour, ghost_ping, anti_link]
 
         try:
             

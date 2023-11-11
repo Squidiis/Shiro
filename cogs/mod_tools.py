@@ -2,6 +2,7 @@
 from import_file import *
 import calendar
 
+set = SlashCommandGroup(name="set", description="set the individual systems")
 
 
 class ModeratorCommands(commands.Cog):
@@ -29,6 +30,17 @@ class ModeratorCommands(commands.Cog):
                     await message.delete()
                     await channel.send(embed=emb, delete_after=5)
                     await member.timeout_for(timedelta(minutes = 10))
+
+    @set.command(name = "anti-link", description = "Stelle das anti-link system ein so wie du es möchtest!")
+    async def set_anti_link(ctx:discord.ApplicationContext, settings:Option(description="Wähle wie sich das anti-link system verhalten soll!", min_value = 1, max_value = 3,
+        choices = {"1": "Alle nachrichten mit einem discord einladungslinks werden gelöscht", 
+        "2":"Alle nachrichten mit einem lik die keine Bilder oder video sind werden gelöscht",
+        "3":"Alle nachrichten mit einem link werden gelscht"})):
+
+        emb = discord.Embed(title=f"{Emojis.settings_emoji} Stelle das anti-link system ein", 
+            description=f"""{Emojis.dot_emoji} Wähle aus dem selectmenü aus wie du das anti-link system einstellen möchtest.
+            {settings} """)
+        await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = "ban", description = "Ban a user so that he can no longer join the server!")
