@@ -77,7 +77,7 @@ class BlacklistManagerButtons(discord.ui.View):
     @discord.ui.button(label="remove from blacklist", style=discord.ButtonStyle.blurple, custom_id="remove_blacklist")
     async def remove_blacklist_manager_button(self, button, interaction:discord.Interaction):
         
-        view = BlacklistManagerSelect()
+        view = BlacklistManagerSelect(status = "remove")
         view.add_item(TempBlackklistLevelSaveButton())
         view.add_item(ShowBlacklistLevelSystemButton())
 
@@ -192,27 +192,36 @@ class BlacklistManagerChecks():
 
 
 class BlacklistManagerSelect(discord.ui.View):
-    def __init__(self):
+    def __init__(self, status):
         self.table = "level"
-        self.status = ""
+        self.status = status
         super().__init__(timeout=None)
 
-    @discord.ui.channel_select(placeholder="Select the channels you want to blacklist!", min_values=1, max_values=5, 
-        channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="add_channel_blacklist_select")
+    def get_placeholder(status, item):
+
+        items = ["channels", "categories", "roles", "users"]
+        if status == "add":
+            return f"Select the {items[item]} you want to blacklist!"
+        
+        else:
+            return f"Select the {items[item]} you want to remove from the blacklist!"
+
+    @discord.ui.channel_select(placeholder=get_placeholder(item=0), min_values=1, max_values=5, 
+        channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="channel_blacklist_select")
     async def add_blacklist_channel_level_select(self, select, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
-            channel_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, channels=select.values, operation="add", table=self.table)
-            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", channel_id=channel_list)
+            channel_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, channels=select.values, operation="add" if self.status == "add" else "remove", table=self.table)
+            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add" if self.status == "add" else "remove", channel_id=channel_list)
             await interaction.response.defer()
 
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
-    @discord.ui.channel_select(placeholder="Select the categories you want to blacklist!", min_values=1, max_values=5, 
-        channel_types=[discord.ChannelType.category], custom_id="add_category_blacklist_select")
+    @discord.ui.channel_select(placeholder=get_placeholder(item=1), min_values=1, max_values=5, 
+        channel_types=[discord.ChannelType.category], custom_id="category_blacklist_select")
     async def add_blacklist_category_level_select(self, select, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -225,67 +234,31 @@ class BlacklistManagerSelect(discord.ui.View):
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
-    @discord.ui.role_select(placeholder="Select the roles you want to blacklist!", min_values=1, max_values=5, custom_id="add_role_blacklist_select")
+    @discord.ui.role_select(placeholder=get_placeholder(2), min_values=1, max_values=5, custom_id="role_blacklist_select")
     async def add_blacklist_role_level_select(self, select, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
-            role_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, roles=select.values, operation="add", table=self.table)
-            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", role_id=role_list)
+            role_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, roles=select.values, operation="add" if self.status == "add" else "remove", table=self.table)
+            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add" if self.status == "add" else "remove", role_id=role_list)
             await interaction.response.defer()
         
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
         
-    @discord.ui.user_select(placeholder="Select the users you want to blacklist!", min_values=1, max_values=5, custom_id="add_user_blacklist_select")
+    @discord.ui.user_select(placeholder=get_placeholder(3), min_values=1, max_values=5, custom_id="user_blacklist_select")
     async def add_blacklist_user_level_select(self, select, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
-            user_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, users=select.values, operation="add", table=self.table)
-            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add", user_id=user_list)
+            user_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, users=select.values, operation="add" if self.status == "add" else "remove", table=self.table)
+            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add" if self.status == "add" else "remove", user_id=user_list)
             await interaction.response.defer()
         
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-
-class BlacklistManagerSelectRemove(discord.ui.View):
-    def __init__(self):
-        self.table = "level"
-        super().__init__(timeout=None)
-
-    @discord.ui.channel_select(placeholder="Select the channels you want to remove from the blacklist!", min_values=1, max_values=5, 
-        channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="remove_channel_blacklist_select")
-    async def add_blacklist_channel_level_select(self, select, interaction:discord.Interaction):
-
-        channel_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, channels=select.values, operation="remove", table=self.table)
-        BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", channel_id=channel_list)
-        await interaction.response.defer()
-
-    @discord.ui.channel_select(placeholder="Select the categories you want to remove from the blacklist!", min_values=1, max_values=5, 
-        channel_types=[discord.ChannelType.category], custom_id="remove_category_blacklist_select")
-    async def add_blacklist_category_level_select(self, select, interaction:discord.Interaction):
-
-        category_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, categories=select.values, operation="remove", table=self.table)
-        BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", category_id=category_list)
-        await interaction.response.defer()
-
-    @discord.ui.role_select(placeholder="Select the roles you want to remove from the blacklist!", min_values=1, max_values=5, custom_id="remove_role_blacklist_select")
-    async def add_blacklist_role_level_select(self, select, interaction:discord.Interaction):
-        
-        role_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, roles=select.values, operation="remove", table=self.table)
-        BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", role_id=role_list)
-        await interaction.response.defer()
-        
-    @discord.ui.user_select(placeholder="Select the users you want to remove from the blacklist!", min_values=1, max_values=5, custom_id="remove_user_blacklist_select")
-    async def add_blacklist_user_level_select(self, select, interaction:discord.Interaction):
-
-        user_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, users=select.values, operation="remove", table=self.table)
-        BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="remove", user_id=user_list)
-        await interaction.response.defer()
 
 
 class TempBlackklistLevelSaveButton(discord.ui.Button):
