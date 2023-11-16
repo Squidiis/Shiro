@@ -33,13 +33,15 @@ class ModeratorCommands(commands.Cog):
 
     @set.command(name = "anti-link", description = "Stelle das anti-link system ein so wie du es möchtest!")
     async def set_anti_link(ctx:discord.ApplicationContext, settings:Option(required = True, description="Wähle wie sich das anti-link system verhalten soll!",
-        choices = ["Alle nachrichten mit einem discord einladungslinks werden gelöscht", 
-        "Alle nachrichten mit einem lik die keine Bilder oder video sind werden gelöscht",
-        "Alle nachrichten mit einem link werden gelöscht"]), 
-        timeout:Option(int, max_value = 60, required = True, description="Wähle wie lange der user getimeoutet werden soll der gegen das anti link system verstöhst!", choices = [0, 5, 10, 20, 30, 40, 50, 60])):
+        choices = ["All messages with a discord invitation link will be deleted", 
+        "All messages with a link will be deleted exceptions: Pictures, videos (discord links will be deleted)",
+        "All messages with a link will be deleted",
+        "Deactivate anti-link system!"]), 
+        timeout:Option(int, max_value = 60, required = True, description="Choose how long the user who violates the anti link system should be timed out! (Optional)", choices = [0, 5, 10, 20, 30, 40, 50, 60])):
 
-        emb = discord.Embed(title=f"{Emojis.settings_emoji} Stelle das anti-link system ein", 
-            description=f"""{Emojis.dot_emoji} Wähle aus dem selectmenü aus wie du das anti-link system einstellen möchtest.
+        print(settings)
+        emb = discord.Embed(title=f"{Emojis.settings_emoji}", 
+            description=f"""{Emojis.dot_emoji}.
             {settings} """)
         await ctx.respond(embed=emb)
 

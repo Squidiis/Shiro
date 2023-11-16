@@ -616,7 +616,7 @@ class DatabaseRemoveDatas():
 
         try:
 
-            if all([role_id, role_level]) == None:
+            if all(x is None for x in [role_id, role_level]):
                 remove_level_role = "DELETE FROM LevelSystemRoles WHERE guildId = %s"
                 remove_level_role_values = [guild_id]
 

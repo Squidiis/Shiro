@@ -56,11 +56,8 @@ class main(commands.Cog):
         self.bot.add_view(ResetBlacklistLevelButton())
 
         # level system blacklist manager
-        self.bot.add_view(BlacklistManagerButtons())
-        self.bot.add_view(BlacklistManagerSelect())
-        view.add_item(TempBlackklistLevelSaveButton())
         view.add_item(ShowBlacklistLevelSystemButton())
-        
+    
         # Applycation
         self.bot.add_view(ApplicationButton())
 
