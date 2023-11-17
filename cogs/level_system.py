@@ -1190,28 +1190,29 @@ class LevelSystem(commands.Cog):
         role:Option(discord.Role, required = False, description="Select a role that you want to exclude from the level system!"),
         user:Option(discord.User, required = False, description="Select a user that you want to exclude from the level system!")):
 
-        print(channel.id, category, role, user.id)
         if [x for x in [channel, category, role, user] if x]:
 
-            check_channel = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id) if channel != None else None
-            check_category = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id) if category != None else None
-            checK_role = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id) if role != None else None
-            check_user = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id) if user != None else None
+            check_channel = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id) if channel != None else False
+            check_category = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id) if category != None else False
+            checK_role = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id) if role != None else False
+            check_user = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id) if user != None else False
 
             if [x for x in [check_channel, check_category, checK_role, check_user] if x is None]:
 
                 items = {0:check_channel, 1:check_category, 2:checK_role, 3:check_user}
                 res = list({ele for ele in items if items[ele]})
                 add_res = list({ele for ele in items if items[ele] is None})
-                print(res)
+                
                 items = [channel, category, role, user]
+                
                 item = [(f"{Emojis.dot_emoji} {items[i].mention}") for i in res]                
                 add_item = [(f"{Emojis.dot_emoji} {items[i].mention}") for i in add_res]
-
-                formatted_items = "\n".join(item)
-                formatted_add_items = "\n".join(add_item)
+                
+                formatted_items = "\n".join(item) if item != [] else "Es waren keines der von dir angegeben items auf der Blacklist"
+                formatted_add_items = "\n".join(add_item) if item != [] else "Es konnte keines von dir angegebenen items auf die black list gesetzt werden da sie bereits auf der black list sind"
+        
                 emb = discord.Embed(title=f"{Emojis.help_emoji} Unter den von dir angegebnen items waren welche bereits auf der blacklist", 
-                    description=f"""{Emojis.dot_emoji} Es waren bereits auf der Blacklist: {formatted_items}\n neu hinzugefügt wurde: {formatted_add_items}""", color=bot_colour)
+                    description=f"""{Emojis.dot_emoji} Es waren bereits auf der Blacklist: {formatted_items}\n neu hinzugefügt wurde:\n{formatted_add_items}""", color=bot_colour)
                 await ctx.respond(embed=emb)
         
         else:
