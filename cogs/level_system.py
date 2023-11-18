@@ -1196,23 +1196,31 @@ class LevelSystem(commands.Cog):
             check_category = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, category_id=category.id) if category != None else False
             checK_role = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id) if role != None else False
             check_user = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id) if user != None else False
-
+            
             if [x for x in [check_channel, check_category, checK_role, check_user] if x is None]:
 
                 items = {0:check_channel, 1:check_category, 2:checK_role, 3:check_user}
                 res = list({ele for ele in items if items[ele]})
                 add_res = list({ele for ele in items if items[ele] is None})
-                
+                print(add_res)
                 items = [channel, category, role, user]
                 
                 item = [(f"{Emojis.dot_emoji} {items[i].mention}") for i in res]                
                 add_item = [(f"{Emojis.dot_emoji} {items[i].mention}") for i in add_res]
                 
-                formatted_items = "\n".join(item) if item != [] else "Es waren keines der von dir angegeben items auf der Blacklist"
-                formatted_add_items = "\n".join(add_item) if item != [] else "Es konnte keines von dir angegebenen items auf die black list gesetzt werden da sie bereits auf der black list sind"
-        
+                formatted_items = "\n".join(item) if item != [] else "\nEs waren keine der von dir angegeben items auf der Blacklist"
+                formatted_add_items = "\n".join(add_item) if add_item != [] else "Es konnte keines von dir angegebenen items auf die black list gesetzt werden da sie bereits auf der black list sind"
+
+                items = {
+                        0:channel.id if 0 in add_res else None, 
+                        1:category.id if 1 in add_res else None, 
+                        2:role.id if 2 in add_res else None,
+                        3:user.id if 3 in add_res else None}
+                
+                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", channel_id=items[0], category_id=items[1], role_id=items[2], user_id=items[3])    
+                    
                 emb = discord.Embed(title=f"{Emojis.help_emoji} Unter den von dir angegebnen items waren welche bereits auf der blacklist", 
-                    description=f"""{Emojis.dot_emoji} Es waren bereits auf der Blacklist: {formatted_items}\n neu hinzugefügt wurde:\n{formatted_add_items}""", color=bot_colour)
+                    description=f"""{Emojis.dot_emoji} Es waren bereits auf der Blacklist:{formatted_items}\n neu hinzugefügt wurde:\n{formatted_add_items}""", color=bot_colour)
                 await ctx.respond(embed=emb)
         
         else:

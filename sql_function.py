@@ -400,29 +400,31 @@ class DatabaseUpdates():
         
         try:
             
-            if items != [None, None, None, None]:
-
+            if any(i is not None for i in items) and operation != "reset":
+            
                 for count in range(len(items)):
                     
                     if items[count] != None:
 
                         if operation == "add":
-
+                            
                             level_sys_blacklist = f"INSERT INTO LevelSystemBlacklist (guildId, {column_name[count]}) VALUES (%s, %s)"
                             level_sys_blacklist_values = [guild_id, items[count]]
                         
                         elif operation == "remove":
-
+                            
                             level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name[count]} = %s"
                             level_sys_blacklist_values = [guild_id, items[count]]
 
+                        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
+                        db_connect.commit()
             else:
-
+                
                 level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
                 level_sys_blacklist_values = [guild_id]
         
-            cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-            db_connect.commit()
+                cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
+                db_connect.commit()
 
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
@@ -546,19 +548,19 @@ class DatabaseUpdates():
                 for count in range(len(items)):
                     
                     if items[count] != None:
-
+                        
                         if operation == "add":
-
+                            
                             bonus_list = f"INSERT INTO BonusXpList (guildId, {column_name[count]}) VALUES (%s, %s)" if bonus == None else f"INSERT INTO BonusXpList (guildId, {column_name[count]}, PercentBonusXp) VALUES (%s, %s, %s)"
                             bonus_list_values = [guild_id, items[count]] if bonus == None else [guild_id, items[count], bonus]
                         
                         elif operation == "remove":
-
+                            
                             bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
                             bonus_list_values = [guild_id, items[count]]
 
             else:
-
+                
                 bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s"
                 bonus_list_values = [guild_id]
 
