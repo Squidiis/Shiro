@@ -279,7 +279,7 @@ class ResetBlacklistLevelButton(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
             guild_id = interaction.guild.id
 
-            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove")
+            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="reset")
 
             emb = discord.Embed(title=f"The blacklist has been reset {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.arrow_emoji} All channels, users, roles and categories have been removed from the blacklist.
@@ -1182,6 +1182,71 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
+    async def check_level_blacklist(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
+
+        if [x for x in [channel, category, role, user] if x]:
+            
+            check_channel = DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=channel.id) if channel != None else False
+            check_category = DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=category.id) if category != None else False
+            checK_role = DatabaseCheck.check_blacklist(guild_id=guild_id, role_id=role.id) if role != None else False
+            check_user = DatabaseCheck.check_blacklist(guild_id=guild_id, user_id=user.id) if user != None else False
+
+            items = {0:check_channel, 1:check_category, 2:checK_role, 3:check_user}
+            items_list = [channel, category, role, user]
+
+            if [x for x in [check_channel, check_category, checK_role, check_user] if x is None]:
+
+                res = list({ele for ele in items if items[ele]}) if operation == "add" else list({ele for ele in items if items[ele] is None})
+                second_res = list({ele for ele in items if items[ele] is None}) if operation == "remove" else list({ele for ele in items if items[ele]})
+
+                item = [(f"{Emojis.dot_emoji} {items_list[i].mention}") for i in res] 
+                second_item = [(f"{Emojis.dot_emoji} {items_list[i].mention}") for i in second_res]
+
+                items_dict = {
+                    0:channel.id if 0 in second_res else None, 
+                    1:category.id if 1 in second_res else None, 
+                    2:role.id if 2 in second_res else None,
+                    3:user.id if 3 in second_res else None}
+                
+                if operation == "add":
+                    
+                    formatted_items = "\n".join(item) if item != [] else "\nEs waren keine der von dir angegeben items auf der Blacklist"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "Es konnte keines von dir angegebenen items auf die black list gesetzt werden da sie bereits auf der black list sind"
+                    
+                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
+                        
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} Folgende items wurden auf die blacklist gesetzt oder waren dort bereits", 
+                        description=f"""{Emojis.dot_emoji} Es waren bereits auf der Blacklist:{formatted_items}\n\n Neu hinzugefügt wurde:\n{formatted_add_items}""", color=bot_colour)
+                    return emb
+
+                elif operation == "remove":
+                
+                    formatted_items = "\n".join(item) if item != [] else "\nEs warn alle von dir angegeben items auf der blacklist"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "Es konnte keines von dir angegebenen items von der blacklist enfernt werden da sie nicht auf der blacklist sind"
+
+                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
+
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} Folgende items wurde von der blacklist gestrichen oder waren nicht aufgelistet", 
+                        description=f"""{Emojis.dot_emoji} Es waren folgende items nicht auf der blacklist:{formatted_items}\n\n Gestrichten von der blacklist wurde:\n{formatted_add_items}""", color=bot_colour)
+                    return emb
+                
+            else:
+
+                emb = discord.Embed(title=f"{Emojis.help_emoji}Es kann nichts {'auf die blacklist gesetzt werden' if operation == 'add' else 'von der blacklist entfenrt werden'}", 
+                    description=f"""{Emojis.dot_emoji} {"Alle sachen die du angegeben hast sind bereits auf der blacklist gelistet" 
+                        if operation == "add" else 
+                        "Keines von dir genanten sachen ist auf der blacklist"}""", color=bot_colour)
+                return emb
+            
+        else:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Du hast nichts angegeben!", 
+                description=f"""{Emojis.dot_emoji}Du hast nichts angegeben {"was auf die blacklist gesetzt werden soll" 
+                    if operation == "add" else
+                    "was von der blacklist entfernt werden soll"}""", color=bot_colour)
+            return emb
+
+
     @commands.slash_command(name = "add-level-blacklist", description = "Add what you want to the blacklist!")
     @commands.has_permissions(administrator = True)
     async def add_level_blacklist(self, ctx:discord.ApplicationContext, 
@@ -1190,6 +1255,37 @@ class LevelSystem(commands.Cog):
         role:Option(discord.Role, required = False, description="Select a role that you want to exclude from the level system!"),
         user:Option(discord.User, required = False, description="Select a user that you want to exclude from the level system!")):
 
+        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
+        check_channel = [1 if channel.category.id == i[2] else None for i in check_blacklist]
+
+        if user != None and user.bot:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keinen bot auf die Blacklist setzen", 
+                description=f"{Emojis.dot_emoji} Alle bots sind automatisch vom level system ausgeschlossen.", color=bot_colour)
+            await ctx.respond(embed=emb)
+        
+        elif any(elem is not None for elem in check_channel):
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The category of this channel is already blacklisted", 
+                description=f"""{Emojis.dot_emoji} The channel {channel.mention} is listed in a category that is blacklisted.
+                {Emojis.dot_emoji} Therefore, he is already excluded from the level system.
+                {Emojis.dot_emoji} Wenn du auf den Button drückst siehst du welche kategorien noch auf der blacklist stehen.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+        
+        else:
+
+            emb = await self.check_level_blacklist(guild_id=ctx.guild.id, operation="add", channel=channel, category=category, role=role, user=user)
+            await ctx.respond(embed=emb)
+    
+    
+    @commands.slash_command(name = "remove-level-blacklist", description = "Remove what you want from the blacklist!")
+    @commands.has_permissions(administrator = True)
+    async def remove_level_blacklist(self, ctx:discord.ApplicationContext, 
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the blacklist!"),
+        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the blacklist "),
+        role:Option(discord.Role, required = False, description="Select a role you want to remove from the blacklist "),
+        user:Option(discord.User, required = False, description="Select a user that you want to remove from the blacklist!")):
+
         if [x for x in [channel, category, role, user] if x]:
 
             check_channel = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, channel_id=channel.id) if channel != None else False
@@ -1197,35 +1293,42 @@ class LevelSystem(commands.Cog):
             checK_role = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, role_id=role.id) if role != None else False
             check_user = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id, user_id=user.id) if user != None else False
             
-            if [x for x in [check_channel, check_category, checK_role, check_user] if x is None]:
+            if [x for x in [check_channel, check_category, checK_role, check_user] if x is not None]:
 
                 items = {0:check_channel, 1:check_category, 2:checK_role, 3:check_user}
-                res = list({ele for ele in items if items[ele]})
-                add_res = list({ele for ele in items if items[ele] is None})
-                print(add_res)
+                res = list({ele for ele in items if items[ele] is None})
+                remove_res = list({ele for ele in items if items[ele]})
+                print(res)
+                print(remove_res)
                 items = [channel, category, role, user]
                 
                 item = [(f"{Emojis.dot_emoji} {items[i].mention}") for i in res]                
-                add_item = [(f"{Emojis.dot_emoji} {items[i].mention}") for i in add_res]
+                remove_item = [(f"{Emojis.dot_emoji} {items[i].mention}") for i in remove_res]
                 
                 formatted_items = "\n".join(item) if item != [] else "\nEs waren keine der von dir angegeben items auf der Blacklist"
-                formatted_add_items = "\n".join(add_item) if add_item != [] else "Es konnte keines von dir angegebenen items auf die black list gesetzt werden da sie bereits auf der black list sind"
+                formatted_add_items = "\n".join(remove_item) if remove_item != [] else "Es konnte keines von dir angegebenen items von der blacklist enfernt werden da sie nicht auf der blacklist sind"
 
-                items = {
-                        0:channel.id if 0 in add_res else None, 
-                        1:category.id if 1 in add_res else None, 
-                        2:role.id if 2 in add_res else None,
-                        3:user.id if 3 in add_res else None}
+                items = {0:channel.id if 0 in remove_res else None, 
+                        1:category.id if 1 in remove_res else None, 
+                        2:role.id if 2 in remove_res else None,
+                        3:user.id if 3 in remove_res else None}
                 
-                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", channel_id=items[0], category_id=items[1], role_id=items[2], user_id=items[3])    
+                DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=items[0], category_id=items[1], role_id=items[2], user_id=items[3])    
                     
-                emb = discord.Embed(title=f"{Emojis.help_emoji} Unter den von dir angegebnen items waren welche bereits auf der blacklist", 
-                    description=f"""{Emojis.dot_emoji} Es waren bereits auf der Blacklist:{formatted_items}\n neu hinzugefügt wurde:\n{formatted_add_items}""", color=bot_colour)
+                emb = discord.Embed(title=f"{Emojis.help_emoji} Folgende items wurden auf die blacklist gesetzt oder waren dort bereits", 
+                    description=f"""{Emojis.dot_emoji} Es waren bereits auf der Blacklist:\n{formatted_items}\n\n Neu hinzugefügt wurde:\n{formatted_add_items}""", color=bot_colour)
                 await ctx.respond(embed=emb)
-        
+
+            else:
+
+                emb = discord.Embed(title=f"{Emojis.help_emoji} Alle items sind bereits auf der Blacklist", 
+                    description=f"""{Emojis.dot_emoji} Alle sachen die du angegeben hast sind bereits auf der blacklist gelistet.""", color=bot_colour)
+                await ctx.respond(embed=emb)
+
         else:
 
-            emb = discord.Embed(title="Du hast nichts angegeben")
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Du hast nichts angegeben!", 
+                description=f"""{Emojis.dot_emoji} Du hast nicht angegeben was auf die Blacklist gesetzt werden soll.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 

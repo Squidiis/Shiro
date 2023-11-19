@@ -8,8 +8,9 @@ Inspezieren des anti link systems (Ist nicht das beste)
 Wenn möglich das anti link system überarbeiten mit db (Idee ein select menü das nach auswahl fragt wie lange time out)
 
 texte in Moderator tolls überarbeiten
-Mute und unmute commands machen
 
 
 Streche alle Blacklist commands aus der read me
-Noch hinzufügen das die sachen die nicht None ist auch geblacklisted werden
+
+delete user data file testen und überarbeiten
+hinzufügen das wenn bot aktiv die tables erstellt werden
