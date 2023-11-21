@@ -418,7 +418,8 @@ class DatabaseUpdates():
 
                         cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
                         db_connect.commit()
-            else:
+
+            elif operation == "reset":
                 
                 level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
                 level_sys_blacklist_values = [guild_id]
