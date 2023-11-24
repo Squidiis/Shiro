@@ -933,13 +933,7 @@ class LevelSystem(commands.Cog):
         else:
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} There is nothing on the blacklist", 
-                description=f"""{Emojis.dot_emoji} The blacklist could not be reset because nothing is stored on it.
-                {Emojis.dot_emoji} If you want to blacklist something use one of these commands:
-                
-                {Emojis.arrow_emoji} {add_blacklist_level_channel}
-                {Emojis.arrow_emoji} {add_blacklist_level_category}
-                {Emojis.arrow_emoji} {add_blacklist_level_role}
-                {Emojis.arrow_emoji} {add_blacklist_level_user}""", color=bot_colour)
+                description=f"""{Emojis.dot_emoji} The blacklist could not be reset because nothing is stored on it.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -971,44 +965,44 @@ class LevelSystem(commands.Cog):
             
                 if operation == "add":
                     
-                    formatted_items = "\n".join(item) if item != [] else "\n> Es waren keine der von dir angegeben items auf der Blacklist"
-                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> Es konnte keines von dir angegebenen items auf die black list gesetzt werden da sie bereits auf der black list sind"
+                    formatted_items = "\n".join(item) if item != [] else "\n> None of the items you specified were on the blacklist"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be blacklisted because they are already on the blacklist"
                     
                     DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
                         
-                    emb = discord.Embed(title=f"{Emojis.help_emoji} Folgende items wurden auf die blacklist gesetzt oder waren dort bereits", 
-                        description=f"""### {Emojis.dot_emoji} Es waren bereits auf der Blacklist:
-                        {formatted_items}\n### {Emojis.dot_emoji} Neu hinzugefügt wurde:
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the blacklist or were already there", 
+                        description=f"""### {Emojis.dot_emoji} The following were already on the blacklist:
+                        {formatted_items}\n### {Emojis.dot_emoji} Newly added:
                         {formatted_add_items}""", color=bot_colour)
                     return emb
 
                 elif operation == "remove":
                 
-                    formatted_items = "\n".join(item) if item != [] else "\n> Es warn alle von dir angegeben items auf der blacklist"
-                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> Es konnte keines von dir angegebenen items von der blacklist enfernt werden da sie nicht auf der blacklist sind"
+                    formatted_items = "\n".join(item) if item != [] else "> All the items you specified were on the blacklist"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be removed from the blacklist because they are not on the blacklist"
 
                     DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
 
-                    emb = discord.Embed(title=f"{Emojis.help_emoji} Folgende items wurde von der blacklist gestrichen oder waren nicht aufgelistet", 
-                        description=f"""### {Emojis.dot_emoji} Es waren folgende items nicht auf der blacklist:
-                        {formatted_items}\n### {Emojis.dot_emoji} Gestrichten von der blacklist wurde:
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been removed from the blacklist or were not listed", 
+                        description=f"""### {Emojis.dot_emoji} The following items were not on the blacklist:
+                        {formatted_items}\n### {Emojis.dot_emoji} Was deleted from the blacklist:
                         {formatted_add_items}""", color=bot_colour)
                     return emb
                 
             else:
 
-                emb = discord.Embed(title=f"{Emojis.help_emoji}Es kann nichts {'auf die blacklist gesetzt werden' if operation == 'add' else 'von der blacklist entfenrt werden'}", 
-                    description=f"""{Emojis.dot_emoji} {"Alle sachen die du angegeben hast sind bereits auf der blacklist gelistet" 
+                emb = discord.Embed(title=f"{Emojis.help_emoji}Nothing can be {'blacklisted' if operation == 'add' else 'removed from the blacklist'}", 
+                    description=f"""{Emojis.dot_emoji} {"All the things you have specified are already on the blacklist" 
                         if operation == "add" else 
-                        "Keines von dir genanten sachen ist auf der blacklist"}""", color=bot_colour)
+                        "None of the things you mentioned are on the blacklist"}""", color=bot_colour)
                 return emb
             
         else:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du hast nichts angegeben!", 
-                description=f"""{Emojis.dot_emoji}Du hast nichts angegeben {"was auf die blacklist gesetzt werden soll" 
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You have not specified anything!", 
+                description=f"""{Emojis.dot_emoji}You have not specified anything {"what should be blacklisted" 
                     if operation == "add" else
-                    "was von der blacklist entfernt werden soll"}""", color=bot_colour)
+                    "What should be removed from the blacklist"}""", color=bot_colour)
             return emb
 
 
@@ -1036,9 +1030,8 @@ class LevelSystem(commands.Cog):
         
         if channel != None and any(channel.category.id == x[2] for x in check_blacklist):
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Der channel ist indierekt bereits auf der blacklist", 
-                description=f"""{Emojis.dot_emoji} Der channel {channel.mention} den du auf die blacklist setzen möchtest ist bereis auf der Blacklist,
-                da er unter der category {channel.category.mention} gelistet ist und somit automatisch ausgeschlossen ist.""", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The channel is already indirectly on the blacklist", 
+                description=f"""{Emojis.dot_emoji} The channel {channel.mention} that you want to blacklist is already on the blacklist because it is listed under the category {channel.category.mention} and is therefore automatically excluded.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         elif category != None and filtered_list != []:
@@ -1054,8 +1047,8 @@ class LevelSystem(commands.Cog):
 
         elif user != None and user.bot:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Du kannst keinen bot auf die Blacklist setzen", 
-                description=f"{Emojis.dot_emoji} Alle bots sind automatisch vom level system ausgeschlossen.", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You cannot put a bot on the blacklist", 
+                description=f"{Emojis.dot_emoji} All bots are automatically excluded from the level system.", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -1081,13 +1074,13 @@ class LevelSystem(commands.Cog):
 
         blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
-        emb = discord.Embed(title=f"Here you can see the complete level system blacklist", 
-            description=f"""Here you can see everything that is on the level system blacklist:{Emojis.exclamation_mark_emoji}
-            """, color=bot_colour)
+        emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see the complete level system blacklist", 
+            description=f"""Here you can see everything that is on the level system blacklist:""", color=bot_colour)
         emb.add_field(name=f"{Emojis.arrow_emoji} All Channels on the Blacklist", value=f" {blacklist[0]}", inline=False)
         emb.add_field(name=f"{Emojis.arrow_emoji} All Categories on the Blacklist", value=f" {blacklist[1]}", inline=False)
         emb.add_field(name=f"{Emojis.arrow_emoji} All Roles on the Blacklist", value=f" {blacklist[2]}", inline=False)
         emb.add_field(name=f"{Emojis.arrow_emoji} All Users on the Blacklist", value=f" {blacklist[3]}", inline=False)
+        emb.set_footer(icon_url=ctx.guild.icon, text=f"Blacklist from {ctx.guild.name}")
         await ctx.respond(embed=emb)
 
 
