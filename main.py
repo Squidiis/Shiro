@@ -11,7 +11,7 @@ from cogs.fun_commands import *
 async def ping(ctx):
     await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
-
+   
 class main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -60,6 +60,7 @@ async def status_task():
 
 
 bot.add_cog(main(bot))
+
 
 
 class ApplicationButton(discord.ui.View):

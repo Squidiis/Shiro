@@ -961,7 +961,8 @@ class LevelSystem(commands.Cog):
                     0:channel.id if 0 in second_res else None, 
                     1:category.id if 1 in second_res else None, 
                     2:role.id if 2 in second_res else None,
-                    3:user.id if 3 in second_res else None}
+                    3:user.id if 3 in second_res else None
+                }
             
                 if operation == "add":
                     

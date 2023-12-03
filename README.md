@@ -27,7 +27,6 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 
 * Level System
     - Individual blacklist commands to exclude individual channels, categories, roles or users from the level system.
-    - Blacklist manager to quickly manage the entire blacklist.
     - Commands to manage and change the statistics of individual users.
     - Ranking command to show how far users are in the level system.
     - Ranking list of the top 10 users.
@@ -72,15 +71,6 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 |rank|Shows the progress of a user in the level system with the help of a rank card, for example [press here](https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/rank-card/example_rank_card.png?raw=true)|
 |leaderboard|Zeigt die 10 besten auf den server|
 |level-system-settings|Schaltet das level system aus oder ein|
-|add-level-blacklist channel|Fügt einen channel auf die Level system blacklist hinzu dieser wird dann vom level system ausgeschlossen und man erhält in diesen channel kein XP|
-|remove-level-blacklist-channel|Streiche einen channel von der Blacklist und lasse in wieder am level system teilnehmen man erhält in diesen channel dann wieder XP|
-|add-level-blacklist-category|Fügt eine Kategorie auf die level blacklist hinzu alle aktivitäten in den channel der Kategorie werden nicht mit XP belohnt|
-|remove-level-blacklist-category||
-|add-level-blacklist-role||
-|remove-level-blacklist-role||
-|add-level-blacklist-user||
-|remove-level-blacklist-user||
-|manage-level-blacklist||
 |show-level-blacklist||
 |reset-level-blacklist||
 |add-level-role||

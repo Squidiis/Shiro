@@ -2,7 +2,6 @@
 from import_file import *
 import calendar
 
-set = SlashCommandGroup(name="set", description="set the individual systems")
 
 
 class ModeratorCommands(commands.Cog):
@@ -22,27 +21,60 @@ class ModeratorCommands(commands.Cog):
                 return
             
             else:
+                
+                check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
 
-                if 'discord.gg/' in message.content:
-                    channel = message.channel
-                    emb = discord.Embed(title=f'Hey {message.author.name}!', 
-                        description=f"""{Emojis.dot_emoji} Please do not send any more discord invitation links as a punishment you will get a 10 minute timeout and a warning on the third warning you will be banned from the server!""", colour=bot_colour)
-                    await message.delete()
-                    await channel.send(embed=emb, delete_after=5)
-                    await member.timeout_for(timedelta(minutes = 10))
+                if check_settings[3] == 0:
 
-    @set.command(name = "anti-link", description = "Stelle das anti-link system ein so wie du es möchtest!")
-    async def set_anti_link(ctx:discord.ApplicationContext, settings:Option(required = True, description="Wähle wie sich das anti-link system verhalten soll!",
-        choices = ["All messages with a discord invitation link will be deleted", 
-        "All messages with a link will be deleted exceptions: Pictures, videos (discord links will be deleted)",
-        "All messages with a link will be deleted",
-        "Deactivate anti-link system!"]), 
-        timeout:Option(int, max_value = 60, required = True, description="Choose how long the user who violates the anti link system should be timed out! (Optional)", choices = [0, 5, 10, 20, 30, 40, 50, 60])):
+                    if 'discord.gg/' in message.content:
+                        channel = message.channel
+                        emb = discord.Embed(title=f'Hey {message.author.name}!', 
+                            description=f"""{Emojis.dot_emoji} Please do not send any more discord invitation links as a punishment you will get a 10 minute timeout and a warning on the third warning you will be banned from the server!""", colour=bot_colour)
+                        await message.delete()
 
-        print(settings)
-        emb = discord.Embed(title=f"{Emojis.settings_emoji}", 
-            description=f"""{Emojis.dot_emoji}.
-            {settings} """)
+                elif check_settings[3] == 1:
+
+                    if 'https//' in message.content:
+                        await message.delete()
+
+                elif check_settings[3] == 2:
+
+                    if 'https//' in message.content and not message.content.endswith(('jpg', 'png', 'gif', 'tif', 'bmp', 'swf', 'svg', 'mp4')):
+                        await message.delete()
+
+                elif check_settings[3] == 3:
+                    return
+
+                await channel.send(embed=emb, delete_after=5)
+                await member.timeout_for(timedelta(minutes = check_settings[4]))
+
+
+    @commands.slash_command(name = "set-anti-link", description = "Set the anti-link system the way you want it!")
+    @commands.has_permissions(administrator = True)
+    async def set_anti_link(self, ctx:discord.ApplicationContext,
+        settings:Option(str, required = True,
+                        description="Choose how the anti-link system should behave!",
+                        choices = [
+                                discord.OptionChoice(name = 'All messages with a discord invitation link will be deleted', value="0"),
+                                discord.OptionChoice(name = 'All messages with a link will be deleted exceptions: images, videos (discord links will be deleted)', value="1"),
+                                discord.OptionChoice(name = 'All messages with a link will be deleted', value="2"),
+                                discord.OptionChoice(name = 'Deactivate anti-link system! (no messages are deleted)', value="3")]), 
+        timeout:Option(int, max_value = 60, required = True, 
+                       description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
+                       choices = [0, 5, 10, 20, 30, 40, 50, 60])):
+
+        DatabaseUpdates.update_bot_settings(guild_id=ctx.guild.id, anti_link=int(settings), anti_link_timeout=timeout)
+
+        settings_text = {
+                        "0":"All messages that contain a discord invitation link.",
+                        "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
+                        "2":"All messages that contain a link no matter where it leads to",
+                        "3":"Nothing because the anti-link system is deactivated"}
+
+        emb = discord.Embed(title=f"{Emojis.settings_emoji} The anti-link system was set up", 
+            description=f"""{Emojis.dot_emoji} The anti-link system will now delete the following messages:
+            `{settings_text[settings]}`
+            {Emojis.dot_emoji} Users who still send links will receive a timeout of **{timeout}** minutes""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 

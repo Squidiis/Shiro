@@ -1,6 +1,4 @@
 
-commands minimieren in dem man verwaltungs commands macht
-(Ein settings command mit dem man dann steuern kann wie sich der command verhalten soll)
 
 Heute zu erledigen:
 

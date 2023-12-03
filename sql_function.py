@@ -309,11 +309,16 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
-    def update_bot_settings(guild_id:int, bot_colour:str = None, ghost_ping:int = None, anti_link:int = None,back_to_none:int = None):
+    def update_bot_settings(guild_id:int, 
+                            bot_colour:str = None, 
+                            ghost_ping:int = None, 
+                            anti_link:int = None, 
+                            anti_link_timeout:int = None,
+                            back_to_none:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
-
+        
         column_name = ["botColour", "ghostPing", "antiLink"]
         items = [bot_colour, ghost_ping, anti_link]
 
@@ -322,21 +327,23 @@ class DatabaseUpdates():
             if back_to_none == None:
 
                 for count in range(len(items)):
+                    
+                    if items[count] != None:
 
-                    update_settings = f"UPDATE BotSettings SET {column_name[count]} = %s WHERE guildId = %s"
-                    update_settings_values = (items[count], guild_id)
-                    cursor.execute(update_settings, update_settings_values)
-                    db_connect.commit()
+                        update_settings = f'UPDATE BotSettings SET {column_name[count]} = %s{f", antiLinkTimeout = {anti_link_timeout}" if anti_link_timeout != None else ""} WHERE guildId = %s'
+                        update_settings_values = (items[count], guild_id)
+                        cursor.execute(update_settings, update_settings_values)
+                        db_connect.commit()
 
             else:
 
-                update_settings = f"UPDATE BotSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s"
+                update_settings = f'UPDATE BotSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s'
                 update_settings_values = [guild_id]
                 cursor.execute(update_settings, update_settings_values)
                 db_connect.commit()
             
         except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
+            print('parameterized query failed {}'.format(error))
 
         finally:
 
@@ -450,10 +457,12 @@ class DatabaseUpdates():
 
                 for count in range(len(items)):
 
-                    update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
-                    update_settings_values = (items[count], guild_id)
-                    cursor.execute(update_settings, update_settings_values)
-                    db_connect.commit()
+                    if items[count] != None:
+
+                        update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
+                        update_settings_values = (items[count], guild_id)
+                        cursor.execute(update_settings, update_settings_values)
+                        db_connect.commit()
 
             else:
 
