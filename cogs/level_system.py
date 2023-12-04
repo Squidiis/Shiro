@@ -1686,8 +1686,10 @@ class LevelSystem(commands.Cog):
             mark_stings = ["{user}", "{level}"]
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} Set an individual level-up message now", 
-                description=f"""{Emojis.dot_emoji}When you set your level-up message use {mark_stings[0]} to mark a user the user will be pinned to the place where you set {mark_stings[1]}.
-                To show the level use {mark_stings[1]} and put it where you want the level to be here is a small example:
+                description=f"""{Emojis.dot_emoji} If you want to set the level up message, you have two default arguments `{mark_stings[0]}` and `{mark_stings[1]}`.
+                {Emojis.dot_emoji} Where you insert `{mark_stings[0]}`, the user is marked
+                {Emojis.dot_emoji} Where you insert `{mark_stings[1]}`, the current level of the user is inserted
+                Here you have a small example:
 
                 {Emojis.arrow_emoji} `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
 

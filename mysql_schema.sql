@@ -98,7 +98,7 @@ CREATE TABLE BotSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     botColour VARCHAR(20) NULL,
     ghostPing BIT DEFAULT 0,
-    antiLink CHAR(3) DEFAULT 3,
+    antiLink BIT(4) DEFAULT 3,
     antiLinkTimeout INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

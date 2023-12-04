@@ -11,7 +11,6 @@ class ModeratorCommands(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
 
-        member=message.author
         if message.author.bot:
             return
 
@@ -22,31 +21,41 @@ class ModeratorCommands(commands.Cog):
             
             else:
                 
+                anti_link_text = {
+                    0:'discord invitation link',
+                    1:'link or a discord invitation ',
+                    2:'link or an image / video',
+                }
+
                 check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
+                channel = message.channel
+            
+                emb = discord.Embed(title=f'{Emojis.help_emoji} {message.author.name} you have violated the anti-link system', 
+                    description=f"""{Emojis.dot_emoji} You have violated the anti-link system on {message.guild.name} it is forbidden:
+                    {Emojis.dot_emoji} `You have sent an {anti_link_text[check_settings[3]]} to this chat`.
+                    {f"{Emojis.dot_emoji} That's why you got a timeout for {check_settings[4]} minutes" if check_settings[4] != 0 else ''}""", colour=bot_colour)
+                emb.set_footer(text=f'{message.author.name}', icon_url=message.author.avatar.url)
 
                 if check_settings[3] == 0:
 
                     if 'discord.gg/' in message.content:
-                        channel = message.channel
-                        emb = discord.Embed(title=f'Hey {message.author.name}!', 
-                            description=f"""{Emojis.dot_emoji} Please do not send any more discord invitation links as a punishment you will get a 10 minute timeout and a warning on the third warning you will be banned from the server!""", colour=bot_colour)
                         await message.delete()
 
                 elif check_settings[3] == 1:
 
-                    if 'https//' in message.content:
+                    if 'https://' in message.content and not message.attachments:
                         await message.delete()
 
                 elif check_settings[3] == 2:
 
-                    if 'https//' in message.content and not message.content.endswith(('jpg', 'png', 'gif', 'tif', 'bmp', 'swf', 'svg', 'mp4')):
+                    if 'https://' in message.content or message.attachments:
                         await message.delete()
 
                 elif check_settings[3] == 3:
                     return
 
                 await channel.send(embed=emb, delete_after=5)
-                await member.timeout_for(timedelta(minutes = check_settings[4]))
+                await message.author.timeout_for(timedelta(minutes = check_settings[4]))
 
 
     @commands.slash_command(name = "set-anti-link", description = "Set the anti-link system the way you want it!")
@@ -57,7 +66,7 @@ class ModeratorCommands(commands.Cog):
                         choices = [
                                 discord.OptionChoice(name = 'All messages with a discord invitation link will be deleted', value="0"),
                                 discord.OptionChoice(name = 'All messages with a link will be deleted exceptions: images, videos (discord links will be deleted)', value="1"),
-                                discord.OptionChoice(name = 'All messages with a link will be deleted', value="2"),
+                                discord.OptionChoice(name = 'All messages with a link will be deleted this also includes pictures and videos', value="2"),
                                 discord.OptionChoice(name = 'Deactivate anti-link system! (no messages are deleted)', value="3")]), 
         timeout:Option(int, max_value = 60, required = True, 
                        description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
@@ -68,7 +77,7 @@ class ModeratorCommands(commands.Cog):
         settings_text = {
                         "0":"All messages that contain a discord invitation link.",
                         "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
-                        "2":"All messages that contain a link no matter where it leads to",
+                        "2":"All messages with a link will be deleted this also includes pictures and videoso",
                         "3":"Nothing because the anti-link system is deactivated"}
 
         emb = discord.Embed(title=f"{Emojis.settings_emoji} The anti-link system was set up", 
