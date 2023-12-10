@@ -37,9 +37,12 @@ class main(commands.Cog):
         self.bot.add_view(ResetLevelStatsButton())
         self.bot.add_view(LevelSystemSettings())
         self.bot.add_view(ResetBlacklistLevelButton())
-
-        # level system blacklist manager
         view.add_item(ShowBlacklistLevelSystemButton())
+        self.bot.add_view(ModalButtonLevelUpMessage())
+        
+
+        # Mod tools
+        self.bot.add_view(GhostPingButtons())
     
         # Applycation
         self.bot.add_view(ApplicationButton())
@@ -138,7 +141,7 @@ class AutoReaction(commands.Cog):
 
         if message.guild:
             if message.guild.id == 865899808183287848:
-                categorys = [996846958536835203, 927683692695027772, 998934946708205598, 930157270275350598, 897544467266011177, 873622071484252200, 927668688239353926]
+                categorys = [996846958536835203, 927683692695027772, 998934946708205598, 930157270275350598, 897544467266011177, 873622071484252200, 927668688239353926, 1084219817269149747]
                 if message.channel.category_id in categorys:
                     if len(message.attachments) > 0 or message.content.startswith("https://"):
                         await message.add_reaction("❤")

@@ -7,4 +7,7 @@ hinzufügen das wenn bot aktiv die tables erstellt werden
 
 Embed im gesamten bot bisschen überarbeiten dabei an den vulfo bot orientieren
 
-Alle buttons im on ready adden
+
+
+
+Help menü adden

@@ -4,76 +4,6 @@ import discord
 from sql_function import DatabaseCheck, DatabaseRemoveDatas, DatabaseSetup
 
 
-class UserLeavesServer(commands.Cog):
-
-    def __init__(self, bot):
-        self.bot = bot
-
-
-#########################################  Deletes data when a user or the bot itself leaves the server   ############################################
-
-
-    # Deletes all data when the bot is kicked from the server 
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        tables = ["LevelSystemStats", 
-                  "LevelSystemBlacklist", 
-                  "LevelSystemRoles", 
-                  "LevelSystemSettings",  
-                  "BotSettings", 
-                  "AutoReactionSetup", 
-                  "AutoReactionSettings"
-                  ]
-
-        try:
-
-            for table in tables:
-
-                delete_datas = f"DELETE FROM {table} WHERE guildId = %s"
-                delete_datas_values = [guild.id]
-
-                cursor.execute(delete_datas, delete_datas_values)
-                db_connect.commit()
-
-        except mysql.connector.Error as error:
-            print("parameterized query failed {}".format(error))
-
-        finally:
-
-            return True
-        
-
-    # Deletes all data when the user leaves the server 
-    @commands.Cog.listener()
-    async def on_member_remove(self, member:discord.Member):
-
-        if not member.bot:
-
-            db_connect = DatabaseSetup.db_connector()
-            cursor = db_connect.cursor()
-
-            tables = ["LevelSystemBlacklist", 
-                      "LevelSystemStats"]
-            
-            try:
-
-                for table in tables:
-
-                    delete_user_datas = f"DELETE {table} WHERE guildId = %s AND userId = %s"
-                    delete_user_datas_values = [member.guild.id, member.id]
-                    cursor.execute(delete_user_datas, delete_user_datas_values)
-                    db_connect.commit()
-            
-            except mysql.connector.Error as error:
-                print("parameterized query failed {}".format(error))
-
-            finally:
-
-                return True
 
 
 class DeleteData(commands.Cog):
@@ -81,30 +11,81 @@ class DeleteData(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def delete_data(self, table:str, column:str, item:str):
+
+
+#########################################  Deletes data when a user or the bot itself leaves the server   ############################################
+
+
+    def delete_data(table:str, column:str, item):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        delete_datas = f"DELETE {table} WHERE guildId = %s AND {column} = %s"
-        delete_datas_values = [table, item.guild.id, item.id]
+        delete_datas = f"DELETE FROM {table} WHERE guildId = %s AND {column} = %s" if column != 'guildId' else f'DELETE FROM {table} WHERE guildId = %s'
+        delete_datas_values = [item.guild.id, item.id] if column != 'guildId' else [item.id]
         cursor.execute(delete_datas, delete_datas_values)
-        db_connect.commit()
+        db_connect.commit() 
 
 
+    # Deletes all data when the bot is kicked from the server 
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild):
+
+        tables = ["LevelSystemStats", 
+                  "LevelSystemBlacklist", 
+                  "LevelSystemRoles", 
+                  "LevelSystemSettings",
+                  "BonusXpList",  
+                  "BotSettings", 
+                  "AutoReactionSetup", 
+                  "AutoReactionSettings"]
+
+        for table in tables:
+
+            DeleteData.delete_data(table=table, column='guildId', item=guild)
+
+
+    # Deletes all data when the user leaves the server 
+    @commands.Cog.listener()
+    async def on_member_remove(self, member:discord.Member):
+
+        if not member.bot:
+
+            tables = ["LevelSystemBlacklist", 
+                      "LevelSystemStats",
+                      "BonusXpList"]
+            
+            for table in tables:
+
+                DeleteData.delete_data(table=table, column='userId', item=member)   
+
+
+   # Deletes the tags of a channel when it is deleted
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
 
-        tables = ["LevelSystemBlacklist", "ManageBlacklistTemp", "AutoReactionSetup", "LevelSystemSettings", "BonusXpList"]
+        tables = ["LevelSystemBlacklist", 
+                  "AutoReactionSetup", 
+                  "LevelSystemSettings", 
+                  "BonusXpList",
+                  "AutoReactionSetup"]
+        
         for table in tables:
 
             DeleteData.delete_data(table=table, column="channelId", item=channel)
 
-    
-    
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role):
+
+        tables = ['LevelSystemBlacklist',
+                  'BonusXpList',
+                  'LevelSystemRoles']
         
+        for table in tables:
 
+            DeleteData.delete_data(table=table, column='roleId', item=role)
 
+    
 def setup(bot):
     bot.add_cog(DeleteData(bot))
-    bot.add_cog(UserLeavesServer(bot))
