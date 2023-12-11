@@ -12,9 +12,106 @@ async def ping(ctx):
     await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
    
-class main(commands.Cog):
+
+class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    async def create_db_table():
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        tables = [
+            # Level system Tables
+            '''
+            CREATE TABLE IF NOT EXISTS `LevelSystemStats` (
+                guildId BIGINT UNSIGNED NOT NULL, 
+                userId BIGINT UNSIGNED NOT NULL,
+                userLevel BIGINT UNSIGNED NOT NULL,
+                userXp BIGINT UNSIGNED NOT NULL,
+                userName VARCHAR(255) NOT NULL,
+                voiceTime TIMESTAMP(6) NULL,
+                wholeXp BIGINT UNSIGNED NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LevelSystemBlacklist (
+                guildId BIGINT UNSIGNED NOT NULL,
+                channelId BIGINT UNSIGNED NULL,
+                categoryId BIGINT UNSIGNED NULL,
+                roleId BIGINT UNSIGNED NULL,
+                userId BIGINT UNSIGNED NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LevelSystemRoles (
+                guildId BIGINT UNSIGNED NOT NULL,
+                roleId BIGINT UNSIGNED NOT NULL,
+                roleLevel INT UNSIGNED NOT NULL,
+                guildName VARCHAR(255) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LevelSystemSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                xpRate INT UNSIGNED DEFAULT 20,
+                levelStatus VARCHAR(50) DEFAULT 'on',
+                levelUpChannel BIGINT UNSIGNED NULL,
+                levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
+                bonusXpPercentage INT UNSIGNED DEFAULT 10
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS BonusXpList (
+                guildId BIGINT UNSIGNED NOT NULL,
+                channelId BIGINT UNSIGNED NULL,
+                categoryId BIGINT UNSIGNED NULL,
+                roleId BIGINT UNSIGNED NULL,
+                userId BIGINT UNSIGNED NULL,
+                PercentBonusXp INT UNSIGNED DEFAULT 0
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            # Bot settings Table
+            '''
+            CREATE TABLE IF NOT EXISTS BotSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                botColour VARCHAR(20) NULL,
+                ghostPing BIT DEFAULT 0,
+                antiLink BIT(4) DEFAULT 3,
+                antiLinkTimeout INT DEFAULT 0
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            # Auto reaction system table
+            '''
+            CREATE TABLE IF NOT EXISTS AutoReactionSetup (
+                guildId BIGINT UNSIGNED NOT NULL, 
+                channelId BIGINT UNSIGNED NOT NULL,
+                categoryId BIGINT UNSIGNED NOT NULL,
+                emojiOne VARCHAR(255) NULL,
+                emojiTwo VARCHAR(255) NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS AutoReactionSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                teServerReaction INT NULL,
+                reactionParameter VARCHAR(255) NULL,
+                mainReactionEmoji VARCHAR(255) NOT NULL,
+                reactionKeyWords VARCHAR(4000) NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            '''
+        ]  
+
+        try:
+
+            for table in tables:
+                cursor.execute(table)
+                db_connect.commit()
+        
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -40,7 +137,6 @@ class main(commands.Cog):
         view.add_item(ShowBlacklistLevelSystemButton())
         self.bot.add_view(ModalButtonLevelUpMessage())
         
-
         # Mod tools
         self.bot.add_view(GhostPingButtons())
     
@@ -51,6 +147,8 @@ class main(commands.Cog):
         self.bot.add_view(GhostPingButtons())
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
         self.bot.add_view(view)
+
+        await Main.create_db_table()
         
         
 
@@ -62,7 +160,7 @@ async def status_task():
         await asyncio.sleep(15)
 
 
-bot.add_cog(main(bot))
+bot.add_cog(Main(bot))
 
 
 
