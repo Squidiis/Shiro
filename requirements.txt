@@ -5,3 +5,4 @@ py-cord==2.4.1
 python-dotenv==1.0.0
 requests==2.31.0
 ui==0.1.4
+PyYAML==6.0.1

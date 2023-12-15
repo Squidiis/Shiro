@@ -193,7 +193,6 @@ class ApplicationButton(discord.ui.View):
         await channels.send(embed=emb)
 
 
-
 @bot.command()
 async def application(ctx):
 

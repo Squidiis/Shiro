@@ -351,7 +351,7 @@ class LevelSystem(commands.Cog):
         check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message) if message != None else 0
      
         if check_bonus_xp_system != 0 and check_bonus_xp_system != None:
-            print(check_bonus_xp_system)
+        
             xp = settings[1] * (1 + (check_bonus_xp_system / 100))    
         else:
             xp = settings[1]
@@ -378,7 +378,7 @@ class LevelSystem(commands.Cog):
 
             channel = bot.get_channel(check_level_up_channel)
             channel.send(level_message(guild_id=guild_id, user_id=user_id, level=level))
-        
+
         else:
 
             message.channel.send(level_message(guild_id=guild_id, user_id=user_id, level=level))
@@ -455,8 +455,9 @@ class LevelSystem(commands.Cog):
                                 check_level_up_channel = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
 
                                 if check_level_up_channel[3]:
-
-                                    channel = bot.get_channel(check_level_up_channel)
+                                    
+                                    channel = bot.get_channel(check_level_up_channel[3])
+                            
                                     await channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
 
                                     if check_level_role:
@@ -492,8 +493,6 @@ class LevelSystem(commands.Cog):
                 except mysql.connector.Error as error:
                     print("parameterized query failed {}".format(error))
    
-
-
 
 
 ####################################################  User stats setting  #################################################
@@ -873,7 +872,7 @@ class LevelSystem(commands.Cog):
 
         DatabaseSetup.db_close(cursor=my_cursor, db_connection=leaderboard_connect)
 
-        emb = discord.Embed(title="leaderboard", description=f"leaderboard participants:\n\n{level_roles_mention_end}", color=discord.Colour.random())
+        emb = discord.Embed(title="leaderboard", description=f"leaderboard participants:\n\n{level_roles_mention_end}", color=bot_colour)
         emb.set_thumbnail(url=ctx.guild.icon.url)
         await ctx.respond(embed=emb)
 
@@ -1117,7 +1116,7 @@ class LevelSystem(commands.Cog):
 
                     emb = discord.Embed(title=f"The role was assigned successfully {Emojis.succesfully_emoji}", 
                         description=f"""{Emojis.dot_emoji} The role {role.mention} was successfully assigned to the level {level}.
-                        {Emojis.dot_emoji} As soon as a user reaches {level} he gets the <@&{role.mention}> role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                        {Emojis.dot_emoji} As soon as a user reaches {level} he gets the {role.mention} role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                 await ctx.respond(embed=emb_level_0) if level == 0 else None

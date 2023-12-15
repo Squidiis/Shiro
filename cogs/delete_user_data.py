@@ -71,8 +71,9 @@ class DeleteData(commands.Cog):
                   "AutoReactionSetup"]
         
         for table in tables:
-
-            DeleteData.delete_data(table=table, column="channelId", item=channel)
+            
+            column = "channelId" if table != "LevelSystemSettings" else "levelUpChannel"
+            DeleteData.delete_data(table=table, column=column, item=channel)
 
 
     @commands.Cog.listener()

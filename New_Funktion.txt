@@ -2,12 +2,9 @@
 
 texte in Moderator tolls überarbeiten
 
-delete user data file testen und überarbeiten
-hinzufügen das wenn bot aktiv die tables erstellt werden
 
 Embed im gesamten bot bisschen überarbeiten dabei an den vulfo bot orientieren
 
-
-
-
 Help menü adden
+
+Kommentare verfassen

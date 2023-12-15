@@ -8,8 +8,29 @@ class ModeratorCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
+
+##################################  Anti-link system  #########################################
+
+
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
+
+        '''
+        Anti-link system
+
+        :Function:
+        Deletes messages if they contain a link
+        If the message is deleted, an embed is sent in which the violation is pointed out again
+        
+        Parameters
+        ------------
+        ..mode
+            0 == All discord invites links will be deleted
+            1 == All links will be deleted if they are not an image or video
+            2 == All links will be deleted
+            3 == Nothing will be deleted :disabled:
+        '''
 
         if message.author.bot:
             return
@@ -21,75 +42,114 @@ class ModeratorCommands(commands.Cog):
             
             else:
                 
+                # Text additions for the embed
                 anti_link_text = {
-                    0:'discord invitation link',
-                    1:'link or a discord invitation ',
-                    2:'link or an image / video',
-                }
+                    0:"discord invitation link",
+                    1:"link or a discord invitations",
+                    2:"link or an image / video",
+                    3:""}
 
                 check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
                 channel = message.channel
             
                 emb = discord.Embed(title=f'{Emojis.help_emoji} {message.author.name} you have violated the anti-link system', 
                     description=f"""{Emojis.dot_emoji} You have violated the anti-link system on {message.guild.name} it is forbidden:
-                    {Emojis.dot_emoji} `You have sent an {anti_link_text[check_settings[3]]} to this chat`.
+                    {Emojis.dot_emoji} `You have sent an {anti_link_text[check_settings[3]]} to this chat`
                     {f"{Emojis.dot_emoji} That's why you got a timeout for {check_settings[4]} minutes" if check_settings[4] != 0 else ''}""", colour=bot_colour)
-                emb.set_footer(text=f'{message.author.name}', icon_url=message.author.avatar.url)
-
+                emb.set_footer(text=f'{message.author.name}', icon_url=message.author.display_avatar.url)
+                
+                rule_violation = False
+                
+                # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
                 if check_settings[3] == 0:
-
-                    if 'discord.gg/' in message.content:
+            
+                    if "discord.gg/" in message.content:
                         await message.delete()
+                        rule_violation = True
 
+                # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
                 elif check_settings[3] == 1:
+            
+                    if "https://" in message.content and not message.attachments:
 
-                    if 'https://' in message.content and not message.attachments:
                         await message.delete()
+                        rule_violation = True
 
+                # Is triggered when there is a link in the message (when triggered, the message is deleted)
                 elif check_settings[3] == 2:
 
-                    if 'https://' in message.content or message.attachments:
+                    if "https://" in message.content or message.attachments:
+
                         await message.delete()
+                        rule_violation = True
 
                 elif check_settings[3] == 3:
                     return
+                
+                if rule_violation == True:
 
-                await channel.send(embed=emb, delete_after=5)
-                await message.author.timeout_for(timedelta(minutes = check_settings[4]))
+                    await channel.send(embed=emb, delete_after=5)
+                    await message.author.timeout_for(timedelta(minutes = check_settings[4]))
 
 
     @commands.slash_command(name = "set-anti-link", description = "Set the anti-link system the way you want it!")
     @commands.has_permissions(administrator = True)
     async def set_anti_link(self, ctx:discord.ApplicationContext,
         settings:Option(str, required = True,
-                        description="Choose how the anti-link system should behave!",
-                        choices = [
-                                discord.OptionChoice(name = 'All messages with a discord invitation link will be deleted', value="0"),
-                                discord.OptionChoice(name = 'All messages with a link will be deleted exceptions: images, videos (discord links will be deleted)', value="1"),
-                                discord.OptionChoice(name = 'All messages with a link will be deleted this also includes pictures and videos', value="2"),
-                                discord.OptionChoice(name = 'Deactivate anti-link system! (no messages are deleted)', value="3")]), 
+            description="Choose how the anti-link system should behave!",
+            choices = [
+                discord.OptionChoice(name = "All messages with a discord invitation link will be deleted", value="0"),
+                discord.OptionChoice(name = "All messages with a link will be deleted exceptions: images, videos (discord links will be deleted)", value="1"),
+                discord.OptionChoice(name = "All messages with a link will be deleted this also includes pictures and videos", value="2"),
+                discord.OptionChoice(name = "Deactivate anti-link system! (no messages are deleted)", value="3")]), 
         timeout:Option(int, max_value = 60, required = True, 
-                       description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
-                       choices = [0, 5, 10, 20, 30, 40, 50, 60])):
+            description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
+            choices = [0, 5, 10, 20, 30, 40, 50, 60])):
+
+        '''
+        set-anti-link (setting command for the anti-link system)
+
+        Function:
+        Shows a dropdown menu where you can select how the anti-link system should behave 
+        
+        Parameters
+        ----------
+        settings: :class:`str` [required]
+            Setting how the anti-link system should behave
+            ..variables
+                0 == All discord invites links will be deleted
+                1 == All links will be deleted if they are not an image or video
+                2 == All links will be deleted
+                3 == Nothing will be deleted `disabled`
+        timeout: :class:`int`
+            How long the user should be timed out
+            ..variables
+                [0, 5, 10, 20, 30, 40, 50, 60]
+        '''
 
         DatabaseUpdates.update_bot_settings(guild_id=ctx.guild.id, anti_link=int(settings), anti_link_timeout=timeout)
 
         settings_text = {
-                        "0":"All messages that contain a discord invitation link.",
-                        "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
-                        "2":"All messages with a link will be deleted this also includes pictures and videoso",
-                        "3":"Nothing because the anti-link system is deactivated"}
+            "0":"All messages that contain a discord invitation link.",
+            "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
+            "2":"All messages with a link will be deleted this also includes pictures and videoso",
+            "3":"Nothing because the anti-link system is deactivated"}
 
         emb = discord.Embed(title=f"{Emojis.settings_emoji} The anti-link system was set up", 
             description=f"""{Emojis.dot_emoji} The anti-link system will now delete the following messages:
             `{settings_text[settings]}`
-            {Emojis.dot_emoji} Users who still send links will receive a timeout of **{timeout}** minutes""", color=bot_colour)
+            {f'{Emojis.dot_emoji} Users who still send links will receive a timeout of **{timeout}** minutes' if settings != '3' else ''}""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 
+
+####################################  Moderation commands  ###################################
+
     @commands.slash_command(name = "ban", description = "Ban a user so that he can no longer join the server!")
     @commands.has_permissions(ban_members = True, administrator = True)
-    async def ban(self, ctx:discord.ApplicationContext, member: Option(discord.Member, description = "Choose the user you want to ban!"), reason:Option(str, description = "Give a reason why this user should be banned! (optional)", required = False)):
+    async def ban(self, ctx:discord.ApplicationContext, 
+        member:Option(discord.Member, description = "Choose the user you want to ban!"), 
+        reason:Option(str, description = "Give a reason why this user should be banned! (optional)", required = False)):
         
         if member.id == ctx.author.id:
 
@@ -252,6 +312,7 @@ class ModeratorCommands(commands.Cog):
                     await message.channel.send(embed=embed)
 
 
+    # If the database contains 0, the system is deactivated; if it contains 1, it is activated
     @commands.slash_command(name = "ghost-ping-settings", description = "Schalte das ghost ping system ein oder aus!")
     async def ghost_ping_settings(self, ctx:commands.Context):
 
@@ -259,7 +320,7 @@ class ModeratorCommands(commands.Cog):
 
         emb = discord.Embed(title=f"{Emojis.settings_emoji} Here you can set the anti ghost ping system ", 
             description=f"""{Emojis.dot_emoji} Currently the anti ghost ping system is {'**enabled**' if check_settings[2] == 0 else '**disabled**'}
-            {Emojis.dot_emoji} If you want it to {'**turn it on**' if check_settings[2] != 0 else '**turn it off**'} press the lower button""", color=bot_colour)
+            {Emojis.dot_emoji} If you want it to {'**turn it on**' if check_settings[2] == 0 else '**turn it off**'} press the lower button""", color=bot_colour)
         await ctx.respond(embed=emb, view=GhostPingButtons())
 
 
@@ -376,6 +437,7 @@ class ModeratorCommands(commands.Cog):
 
 def setup(bot):
     bot.add_cog(ModeratorCommands(bot))
+
 
 
 class GhostPingButtons(discord.ui.View):
