@@ -69,21 +69,21 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 |reset-level|Resets the forward step of all users on the server to 0|
 |reset-user-stats||
 |rank|Shows the progress of a user in the level system with the help of a rank card, for example [press here](https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/rank-card/example_rank_card.png?raw=true)|
-|leaderboard|Zeigt die 10 besten auf den server|
-|level-system-settings|Schaltet das level system aus oder ein|
-|add-level-blacklist||
-|remove-level-blacklist||
-|show-level-blacklist||
-|reset-level-blacklist||
-|add-level-role||
-|remove-level-role||
-|show-level-roles||
-|set-level-up-channel||
-|disable-level-up-channel||
-|show-level-up-channel||
-|set-xp-rate||
-|default-xp-rate||
-|show-xp-rate||
+|leaderboard|Shows the 10 best on the server|
+|level-system-settings|Enables the level system to be set|
+|add-level-blacklist|Excludes a channel, category, role or user from the level system, after which activities in the channel or categories and by users or role holders are no longer rewarded with XP|
+|remove-level-blacklist|Deletes a channel, category, role or user from the level system blacklist then you can get XP again by being active|
+|show-level-blacklist|Shows everything that is on the blacklist|
+|reset-level-blacklist|Resets the entire blacklist|
+|add-level-role|Adds a level role when you reach a certain level that you can freely choose, this is then awarded|
+|remove-level-role|Removes a role as a level role|
+|show-level-roles|Displays all level roles|
+|set-level-up-channel|Defines a channel as the level up channel to which all level up messages are then sent|
+|disable-level-up-channel|Resets the channel set as level up then the level up notifications are always set to the channel in which the last activity took place|
+|show-level-up-channel|Shows the currently set level up channel|
+|set-xp-rate|Sets a value for how much XP should be awarded per message|
+|default-xp-rate|Sets the value of XP to be awarded per message back to default: 20 XP per message|
+|show-xp-rate|Shows the current value of how much XP is awarded per message|
 |add-bonus-xp-channel||
 |remove-bonus-xp-channel||
 |add-bonus-xp-category||
@@ -92,11 +92,11 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 |remove-bonus-xp-role||
 |add-bonus-xp-user||
 |remove-bonus-xp-user||
-|show-bonus-xp-list||
-|reset-bonus-xp-list||
-|set-bonus-xp-percentage||
-|default-bonus-xp-percentage||
-|show-bonus-xp-percentage||
-|set-level-up-message||
-|default-level-up-message||
-|show-level-up-message||
+|show-bonus-xp-list|Shows all channels, categories, roles and users that are rewarded with extra XP for activities|
+|reset-bonus-xp-list|Resets the entire bonus XP list|
+|set-bonus-xp-percentage|Defines a stadart bonus XP percentage how much more XP should be awarded as a percentage per activity (only applies to channels, categories, roles and users on the bonus XP list)|
+|default-bonus-xp-percentage|Resets the bonus XP percentage to default: 10% more XP per activity (this percentage only applies to the channels, categories, roles and users on the bonus XP list)|
+|show-bonus-xp-percentage|Shows you the bonus XP percentage|
+|set-level-up-message|Defines an individual level up message for a server: 2 arguments are given (user and level)|
+|default-level-up-message|Resets the level up message to default|
+|show-level-up-message|Shows the current level up message|

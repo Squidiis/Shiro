@@ -16,7 +16,7 @@ class DatabaseSetup():
 
     def db_close(cursor, db_connection):
 
-        if db_connection.is_connected:
+        if db_connection.is_connected():
             
             db_connection.close()
             cursor.close()
@@ -24,6 +24,7 @@ class DatabaseSetup():
         else:
             pass
 
+        
 
 class DatabaseStatusCheck():
 
@@ -75,7 +76,7 @@ class DatabaseStatusCheck():
 
 
 
-#######################  Database Statemants  ############################
+##################################################  Database Statemants  #####################################
 
 class DatabaseCheck():
 
@@ -282,7 +283,7 @@ class DatabaseCheck():
 
 class DatabaseUpdates():
 
-####################################  Bot Settings  ###############################################
+###############################################  Bot Settings  ###############################################
 
 
     def _create_bot_settings(guild_id:int):
@@ -586,8 +587,6 @@ class DatabaseUpdates():
 
 
 
-
-
 class DatabaseRemoveDatas():
 
 ###########################################################  Removes values from the level system  #######################################
@@ -646,8 +645,6 @@ class DatabaseRemoveDatas():
         finally:
 
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
-
-
 
 
 

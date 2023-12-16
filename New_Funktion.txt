@@ -8,3 +8,7 @@ Embed im gesamten bot bisschen überarbeiten dabei an den vulfo bot orientieren
 Help menü adden
 
 Kommentare verfassen
+
+Mute und unmute command
+
+Bonus xp liest system umbauen das es wie das blacklist system funktioniert

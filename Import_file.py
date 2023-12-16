@@ -26,25 +26,12 @@ import yaml
 
 disable_level_up_channel = ""
 add_level_up_channel = ""
-level_settings = ""
 remove_xp = ""
 give_xp = ""
 give_level = ""
 remove_level = ""
 show_level_role = ""
 add_level_role = ""
-remove_level_role = ""
-
-# Blacklist level
-add_blacklist_level_channel = ""
-remove_blacklist_level_channel = ""
-add_blacklist_level_category = "" # Ändern
-remove_blacklist_level_category = ""
-add_blacklist_level_role = ""
-remove_blacklist_level_role = ""
-add_blacklist_level_user = ""
-remove_blacklist_level_user = ""
-show_blacklist_level = ""
 
 
 # These are all emojis used in this bot the individual eimojis are stored again in this folder: discord_bot/emojis
@@ -94,13 +81,17 @@ bot_colour = data["Bot_colour"]
 
 
 # Fail / error embeds
-no_permissions_emb = discord.Embed(title="You are not authorized", description = f"You are not allowed to press this button only admins are allowed to interact with this command {Emojis.fail_emoji}",color = error_red)
+no_permissions_emb = discord.Embed(title="You are not authorized", 
+    description = f"You are not allowed to press this button only admins are allowed to interact with this command {Emojis.fail_emoji}",color = error_red)
 
-user_bot_emb = discord.Embed(title = f"The user is a bot {Emojis.fail_emoji}", description = f"The user you have selected is a bot and cannot be selected in this command!", color = error_red)
+user_bot_emb = discord.Embed(title = f"The user is a bot {Emojis.fail_emoji}", 
+    description = f"The user you have selected is a bot and cannot be selected in this command!", color = error_red)
 
-user_not_found_emb = discord.Embed(title=f"The user was not found {Emojis.fail_emoji}", description = f"{Emojis.dot_emoji} No entry was found the user is also no longer on the server {Emojis.exclamation_mark_emoji}", color = error_red)
+user_not_found_emb = discord.Embed(title=f"The user was not found {Emojis.fail_emoji}", 
+    description = f"{Emojis.dot_emoji} No entry was found the user is also no longer on the server {Emojis.exclamation_mark_emoji}", color = error_red)
 
-no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", description = f"{Emojis.dot_emoji} Therefore, one was created just try again.", color = bot_colour) 
+no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", 
+    description = f"{Emojis.dot_emoji} Therefore, one was created just try again.", color = bot_colour) 
 
 
 # Help command

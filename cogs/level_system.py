@@ -8,6 +8,7 @@ import re
 
 class CheckLevelSystem():
 
+    # Function that returns all items of the blacklist 
     def show_blacklist_level(guild_id:int):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
@@ -20,6 +21,7 @@ class CheckLevelSystem():
         return ["\n".join(checked_channel), "\n".join(checked_category), "\n".join(checked_role), "\n".join(checked_user)]
     
 
+    # Function that checks how high the bonus xp percentage rate is
     def check_bonus_xp(guild_id:int, message:discord.Message):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
@@ -47,8 +49,6 @@ class CheckLevelSystem():
         else:
             return None
             
-
-
 
 
 #############################################  Level Systen Settings  #############################################
@@ -369,23 +369,8 @@ class LevelSystem(commands.Cog):
         rectangle.putalpha(mask)
         return (rectangle, mask)
     
-    @staticmethod
-    def check_level_up_channel(guild_id:int, user_id:int, level:int, message:discord.Message):
-
-        check_level_up_channel = DatabaseCheck.check_level_settings(guild_id=guild_id)[3]
-
-        if check_level_up_channel:
-
-            channel = bot.get_channel(check_level_up_channel)
-            channel.send(level_message(guild_id=guild_id, user_id=user_id, level=level))
-
-        else:
-
-            message.channel.send(level_message(guild_id=guild_id, user_id=user_id, level=level))
-
-        
-
-
+    
+    # Level system checks who gets XP and how much has a cooldown of 10 seconds
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
         

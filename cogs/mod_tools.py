@@ -16,22 +16,6 @@ class ModeratorCommands(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
 
-        '''
-        Anti-link system
-
-        :Function:
-        Deletes messages if they contain a link
-        If the message is deleted, an embed is sent in which the violation is pointed out again
-        
-        Parameters
-        ------------
-        ..mode
-            0 == All discord invites links will be deleted
-            1 == All links will be deleted if they are not an image or video
-            2 == All links will be deleted
-            3 == Nothing will be deleted :disabled:
-        '''
-
         if message.author.bot:
             return
 
@@ -106,29 +90,9 @@ class ModeratorCommands(commands.Cog):
             description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
             choices = [0, 5, 10, 20, 30, 40, 50, 60])):
 
-        '''
-        set-anti-link (setting command for the anti-link system)
-
-        Function:
-        Shows a dropdown menu where you can select how the anti-link system should behave 
-        
-        Parameters
-        ----------
-        settings: :class:`str` [required]
-            Setting how the anti-link system should behave
-            ..variables
-                0 == All discord invites links will be deleted
-                1 == All links will be deleted if they are not an image or video
-                2 == All links will be deleted
-                3 == Nothing will be deleted `disabled`
-        timeout: :class:`int`
-            How long the user should be timed out
-            ..variables
-                [0, 5, 10, 20, 30, 40, 50, 60]
-        '''
-
         DatabaseUpdates.update_bot_settings(guild_id=ctx.guild.id, anti_link=int(settings), anti_link_timeout=timeout)
 
+        # Text passages for the embed
         settings_text = {
             "0":"All messages that contain a discord invitation link.",
             "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
@@ -145,12 +109,13 @@ class ModeratorCommands(commands.Cog):
 
 ####################################  Moderation commands  ###################################
 
+
     @commands.slash_command(name = "ban", description = "Ban a user so that he can no longer join the server!")
     @commands.has_permissions(ban_members = True, administrator = True)
     async def ban(self, ctx:discord.ApplicationContext, 
-        member:Option(discord.Member, description = "Choose the user you want to ban!"), 
+        member:Option(discord.Member, required = True, description = "Choose the user you want to ban!"), 
         reason:Option(str, description = "Give a reason why this user should be banned! (optional)", required = False)):
-        
+
         if member.id == ctx.author.id:
 
             emb = discord.Embed(title=f"{Emojis.help_emoji} You can't ban yourself!",
@@ -169,6 +134,26 @@ class ModeratorCommands(commands.Cog):
                 reason = f"No reason was given"
             emb=discord.Embed(title=f"{member.name} was successfully banned {Emojis.succesfully_emoji}", description=f"{Emojis.dot_emoji} {reason}", color=bot_colour)
             await member.ban(reason = reason)
+            await ctx.respond(embed=emb)
+
+    
+    @commands.slash_command(name = "unban", description = "Pick up the ban of a user!")
+    @commands.has_permissions(ban_members = True)
+    async def unban(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!", required = True)):
+        
+        try:
+
+            member = await bot.get_or_fetch_user(int(id))
+            await ctx.guild.unban(member)
+
+            emb = discord.Embed(title=f"{member.name} was successfully unbanned {Emojis.succesfully_emoji}", 
+                description=f"""{Emojis.dot_emoji} {member.mention} has been successfully unbanned and can now enter the server again.""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        except:    
+            
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The user whose ID you entered was not banned", 
+                description=f"""{Emojis.dot_emoji} The ID you entered does not belong to a user who has been banned on this server.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -193,26 +178,6 @@ class ModeratorCommands(commands.Cog):
                 description=f"""{Emojis.dot_emoji} You have successfully kicked {member.mention}.""", color=bot_colour)
             await ctx.respond(embed=emb)
             await member.kick()
-
-
-    @commands.slash_command(name = "unban", description = "Pick up the ban of a user!")
-    @commands.has_permissions(ban_members = True)
-    async def unban(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!", required = True)):
-        
-        try:
-
-            member = await bot.get_or_fetch_user(int(id))
-            await ctx.guild.unban(member)
-
-            emb = discord.Embed(title=f"{member.name} was successfully unbanned {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} {member.mention} has been successfully unbanned and can now enter the server again.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        except:    
-            
-            emb = discord.Embed(title=f"{Emojis.help_emoji} The user whose ID you entered was not banned", 
-                description=f"""{Emojis.dot_emoji} The ID you entered does not belong to a user who has been banned on this server.""", color=bot_colour)
-            await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = 'timeout', description = "Send a user to timeout!")
@@ -297,7 +262,7 @@ class ModeratorCommands(commands.Cog):
         check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
 
         # If the value is above 0, the ghost ping system is deactivated
-        if check_settings[2] != 0:
+        if check_settings[2] != 0 and check_settings[2] != None:
 
             if message.mentions != 0:
                 if len(message.mentions) < 3:
@@ -312,10 +277,10 @@ class ModeratorCommands(commands.Cog):
                     await message.channel.send(embed=embed)
 
 
-    # If the database contains 0, the system is deactivated; if it contains 1, it is activated
     @commands.slash_command(name = "ghost-ping-settings", description = "Schalte das ghost ping system ein oder aus!")
     async def ghost_ping_settings(self, ctx:commands.Context):
 
+        # If the database contains 0, the system is deactivated; if it contains 1, it is activated
         check_settings = DatabaseCheck.check_bot_settings(guild_id=ctx.guild.id)
 
         emb = discord.Embed(title=f"{Emojis.settings_emoji} Here you can set the anti ghost ping system ", 
