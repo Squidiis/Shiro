@@ -921,7 +921,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    async def check_level_blacklist(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
+    async def config_level_blacklist(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
 
         if [x for x in [channel, category, role, user] if x]:
             
@@ -1038,7 +1038,7 @@ class LevelSystem(commands.Cog):
         
         else:
 
-            emb = await self.check_level_blacklist(guild_id=ctx.guild.id, operation="add", channel=channel, category=category, role=role, user=user)
+            emb = await self.config_level_blacklist(guild_id=ctx.guild.id, operation="add", channel=channel, category=category, role=role, user=user)
             await ctx.respond(embed=emb)
     
     
@@ -1050,7 +1050,7 @@ class LevelSystem(commands.Cog):
         role:Option(discord.Role, required = False, description="Select a role you want to remove from the blacklist "),
         user:Option(discord.User, required = False, description="Select a user that you want to remove from the blacklist!")):
 
-        emb = await self.check_level_blacklist(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
+        emb = await self.config_level_blacklist(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
         await ctx.respond(embed=emb)
 
    
@@ -1344,6 +1344,129 @@ class LevelSystem(commands.Cog):
         
         return bonus_percentage
     
+    
+    async def config_bonus_xp_list(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
+
+        if [x for x in [channel, category, role, user] if x]:
+            
+            check_channel = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, channel_id=channel.id) if channel != None else False
+            check_category = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, category_id=category.id) if category != None else False
+            checK_role = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, role_id=role.id) if role != None else False
+            check_user = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, user_id=user.id) if user != None else False
+
+            items = {0:check_channel, 1:check_category, 2:checK_role, 3:check_user}
+            items_list = [channel, category, role, user]
+            
+            if [x for x in items.values() if x is None] and operation == "add" or any(x for x in items.values() if x is not False or None) and operation == "remove":
+
+                res = list({ele for ele in items if items[ele]}) if operation == "add" else list({ele for ele in items if items[ele] is None})
+                second_res = list({ele for ele in items if items[ele] is None}) if operation == "add" else list({ele for ele in items if items[ele]})
+            
+                item = [(f"> {Emojis.dot_emoji} {items_list[i].mention}") for i in res] 
+                second_item = [(f"> {Emojis.dot_emoji} {items_list[i].mention}") for i in second_res]
+        
+                items_dict = {
+                    0:channel.id if 0 in second_res else None, 
+                    1:category.id if 1 in second_res else None, 
+                    2:role.id if 2 in second_res else None,
+                    3:user.id if 3 in second_res else None
+                }
+            
+                if operation == "add":
+                    
+                    formatted_items = "\n".join(item) if item != [] else "\n> Keines dieser Items ist auf der Bonus XP list"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> Keines dieser Items kann von der Bonus XP list entfernt werden da sie dort nicht gelistet sind"
+                    
+                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
+                        
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the bonus XP list or were already there", 
+                        description=f"""### {Emojis.dot_emoji} The following were already on the XP bonus list:
+                        {formatted_items}\n### {Emojis.dot_emoji} Newly added:
+                        {formatted_add_items}""", color=bot_colour)
+                    return emb
+
+                elif operation == "remove":
+                
+                    formatted_items = "\n".join(item) if item != [] else "> All the items you specified were on the XP bonus list"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be removed from the XP bonus list because they are not on the blacklist"
+
+                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
+
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been removed from the XP bonus list or were not listed", 
+                        description=f"""### {Emojis.dot_emoji} The following items were not on the XP bonus list:
+                        {formatted_items}\n### {Emojis.dot_emoji} Was deleted from the XP bonus list:
+                        {formatted_add_items}""", color=bot_colour)
+                    return emb
+                
+            else:
+
+                emb = discord.Embed(title=f"{Emojis.help_emoji}Nothing can be {'added to the bonus XP list' if operation == 'add' else 'removed from the bonus XP list'}", 
+                    description=f"""{Emojis.dot_emoji} {"All the things you have specified are already on the bonus XP list" 
+                        if operation == "add" else 
+                        "None of the things you mentioned are on the bonus XP list"}""", color=bot_colour)
+                return emb
+            
+        else:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You have not specified anything!", 
+                description=f"""{Emojis.dot_emoji}You have not specified anything {"what should be added to the bonus XP list" 
+                    if operation == "add" else
+                    "what should be removed from the bonus XP list"}""", color=bot_colour)
+            return emb
+
+    
+    @commands.slash_command(name = "add-bonus-xp-list", description = "Add what you want to the bonus XP list!")
+    @commands.has_permissions(administrator = True)
+    async def add_level_blacklist(self, ctx:discord.ApplicationContext, 
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Wähle einen channel aus in den nachrichten mit mehr XP belohnen werden sollen!"),
+        category:Option(discord.CategoryChannel, required = False, description="Wähle eine Kategorie aus in der nachrichten mit mehr XP belohnen werden sollen!"),
+        role:Option(discord.Role, required = False, description="Wähle eine Rolle aus wo der jenige der sie besitzt mehr XP erhält wenn er nachrichten schreibt!"),
+        user:Option(discord.User, required = False, description="Wähle einen user aus der mehr XP pro Nachricht erhalten soll!"),
+        bonus:Option(int, required = False, description="Choose how much more xp to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
+
+        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
+
+        filtered_list = []
+        if category != None:
+            
+            for _, channels, _, _, _ in check_blacklist:
+
+                if channels:
+
+                    if bot.get_channel(channels).category.id == category.id:
+
+                        DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channels)
+                        filtered_list.append(f"> {Emojis.dot_emoji} <#{channels}>")
+        
+        if channel != None and any(channel.category.id == x[2] for x in check_blacklist):
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} The channel is already indirectly on the XP bonus list", 
+                description=f"""{Emojis.dot_emoji} Der channe {channel.mention} ist bereits auf der bonus XP list und wir somit schon mit """, color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        elif category != None and filtered_list != []:
+ 
+            channel_list = "\n".join(filtered_list)
+            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id)
+                    
+            emb = discord.Embed(title=f"{Emojis.help_emoji} {'One channel' if len(filtered_list) == 1 else 'Several channels'} in this category is already blacklisted", 
+                description=f"""{Emojis.dot_emoji} The following {'channel is' if len(filtered_list) == 1 else 'channels are'} already blacklisted \n\n{channel_list}
+                    {Emojis.arrow_emoji} Therefore {'this' if len(filtered_list) == 1 else 'these'} channel will be removed from the blacklist and the category will be added instead.
+                   This excludes all channels in the category from the level system.""", color=bot_colour)
+            await ctx.respond(embed=emb) 
+
+        elif user != None and user.bot:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You cannot put a bot on the blacklist", 
+                description=f"{Emojis.dot_emoji} All bots are automatically excluded from the level system.", color=bot_colour)
+            await ctx.respond(embed=emb)
+        
+        else:
+
+            emb = await self.check_level_blacklist(guild_id=ctx.guild.id, operation="add", channel=channel, category=category, role=role, user=user)
+            await ctx.respond(embed=emb)
+
+
 
     @commands.slash_command(name = "add-bonus-xp-channel")
     @commands.has_permissions(administrator = True)

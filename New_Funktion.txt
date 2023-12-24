@@ -9,6 +9,4 @@ Help menü adden
 
 Kommentare verfassen
 
-Mute und unmute command
-
 Bonus xp liest system umbauen das es wie das blacklist system funktioniert

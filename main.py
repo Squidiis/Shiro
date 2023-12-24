@@ -230,41 +230,20 @@ async def rules_funpark(ctx):
     https://discord.com/guidelines
     """, color=0xde2cc3)
     await ctx.send(embed=emb)
+
 @bot.command()
-async def application(ctx):
+async def Christmas(ctx):
 
-    emb = discord.Embed(title="Hello Members,", description="""
-    Cause of the rising of our members we decided to seek for more staff members.
+    emb = discord.Embed(description=""" 
+    # 🎄 Merry Christmas 🎄
+    We from the Hanime Funpark team wish you all a Merry Christmas 
+    as a little special we post in the <#1181304140404625548> and in the <#921862164267024386> 40 pictures and video 🎁
+    Enjoy your holidays ⛄
+    @everyone
+    """, color=discord.Colour.red())
+    emb.set_image(url="https://wallpapers-clan.com/wp-content/uploads/2023/11/christmas-anime-girl-with-candle-desktop-wallpaper-preview.jpg")
+    await ctx.send(embed=emb)
 
-    We offer: 
-
-    > ```Moderator,```
-    > here you have to watch a few channels like Global chat and look if everyone follows the rules. If not, then please respond in a comprehensible way. You also should look for other things like spam or if someone writes in one of the hanime channels then please delete the message. 
-
-    > ```Developers,```
-    > you are able to help programming and testing our bots. We prefer Python but we also take Java, HTML CSS, Java script. Some things you are able to do is creating and developing future Minigames.
-
-    > ```Hentai Konzern,```
-    > Here your Task is to refill the hentai Channels with a minimum of 5 channels and 10 pictures. Its ok if you fill them up every 2 or 3 days. There are also some rules witch type of pictures are not allowed. These Types are: Loli, Gore and other things that contain children or other disturbing stuff.
-
-    > ```Artist,```
-    > As an artist your job is it to create banners, mascots and other stuff. Another thing you are able to do is helping to design and create mascots and to create assets for future Minigames. 
-
-    > ```Assistant,```
-    > As an Assistant you have to help the owners with a few tasks like organising events and other stuff we might need help with. Another task is to help setting up streams, for example an Hanime stream or gaming stream. 
-
-    *Other things you should know about:*
-
-    > You must be nice to the members and other staff members or there will be consiquencies.
-    > If you should´t be available for a few day then please let us know. 
-    > In case you are noticed in a negative way to often you will be dismissed.
-
-    So, want to join our Team?
-    **Then please contact one of the owners!**
-    **Or press the button**
-    <@&865907711832227840>
-    """, color=0x09ebdf)
-    await ctx.send(embed=emb, view=ApplicationButton())
 
 class AutoReaction(commands.Cog):
     def __init__(self, bot):

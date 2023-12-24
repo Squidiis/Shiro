@@ -400,6 +400,34 @@ class ModeratorCommands(commands.Cog):
         await ctx.reply(embed=embed)
 
 
+    @commands.Cog.listener()
+    async def on_message(self, message:discord.Message):
+        
+
+        """
+        CREATE TABLE IF NOT EXISTS Special (
+            guildId BIGINT UNSIGNED NOT NULL,
+            userId BIGINT UNSIGNED NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+        """
+
+        db_connection = DatabaseSetup.db_connector()
+        cursor = db_connection.cursor()
+
+        cursor.execute("SELECT * FROM Special WHERE guildId = %s and userID = %s")
+        check = cursor.fetchall()
+
+        if check == None:
+
+            new_user = "INSERT INTO Special (guildId, userId) VALUES (%s, %s)"
+            new_user_vlaues = [message.guild.id, message.author.id]
+            cursor.execute(new_user, new_user_vlaues)
+            db_connection.commit()
+
+        else:
+            pass
+            
+
 def setup(bot):
     bot.add_cog(ModeratorCommands(bot))
 
