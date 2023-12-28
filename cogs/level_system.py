@@ -374,6 +374,10 @@ class LevelSystem(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
         
+        # If it is a direct message
+        if not message.guild:
+            return
+
         # Check if the cool down has already expired if not the message will not be counted
         if self.get_ratelimit(message):
             return
@@ -1345,7 +1349,7 @@ class LevelSystem(commands.Cog):
         return bonus_percentage
     
     
-    async def config_bonus_xp_list(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
+    async def config_bonus_xp_list(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None, bonus = None):
 
         if [x for x in [channel, category, role, user] if x]:
             
@@ -1377,12 +1381,13 @@ class LevelSystem(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "\n> Keines dieser Items ist auf der Bonus XP list"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> Keines dieser Items kann von der Bonus XP list entfernt werden da sie dort nicht gelistet sind"
                     
-                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
-                        
+                    DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3], bonus = bonus)    
+                    server_bonus = DatabaseCheck.check_level_settings(guild_id=guild_id)[5]
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the bonus XP list or were already there", 
                         description=f"""### {Emojis.dot_emoji} The following were already on the XP bonus list:
                         {formatted_items}\n### {Emojis.dot_emoji} Newly added:
-                        {formatted_add_items}""", color=bot_colour)
+                        {formatted_add_items}
+                        {Emojis.dot_emoji}Each of the newly added items is rewarded with {f'the bonus you specified this is: {bonus} %' if bonus != None else f'the bonus you have specified for the server, which is: {server_bonus} %'}""", color=bot_colour)
                     return emb
 
                 elif operation == "remove":
@@ -1390,7 +1395,7 @@ class LevelSystem(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "> All the items you specified were on the XP bonus list"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be removed from the XP bonus list because they are not on the blacklist"
 
-                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
+                    DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
 
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been removed from the XP bonus list or were not listed", 
                         description=f"""### {Emojis.dot_emoji} The following items were not on the XP bonus list:
@@ -1415,263 +1420,39 @@ class LevelSystem(commands.Cog):
             return emb
 
     
-    @commands.slash_command(name = "add-bonus-xp-list", description = "Add what you want to the bonus XP list!")
+    @commands.slash_command(name = "add-bonus-xp-list", description = "Choose what you want to reward with more XP!")
     @commands.has_permissions(administrator = True)
-    async def add_level_blacklist(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Wähle einen channel aus in den nachrichten mit mehr XP belohnen werden sollen!"),
-        category:Option(discord.CategoryChannel, required = False, description="Wähle eine Kategorie aus in der nachrichten mit mehr XP belohnen werden sollen!"),
-        role:Option(discord.Role, required = False, description="Wähle eine Rolle aus wo der jenige der sie besitzt mehr XP erhält wenn er nachrichten schreibt!"),
-        user:Option(discord.User, required = False, description="Wähle einen user aus der mehr XP pro Nachricht erhalten soll!"),
+    async def add_bonus_xp_list(self, ctx:discord.ApplicationContext, 
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Choose a channel in which messages should be rewarded with more XP!"),
+        category:Option(discord.CategoryChannel, required = False, description="Choose a category in which messages should be rewarded with more XP!"),
+        role:Option(discord.Role, required = False, description="Choose a role where the one who owns it gets more XP when writing messages!"),
+        user:Option(discord.User, required = False, description="Select a user who should receive more XP per message!"),
         bonus:Option(int, required = False, description="Choose how much more xp to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
 
-        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
+        if user.bot:
 
-        filtered_list = []
-        if category != None:
-            
-            for _, channels, _, _, _ in check_blacklist:
-
-                if channels:
-
-                    if bot.get_channel(channels).category.id == category.id:
-
-                        DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channels)
-                        filtered_list.append(f"> {Emojis.dot_emoji} <#{channels}>")
-        
-        if channel != None and any(channel.category.id == x[2] for x in check_blacklist):
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} The channel is already indirectly on the XP bonus list", 
-                description=f"""{Emojis.dot_emoji} Der channe {channel.mention} ist bereits auf der bonus XP list und wir somit schon mit """, color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        elif category != None and filtered_list != []:
- 
-            channel_list = "\n".join(filtered_list)
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id)
-                    
-            emb = discord.Embed(title=f"{Emojis.help_emoji} {'One channel' if len(filtered_list) == 1 else 'Several channels'} in this category is already blacklisted", 
-                description=f"""{Emojis.dot_emoji} The following {'channel is' if len(filtered_list) == 1 else 'channels are'} already blacklisted \n\n{channel_list}
-                    {Emojis.arrow_emoji} Therefore {'this' if len(filtered_list) == 1 else 'these'} channel will be removed from the blacklist and the category will be added instead.
-                   This excludes all channels in the category from the level system.""", color=bot_colour)
-            await ctx.respond(embed=emb) 
-
-        elif user != None and user.bot:
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} You cannot put a bot on the blacklist", 
-                description=f"{Emojis.dot_emoji} All bots are automatically excluded from the level system.", color=bot_colour)
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You cannot put a bot on the bonus XP list", 
+                description=f"{Emojis.dot_emoji} Bots don't get XP so you can't put them on the bonus XP list", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
 
-            emb = await self.check_level_blacklist(guild_id=ctx.guild.id, operation="add", channel=channel, category=category, role=role, user=user)
+            emb = await self.config_bonus_xp_list(guild_id=ctx.guild.id, operation="add", channel=channel, category=category, role=role, user=user, bonus=bonus)
             await ctx.respond(embed=emb)
 
 
-
-    @commands.slash_command(name = "add-bonus-xp-channel")
+    @commands.slash_command(name = "remove-bonus-xp", description = "Wähle was du von der bonus XP list entgernen möchtest!")
     @commands.has_permissions(administrator = True)
-    async def add_bonus_xp_channel(self, ctx:commands.Context, 
-        channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that is rewarded with extra xp!"), 
-        bonus:Option(int, description="Choose how much more xp to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
+    async def remove_bonus_xp_list(self, ctx:discord.ApplicationContext, 
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the bonus XP list!"),
+        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the bonus XP list!"),
+        role:Option(discord.Role, required = False, description="Select a role you want to remove from the bonus XP list!"),
+        user:Option(discord.User, required = False, description="Select a user that you want to remove from the bonus XP list!")):
 
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
-
-        if check_list: 
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This channel has already been set as XP bonus channel", 
-                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> has already been set as XP bonus channel therefore all activities in this channel will be rewarded with extra XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        else:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", channel_id=channel.id, bonus=bonus)
-
-            emb = discord.Embed(title=f"The bonus xp channel was successfully set {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was set as XP bonus channel.
-                {Emojis.dot_emoji} Messages or activities in this channel will be rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-
-    @commands.slash_command(name = "remove-bonus-xp-channel")
-    @commands.has_permissions(administrator = True)
-    async def remove_bonus_xp_channel(self, ctx:commands.Context, channel:Option(Union[discord.TextChannel, discord.VoiceChannel], description="Choose a channel that you want to use as xp bonus channel!")):
-
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, channel_id=channel.id)
-
-        if check_list:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", channel_id=channel.id)
-
-            emb = discord.Embed(title=f"The channel was successfully removed as bonus xp channel {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was removed as XP bonus channel.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        else:
-
-            bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
-            
-            bonus_xp_channels = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[1]] if bonus_xp_list else ["No channel has been set as a bonus XP channel"]
-            bonus_channels = "\n".join(bonus_xp_channels)
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This channel was not set as a bonus XP channel.", 
-                description=f"""{Emojis.dot_emoji} The channel <#{channel.id}> was not set as a bonus XP channel and therefore cannot be removed.
-                {Emojis.dot_emoji} Here you can see all the channels that have been set as bonus XP channels:\n\n{bonus_channels}""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-
-    @commands.slash_command(name = "add-bonus-xp-category")
-    @commands.has_permissions(administrator = True)
-    async def add_bonus_xp_category(self, ctx:commands.Context, 
-        category:Option(discord.CategoryChannel, description="Choose  a category in which all activities in all channels are rewarded with extra xp!"),
-        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
-
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, category_id=category.id)
-
-        if check_list: 
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This category has already been set as XP bonus category.", 
-                description=f"""{Emojis.dot_emoji} The category <#{category.id}> is already set as XP bonus category therefore all activities in all channels of the category will be rewarded with extra XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        else:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", category_id=category.id, bonus=bonus)
-
-            emb = discord.Embed(title=f"The bonus xp category was successfully set {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The category <#{category.id}> was set as XP bonus category.
-                {Emojis.dot_emoji} Messages or activities in this category will be rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-
-    @commands.slash_command(name = "remove-bonus-xp-category")
-    @commands.has_permissions(administrator = True)
-    async def remove_bonus_xp_category(self, ctx:commands.Context, category:Option(discord.CategoryChannel, description="Choose a category that you want to remove as XP bonus category!")):
-
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, category_id=category.id)
-
-        if check_list:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", category_id=category.id)
-
-            emb = discord.Embed(title=f"The category was successfully removed as bonus XP category {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The category <#{category.id}> was removed as XP bonus category.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        else:
-
-            bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
-            
-            bonus_xp_categories = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[2]] if bonus_xp_list else ["No category was set as bonus XP category"]
-            bonus_categories = "\n".join(bonus_xp_categories)
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This category was not set as a bonus XP category.", 
-                description=f"""{Emojis.dot_emoji} The category <#{category.id}> was not set as bonus XP category and therefore cannot be removed.
-                {Emojis.dot_emoji} Here you can see all the categories that have been set as bonus XP categories:\n\n{bonus_categories}""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
+        emb = await self.config_bonus_xp_list(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
+        await ctx.respond(embed=emb)
     
-    @commands.slash_command(name = "add-bonus-xp-role", description = "Add a role as a bonus XP role and set its XP bonus!")
-    @commands.has_permissions(administrator = True)
-    async def add_bonus_xp_role(self, ctx:commands.Context, 
-        role:Option(discord.Role, description="Choose a role that everyone who has this role gets extra xp!"),
-        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
 
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, role_id=role.id)
-
-        if check_list: 
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This role has already been set as XP bonus role.", 
-                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> is already set as XP bonus role therefore all activities of users with this role will be rewarded with extra XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-            
-        else:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", role_id=role.id, bonus=bonus)
-
-            emb = discord.Embed(title=f"The bonus xp role was successfully set {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> was set as XP bonus role.
-                {Emojis.dot_emoji} Messages or activities from users with this role are rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-
-    @commands.slash_command(name = "remove-bonus-xp-role", description = "Remove a role as a bonus XP role!")
-    @commands.has_permissions(administrator = True)
-    async def remove_bonus_xp_role(self, ctx:commands.Context, role:Option(discord.Role, description="Choose a role that you want to remove as XP bonus role!")):
-
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, role_id=role.id)
-
-        if check_list:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", role_id=role.id)
-
-            emb = discord.Embed(title=f"The role was successfully removed as bonus XP role {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> was removed as XP bonus role.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        else:
-
-            bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
-            
-            bonus_xp_roles = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[3]] if bonus_xp_list else ["No role was set as a bonus XP role"]
-            bonus_roles = "\n".join(bonus_xp_roles)
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This role was not set as a bonus XP role.", 
-                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> has not been set as a bonus XP role and therefore cannot be removed.
-                {Emojis.dot_emoji} Here you can see all the roles that have been set as bonus XP roles:\n\n{bonus_roles}""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-
-    @commands.slash_command(name = "add-bonus-xp-user", description = "Add a user as bonus XP user and set his XP bonus!")
-    @commands.has_permissions(administrator = True)
-    async def add_bonus_xp_user(self, ctx:commands.Context, 
-        user:Option(discord.User, description="Choose a user who gets extra xp for each message or activity!"),
-        bonus:Option(int, description="Choose how much more XP to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) = None):
-
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, user_id=user.id)
-
-        if check_list: 
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This user has already been set as XP bonus user.", 
-                description=f"""{Emojis.dot_emoji} The user <@{user.id}> is set as XP bonus user therefore all activities of <@{user.id}> will be rewarded with extra XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        else:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="add", user_id=user.id, bonus=bonus)
-
-            emb = discord.Embed(title=f"The bonus xp user was successfully set {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The user <@{user.id}> was set as XP bonus user.
-                {Emojis.dot_emoji} Messages or activities from <@{user.id}> are rewarded with **{self.check_bonus_percentage(bonus=bonus, guild_id=ctx.guild.id)} %** more XP.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        
-    @commands.slash_command(name = "remove-bonus-xp-user", description = "Remove a user as bonus XP user!")
-    @commands.has_permissions(administrator = True)
-    async def remove_bonus_xp_user(self, ctx:commands.Context, user:Option(discord.User, description="Choose a user you want to remove as XP bonus user!")):
-
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id, user_id=user.id)
-
-        if check_list:
-
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove", user_id=user.id)
-
-            emb = discord.Embed(title=f"The user {user.name} was successfully removed as bonus XP user {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The user <@{user.id}> was removed as XP bonus user.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-        else:
-
-            bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
-            
-            bonus_xp_user = [f"{Emojis.dot_emoji} {i}" for i in bonus_xp_list[4]] if bonus_xp_list else ["No user has been set as bonus XP user"]
-            bonus_user = "\n".join(bonus_xp_user)
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} The user {user.name} was not set as bonus XP user.", 
-                description=f"""{Emojis.dot_emoji} The user <@{user.id}> was not set as a bonus XP user and therefore cannot be removed.
-                {Emojis.dot_emoji} Here you can see all the users that have been set as bonus XP users:\n\n{bonus_user}""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-    
     @commands.slash_command(name = "show-bonus-xp-list", description = "Display everything that is on the bonus xp list!")
     async def show_bonus_xp_list(self, ctx:commands.Context):
 

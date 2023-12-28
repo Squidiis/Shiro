@@ -554,7 +554,7 @@ class DatabaseUpdates():
         
         try:
             
-            if any(elem is not None for elem in items):
+            if any(elem is not None for elem in items) and operation != "reset":
 
                 for count in range(len(items)):
                     
@@ -570,18 +570,21 @@ class DatabaseUpdates():
                             bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
                             bonus_list_values = [guild_id, items[count]]
 
-            else:
+                        cursor.execute(bonus_list, bonus_list_values)
+                        db_connect.commit()
+
+            elif operation == "reset":
                 
                 bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s"
                 bonus_list_values = [guild_id]
+
+                cursor.execute(bonus_list, bonus_list_values)
+                db_connect.commit()
 
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
-
-            cursor.execute(bonus_list, bonus_list_values)
-            db_connect.commit()
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 

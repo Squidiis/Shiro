@@ -100,6 +100,15 @@ class Main(commands.Cog):
                 mainReactionEmoji VARCHAR(255) NOT NULL,
                 reactionKeyWords VARCHAR(4000) NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            # Event 
+            '''
+            CREATE TABLE IF NOT EXISTS Special (
+                guildId BIGINT UNSIGNED NOT NULL,
+                userId BIGINT UNSIGNED NOT NULL,
+                verify VARCHAR(20) DEFAULT 'no',
+                task VARCHAR(20) DEFAULT 'no'
+            );
             '''
         ]  
 
@@ -139,13 +148,11 @@ class Main(commands.Cog):
         
         # Mod tools
         self.bot.add_view(GhostPingButtons())
-    
-        # Applycation
-        self.bot.add_view(ApplicationButton())
 
         # Other Systems
         self.bot.add_view(GhostPingButtons())
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
+
         self.bot.add_view(view)
 
         await Main.create_db_table()
@@ -162,35 +169,6 @@ async def status_task():
 
 bot.add_cog(Main(bot))
 
-
-
-class ApplicationButton(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.select(placeholder="Choose what you want to apply as", min_values=1, max_values=1, custom_id="interaction:aplication", options = [
-
-        discord.SelectOption(label="Moderator", description="Click here to apply as a moderator", value="moderator"),
-        discord.SelectOption(label="Developer", description="Click here to apply as a developer", value="developer"),
-        discord.SelectOption(label="Hentai Konzern", description="Click here to apply as a Hentai Group member", value="hentai_konzern"),
-        discord.SelectOption(label="Artist", description="Click here to apply as an artist", value="artist"),
-        discord.SelectOption(label="Assistant", description="Click here to apply as an assistant", value="assistant"),
-    ])
-
-    async def callback(self, select, interaction: discord.Interaction): 
-
-        overwrites = {
-            interaction.user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-            interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        }
-        channels = await interaction.guild.create_text_channel(name="waiting room", overwrites=overwrites)
-
-        emb = discord.Embed(title=f"Wait here for a moment, an admin will contact you in a moment", 
-            description=f"An admin will get right back to you on this channel!", color=0x09ebdf)
-        emb.add_field(name=f"Infos {Emojis.help_emoji}", 
-            value=f"{Emojis.dot_emoji} user: {interaction.user.mention}\n{Emojis.dot_emoji} Id: {interaction.user.id}\n{Emojis.dot_emoji} Advertising as: {select.values[0]}")
-        emb.set_footer(icon_url=interaction.user.avatar.url, text=f"Applicant: {interaction.user.name}")
-        await channels.send(embed=emb)
 
 
 @bot.command()
@@ -231,18 +209,6 @@ async def rules_funpark(ctx):
     """, color=0xde2cc3)
     await ctx.send(embed=emb)
 
-@bot.command()
-async def Christmas(ctx):
-
-    emb = discord.Embed(description=""" 
-    # 🎄 Merry Christmas 🎄
-    We from the Hanime Funpark team wish you all a Merry Christmas 
-    as a little special we post in the <#1181304140404625548> and in the <#921862164267024386> 40 pictures and video 🎁
-    Enjoy your holidays ⛄
-    @everyone
-    """, color=discord.Colour.red())
-    emb.set_image(url="https://wallpapers-clan.com/wp-content/uploads/2023/11/christmas-anime-girl-with-candle-desktop-wallpaper-preview.jpg")
-    await ctx.send(embed=emb)
 
 
 class AutoReaction(commands.Cog):
@@ -261,7 +227,8 @@ class AutoReaction(commands.Cog):
         else:
             return
         
-bot.add_cog(AutoReaction(bot)) 
+bot.add_cog(AutoReaction(bot))
+
 
 if __name__ == "__main__":
     for filename in os.listdir("cogs"):
