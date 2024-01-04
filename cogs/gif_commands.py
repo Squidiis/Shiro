@@ -141,36 +141,6 @@ class ApiSearchCommands(commands.Cog):
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)
 
-    
-    
-    @commands.slash_command()
-    async def rule34(self, ctx, tag:Option(str, description="Gebe einen tag ein nach dem gesucht werden soll achte dabei auf die schreibweiße")):
-        tag.lower()
-
-        if " " in tag:
-            newtag = tag.replace(" ", "_")
-        else:
-            newtag = tag
-        
-        params = {
-        "tags":newtag,
-        "json":1
-        }
-
-        result = requests.get("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index", params=params)
-        
-        data = result.json()
-        r = random.choice(data)
-        url = r["sample_url"]
-
-        embed = discord.Embed(
-            title="Hentai",description =f"url: {url}",
-            color=discord.Colour.random()
-        )
-        embed.set_image(url=url)
-        embed.set_footer(text="Via rule 34")
-        await ctx.respond(embed=embed)
-
 
     @commands.command()
     async def animememe(self, ctx):

@@ -155,12 +155,12 @@ class Fun(commands.Cog):
             await ctx.respond(embed=emb, view=RPSButtons(game_mode=1, second_user=user, first_user=ctx.author))
 
 
-    @commands.command()
-    async def coinflip(self, ctx):
+    @commands.slash_command(description = "Throw a coin!")
+    async def coinflip(self, ctx:discord.ApplicationContext):
         
         Tail = discord.File("assets/coin_flip/tail_coin.png", filename="tail_coin.png")
         Head = discord.File("assets/coin_flip/head_coin.png", filename="head_coin.png")
-        emb = discord.Embed(title="", description=f"**{ctx.author.mention} has flipped the coin!**", color=discord.Colour.random())
+        emb = discord.Embed(title="", description=f"**{ctx.author.mention} has flipped the coin!**", color=bot_colour)
         emb.set_image(url = "https://cdn.dribbble.com/users/1102039/screenshots/6574749/multi-coin-flip.gif")
         coin = [Tail, Head]
         coinsite = ""
@@ -172,16 +172,16 @@ class Fun(commands.Cog):
         elif random_flip == Head:
             coinsite = "Head"
         
-        embed1 = await ctx.send(embed=emb)
+        embed1 = await ctx.respond(embed=emb)
         await asyncio.sleep(5)
         
-        emb = discord.Embed(title=f"You flipped {coinsite}", description="", color=discord.Colour.random())
+        emb = discord.Embed(title=f"You flipped {coinsite}", description="", color=bot_colour)
         emb.set_image(url=f"attachment://{random_flip}")
         await embed1.edit (embed=emb, file=random_flip)
 
 
 
-    @commands.slash_command(description="Gives you a random cocktail recipe.")
+    @commands.slash_command(description="Gives you a random cocktail recipe!")
     async def cocktails(self, ctx):
         cocktails = requests.get("https://www.thecocktaildb.com/api/json/v1/1/random.php").json()["drinks"][0]
         name = cocktails['strDrink']
@@ -216,7 +216,7 @@ class Fun(commands.Cog):
 
         Instructions: {instructions}
         
-        """, color=discord.Colour.random())
+        """, color=bot_colour)
         emb.set_image(url=DrinkThumb)
         await ctx.respond(embed=emb)
 

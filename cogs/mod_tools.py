@@ -233,7 +233,7 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "clear", description = "Delete messages in the channel!")
     @commands.has_permissions(manage_messages=True)
-    async def clear_slash(self, ctx, quantity:Option(int, description = "How many messages do you want to delete?", required = True)):
+    async def clear(self, ctx, quantity:Option(int, description = "How many messages do you want to delete?", required = True)):
         await ctx.defer()
         z = await ctx.channel.purge(limit = quantity)
         await ctx.send(f"I have deleted {len(z)} messages.")

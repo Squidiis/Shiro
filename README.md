@@ -84,14 +84,8 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 |set-xp-rate|Sets a value for how much XP should be awarded per message|
 |default-xp-rate|Sets the value of XP to be awarded per message back to default: 20 XP per message|
 |show-xp-rate|Shows the current value of how much XP is awarded per message|
-|add-bonus-xp-channel||
-|remove-bonus-xp-channel||
-|add-bonus-xp-category||
-|remove-bonus-xp-category||
-|add-bonus-xp-role||
-|remove-bonus-xp-role||
-|add-bonus-xp-user||
-|remove-bonus-xp-user||
+|add_bonus_xp_list|Reward activities in a category or channel with more XP you can also select roles and users the percentage rate for the bonus XP items can be chosen freely|
+|remove_bonus_xp_list|Remove categories, channels, roles and users from the Bonus XP list|
 |show-bonus-xp-list|Shows all channels, categories, roles and users that are rewarded with extra XP for activities|
 |reset-bonus-xp-list|Resets the entire bonus XP list|
 |set-bonus-xp-percentage|Defines a stadart bonus XP percentage how much more XP should be awarded as a percentage per activity (only applies to channels, categories, roles and users on the bonus XP list)|
@@ -100,3 +94,31 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 |set-level-up-message|Defines an individual level up message for a server: 2 arguments are given (user and level)|
 |default-level-up-message|Resets the level up message to default|
 |show-level-up-message|Shows the current level up message|
+|rps||
+|cocktails||
+|coinflip||
+|gif kiss||
+|gif hug||
+|gif lick||
+|gif feed||
+|gif idk||
+|gif dance||
+|gif slap||
+|gif fbi||
+|gif embarres||
+|gif pet||
+|gif animememe||
+|set-anti-link||
+|ban||
+|unban||
+|kick||
+|timeout||
+|remove_timeout||
+|clear||
+|serverinfo_slash||
+|userinfo||
+|ghost_ping_settings||
+|||
+|||
+|||
+|||
