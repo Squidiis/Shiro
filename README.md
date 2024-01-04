@@ -94,31 +94,28 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 |set-level-up-message|Defines an individual level up message for a server: 2 arguments are given (user and level)|
 |default-level-up-message|Resets the level up message to default|
 |show-level-up-message|Shows the current level up message|
-|rps||
-|cocktails||
-|coinflip||
-|gif kiss||
-|gif hug||
-|gif lick||
-|gif feed||
-|gif idk||
-|gif dance||
-|gif slap||
-|gif fbi||
-|gif embarres||
-|gif pet||
-|gif animememe||
-|set-anti-link||
-|ban||
-|unban||
-|kick||
-|timeout||
-|remove_timeout||
-|clear||
-|serverinfo_slash||
-|userinfo||
-|ghost_ping_settings||
-|||
-|||
-|||
-|||
+|rps|Play rock, paper, scissors against another user or a bot|
+|cocktails|Send a recipe of a random cocktail|
+|coinflip|Toss a coin where heads or tails can come out|
+|gif kiss|Send an anime gif of someone being kissed (a user can also be tagged)|
+|gif hug|Send an anime gif where someone is hugged (a user can also be marked)|
+|gif lick|Send an anime gif where someone is put down (a user can also be tagged)|
+|gif feed|Send an anime gif where someone is being fed (a user can also be tagged)|
+|gif idk|Send an anime gif that expresses cluelessness (you can also mark a user)|
+|gif dance|Send an anime gif with dancing characters (a user can also be tagged)|
+|gif slap|Send an anime slap gif (a user can also be tagged)|
+|gif fbi|Send an anime FBI gif (a user can also be tagged)|
+|gif embarres|Send an anime gif (You can also mark a user)|
+|gif pet|Send an anime gif of a head pet (a user can also be tagged)|
+|animememe|Displays a random anime meme from Reddit|
+|set-anti-link|Deletes all messages with a link you can choose what to delete (options: Everything, only invite links to other servers, everything except pictures and vidoes, nothing)|
+|ban|Bans a user of your choice who can no longer enter the server|
+|unban|Unban a user of your choice|
+|kick|Kicks a user from the server|
+|timeout|Sends a user to a timeout for a time specified by you|
+|remove-timeout|Removes a timeout of a user of your choice|
+|clear|Deletes a number of messages of your choice|
+|serverinfo-slash|Displays all relevant information about the server|
+|userinfo|Displays all relevant information about a user|
+|ghost-ping-settings|Set the ghost ping system if someone tags you and deletes the message a message will be sent with the content and the sender can be turned on/off|
+
