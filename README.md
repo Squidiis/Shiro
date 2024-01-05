@@ -42,10 +42,9 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 
 * Fun commands
     - RPS (Rock, Paper, Scissors) alone against a bot or against your friends
-    - Tik Tak Toe
     - Coin flip game with gifs
     - cocktail command that gives you a random cocktail recipe 
-    - Anime gif commands (kiss, hug, lick, punch, idk, dance, slap, fbi, embarres, pet) uses all the [tenor API](https://tenor.com/gifapi/documentation)
+    - Anime gif commands (kiss, hug and much more) uses all the [tenor API](https://tenor.com/gifapi/documentation)
     - Anime meme command with the [reddit API](https://www.reddit.com/dev/api/)
 
 ## 📝 Requirements
