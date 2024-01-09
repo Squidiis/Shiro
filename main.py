@@ -100,15 +100,6 @@ class Main(commands.Cog):
                 mainReactionEmoji VARCHAR(255) NOT NULL,
                 reactionKeyWords VARCHAR(4000) NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-            ''',
-            # Event 
-            '''
-            CREATE TABLE IF NOT EXISTS Special (
-                guildId BIGINT UNSIGNED NOT NULL,
-                userId BIGINT UNSIGNED NOT NULL,
-                verify VARCHAR(20) DEFAULT 'no',
-                task VARCHAR(20) DEFAULT 'no'
-            );
             '''
         ]  
 
@@ -168,47 +159,6 @@ async def status_task():
 
 
 bot.add_cog(Main(bot))
-
-
-
-@bot.command()
-async def rules_funpark(ctx):
-
-    emb = discord.Embed(description=f"""
-    # Rules
-    - No spam.
-
-    - no self-promotion of any kind.
-
-    - friendly contact (no insults or racist statements, discriminatory statements).
-
-    - no harassment of other persons.
-
-    - no violent videos or other disturbing content.
-
-    - please post, chat only in the designated channels.
-
-    - follow the guidelines as well.
-
-    - if you notice a rule violation, please report it to a team member.
-
-    - if you break the rules yourself, there will be consequences.
-
-    - no radical political topics.
-
-    - no self-promotion for your server, unless it is agreed with the owner or moderator.
-
-    - don't post private information of other people (e.g. address, full name or IDs).
-
-    - just because something is not in the rules does not mean it is directly allowed.
-    
-    - please respect the Discord guidelines.
-                        
-    `The Discord guidelines can be found at:`\n
-    https://discord.com/guidelines
-    """, color=0xde2cc3)
-    await ctx.send(embed=emb)
-
 
 
 class AutoReaction(commands.Cog):

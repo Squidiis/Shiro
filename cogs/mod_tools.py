@@ -240,7 +240,7 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(name = "server-info", description="Server info!")
-    async def serverinfo_slash(self, ctx):
+    async def serverinfo(self, ctx):
 
         embed = discord.Embed(title=f"{ctx.guild.name} Info", description="Information of this Server", color=discord.Colour.blue())
         embed.add_field(name='🆔Server ID', value=f"{ctx.guild.id}")

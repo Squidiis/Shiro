@@ -1,12 +1,5 @@
 
 
-texte in Moderator tolls überarbeiten
-
-
-Embed im gesamten bot bisschen überarbeiten dabei an den vulfo bot orientieren
-
 Help menü adden
 
-Kommentare verfassen
-
-Bonus xp liest system umbauen das es wie das blacklist system funktioniert
+Readme adden anleitung wie man den Bot einstellt
