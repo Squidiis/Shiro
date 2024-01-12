@@ -721,7 +721,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "rank", description = "Shows you the rank of a user in the level system!")
-    async def rank_slash(self, ctx:commands.Context, user:Option(discord.Member, description="Look at the rank of others!")):
+    async def rank(self, ctx:commands.Context, user:Option(discord.Member, description="Look at the rank of others!")):
 
         count = 0
         rank = 0

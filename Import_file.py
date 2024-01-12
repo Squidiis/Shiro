@@ -14,6 +14,7 @@ from discord.commands import Option, SlashCommandGroup
 from PIL import Image
 from sql_function import *
 import yaml
+from discord.ext.pages import Paginator, Page
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
@@ -62,7 +63,7 @@ intent.members = True
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
-bot.remove_command("help")
+
 
 # level up message
 def level_message(guild_id:int, user_id:int, level:int):
@@ -139,7 +140,75 @@ class HelpDropdown(discord.ui.View):
 
         elif select.values[0] == "level":
 
-            emb = discord.Embed()
+            emb = discord.Embed(
+                title="Level commands",
+                description="""
+                **/give-xp**
+
+                **/remove-xp**
+
+                **/give-level**
+
+                **/remove-level**
+
+                **/reset-level**
+
+                **/reset-user-stats**
+
+                **/rank**
+
+                **/leaderboard**
+
+                **/level-system-settings**
+
+                **/reset-level-blacklist**
+
+                **/add-level-blacklist**
+
+                **/remove-level-blacklist**
+
+                **/show-level-blacklist**
+
+                **/add-level-role**
+
+                **/remove-level-role**
+
+                **/show-level-roles**
+
+                **/set-level-up-channel**
+
+                **/disable-level-up-channel**
+
+                **/show-level-up-channel**
+
+                **/set-xp-rate**
+
+                **/default-xp-rate**
+
+                **/show-xp-rate**
+                
+                **/add-bonus-xp-list**
+
+                **/remove-bonus-xp**
+
+                **/reset-bonus-xp-list**
+
+                **/show-bonus-xp-list**
+
+                **/set-bonus-xp-percentage**
+
+                **/default-bonus-xp-percentage**
+
+                **/show-bonus-xp-percentage**
+
+                **/set-level-up-message**
+
+                **/default-level-up-message**
+
+                **/show-level-up-message**
+                """, color=bot_colour)
+            
+            await interaction.response.edit_message(embed=emb)
 
         elif select.values[0] == "fun":
 
@@ -153,25 +222,25 @@ class HelpDropdown(discord.ui.View):
 
             emb = discord.Embed()
 
-
-
 # Help command
-class Help_menu(discord.Cog):
+class HelpMenu(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command()
-    async def help (self, ctx:commands.Context):
+    @commands.slash_command(name = "help", description = "Do you need a little help!")
+    async def help(self, ctx:discord.ApplicationContext):
+        
+        pages = [
 
-        embed = discord.Embed(
-        title= f"This is the Help menu from {bot.user.name}",
-        description= f"The help menu is divided into several sections **the Prifix is $**",
-        color= discord.Colour.orange())
-        await ctx.send (embed=embed)
+            Page(embeds=[discord.Embed(title="test1", description="stuff1", color=bot_colour),
+                discord.Embed(title="test2", description="stuff2", color=bot_colour)]),
+            Page(content="test3")
+        ]
+        paginator = Paginator(pages=pages)
 
-
+        await paginator.respond(ctx.interaction)
      
-bot.add_cog(Help_menu(bot))
+bot.add_cog(HelpMenu(bot))
 
 
 

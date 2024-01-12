@@ -180,6 +180,7 @@ class AutoReaction(commands.Cog):
 bot.add_cog(AutoReaction(bot))
 
 
+
 if __name__ == "__main__":
     for filename in os.listdir("cogs"):
         if filename.endswith(".py"):
