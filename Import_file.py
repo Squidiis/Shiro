@@ -95,134 +95,7 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
     description = f"{Emojis.dot_emoji} Therefore, one was created just try again.", color = bot_colour) 
 
 
-class HelpDropdown(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
 
-    @discord.ui.select(placeholder="Choose what you want to apply as", min_values=1, max_values=1, custom_id="interaction:aplication", options = [
-
-        discord.SelectOption(label="Mod Commands", description="Hier siehst du alle Moderations Commands aufgelistet", value="mod"),
-        discord.SelectOption(label="Level System", description="Hier sind alle Level System Commands aufgelistet", value="level"),
-        discord.SelectOption(label="Fun Commands", description="Hier sind alle Fun Commands aufgelistet", value="fun"),
-        discord.SelectOption(label="Gif commands", description="Hier sind alle Role play gif commands aufgelistet", value="gif"),
-        discord.SelectOption(label="Main menu", description="Hier kommst du zurück zum Hauptmenu", value="main")
-    ])
-    async def callback(self, select, interaction:discord.Interaction): 
-
-        if select.values[0] == "mod":
-
-            emb = discord.Embed(
-                title="Mod commands", 
-                description="""
-                **/set-anti-link**
-                Stelle das anti link system ein damit du hast ein paar parameter mit denen du einstellen kannst welche links gelöscht werden sollen
-                **/ban**
-                Banne einen nutzer von deinem server
-                **/unban**
-                Hebe den Ban eines nutzers auf
-                **/kick**
-                Kicke einen nutzer von deinem server
-                **/timeout**
-                Schicke einen Nutzer in den Timeout
-                **/remove-timeout**
-                Hebe den Timeout eines users auf
-                **/clear**
-                Löscht nachrichten du kannst die menge frei wählen
-                **/server-info**
-                Zeigt dir alle Relevanten informationen zum Server
-                **/ghost-ping-settings**
-                Schalte das Ghost ping system entweder ein oder aus
-                **/userinfo**
-                Zeigt die alle Relevanten infos zu einem user an
-                """, color = bot_colour)
-            
-            await interaction.response.edit_message(embed=emb)
-
-        elif select.values[0] == "level":
-
-            emb = discord.Embed(
-                title="Level commands",
-                description="""
-                **/give-xp**
-
-                **/remove-xp**
-
-                **/give-level**
-
-                **/remove-level**
-
-                **/reset-level**
-
-                **/reset-user-stats**
-
-                **/rank**
-
-                **/leaderboard**
-
-                **/level-system-settings**
-
-                **/reset-level-blacklist**
-
-                **/add-level-blacklist**
-
-                **/remove-level-blacklist**
-
-                **/show-level-blacklist**
-
-                **/add-level-role**
-
-                **/remove-level-role**
-
-                **/show-level-roles**
-
-                **/set-level-up-channel**
-
-                **/disable-level-up-channel**
-
-                **/show-level-up-channel**
-
-                **/set-xp-rate**
-
-                **/default-xp-rate**
-
-                **/show-xp-rate**
-                
-                **/add-bonus-xp-list**
-
-                **/remove-bonus-xp**
-
-                **/reset-bonus-xp-list**
-
-                **/show-bonus-xp-list**
-
-                **/set-bonus-xp-percentage**
-
-                **/default-bonus-xp-percentage**
-
-                **/show-bonus-xp-percentage**
-
-                **/set-level-up-message**
-
-                **/default-level-up-message**
-
-                **/show-level-up-message**
-                """, color=bot_colour)
-            
-            await interaction.response.edit_message(embed=emb)
-
-        elif select.values[0] == "fun":
-
-            emb = discord.Embed()
-
-        elif select.values[0] == "gif":
-
-            emb = discord.Embed()
-
-        elif select.values[0] == "main":
-
-            emb = discord.Embed()
-
-# Help command
 class HelpMenu(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -232,9 +105,8 @@ class HelpMenu(commands.Cog):
         
         pages = [
 
-            Page(embeds=[discord.Embed(title="test1", description="stuff1", color=bot_colour),
-                discord.Embed(title="test2", description="stuff2", color=bot_colour)]),
-            Page(content="test3")
+            Page(embeds=[discord.Embed(title="test1", description="stuff1", color=bot_colour)]),
+            Page(embeds=[discord.Embed()])
         ]
         paginator = Paginator(pages=pages)
 
