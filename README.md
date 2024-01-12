@@ -69,6 +69,7 @@ Um den den Code auf dein Bot laufen zu lassen passe die [`.env`](.env) datei an
 Befülle dafür einfach elle gegebenen Variablen
 
 |Variable|Explanation|
+| --- | --- |
 |TOKEN|Here is the token of your Discord bot you can find it [here](https://discord.com/login?redirect_to=%2Fdevelopers%2Fapplications) just log in and copy the token if no application has been created yet you have to do this to get the token.|
 |API_KEY|Paste the API key from the Tenor API here you get it [here](https://tenor.com/developer/dashboard) just log in or register if you don't have an account yet.|
 |sql_password|Enter the password that belongs to your MySQL database|
