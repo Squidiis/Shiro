@@ -56,30 +56,27 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 - [requests 2.31.0](https://pypi.org/project/requests/)
 - [ui 0.1.4](https://pypi.org/project/ui/)
 
-## How to set up
+# How to set up
 
 Setting up the bot has been made as simple as possible.
 
-### `config.yaml` 
+There is a file named [`config.yaml`](config.yaml) in which you can make the necessary adjustments to make everything the way you want it
 
-There is [`config.yaml`](config.yaml) file where you can put the
-needed things to edit.
-
-Um den den Code auf dein Bot laufen zu lassen passe die [`.env`](.env) datei an
-Befülle dafür einfach elle gegebenen Variablen
+To run the code on your bot customize the [`.env`](.env) file
+Simply fill in all the given variables
 
 |Variable|Explanation|
 | --- | --- |
-|TOKEN|Here is the token of your Discord bot you can find it [here](https://discord.com/login?redirect_to=%2Fdevelopers%2Fapplications) just log in and copy the token if no application has been created yet you have to do this to get the token.|
+|TOKEN|Insert your token for your bot here you can find it [here](https://discord.com/login?redirect_to=%2Fdevelopers%2Fapplications) just log in and copy the token if no application has been created yet you have to do this to get the token.|
 |API_KEY|Paste the API key from the Tenor API here you get it [here](https://tenor.com/developer/dashboard) just log in or register if you don't have an account yet.|
-|sql_password|Enter the password that belongs to your MySQL database|
-|host|enter the host here this can be an ip or `localhost` if you run the database locally on your device.|
+|sql_password|Enter the password that belongs to your MySQL database.|
+|host|Enter the host here this can be an ip or `localhost` if you run the database locally on your device.|
 |user|Enter the user name of your MySQL database here this can be `root` if you run it locally or a custom name of your choice.|
 |discord_db|Here the name of the database schema.|
 
-## How to start?
+# How to start?
 
-Wenn du alles eingestellt hast und die benötigten Variablen in [`config.yaml`](config.yaml) und [`.env`](.env) angepasst hast musst du nur noch die benötigten packete installieren
+Once you have configured everything and adjusted the required variables in [`config.yaml`](config.yaml) and [`.env`](.env), all you have to do is install the required packages
 ```
 python -m pip install -r requirements.txt
 ```
@@ -89,7 +86,7 @@ After that you can start it with
 ```
 python bot.py
 ```
-Sollten dabei Probleme auftauchen nutze den oben verlinkten discord server oder drücke [hier](https://discord.gg/Zv5JtYhd9r) um dierekt auf in geleitet zu werden.
+If you encounter problems use the discord server linked above or press [here](https://discord.gg/Zv5JtYhd9r) to be redirected directly to in.
 
 ## All commands
 
