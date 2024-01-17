@@ -96,20 +96,54 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
 
 
 
+# Help Commands
+#TODO Ein Inhaltsverzeichnis auf die erste seite 
 class HelpMenu(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+        self.pages = [
+            Page(embeds=[discord.Embed(title="Mod Commands", 
+                description="All mod commands are listed on this page", color=bot_colour)
+                .add_field(name="set-anti-link", 
+                    value="Set the anti-link system, you can choose if only dischrd invitation links should be deleted, if everything except pictures and videos should be deleted or if everything should be deleted", inline=False)
+                .add_field(name="ban", 
+                    value="Ban a user from your server who will not be able to join again", inline=False)
+                .add_field(name="unban", 
+                    value="Unban a user from your server who can then rejoin the server", inline=False)
+                .add_field(name="kick", 
+                    value="Kick a user from your server", inline=False)
+                .add_field(name="timeout", 
+                    value="Send a user to a timeout you decide how long he needs a timeout", inline=False)
+                .add_field(name="remove-timeout", 
+                    value="Cancel the timeout of a user who can then write messages normally again", inline=False)
+                .add_field(name="clear", 
+                    value="Delete messages you can freely specify how many should be deleted", inline=False)
+                .add_field(name="ghost-ping-settings", 
+                    value="Set the anti ghost ping system when someone tags another user and then deletes the message, a message is sent stating what the user wrote and who they tagged", inline=False)
+                .add_field(name="userinfo", 
+                    value="Display all important information about a user", inline=False)
+                .add_field(name="serverinfo", 
+                    value="Show all important information about your server", inline=False)
+                ]),
+
+            Page(embeds=[discord.Embed(title="test2", description="stuff2", color=bot_colour)])
+        ]
+
+
+    def get_pages(self):
+        return self.pages
     
     @commands.slash_command(name = "help", description = "Do you need a little help!")
     async def help(self, ctx:discord.ApplicationContext):
         
-        pages = [
+        
+        paginator = Paginator(pages=self.get_pages())
 
-            Page(embeds=[discord.Embed(title="test1", description="stuff1", color=bot_colour)]),
-            Page(embeds=[discord.Embed()])
-        ]
-        paginator = Paginator(pages=pages)
+        embed = discord.Embed(title="3", description="stuff3")
+        embed.add_field(name="meddl", value="meddl leute")
 
+        self.pages.append(embed)
         await paginator.respond(ctx.interaction)
      
 bot.add_cog(HelpMenu(bot))
