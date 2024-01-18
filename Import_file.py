@@ -103,36 +103,54 @@ class HelpMenu(commands.Cog):
         self.bot = bot
 
         self.pages = [
+
+            # Mod commands
             Page(embeds=[discord.Embed(title="Mod Commands", 
                 description="All mod commands are listed on this page", color=bot_colour)
                 .add_field(name="set-anti-link", 
                     value="Set the anti-link system, you can choose if only dischrd invitation links should be deleted, if everything except pictures and videos should be deleted or if everything should be deleted", inline=False)
-                .add_field(name="ban", 
+                .add_field(name="/ban", 
                     value="Ban a user from your server who will not be able to join again", inline=False)
-                .add_field(name="unban", 
+                .add_field(name="/unban", 
                     value="Unban a user from your server who can then rejoin the server", inline=False)
-                .add_field(name="kick", 
+                .add_field(name="/kick", 
                     value="Kick a user from your server", inline=False)
-                .add_field(name="timeout", 
+                .add_field(name="/timeout", 
                     value="Send a user to a timeout you decide how long he needs a timeout", inline=False)
                 .add_field(name="remove-timeout", 
                     value="Cancel the timeout of a user who can then write messages normally again", inline=False)
-                .add_field(name="clear", 
+                .add_field(name="/clear", 
                     value="Delete messages you can freely specify how many should be deleted", inline=False)
-                .add_field(name="ghost-ping-settings", 
+                .add_field(name="/ghost-ping-settings", 
                     value="Set the anti ghost ping system when someone tags another user and then deletes the message, a message is sent stating what the user wrote and who they tagged", inline=False)
-                .add_field(name="userinfo", 
+                .add_field(name="/userinfo", 
                     value="Display all important information about a user", inline=False)
-                .add_field(name="serverinfo", 
+                .add_field(name="/serverinfo", 
                     value="Show all important information about your server", inline=False)
                 ]),
 
-            Page(embeds=[discord.Embed(title="test2", description="stuff2", color=bot_colour)])
-        ]
-
+            # Fun commands
+            Page(embeds=[discord.Embed(title="Fun commands", 
+                description="All fun commands are listed here on this page", color=bot_colour)
+                .add_field(name="/rps", 
+                    value="Play rock, paper, scissors against the bot or another user", inline=False)
+                .add_field(name="/coinflip", 
+                    value="Flip a coin either heads or tails", inline=False)
+                .add_field(name="/cocktails", 
+                    value="Get a random cocktail recipe", inline=False)
+                .add_field(name="/animememe", 
+                    value="Show you a random anime meme from reddit", inline=False)
+                .add_field(name="Role play commands", 
+                    value="Here are all Role play commands", inline=False)
+                .add_field(name="/anime gif (tag)",
+                    value="Tags: kiss, hug, lick, feed, idk, dance, slap, fbi, embarres, pet", inline=False)
+                ])
+            
+            ]
 
     def get_pages(self):
         return self.pages
+    
     
     @commands.slash_command(name = "help", description = "Do you need a little help!")
     async def help(self, ctx:discord.ApplicationContext):
