@@ -152,7 +152,7 @@ class Main(commands.Cog):
 
 async def status_task():
     while True:
-        await bot.change_presence(activity=discord.Game('?help to see all commands'), status=discord.Status.online)
+        await bot.change_presence(activity=discord.Game('/help to see all commands'), status=discord.Status.online)
         await asyncio.sleep(15)
         await bot.change_presence(activity=discord.Game('Funpark.net'), status=discord.Status.online)
         await asyncio.sleep(15)

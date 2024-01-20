@@ -144,7 +144,20 @@ class HelpMenu(commands.Cog):
                     value="Here are all Role play commands", inline=False)
                 .add_field(name="/anime gif (tag)",
                     value="Tags: kiss, hug, lick, feed, idk, dance, slap, fbi, embarres, pet", inline=False)
-                ])
+                ]),
+
+            Page(embeds=[discord.Embed(title="Level System commands Teil 1",
+                description="""Hier sihst du alle level system commands""", color=bot_colour)
+                .add_field(name="/give-xp", value="", inline=False)
+                .add_field(name="/remove-xp", value="", inline=False)
+                .add_field(name="/give-level", value="", inline=False)
+                .add_field(name="/remove-level", value="", inline=False)
+                .add_field(name="/reset-level", value="", inline=False)
+                .add_field(name="/reset-user-stats", value="", inline=False)
+                .add_field(name="/rank", value="", inline=False)
+                .add_field(name="/leaderboard-level", value="", inline=False)
+                .add_field(name="", value="", inline=False)
+                .add_field(name="", value="", inline=False)])
             
             ]
 
