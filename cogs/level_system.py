@@ -98,7 +98,7 @@ class LevelSystemSettings(discord.ui.View):
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
-
+  
 
 ######################################################  Level System level roles button  ##################################################
 
@@ -1441,7 +1441,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "remove-bonus-xp", description = "Wähle was du von der bonus XP list entgernen möchtest!")
+    @commands.slash_command(name = "remove-bonus-xp-list", description = "Wähle was du von der bonus XP list entgernen möchtest!")
     @commands.has_permissions(administrator = True)
     async def remove_bonus_xp_list(self, ctx:discord.ApplicationContext, 
         channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the bonus XP list!"),

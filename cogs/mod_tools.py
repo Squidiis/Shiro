@@ -256,12 +256,16 @@ class ModeratorCommands(commands.Cog):
         await ctx.respond(embed=embed)
 
 
+    # Anti ghost ping system
     @commands.Cog.listener()
     async def on_message_delete(self, message:discord.Message):
 
         check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
 
         # If the value is above 0, the ghost ping system is deactivated
+        if message.author.bot:
+            return
+
         if check_settings[2] != 0 and check_settings[2] != None:
 
             if message.mentions != 0:
@@ -290,7 +294,7 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command()
-    async def userinfo(ctx, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
+    async def userinfo(ctx:discord.ApplicationContext, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
         member = ctx.author if not member else member
 
         unix_join_time = calendar.timegm(member.joined_at.utctimetuple())

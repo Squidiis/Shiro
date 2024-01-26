@@ -3,3 +3,5 @@
 Help menü adden
 
 Readme adden anleitung wie man den Bot einstellt
+
+Den settings command erweitern das man da auch die anderen einstellungen vor nehmen kann
