@@ -484,6 +484,16 @@ class LevelSystem(commands.Cog):
    
 
 
+    @commands.slash_command(name = "set-level-system")
+    @commands.has_permissions(administrator = True)
+    async def set_level_system(self, ctx:discord.ApplicationContext):
+
+        emb = discord.Embed(
+            description=f"""# {Emojis.settings_emoji} Stelle das level system ein
+            {Emojis.dot_emoji} Mit den unteren select menü kannst du auswählen welche funktion des level systems du einstellen möchtest"""
+        )
+        await ctx.response.send_message(embed=emb, view=LevelSystemSetting())
+
 ####################################################  User stats setting  #################################################
 
 
@@ -1659,6 +1669,90 @@ class LevelUpMessageModal(discord.ui.Modal):
         await interaction.response.edit_message(embeds=[embed], view=None)
 
 
+class LevelSystemSetting(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.select( 
+        placeholder = "Wähle das system was du einstellen möchtest!",
+        min_values = 1,
+        max_values = 1,
+        custom_id="set_level_system_select",
+        options = [
+            discord.SelectOption(
+                label="Level up message",
+                description="Lege einen level up channel fest!",
+                value="level_up_channel"
+            ),
+            discord.SelectOption(
+                label="Chocolate",
+                description="Pick this if you like chocolate!"
+            ),
+            discord.SelectOption(
+                label="Strawberry",
+                description="Pick this if you like strawberry!"
+            )
+        ]
+    )
+    async def select_callback(self, select, interaction:discord.Interaction):
+        
+        check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
+
+        view = View(timeout=None)
+        view.add_item(SetLevelUpButton(label=f"Lege einen {'neuen' if check_settings == None else ''} level up channel fest"))
+
+
+        if "level_up_channel" == select.values[0]:
+
+            emb = discord.Embed(description=f"""# {'Lege einen level up channel fest' if check_settings == None else 'Überschreibe den aktullen level up channel'}
+                {Emojis.dot_emoji} {'Aktuell wurde noch kein level up channel festgelegt' if check_settings == None else f'Der aktuelle level up channel ist <#{check_settings}>'}
+                {Emojis.dot_emoji} Benutzte den unteren button um einen level up channel fest zu legen""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, view=view)
+
+           
+
+class SetLevelUpButton(discord.ui.Button):
+        
+    def __init__(self, label):
+        super().__init__(
+            label=label,
+            style=discord.ButtonStyle.blurple,
+            custom_id="set_level_up_channel_button"
+        )
+
+    async def callback(self, interaction:discord.Interaction):
+
+        emb = discord.Embed(description=f"""# Lege einen level up channel fest
+            {Emojis.dot_emoji} Mit den unteren select menü kannst du auswählen welcher channel zum level up channel werden soll.
+            {Emojis.dot_emoji} In diesen werden dann alle level up nachrichten und alle benachrichigungen für die level roles geschickt.""", color=bot_colour)
+        await interaction.response.send_message(embed=emb, ephemeral=True, view=SetLevelUpChannelSelect())
+
+
+class SetLevelUpChannelSelect(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.channel_select(
+                placeholder = "Wähle einen channel den du als level up channel festlegen möchtest!",
+                min_values = 1,
+                max_values = 1,
+                custom_id = "level_up_channel_select",
+                channel_types = [
+                    discord.ChannelType.text, 
+                    discord.ChannelType.forum, 
+                    discord.ChannelType.news
+                ]
+            )
+    async def callback(self, select, interaction:discord.Interaction):
+            
+        DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, levelup_channel = select.values[0].id)
+            
+        emb = discord.Embed(
+            description=f"""# Level up channel wurde {f"festgelegt" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "überschrieben"}
+            {Emojis.dot_emoji} Du hast {"neuen" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} <#{select.values[0].id}> als level up channel festgelgt.
+            {Emojis.dot_emoji} Alle level up Nachrichten und alle benachrichtigungen für die level rollen werden ab jetzt in diesen channel geschickt.""", color=bot_colour)
+        await interaction.response.send_message(embed=emb, ephemeral=True)
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))

@@ -196,7 +196,7 @@ class HelpMenu(commands.Cog):
         
         paginator = Paginator(pages=self.get_pages())
 
-        embed = discord.Embed(title="3", description="stuff3")
+        embed = discord.Embed(description="stuff3")
         embed.add_field(name="meddl", value="meddl leute")
 
         self.pages.append(embed)

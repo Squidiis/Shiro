@@ -136,6 +136,7 @@ class Main(commands.Cog):
         self.bot.add_view(ResetBlacklistLevelButton())
         view.add_item(ShowBlacklistLevelSystemButton())
         self.bot.add_view(ModalButtonLevelUpMessage())
+        self.bot.add_view(LevelSystemSetting())
         
         # Mod tools
         self.bot.add_view(GhostPingButtons())
