@@ -1728,6 +1728,22 @@ class SetLevelUpButton(discord.ui.Button):
         await interaction.response.send_message(embed=emb, ephemeral=True, view=SetLevelUpChannelSelect())
 
 
+
+class CancelSetLevelSystem(discord.ui.Button):
+    
+    def __init__(self):
+        super().__init__(
+            label="Einstellen Abbrechen",
+            style=discord.ButtonStyle.danger,
+            custom_id="cancel_level_set"
+        )
+
+    async def callback(self, interaction:discord.Interaction):
+
+        emb = discord.Embed(description="")
+        await interaction.response.edit_message(embed=emb, view=None)
+
+
 class SetLevelUpChannelSelect(discord.ui.View):
 
     def __init__(self):
@@ -1752,7 +1768,7 @@ class SetLevelUpChannelSelect(discord.ui.View):
             description=f"""# Level up channel wurde {f"festgelegt" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "überschrieben"}
             {Emojis.dot_emoji} Du hast {"neuen" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} <#{select.values[0].id}> als level up channel festgelgt.
             {Emojis.dot_emoji} Alle level up Nachrichten und alle benachrichtigungen für die level rollen werden ab jetzt in diesen channel geschickt.""", color=bot_colour)
-        await interaction.response.send_message(embed=emb, ephemeral=True)
+        await interaction.response.edit_message(embed=emb, view=None)
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
