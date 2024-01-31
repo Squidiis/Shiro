@@ -488,11 +488,15 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def set_level_system(self, ctx:discord.ApplicationContext):
 
+        view = View(timeout=None)
+        view.add_item(CancelSetLevelSystem())
+        view.add_item(LevelSystemSetting())
+
         emb = discord.Embed(
             description=f"""# {Emojis.settings_emoji} Stelle das level system ein
             {Emojis.dot_emoji} Mit den unteren select menü kannst du auswählen welche funktion des level systems du einstellen möchtest"""
         )
-        await ctx.response.send_message(embed=emb, view=LevelSystemSetting())
+        await ctx.response.send_message(embed=emb, view=view)
 
 ####################################################  User stats setting  #################################################
 
@@ -1700,6 +1704,7 @@ class LevelSystemSetting(discord.ui.View):
 
         view = View(timeout=None)
         view.add_item(SetLevelUpButton(label=f"Lege einen {'neuen' if check_settings == None else ''} level up channel fest"))
+        self.add_item(SetLevelUpChannelSelect())
 
 
         if "level_up_channel" == select.values[0]:
@@ -1740,7 +1745,9 @@ class CancelSetLevelSystem(discord.ui.Button):
 
     async def callback(self, interaction:discord.Interaction):
 
-        emb = discord.Embed(description="")
+        emb = discord.Embed(description=f"""# Einstellung Abgebrochen
+            {Emojis.dot_emoji} Die einstellung des Level Systems wurde abgebrochen
+            {Emojis.dot_emoji} Wenn du es dir anders überlegen solltest kannst du jederzeit den Command erneut ausführen""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
 
 
