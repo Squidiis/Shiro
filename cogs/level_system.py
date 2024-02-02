@@ -488,15 +488,11 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def set_level_system(self, ctx:discord.ApplicationContext):
 
-        view = View(timeout=None)
-        view.add_item(CancelSetLevelSystem())
-        view.add_item(LevelSystemSetting())
-
         emb = discord.Embed(
             description=f"""# {Emojis.settings_emoji} Stelle das level system ein
             {Emojis.dot_emoji} Mit den unteren select menü kannst du auswählen welche funktion des level systems du einstellen möchtest"""
         )
-        await ctx.response.send_message(embed=emb, view=view)
+        await ctx.response.send_message(embed=emb, view=LevelSystemSetting())
 
 ####################################################  User stats setting  #################################################
 
@@ -1676,6 +1672,7 @@ class LevelUpMessageModal(discord.ui.Modal):
 class LevelSystemSetting(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelSetLevelSystem())
 
     @discord.ui.select( 
         placeholder = "Wähle das system was du einstellen möchtest!",
@@ -1704,7 +1701,7 @@ class LevelSystemSetting(discord.ui.View):
 
         view = View(timeout=None)
         view.add_item(SetLevelUpButton(label=f"Lege einen {'neuen' if check_settings == None else ''} level up channel fest"))
-        self.add_item(SetLevelUpChannelSelect())
+        view.add_item(CancelSetLevelSystem())
 
 
         if "level_up_channel" == select.values[0]:
@@ -1755,7 +1752,8 @@ class SetLevelUpChannelSelect(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-
+        self.add_item(CancelSetLevelSystem())
+        
     @discord.ui.channel_select(
                 placeholder = "Wähle einen channel den du als level up channel festlegen möchtest!",
                 min_values = 1,
