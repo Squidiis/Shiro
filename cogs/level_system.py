@@ -1592,7 +1592,7 @@ class LevelSystem(commands.Cog):
                 {Emojis.arrow_emoji} `Oh nice {mark_stings[0]} you have a new level, your newlevel is {mark_stings[1]}`
 
                 {Emojis.dot_emoji} If you want to set the custom message for your server, press the button located just below this message.""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ModalButtonLevelUpMessage())
+            await ctx.respond(embed=emb, view=LevelUpMessageButton())
         
         else:
 
@@ -1641,12 +1641,16 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=no_entry_emb)
 
 
-class ModalButtonLevelUpMessage(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
+class LevelUpMessageButton(discord.ui.Button):
 
-    @discord.ui.button(label="Level up message now set", style=discord.ButtonStyle.blurple, custom_id="add_level_up_message")
-    async def add_level_up_message(self, button, interaction:discord.Interaction):
+    def __init__(self, label):
+        super().__init__(
+            label=label,
+            style=discord.ButtonStyle.blurple,
+            custom_id="set_level_up_message"
+        )
+
+    async def callback(self, interaction:discord.Interaction):
 
         await interaction.response.send_modal(LevelUpMessageModal(title="Set a level-up message for your server!"))
 
@@ -1663,8 +1667,8 @@ class LevelUpMessageModal(discord.ui.Modal):
 
         DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
 
-        embed = discord.Embed(title=f"The level-up message was successfully set {Emojis.succesfully_emoji}", 
-            description=f"""{Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}` {Emojis.exclamation_mark_emoji}
+        embed = discord.Embed(description=f"""# The level-up message was successfully set {Emojis.succesfully_emoji}
+            {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}` {Emojis.exclamation_mark_emoji}
             {Emojis.dot_emoji} When someone receives a level-up this message is sent""", color=bot_colour)
         await interaction.response.edit_message(embeds=[embed], view=None)
 
@@ -1681,13 +1685,14 @@ class LevelSystemSetting(discord.ui.View):
         custom_id="set_level_system_select",
         options = [
             discord.SelectOption(
-                label="Level up message",
+                label="Level up channel",
                 description="Lege einen level up channel fest!",
                 value="level_up_channel"
             ),
             discord.SelectOption(
-                label="Chocolate",
-                description="Pick this if you like chocolate!"
+                label="Level up message",
+                description="Lege eine level up nachricht fest!",
+                value="level_up_message"
             ),
             discord.SelectOption(
                 label="Strawberry",
@@ -1697,19 +1702,34 @@ class LevelSystemSetting(discord.ui.View):
     )
     async def select_callback(self, select, interaction:discord.Interaction):
         
-        check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
+        check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
         view = View(timeout=None)
-        view.add_item(SetLevelUpButton(label=f"Lege einen {'neuen' if check_settings == None else ''} level up channel fest"))
         view.add_item(CancelSetLevelSystem())
 
 
         if "level_up_channel" == select.values[0]:
 
-            emb = discord.Embed(description=f"""# {'Lege einen level up channel fest' if check_settings == None else 'Überschreibe den aktullen level up channel'}
-                {Emojis.dot_emoji} {'Aktuell wurde noch kein level up channel festgelegt' if check_settings == None else f'Der aktuelle level up channel ist <#{check_settings}>'}
+            view.add_item(SetLevelUpButton(label=f"Lege einen {'neuen' if check_settings[3] == None else ''} level up channel fest"))
+
+            emb = discord.Embed(description=f"""# {'Lege einen level up channel fest' if check_settings[3] == None else 'Überschreibe den aktullen level up channel'}
+                {Emojis.dot_emoji} {'Aktuell wurde noch kein level up channel festgelegt' if check_settings[3] == None else f'Der aktuelle level up channel ist <#{check_settings[3]}>'}
                 {Emojis.dot_emoji} Benutzte den unteren button um einen level up channel fest zu legen""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=view)
+
+        elif "level_up_message" == select.values[0]:
+
+            view.add_item(LevelUpMessageButton(label=f"Lege eine {'neue' if check_settings[4] == None else ''} level up message fest"))
+
+            default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
+            emb = discord.Embed(description=f"""# {'Lege eine level up message fest' if check_settings[4] == default_message else 'überschreibe die aktuelle level up message'}
+                {Emojis.dot_emoji} Eine level up message wird immer dann geschickt wenn ein user ein level aufsteigt diese wird dann entweder in einen level up channel geschickt (Wenn vorhanden) oder einfach direkt nach der letzten nachricht
+                {Emojis.dot_emoji} Die aktuelle level up nachricht ist: `{check_settings[4]}` 
+                {Emojis.dot_emoji} An den Parameter {'{user}'} wird der name des nutzers eingesetzt und an der setelle von{'{level}'} wird das neue level des nutzers gesetzt
+                {Emojis.dot_emoji} Drücke auf den unteren button um eine level up message fest zu legen""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, view=view)
+
+            
 
            
 
