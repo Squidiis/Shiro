@@ -1695,8 +1695,14 @@ class LevelSystemSetting(discord.ui.View):
                 value="level_up_message"
             ),
             discord.SelectOption(
-                label="Strawberry",
-                description="Pick this if you like strawberry!"
+                label="Set bonus xp percentage",
+                description="Set a default percentage for the bonus XP system (this is set to 10 % by default)!",
+                value="set_bonus_xp_percentage"
+            ),
+            discord.SelectOption(
+                label="Set all level settings on default",
+                description="Setzt alle einstellungen des level systems zurück auf standart!",
+                value="set_level_system_default"
             )
         ]
     )
@@ -1706,7 +1712,7 @@ class LevelSystemSetting(discord.ui.View):
 
         view = View(timeout=None)
         view.add_item(CancelSetLevelSystem())
-
+        default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
 
         if "level_up_channel" == select.values[0]:
 
@@ -1720,8 +1726,7 @@ class LevelSystemSetting(discord.ui.View):
         elif "level_up_message" == select.values[0]:
 
             view.add_item(LevelUpMessageButton(label=f"Lege eine {'neue' if check_settings[4] == None else ''} level up message fest"))
-
-            default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
+            
             emb = discord.Embed(description=f"""# {'Lege eine level up message fest' if check_settings[4] == default_message else 'überschreibe die aktuelle level up message'}
                 {Emojis.dot_emoji} Eine level up message wird immer dann geschickt wenn ein user ein level aufsteigt diese wird dann entweder in einen level up channel geschickt (Wenn vorhanden) oder einfach direkt nach der letzten nachricht
                 {Emojis.dot_emoji} Die aktuelle level up nachricht ist: `{check_settings[4]}` 
@@ -1729,6 +1734,19 @@ class LevelSystemSetting(discord.ui.View):
                 {Emojis.dot_emoji} Drücke auf den unteren button um eine level up message fest zu legen""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=view)
 
+        elif "set_bonus_xp_percentage" == select.values[0]:
+
+            emb = discord.Embed(description=f"""# Lege einen bonus XP prozentsatz fest
+                {Emojis.dot_emoji} Jedes Mal, wenn eine Aktivität von einem Benutzer, In einem Kanal, einer Kategorie oder von Benutzer mit einer bestimmten Rolle der Bonus-XP-Liste ist stattfindet, wird diese entsprechend des von dir festgelegten Bonus-XP-Prozentsatzes belohnt.
+                Dieser wird dann immer auf die standart XP addiert der standart Prozensatz liegt bei **10 %**
+                {Emojis.dot_emoji} Drücke auf den unteren Button um einzustellen welcher Prozentsatz benutzt werden soll""")
+
+        elif "set_level_system_default" == select.values[0]:
+
+            emb = discord.Embed(description=f"""# Bist du dir sicher das du alle einstellungen zurück auf standart setzten möchtest?
+                {'' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> ist dann nicht länger als level up channel festgelgt ab dann werden alle level up nachrichten in den channel gesendet in dem die letzte nachricht geschrieben wurde'}
+                {'' if check_settings[4] == default_message else f'{Emojis.dot_emoji} Die level up message wird dann wieder auf diese nachricht zurückgesetzt: `{default_message}`'}
+                """, color=bot_colour)
             
 
            
