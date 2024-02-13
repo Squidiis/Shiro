@@ -134,9 +134,8 @@ class Main(commands.Cog):
         self.bot.add_view(ResetLevelStatsButton())
         self.bot.add_view(LevelSystemSettings())
         self.bot.add_view(ResetBlacklistLevelButton())
-        view.add_item(ShowBlacklistLevelSystemButton())
-        self.bot.add_view(ModalButtonLevelUpMessage())
         self.bot.add_view(LevelSystemSetting())
+        view.add_item(ShowBlacklistLevelSystemButton())
         
         # Mod tools
         self.bot.add_view(GhostPingButtons())
