@@ -54,12 +54,19 @@ class CheckLevelSystem():
         check_bonus = DatabaseCheck.check_level_settings(guild_id=guild_id)
         bonus = check_bonus[5]
 
-        bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> activities in this channel are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[1] else None for i in check_list] + [
-            f"{Emojis.dot_emoji} <#{i[2]}> activities of this category are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[2] != None else None for i in check_list] + [
-            f"{Emojis.dot_emoji} <@&{i[3]}> activities of users with this role are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[3] != None else None for i in check_list] + [
-            f"{Emojis.dot_emoji} <@{i[4]}> activities of this user will be rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[4] != None else None for i in check_list]
-        filtered_list = [x for x in bonus_xp_list if x is not None]
-        all_bonus_xp_items = "\n".join(filtered_list)
+        if check_list:
+
+            bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> activities in this channel are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[1] else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <#{i[2]}> activities of this category are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[2] != None else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <@&{i[3]}> activities of users with this role are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[3] != None else None for i in check_list] + [
+                f"{Emojis.dot_emoji} <@{i[4]}> activities of this user will be rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[4] != None else None for i in check_list]
+            filtered_list = [x for x in bonus_xp_list if x is not None]
+            all_bonus_xp_items = "\n".join(filtered_list)
+
+        else:
+
+            all_bonus_xp_items = f"{Emojis.dot_emoji} Nothing has been listed on the Bonus XP list"
+
         return all_bonus_xp_items
             
 
@@ -1754,7 +1761,7 @@ class LevelSystemSetting(discord.ui.View):
             emb = discord.Embed(description=f"""# Lege einen bonus XP prozentsatz fest
                 {Emojis.dot_emoji} Jedes Mal, wenn eine Aktivität von einem Benutzer, In einem Kanal, einer Kategorie oder von Benutzer mit einer bestimmten Rolle der Bonus-XP-Liste ist stattfindet, wird diese entsprechend des von dir festgelegten Bonus-XP-Prozentsatzes belohnt.
                 Dieser wird dann immer auf die standart XP addiert der standart Prozensatz liegt bei **10 %**
-                {Emojis.dot_emoji} Drücke auf den unteren Button um einzustellen welcher Prozentsatz benutzt werden soll.""")
+                {Emojis.dot_emoji} Drücke auf den unteren Button um einzustellen welcher Prozentsatz benutzt werden soll.""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=view)
 
         elif "set_level_system_default" == select.values[0]:
@@ -1801,7 +1808,7 @@ class CancelSetLevelSystem(discord.ui.Button):
         await interaction.response.edit_message(embed=emb, view=None)
 
 
-class SetBonusXpPercentageButton(discord.ui.Button()):
+class SetBonusXpPercentageButton(discord.ui.Button):
 
     def __init__(self, label):
         super().__init__(
@@ -1812,12 +1819,11 @@ class SetBonusXpPercentageButton(discord.ui.Button()):
 
     async def callback(self, interaction:discord.Interaction):
 
-        view = View() 
         emb = discord.Embed(description=f"""# Lege einen individuellen bonus XP prozentsatz fest 
             {Emojis.dot_emoji} Mit den unteren Dropdown menü kannst du einen bonus XP prozent satz der auf der auf die Noamle XP menge drauf gerechnet wird angeben
             {Emojis.dot_emoji} Wenn dir keinen der vorgeschlagenen Prozentsätze gefällt kannst du auch mit den unteren button einen ganz eigenen angeben bedenke aber das dieser nicht über 100 % liegen darf!
-            auch muss diese dann eine ganzzahl sein und darf kein kommer oder zeichen enthalten""")
-        await interaction.response.edit_message(embed=emb, view=view)
+            auch muss diese dann eine ganzzahl sein und darf kein kommer oder zeichen enthalten""", color=bot_colour)
+        await interaction.response.send_message(embed=emb, view=BonusXpPercentage())
 
 
 class BonusXpPercentage(discord.ui.View):
@@ -1827,33 +1833,37 @@ class BonusXpPercentage(discord.ui.View):
         self.add_item(SendXpBonusModal())
         self.add_item(CancelSetLevelSystem())
 
-    @discord.ui.select(
-        description = "Wähle einen Prozentsatz aus",
+    @discord.ui.string_select(
+        placeholder = "Wähle einen Prozentsatz aus",
         min_values = 1,
         max_values = 1,
         custom_id="set_bonus_xp_percentage_select",
         options = [
-            5,
-            10,
-            20,
-            30,
-            40,
-            50,
-            60,
-            70,
-            80,
-            90,
-            100
+            discord.SelectOption(label = "5"),
+            discord.SelectOption(label = "10"),
+            discord.SelectOption(label = "20"),
+            discord.SelectOption(label = "30"),
+            discord.SelectOption(label = "40"),
+            discord.SelectOption(label = "50"),
+            discord.SelectOption(label = "60"),
+            discord.SelectOption(label = "70"),
+            discord.SelectOption(label = "80"),
+            discord.SelectOption(label = "90"),
+            discord.SelectOption(label = "100")
         ]
     )
     async def callback(self, select, interaction:discord.Interaction):
 
-        emb = discord.Embed()
+        emb = discord.Embed(description=f"""# Ein neuer bonus XP prozensatz wurde festgelegt
+            {Emojis.dot_emoji} Ab jetzt werden alle aktivitäten die in einem Channe, Kategorie oder von einem user, user mit einer rolle die auf der Bonus XP list ist mit extra XP belohnt
+            {Emojis.dot_emoji} Hier siehst du auch noch mal eine übersicht über die gesammte bonus XP list:\n
+            {CheckLevelSystem.bonus_xp_list(guild_id = interaction.guild.id)}""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=None)
 
 
 class SendXpBonusModal(discord.ui.Button):
 
-    def __init__():
+    def __init__(self):
         super().__init__(
             label = "Set individual XP bonus percentage",
             style=discord.ButtonStyle.blurple,
@@ -1868,21 +1878,26 @@ class SendXpBonusModal(discord.ui.Button):
 class BonusXpPercentageModal(discord.ui.Modal):
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__()
+        super().__init__(title="Enter your own bonus XP percentage!")
         self.add_item(discord.ui.InputText(label="Enter your bonus percentage as a number here", style=discord.InputTextStyle.short))
 
     async def callback(self, interaction: discord.Interaction):
 
-        if self.children[0].value.isnumeric() or self.children[0].value > 100:
+        try:
+            
+            if self.children[0].value > 100 and int(self.children[0].value):
 
-            DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
+                DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
 
-            embed = discord.Embed(description=f"""# Dein Bonus XP prozentsatz wurde festgelegt
-                {Emojis.dot_emoji} Der Bonus XP Prozentsatz wurde auf {self.children[0].value} % festgelegt\n## {Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt
-                {CheckLevelSystem.bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
-            await interaction.response.edit_message(embeds=[embed], view=None)
+                embed = discord.Embed(description=f"""# Dein Bonus XP prozentsatz wurde festgelegt
+                    {Emojis.dot_emoji} Der Bonus XP Prozentsatz wurde auf {self.children[0].value} % festgelegt\n## {Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt
+                    {CheckLevelSystem.bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
+                await interaction.response.edit_message(embeds=[embed], view=None)
 
-        else:
+            else:
+                raise Exception('Exception message')
+
+        except:
 
             emb = discord.Embed(description=f"""# Deine eingabe ist invalide
                 {Emojis.dot_emoji} Deine eingabe ist entweder größer als 100 oder beinhaltet Buchstaben, sonderzeichen oder ein komma
