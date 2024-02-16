@@ -7,3 +7,5 @@ Readme adden anleitung wie man den Bot einstellt
 Den settings command erweitern das man da auch die anderen einstellungen vor nehmen kann
 
 Noch machen das man auch die einzelnen sachen zurück auf default stellen kann
+
+Noch das in ein View packen was geht

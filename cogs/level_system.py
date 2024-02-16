@@ -68,7 +68,6 @@ class CheckLevelSystem():
             all_bonus_xp_items = f"{Emojis.dot_emoji} Nothing has been listed on the Bonus XP list"
 
         return all_bonus_xp_items
-            
 
 
 #############################################  Level Systen Settings  #############################################
@@ -1661,39 +1660,11 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=no_entry_emb)
 
 
-class LevelUpMessageButton(discord.ui.Button):
 
-    def __init__(self, label):
-        super().__init__(
-            label=label,
-            style=discord.ButtonStyle.blurple,
-            custom_id="set_level_up_message"
-        )
-
-    async def callback(self, interaction:discord.Interaction):
-
-        await interaction.response.send_modal(LevelUpMessageModal(title="Set a level-up message for your server!"))
-
-
-class LevelUpMessageModal(discord.ui.Modal):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__()
-        self.add_item(discord.ui.InputText(label="Insert here the text for the level-up message", style=discord.InputTextStyle.long))
-
-    async def callback(self, interaction: discord.Interaction):
-        user = interaction.user.mention
-        level = 1
-        level_up_message = eval("f'{}'".format(self.children[0].value))
-
-        DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
-
-        embed = discord.Embed(description=f"""# The level-up message was successfully set {Emojis.succesfully_emoji}
-            {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}` {Emojis.exclamation_mark_emoji}
-            {Emojis.dot_emoji} When someone receives a level-up this message is sent""", color=bot_colour)
-        await interaction.response.edit_message(embeds=[embed], view=None)
 
 
 class LevelSystemSetting(discord.ui.View):
+
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(CancelSetLevelSystem())
@@ -1726,6 +1697,7 @@ class LevelSystemSetting(discord.ui.View):
             )
         ]
     )
+
     async def select_callback(self, select, interaction:discord.Interaction):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
@@ -1734,43 +1706,97 @@ class LevelSystemSetting(discord.ui.View):
         view.add_item(CancelSetLevelSystem())
         default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
 
-        if "level_up_channel" == select.values[0]:
+        if interaction.user.guild_permissions.administrator:
 
-            view.add_item(SetLevelUpChannelButton(label=f"Lege einen {'neuen' if check_settings[3] == None else ''} level up channel fest"))
+            if "level_up_channel" == select.values[0]:
 
-            emb = discord.Embed(description=f"""# {'Lege einen level up channel fest' if check_settings[3] == None else 'Überschreibe den aktullen level up channel'}
-                {Emojis.dot_emoji} {'Aktuell wurde noch kein level up channel festgelegt' if check_settings[3] == None else f'Der aktuelle level up channel ist <#{check_settings[3]}>'}
-                {Emojis.dot_emoji} Benutzte den unteren button um einen level up channel fest zu legen""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, view=view)
+                view.add_item(SetLevelUpChannelButton(label=f"Lege einen {'neuen' if check_settings[3] == None else ''} level up channel fest"))
 
-        elif "level_up_message" == select.values[0]:
+                emb = discord.Embed(description=f"""# {'Lege einen level up channel fest' if check_settings[3] == None else 'Überschreibe den aktullen level up channel'}
+                    {Emojis.dot_emoji} {'Aktuell wurde noch kein level up channel festgelegt' if check_settings[3] == None else f'Der aktuelle level up channel ist <#{check_settings[3]}>'}
+                    {Emojis.dot_emoji} Benutzte den unteren button um einen level up channel fest zu legen""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=view, ephemeral=True)
 
-            view.add_item(LevelUpMessageButton(label=f"Lege eine {'neue' if check_settings[4] == None else ''} level up message fest"))
-            
-            emb = discord.Embed(description=f"""# {'Lege eine level up message fest' if check_settings[4] == default_message else 'überschreibe die aktuelle level up message'}
-                {Emojis.dot_emoji} Eine level up message wird immer dann geschickt wenn ein user ein level aufsteigt diese wird dann entweder in einen level up channel geschickt (Wenn vorhanden) oder einfach direkt nach der letzten nachricht
-                {Emojis.dot_emoji} Die aktuelle level up nachricht ist: `{check_settings[4]}` 
-                {Emojis.dot_emoji} An den Parameter {'{user}'} wird der name des nutzers eingesetzt und an der setelle von{'{level}'} wird das neue level des nutzers gesetzt
-                {Emojis.dot_emoji} Drücke auf den unteren button um eine level up message fest zu legen""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, view=view)
+            elif "level_up_message" == select.values[0]:
 
-        elif "set_bonus_xp_percentage" == select.values[0]:
+                view.add_item(LevelUpMessageButton(label=f"Lege eine {'neue' if check_settings[4] == None else ''} level up message fest"))
+                
+                emb = discord.Embed(description=f"""# {'Lege eine level up message fest' if check_settings[4] == default_message else 'überschreibe die aktuelle level up message'}
+                    {Emojis.dot_emoji} Eine level up message wird immer dann geschickt wenn ein user ein level aufsteigt diese wird dann entweder in einen level up channel geschickt (Wenn vorhanden) oder einfach direkt nach der letzten nachricht
+                    {Emojis.dot_emoji} Die aktuelle level up nachricht ist: `{check_settings[4]}` 
+                    {Emojis.dot_emoji} An den Parameter {'{user}'} wird der name des nutzers eingesetzt und an der setelle von{'{level}'} wird das neue level des nutzers gesetzt
+                    {Emojis.dot_emoji} Drücke auf den unteren button um eine level up message fest zu legen""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=view, ephemeral=True)
 
-            view.add_item(SetBonusXpPercentageButton(label=f"Lege einen {'neuen' if check_settings[4] == None else ''} bonus XP prozentsatz fest"))
+            elif "set_bonus_xp_percentage" == select.values[0]:
 
-            emb = discord.Embed(description=f"""# Lege einen bonus XP prozentsatz fest
-                {Emojis.dot_emoji} Jedes Mal, wenn eine Aktivität von einem Benutzer, In einem Kanal, einer Kategorie oder von Benutzer mit einer bestimmten Rolle der Bonus-XP-Liste ist stattfindet, wird diese entsprechend des von dir festgelegten Bonus-XP-Prozentsatzes belohnt.
-                Dieser wird dann immer auf die standart XP addiert der standart Prozensatz liegt bei **10 %**
-                {Emojis.dot_emoji} Drücke auf den unteren Button um einzustellen welcher Prozentsatz benutzt werden soll.""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, view=view)
+                view.add_item(SetBonusXpPercentageButton(label=f"Lege einen {'neuen' if check_settings[4] == None else ''} bonus XP prozentsatz fest"))
 
-        elif "set_level_system_default" == select.values[0]:
+                emb = discord.Embed(description=f"""# Lege einen bonus XP prozentsatz fest
+                    {Emojis.dot_emoji} Jedes Mal, wenn eine Aktivität von einem Benutzer, In einem Kanal, einer Kategorie oder von Benutzer mit einer bestimmten Rolle der Bonus-XP-Liste ist stattfindet, wird diese entsprechend des von dir festgelegten Bonus-XP-Prozentsatzes belohnt.
+                    Dieser wird dann immer auf die standart XP addiert der standart Prozensatz liegt bei **10 %**
+                    {Emojis.dot_emoji} Drücke auf den unteren Button um einzustellen welcher Prozentsatz benutzt werden soll.""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=view, ephemeral=True)
 
-            emb = discord.Embed(description=f"""# Bist du dir sicher das du alle einstellungen zurück auf standart setzten möchtest?
-                {'' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> ist dann nicht länger als level up channel festgelgt ab dann werden alle level up nachrichten in den channel gesendet in dem die letzte nachricht geschrieben wurde'}
-                {'' if check_settings[4] == default_message else f'{Emojis.dot_emoji} Die level up message wird dann wieder auf diese nachricht zurückgesetzt: `{default_message}`'}""", color=bot_colour)
-            
+            elif "set_level_system_default" == select.values[0]:
 
+                emb = discord.Embed(description=f"""# Einstellungen zurück setzten?
+                    {'' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> ist dann nicht länger als level up channel festgelgt ab dann werden alle level up nachrichten in den channel gesendet in dem die letzte nachricht geschrieben wurde'}
+                    {'' if check_settings[4] == default_message else f'{Emojis.dot_emoji} Die level up message wird dann wieder auf diese nachricht zurückgesetzt: `{default_message}`'}
+                    {'' if check_settings[5] == 10 else f'{Emojis.dot_emoji} Dein festgelegter bonus XP prozensatz würde dann wieder auf standart sein aktull leigt er bei {check_settings[5]} % auf standart würde er 10 % betragen'}
+                    {f'{Emojis.dot_emoji} Alle deine einstellungen sind bereits auf dem standart wert' if check_settings[3] == None and check_settings[4] == default_message and check_settings[5] == 10 else ''}
+                    """, color=bot_colour)
+        
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+
+################################################  Level up message  ##############################################
+
+class LevelUpMessageButton(discord.ui.Button):
+
+    def __init__(self, label):
+        super().__init__(
+            label=label,
+            style=discord.ButtonStyle.blurple,
+            custom_id="set_level_up_message"
+        )
+
+    async def callback(self, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            await interaction.response.send_modal(LevelUpMessageModal(title="Set a level-up message for your server!"))
+        
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+class LevelUpMessageModal(discord.ui.Modal):
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
+        self.add_item(discord.ui.InputText(label="Insert here the text for the level-up message", style=discord.InputTextStyle.long))
+
+    async def callback(self, interaction: discord.Interaction):
+
+        user = interaction.user.mention
+        level = 1
+        level_up_message = eval("f'{}'".format(self.children[0].value))
+
+        DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
+
+        embed = discord.Embed(description=f"""# The level-up message was successfully set {Emojis.succesfully_emoji}
+            {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}` {Emojis.exclamation_mark_emoji}
+            {Emojis.dot_emoji} When someone receives a level-up this message is sent""", color=bot_colour)
+        await interaction.response.edit_message(embeds=[embed], view=None, ephemeral=True)
+
+
+
+#######################################  Level up channel  ############################################
 
 
 class SetLevelUpChannelButton(discord.ui.Button):
@@ -1784,28 +1810,55 @@ class SetLevelUpChannelButton(discord.ui.Button):
 
     async def callback(self, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f"""# Lege einen level up channel fest
-            {Emojis.dot_emoji} Mit den unteren select menü kannst du auswählen welcher channel zum level up channel werden soll.
-            {Emojis.dot_emoji} In diesen werden dann alle level up nachrichten und alle benachrichigungen für die level roles geschickt.""", color=bot_colour)
-        await interaction.response.send_message(embed=emb, ephemeral=True, view=SetLevelUpChannelSelect())
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""# Lege einen level up channel fest
+                {Emojis.dot_emoji} Mit den unteren select menü kannst du auswählen welcher channel zum level up channel werden soll.
+                {Emojis.dot_emoji} In diesen werden dann alle level up nachrichten und alle benachrichigungen für die level roles geschickt.""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=SetLevelUpChannelSelect())
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
+class SetLevelUpChannelSelect(discord.ui.View):
 
-class CancelSetLevelSystem(discord.ui.Button):
-    
     def __init__(self):
-        super().__init__(
-            label="Einstellen Abbrechen",
-            style=discord.ButtonStyle.danger,
-            custom_id="cancel_level_set"
-        )
+        super().__init__(timeout=None)
+        self.add_item(CancelSetLevelSystem())
+        
+    @discord.ui.channel_select(
+        placeholder = "Wähle einen channel den du als level up channel festlegen möchtest!",
+        min_values = 1,
+        max_values = 1,
+        custom_id = "level_up_channel_select",
+        channel_types = [
+            discord.ChannelType.text, 
+            discord.ChannelType.forum, 
+            discord.ChannelType.news
+        ]
+    )
+    
+    async def callback(self, select, interaction:discord.Interaction):
+        
+        if interaction.user.guild_permissions.administrator:
 
-    async def callback(self, interaction:discord.Interaction):
+            DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, levelup_channel = select.values[0].id)
+                
+            emb = discord.Embed(
+                description=f"""# Level up channel wurde {f"festgelegt" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "überschrieben"}
+                {Emojis.dot_emoji} Du hast {"neuen" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} <#{select.values[0].id}> als level up channel festgelgt.
+                {Emojis.dot_emoji} Alle level up Nachrichten und alle benachrichtigungen für die level rollen werden ab jetzt in diesen channel geschickt.""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None, ephemeral=True)
 
-        emb = discord.Embed(description=f"""# Einstellung Abgebrochen
-            {Emojis.dot_emoji} Die einstellung des Level Systems wurde abgebrochen
-            {Emojis.dot_emoji} Wenn du es dir anders überlegen solltest kannst du jederzeit den Command erneut ausführen""", color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=None)
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+
+################################################  Bonus XP Percentage  ################################################
 
 
 class SetBonusXpPercentageButton(discord.ui.Button):
@@ -1819,11 +1872,17 @@ class SetBonusXpPercentageButton(discord.ui.Button):
 
     async def callback(self, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f"""# Lege einen individuellen bonus XP prozentsatz fest 
-            {Emojis.dot_emoji} Mit den unteren Dropdown menü kannst du einen bonus XP prozent satz der auf der auf die Noamle XP menge drauf gerechnet wird angeben
-            {Emojis.dot_emoji} Wenn dir keinen der vorgeschlagenen Prozentsätze gefällt kannst du auch mit den unteren button einen ganz eigenen angeben bedenke aber das dieser nicht über 100 % liegen darf!
-            auch muss diese dann eine ganzzahl sein und darf kein kommer oder zeichen enthalten""", color=bot_colour)
-        await interaction.response.send_message(embed=emb, view=BonusXpPercentage())
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""# Lege einen individuellen bonus XP prozentsatz fest 
+                {Emojis.dot_emoji} Mit den unteren Dropdown menü kannst du einen bonus XP prozent satz der auf der auf die Noamle XP menge drauf gerechnet wird angeben
+                {Emojis.dot_emoji} Wenn dir keinen der vorgeschlagenen Prozentsätze gefällt kannst du auch mit den unteren button einen ganz eigenen angeben bedenke aber das dieser nicht über 100 % liegen darf!
+                auch muss diese dann eine ganzzahl sein und darf kein kommer oder zeichen enthalten""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, view=BonusXpPercentage(), ephemeral=True)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 class BonusXpPercentage(discord.ui.View):
@@ -1852,13 +1911,23 @@ class BonusXpPercentage(discord.ui.View):
             discord.SelectOption(label = "100")
         ]
     )
-    async def callback(self, select, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f"""# Ein neuer bonus XP prozensatz wurde festgelegt
-            {Emojis.dot_emoji} Ab jetzt werden alle aktivitäten die in einem Channe, Kategorie oder von einem user, user mit einer rolle die auf der Bonus XP list ist mit extra XP belohnt
-            {Emojis.dot_emoji} Hier siehst du auch noch mal eine übersicht über die gesammte bonus XP list:\n
-            {CheckLevelSystem.bonus_xp_list(guild_id = interaction.guild.id)}""", color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=None)
+    async def callback(self, select, interaction:discord.Interaction):
+        
+        if interaction.user.guild_permissions.administrator:
+
+            DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=int(select.values[0]))
+
+            emb = discord.Embed(description=f"""# Ein neuer bonus XP prozensatz wurde festgelegt
+                {Emojis.dot_emoji} Der neu festgelegte bonus Prozentsatzt leigt ab jetzt bei {select.values[0]}
+                {Emojis.dot_emoji} Ab jetzt werden alle aktivitäten die in einem Channe, Kategorie oder von einem user, user mit einer rolle die auf der Bonus XP list ist mit extra XP belohnt
+                {Emojis.dot_emoji} Hier siehst du auch noch mal eine übersicht über die gesammte bonus XP list:\n
+                {CheckLevelSystem.bonus_xp_list(guild_id = interaction.guild.id)}""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None, ephemeral=True)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 class SendXpBonusModal(discord.ui.Button):
@@ -1872,7 +1941,13 @@ class SendXpBonusModal(discord.ui.Button):
     
     async def callback(self, interaction:discord.Interaction):
 
-        await interaction.response.send_modal(BonusXpPercentageModal(title="Enter your own bonus XP percentage!"))
+        if interaction.user.guild_permissions.administrator:
+
+            await interaction.response.send_modal(BonusXpPercentageModal(title="Enter your own bonus XP percentage!"))
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 class BonusXpPercentageModal(discord.ui.Modal):
@@ -1883,54 +1958,111 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
     async def callback(self, interaction: discord.Interaction):
 
-        try:
-            
-            if self.children[0].value > 100 and int(self.children[0].value):
+        if interaction.user.guild_permissions.administrator:
 
-                DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
+            try:
+                
+                if self.children[0].value > 100 and int(self.children[0].value):
 
-                embed = discord.Embed(description=f"""# Dein Bonus XP prozentsatz wurde festgelegt
-                    {Emojis.dot_emoji} Der Bonus XP Prozentsatz wurde auf {self.children[0].value} % festgelegt\n## {Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt
-                    {CheckLevelSystem.bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
-                await interaction.response.edit_message(embeds=[embed], view=None)
+                    DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
 
-            else:
-                raise Exception('Exception message')
+                    embed = discord.Embed(description=f"""# Dein Bonus XP prozentsatz wurde festgelegt
+                        {Emojis.dot_emoji} Der Bonus XP Prozentsatz wurde auf {self.children[0].value} % festgelegt\n## {Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt
+                        {CheckLevelSystem.bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
+                    await interaction.response.edit_message(embeds=[embed], view=None, ephemeral=True)
 
-        except:
+                else:
+                    raise Exception('Exception message')
 
-            emb = discord.Embed(description=f"""# Deine eingabe ist invalide
-                {Emojis.dot_emoji} Deine eingabe ist entweder größer als 100 oder beinhaltet Buchstaben, sonderzeichen oder ein komma
-                {Emojis.dot_emoji} Du kannst einen neuen anderen wert eingeben in dem du noch einmal auf den Button drückst oder du brichst die einstellung ab dafür musst du nur auf den Roten button drücken.""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+            except:
+
+                emb = discord.Embed(description=f"""# Deine eingabe ist invalide
+                    {Emojis.dot_emoji} Deine eingabe ist entweder größer als 100 oder beinhaltet Buchstaben, sonderzeichen oder ein komma
+                    {Emojis.dot_emoji} Du kannst einen neuen anderen wert eingeben in dem du noch einmal auf den Button drückst oder du brichst die einstellung ab dafür musst du nur auf den Roten button drücken.""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+
+        else:
+
+                await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-class SetLevelUpChannelSelect(discord.ui.View):
+
+#########################################  Cancel Button  ########################################
+
+
+class CancelSetLevelSystem(discord.ui.Button):
+    
+    def __init__(self):
+        super().__init__(
+            label="Einstellen Abbrechen",
+            style=discord.ButtonStyle.danger,
+            custom_id="cancel_level_set"
+        )
+
+    async def callback(self, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""# Einstellung Abgebrochen
+                {Emojis.dot_emoji} Die einstellung des Level Systems wurde abgebrochen
+                {Emojis.dot_emoji} Wenn du es dir anders überlegen solltest kannst du jederzeit den Command erneut ausführen""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+
+
+class LevelSystemDefault(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(CancelSetLevelSystem())
-        
-    @discord.ui.channel_select(
-                placeholder = "Wähle einen channel den du als level up channel festlegen möchtest!",
-                min_values = 1,
-                max_values = 1,
-                custom_id = "level_up_channel_select",
-                channel_types = [
-                    discord.ChannelType.text, 
-                    discord.ChannelType.forum, 
-                    discord.ChannelType.news
-                ]
-            )
-    async def callback(self, select, interaction:discord.Interaction):
+
+    @discord.ui.select(
+        max_values=3,
+        min_values=1,
+        placeholder="Wähle aus welche komponenten du auf standart einstellungen zurücksetzten willst",
+        options=[
+            discord.SelectOption(label="Level up channel", description="Setzte den level up channel zurück"),
+            discord.SelectOption(label="Level up message", description="Setzte die level up message zurück"),
+            discord.SelectOption(label="Bonus XP percentage", description="setzte den bonus XP prozensatz zurück")
+        ],
+        custom_id="level_default_select"
+    )
+
+    async def level_system_default_select(self, select, interaction:discord.Interaction):
+
+        for i in select.values:
+            i 
+
+        emb = discord.Embed(description=f"""# Zurückgesetzte einstellungen
+            {Emojis.dot_emoji} Die folgenden einstellungen des level systems wurden zurückgesetzt:
             
-        DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, levelup_channel = select.values[0].id)
-            
-        emb = discord.Embed(
-            description=f"""# Level up channel wurde {f"festgelegt" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "überschrieben"}
-            {Emojis.dot_emoji} Du hast {"neuen" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} <#{select.values[0].id}> als level up channel festgelgt.
-            {Emojis.dot_emoji} Alle level up Nachrichten und alle benachrichtigungen für die level rollen werden ab jetzt in diesen channel geschickt.""", color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=None)
+            {Emojis.dot_emoji} Die folgenden einstellungen waren bereits auf standart:
+            """)
+        await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+
+
+    @discord.ui.button()
+    async def level_system_all_dafault(self, button, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""# Alle daten wurden zurück auf standart gesetzt
+                {Emojis.dot_emoji} Du hast erfolgreich alle level system einstellungen zurück auf standart gesetzt
+                {Emojis.dot_emoji} Du kannst diese jederzeit wieder ändern""")
+            await interaction.response.edit_message(embed=emb, view=None)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+    
+
 
 def setup(bot):
     bot.add_cog(LevelSystem(bot))
