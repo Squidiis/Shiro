@@ -216,7 +216,7 @@ class LevelUpChannelButtons(discord.ui.View):
 
             else:
 
-                DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, levelup_channel=self.channel)
+                DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_channel=self.channel)
 
                 emb = discord.Embed(title=f"The level up channel was successfully overwritten {Emojis.succesfully_emoji}", 
                     description=f"""{Emojis.dot_emoji} From now on the channel <#{self.channel}> is assigned as level up channel.""", color=bot_colour)
@@ -1257,7 +1257,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, levelup_channel=channel.id)
+            DatabaseUpdates.update_level_settings(guild_id=ctx.guild.id, level_up_channel=channel.id)
 
             emb = discord.Embed(title=f"The level up channel was set successfully {Emojis.succesfully_emoji}", 
                 description=f"""{Emojis.dot_emoji} You have successfully set the channel <#{channel.id}> as a level up channel.
@@ -1686,6 +1686,11 @@ class LevelSystemSetting(discord.ui.View):
                 value="level_up_message"
             ),
             discord.SelectOption(
+                label="Set XP rate",
+                description="Set an XP value, this is then distributed as XP per activity",
+                value="set_xp_rate"
+            ),
+            discord.SelectOption(
                 label="Set bonus xp percentage",
                 description="Set a default percentage for the bonus XP system (this is set to 10 % by default)!",
                 value="set_bonus_xp_percentage"
@@ -1738,14 +1743,26 @@ class LevelSystemSetting(discord.ui.View):
                     {Emojis.dot_emoji} Drücke auf den unteren Button um einzustellen welcher Prozentsatz benutzt werden soll.""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=view, ephemeral=True)
 
+            elif "set_xp_rate" == select.values[0]:
+
+                emb = discord.Embed()
+
             elif "set_level_system_default" == select.values[0]:
+                
+                settings = [
+                    '' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> ist aktuell als Level up channel festgelegt heist alle level up nachrichten und alle rolle benachrichtigungen werden in diesen Channel gesendet',
+                    '' if check_settings[4] == default_message else f'{Emojis.dot_emoji} aktuell ist das die level up message `{check_settings[4]}`',
+                    '' if check_settings[5] == 10 else f'{Emojis.dot_emoji} Der Bonus XP Prozensatz liegt aktuell bei {check_settings[5]} %',
+                    f'{Emojis.dot_emoji} Alle deine einstellungen sind bereits auf dem standart wert' if check_settings[3] == None and check_settings[4] == default_message and check_settings[5] == 10 else ''
+                ]
 
                 emb = discord.Embed(description=f"""# Einstellungen zurück setzten?
-                    {'' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> ist dann nicht länger als level up channel festgelgt ab dann werden alle level up nachrichten in den channel gesendet in dem die letzte nachricht geschrieben wurde'}
-                    {'' if check_settings[4] == default_message else f'{Emojis.dot_emoji} Die level up message wird dann wieder auf diese nachricht zurückgesetzt: `{default_message}`'}
-                    {'' if check_settings[5] == 10 else f'{Emojis.dot_emoji} Dein festgelegter bonus XP prozensatz würde dann wieder auf standart sein aktull leigt er bei {check_settings[5]} % auf standart würde er 10 % betragen'}
-                    {f'{Emojis.dot_emoji} Alle deine einstellungen sind bereits auf dem standart wert' if check_settings[3] == None and check_settings[4] == default_message and check_settings[5] == 10 else ''}
+                    {Emojis.dot_emoji} Mit dem unteren Button kannst du alle einstellungen zurücksetzten, falls du einzelne einstellungen nur zurücksetzten möchtest kannst du dafür das select menü wählen du kannst dabei beliebig viele felderauswähelen
+                    
+                    **{Emojis.help_emoji} Hier siehst du noch eine liste von einstellungen die nicht auf standart sind und auf was du sie festgelegt hast:**
+                    {"".join(settings)}
                     """, color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=LevelSystemDefault(), ephemeral=True)
         
         else:
 
@@ -1815,7 +1832,7 @@ class SetLevelUpChannelButton(discord.ui.Button):
             emb = discord.Embed(description=f"""# Lege einen level up channel fest
                 {Emojis.dot_emoji} Mit den unteren select menü kannst du auswählen welcher channel zum level up channel werden soll.
                 {Emojis.dot_emoji} In diesen werden dann alle level up nachrichten und alle benachrichigungen für die level roles geschickt.""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True, view=SetLevelUpChannelSelect())
+            await interaction.response.edit_message(embed=emb, view=SetLevelUpChannelSelect())
 
         else:
 
@@ -1842,15 +1859,25 @@ class SetLevelUpChannelSelect(discord.ui.View):
     
     async def callback(self, select, interaction:discord.Interaction):
         
+        settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+
         if interaction.user.guild_permissions.administrator:
 
-            DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, levelup_channel = select.values[0].id)
-                
-            emb = discord.Embed(
-                description=f"""# Level up channel wurde {f"festgelegt" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "überschrieben"}
-                {Emojis.dot_emoji} Du hast {"neuen" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} <#{select.values[0].id}> als level up channel festgelgt.
-                {Emojis.dot_emoji} Alle level up Nachrichten und alle benachrichtigungen für die level rollen werden ab jetzt in diesen channel geschickt.""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None, ephemeral=True)
+            if settings[3] != select.values[0].id:
+
+                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, level_up_channel = select.values[0].id)
+                    
+                emb = discord.Embed(
+                    description=f"""# Level up channel wurde {f"festgelegt" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "überschrieben"}
+                    {Emojis.dot_emoji} Du hast {"neuen" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} <#{select.values[0].id}> als level up channel festgelgt.
+                    {Emojis.dot_emoji} Alle level up Nachrichten und alle benachrichtigungen für die level rollen werden ab jetzt in diesen channel geschickt.""", color=bot_colour)
+                await interaction.response.edit_message(embed=emb, view=None)
+            
+            else:
+
+                emb = discord.Embed(description=f"""# {Emojis.help_emoji} Dieser Channel ist bereits als level up channel festgelegt 
+                    {Emojis.dot_emoji} <#{select.values[0].id}> ist bereits als level up channel festgelegt""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
         else:
 
@@ -2026,30 +2053,71 @@ class LevelSystemDefault(discord.ui.View):
         min_values=1,
         placeholder="Wähle aus welche komponenten du auf standart einstellungen zurücksetzten willst",
         options=[
-            discord.SelectOption(label="Level up channel", description="Setzte den level up channel zurück"),
-            discord.SelectOption(label="Level up message", description="Setzte die level up message zurück"),
-            discord.SelectOption(label="Bonus XP percentage", description="setzte den bonus XP prozensatz zurück")
+            discord.SelectOption(label="Level up channel", description="Setzte den level up channel zurück", value="level_up_channel"),
+            discord.SelectOption(label="Level up message", description="Setzte die level up message zurück", value="level_up_message"),
+            discord.SelectOption(label="Bonus XP percentage", description="setzte den bonus XP prozensatz zurück", value="bonus_xp_percentage")
         ],
         custom_id="level_default_select"
     )
 
     async def level_system_default_select(self, select, interaction:discord.Interaction):
 
+        settings_dict = {
+            "level_up_channel":2,
+            "level_up_message":3,
+            "bonus_xp_percentage":4
+        }
+
+        settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+        default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
+
+        settings_list = {"reset":{
+            "level_up_channel":'' if settings[3] == None else f'{Emojis.dot_emoji} Level up channel',
+            "level_up_message":'' if settings[4] == default_message else f'{Emojis.dot_emoji} level up message',
+            "bonus_xp_percentage":'' if settings[5] == 10 else f'{Emojis.dot_emoji} Bonus XP percentage'
+        },
+        "default":{
+            "level_up_channel":f'{Emojis.dot_emoji} Level up channel' if settings[3] == None else '',
+            "level_up_message":f'{Emojis.dot_emoji} level up message' if settings[4] == default_message else '',
+            "bonus_xp_percentage":f'{Emojis.dot_emoji} Bonus XP percentage' if settings[5] == 10 else ''
+        }}
+
+        reset_list, default_list = [], []
         for i in select.values:
-            i 
+            reset_list.append(settings_list["reset"][i])
+
+        for i in select.values:
+            default_list.append(settings_list["default"][i])
+
+        reset_list.append(f"{Emojis.dot_emoji} Es können keine einstellungen zurückgesetzt werden da sie bereits alle auf standart einstellungen sind") if reset_list == [''] else ""
+        reset = "\n".join(reset_list)
+        
+        default_list.append(f"{Emojis.dot_emoji} Keine einstellungen waren auf Standart einstellungen") if default_list == [''] else ""
+        default = "\n".join(default_list)
+
+        for i in select.values:
+            DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = settings_dict[i])
 
         emb = discord.Embed(description=f"""# Zurückgesetzte einstellungen
-            {Emojis.dot_emoji} Die folgenden einstellungen des level systems wurden zurückgesetzt:
-            
-            {Emojis.dot_emoji} Die folgenden einstellungen waren bereits auf standart:
-            """)
-        await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+            **{Emojis.dot_emoji} Die folgenden einstellungen des level systems wurden zurückgesetzt:**\n
+            {reset}\n
+            **{Emojis.dot_emoji} Die folgenden einstellungen waren bereits auf standart:**
+            {default}
+            """, color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=None)
 
 
-    @discord.ui.button()
+    @discord.ui.button(
+        label="Reset all settings to default values",
+        style=discord.ButtonStyle.blurple,
+        custom_id="set_all_settings_default"
+    )
     async def level_system_all_dafault(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
+
+            for i in [0, 2, 3, 4]:
+                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = i)
 
             emb = discord.Embed(description=f"""# Alle daten wurden zurück auf standart gesetzt
                 {Emojis.dot_emoji} Du hast erfolgreich alle level system einstellungen zurück auf standart gesetzt

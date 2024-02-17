@@ -9,3 +9,5 @@ Den settings command erweitern das man da auch die anderen einstellungen vor neh
 Noch machen das man auch die einzelnen sachen zurück auf default stellen kann
 
 Noch das in ein View packen was geht
+
+White list für links für das antilink system

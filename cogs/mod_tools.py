@@ -76,6 +76,7 @@ class ModeratorCommands(commands.Cog):
                     await message.author.timeout_for(timedelta(minutes = check_settings[4]))
 
 
+    # TODO Noch einen show command machen 
     @commands.slash_command(name = "set-anti-link", description = "Set the anti-link system the way you want it!")
     @commands.has_permissions(administrator = True)
     async def set_anti_link(self, ctx:discord.ApplicationContext,
