@@ -929,31 +929,6 @@ class LevelSystem(commands.Cog):
 #################################################  Level Blacklist settings  ###############################################
 
 
-    @commands.slash_command(name = "reset-level-blacklist", description="Reset the blacklist of the level system and remove all entries!")
-    @commands.has_permissions(administrator = True)
-    async def reset_blacklist(self, ctx:commands.Context):
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
-
-        if blacklist:
-
-            view = ResetBlacklistLevelButton()
-            view.add_item(ShowBlacklistLevelSystemButton())
-
-            emb = discord.Embed(title="Are you sure you want to remove everything from the blacklist?", 
-                description=f"""{Emojis.help_emoji} With the buttons you can confirm your decisions!
-                {Emojis.dot_emoji} If you press the **Yes button** all channels, categories, users and roles will be removed from the blacklist.
-                {Emojis.dot_emoji} If you press the **No button** the process will be aborted.
-                {Emojis.dot_emoji} The **Shows all elements button** shows you what is currently on the blacklist.""", color=bot_colour)
-            await ctx.respond(embed=emb, view=view)
-        
-        else:
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} There is nothing on the blacklist", 
-                description=f"""{Emojis.dot_emoji} The blacklist could not be reset because nothing is stored on it.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-
     async def config_level_blacklist(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
 
         if [x for x in [channel, category, role, user] if x]:
@@ -1100,6 +1075,31 @@ class LevelSystem(commands.Cog):
         emb.add_field(name=f"{Emojis.arrow_emoji} All Users on the Blacklist", value=f" {blacklist[3]}", inline=False)
         emb.set_footer(icon_url=ctx.guild.icon, text=f"Blacklist from {ctx.guild.name}")
         await ctx.respond(embed=emb)
+
+
+    @commands.slash_command(name = "reset-level-blacklist", description="Reset the blacklist of the level system and remove all entries!")
+    @commands.has_permissions(administrator = True)
+    async def reset_blacklist(self, ctx:commands.Context):
+
+        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
+
+        if blacklist:
+
+            view = ResetBlacklistLevelButton()
+            view.add_item(ShowBlacklistLevelSystemButton())
+
+            emb = discord.Embed(title="Are you sure you want to remove everything from the blacklist?", 
+                description=f"""{Emojis.help_emoji} With the buttons you can confirm your decisions!
+                {Emojis.dot_emoji} If you press the **Yes button** all channels, categories, users and roles will be removed from the blacklist.
+                {Emojis.dot_emoji} If you press the **No button** the process will be aborted.
+                {Emojis.dot_emoji} The **Shows all elements button** shows you what is currently on the blacklist.""", color=bot_colour)
+            await ctx.respond(embed=emb, view=view)
+        
+        else:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} There is nothing on the blacklist", 
+                description=f"""{Emojis.dot_emoji} The blacklist could not be reset because nothing is stored on it.""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 
 
@@ -1384,10 +1384,10 @@ class LevelSystem(commands.Cog):
             
             check_channel = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, channel_id=channel.id) if channel != None else False
             check_category = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, category_id=category.id) if category != None else False
-            checK_role = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, role_id=role.id) if role != None else False
+            check_role = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, role_id=role.id) if role != None else False
             check_user = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, user_id=user.id) if user != None else False
 
-            items = {0:check_channel, 1:check_category, 2:checK_role, 3:check_user}
+            items = {0:check_channel, 1:check_category, 2:check_role, 3:check_user}
             items_list = [channel, category, role, user]
             
             if [x for x in items.values() if x is None] and operation == "add" or any(x for x in items.values() if x is not False or None) and operation == "remove":
@@ -1416,7 +1416,7 @@ class LevelSystem(commands.Cog):
                         description=f"""### {Emojis.dot_emoji} The following were already on the XP bonus list:
                         {formatted_items}\n### {Emojis.dot_emoji} Newly added:
                         {formatted_add_items}
-                        {Emojis.dot_emoji}Each of the newly added items is rewarded with {f'the bonus you specified this is: {bonus} %' if bonus != None else f'the bonus you have specified for the server, which is: {server_bonus} %'}""", color=bot_colour)
+                        {Emojis.dot_emoji} Each of the newly added items is rewarded with {f'the bonus you specified this is: {bonus} %' if bonus != None else f'the bonus you have specified for the server, which is: {server_bonus} %'}""", color=bot_colour)
                     return emb
 
                 elif operation == "remove":
@@ -1745,7 +1745,11 @@ class LevelSystemSetting(discord.ui.View):
 
             elif "set_xp_rate" == select.values[0]:
 
-                emb = discord.Embed()
+                emb = discord.Embed(description=f"""# Lege einen XP standart wert fest
+                    {Emojis.dot_emoji} Dieser wird dann als belohnung auf jede aktivität als XP vergeben
+                    {Emojis.dot_emoji} Du kannst mit dem select menü einen den wird dir vorschlagen wählen
+                    {Emojis.dot_emoji} Standart mäßig liegt der XP wert pro aktivität bei 20 XP""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=SetXpRate(), ephemeral=True)
 
             elif "set_level_system_default" == select.values[0]:
                 
@@ -2041,6 +2045,41 @@ class CancelSetLevelSystem(discord.ui.Button):
 
 
 
+#######################################  Set XP rate  #########################################
+            
+
+class SetXpRate(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.add_item(CancelSetLevelSystem())
+
+    @discord.ui.select(
+        max_values=1,
+        min_values=1,
+        placeholder="Wähle aus wie viel XP man pro aktivität erhalten soll und wie schwer der level aufsteig sein soll!",
+        options=[
+            discord.SelectOption(label="5 XP", value="5"),
+            discord.SelectOption(label="10 XP", value="10"),
+            discord.SelectOption(label="15 XP", value="15"),
+            discord.SelectOption(label="20 XP", value="20"),
+            discord.SelectOption(label="30 XP", value="30"),
+            discord.SelectOption(label="40 XP", value="40"),
+            discord.SelectOption(label="50 XP", value="50"),
+            discord.SelectOption(label="60 XP", value="60")
+        ],
+        custom_id="set_xp_rate"
+    )
+    async def set_xp_rate_selct(self, select, interaction:discord.Interaction):
+
+        DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, xp_rate = int(select.values[0]))
+
+        emb = discord.Embed(description=f"""# Der XP bonus wert wurde festgelegt
+            {Emojis.dot_emoji} Du hast den neuen XP bonus wert auf {select.values[0]} XP festgelegt
+            {Emojis.dot_emoji} Nach jeder aktivität wird dieser XP wert als belohnung vergeben""", color=bot_colour)
+        await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+
+
 
 class LevelSystemDefault(discord.ui.View):
 
@@ -2051,11 +2090,12 @@ class LevelSystemDefault(discord.ui.View):
     @discord.ui.select(
         max_values=3,
         min_values=1,
-        placeholder="Wähle aus welche komponenten du auf standart einstellungen zurücksetzten willst",
+        placeholder="Wähle aus welche komponenten du auf standart einstellungen zurücksetzten willst!",
         options=[
             discord.SelectOption(label="Level up channel", description="Setzte den level up channel zurück", value="level_up_channel"),
             discord.SelectOption(label="Level up message", description="Setzte die level up message zurück", value="level_up_message"),
-            discord.SelectOption(label="Bonus XP percentage", description="setzte den bonus XP prozensatz zurück", value="bonus_xp_percentage")
+            discord.SelectOption(label="Bonus XP percentage", description="setzte den bonus XP prozensatz zurück", value="bonus_xp_percentage"),
+            discord.SelectOption(label="XP rate", description="Setzte die menge an XP die man Pro nachricht bekommt zurück", value="xp_rate")
         ],
         custom_id="level_default_select"
     )
@@ -2072,13 +2112,15 @@ class LevelSystemDefault(discord.ui.View):
         default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
 
         settings_list = {"reset":{
+            "xp_rate":'' if settings[1] == 20 else f'{Emojis.dot_emoji} XP rate',
             "level_up_channel":'' if settings[3] == None else f'{Emojis.dot_emoji} Level up channel',
-            "level_up_message":'' if settings[4] == default_message else f'{Emojis.dot_emoji} level up message',
+            "level_up_message":'' if settings[4] == default_message else f'{Emojis.dot_emoji} Level up message',
             "bonus_xp_percentage":'' if settings[5] == 10 else f'{Emojis.dot_emoji} Bonus XP percentage'
         },
         "default":{
+            "xp_rate":f'{Emojis.dot_emoji} XP rate' if settings[1] == 20 else '',
             "level_up_channel":f'{Emojis.dot_emoji} Level up channel' if settings[3] == None else '',
-            "level_up_message":f'{Emojis.dot_emoji} level up message' if settings[4] == default_message else '',
+            "level_up_message":f'{Emojis.dot_emoji} Level up message' if settings[4] == default_message else '',
             "bonus_xp_percentage":f'{Emojis.dot_emoji} Bonus XP percentage' if settings[5] == 10 else ''
         }}
 

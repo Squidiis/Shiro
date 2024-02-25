@@ -84,7 +84,13 @@ class DatabaseCheck():
 
 
     # Checks the Blacklist from the level system
-    def check_blacklist(guild_id:int, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def check_blacklist(
+        guild_id:int, 
+        channel_id:int = None, 
+        category_id:int = None, 
+        role_id:int = None, 
+        user_id:int = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -146,7 +152,11 @@ class DatabaseCheck():
     
     
     # Checks the level roles, when you get them or what level you need to get them
-    def check_level_system_levelroles(guild_id:int, level_role:int = None, needed_level:int = None, status:str = None):
+    def check_level_system_levelroles(
+        guild_id:int, 
+        level_role:int = None, 
+        needed_level:int = None, 
+        status:str = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -192,7 +202,13 @@ class DatabaseCheck():
         return levelsys_levelroles
     
 
-    def check_xp_bonus_list(guild_id:int, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def check_xp_bonus_list(
+        guild_id:int, 
+        channel_id:int = None, 
+        category_id:int = None, 
+        role_id:int = None, 
+        user_id:int = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -238,6 +254,46 @@ class DatabaseCheck():
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return level_system_settings
+    
+
+    def check_antilink_white_list(
+        guild_id:int, 
+        channel_id:int, 
+        category_id:int, 
+        role_id:int, 
+        user_id:int
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        column_name = ["channelId", "categoryId", "roleId", "userId"]
+        
+        all_items = [channel_id, category_id, role_id, user_id]
+        
+        if all(x is None for x in all_items):
+            
+            check_white_list = f"SELECT * FROM AntiLinkWhiteList WHERE guildId = %s"
+            check_white_list_values = [guild_id]
+
+        else:
+            
+            for count in range(len(all_items)):
+                if all_items[count] != None:
+                    
+                    check_white_list = f"SELECT * FROM AntiLinkWhiteList WHERE guildId = %s AND {column_name[count]} = %s"
+                    check_white_list_values = [guild_id, all_items[count]]
+
+        cursor.execute(check_white_list, check_white_list_values)
+        
+        if all(x is None for x in all_items):
+            white_list = cursor.fetchall()
+        
+        else:
+            white_list = cursor.fetchone()
+            
+        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return white_list
 
 
 
@@ -276,6 +332,8 @@ class DatabaseCheck():
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return bot_settings
+    
+
 
 
 
@@ -310,12 +368,14 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
-    def update_bot_settings(guild_id:int, 
-                            bot_colour:str = None, 
-                            ghost_ping:int = None, 
-                            anti_link:int = None, 
-                            anti_link_timeout:int = None,
-                            back_to_none:int = None):
+    def update_bot_settings(
+        guild_id:int, 
+        bot_colour:str = None, 
+        ghost_ping:int = None, 
+        anti_link:int = None, 
+        anti_link_timeout:int = None,
+        back_to_none:int = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -351,12 +411,71 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
+    def manage_anti_link_white_list(
+        guild_id:int, 
+        operation:str, 
+        channel_id:int = None, 
+        category_id:int = None, 
+        role_id:int = None, 
+        user_id:int = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+        
+        column_name = ["channelId", "categoryId", "roleId", "userId"]
+        items = [channel_id, category_id, role_id, user_id]
+        
+        try:
+            
+            if any(elem is not None for elem in items) and operation != "reset":
+
+                for count in range(len(items)):
+                    
+                    if items[count] != None:
+                        
+                        if operation == "add":
+                            
+                            white_list = f"INSERT INTO AntiLinkWhiteList (guildId, {column_name[count]}) VALUES (%s, %s)"
+                            white_list_values = [guild_id, items[count]]
+                        
+                        elif operation == "remove":
+                            
+                            white_list = f"DELETE FROM AntiLinkWhiteList WHERE guildId = %s AND {column_name[count]} = %s"
+                            white_list_values = [guild_id, items[count]]
+
+                        cursor.execute(white_list, white_list_values)
+                        db_connect.commit()
+
+            elif operation == "reset":
+                
+                white_list = f"DELETE FROM AntiLinkWhiteList WHERE guildId = %s"
+                white_list_values = [guild_id]
+
+                cursor.execute(white_list, white_list_values)
+                db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
 
 ########################################  Insert into / Update the Level System  ##################################################
 
 
     # Inserts all data of the user into the database
-    def _insert_user_stats_level(guild_id:int, user_id:int, user_name:str, user_level:int = 0, user_xp:int = 0, whole_xp:int = 0):
+    def _insert_user_stats_level(
+        guild_id:int, 
+        user_id:int, 
+        user_name:str, 
+        user_level:int = 0, 
+        user_xp:int = 0, 
+        whole_xp:int = 0
+        ):
     
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -377,7 +496,11 @@ class DatabaseUpdates():
     
 
     # Inserts the infos about the level roles into the database
-    def _insert_level_roles(guild_id:int, role_id:int, level:int, guild_name):
+    def _insert_level_roles(
+        guild_id:int, 
+        role_id:int, 
+        level:int, 
+        guild_name):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -398,7 +521,14 @@ class DatabaseUpdates():
         
 
     # Function that adds all specified data to the blacklist 
-    def manage_blacklist(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
+    def manage_blacklist(
+        guild_id:int, 
+        operation:str, 
+        channel_id:int = None, 
+        category_id:int = None, 
+        role_id:int = None, 
+        user_id:int = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -444,7 +574,15 @@ class DatabaseUpdates():
 
     
     # Update the level system settings
-    def update_level_settings(guild_id:int, xp_rate:int = None, level_status:str = None, level_up_channel:int = None, level_up_message:str = None, percentage:int = None, back_to_none:int = None):
+    def update_level_settings(
+        guild_id:int, 
+        xp_rate:int = None, 
+        level_status:str = None, 
+        level_up_channel:int = None, 
+        level_up_message:str = None, 
+        percentage:int = None, 
+        back_to_none:int = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -481,7 +619,13 @@ class DatabaseUpdates():
 
 
     # Update the stats from users in the level system  
-    def _update_user_stats_level(guild_id:int, user_id:int, level:int = None, xp:int = None, whole_xp:int = None):
+    def _update_user_stats_level(
+        guild_id:int, 
+        user_id:int, 
+        level:int = None, 
+        xp:int = None, 
+        whole_xp:int = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -515,7 +659,12 @@ class DatabaseUpdates():
 
 
     # Update the level roles
-    def update_level_roles(guild_id:int, role_id:int = None, role_level:int = None, status:str = None):
+    def update_level_roles(
+        guild_id:int, 
+        role_id:int = None, 
+        role_level:int = None, 
+        status:str = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor() 
@@ -544,7 +693,15 @@ class DatabaseUpdates():
 
     
     # Updates the bonus xp system
-    def manage_xp_bonus(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None, bonus:int = None):
+    def manage_xp_bonus(
+        guild_id:int, 
+        operation:str, 
+        channel_id:int = None, 
+        category_id:int = None, 
+        role_id:int = None, 
+        user_id:int = None, 
+        bonus:int = None
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -587,6 +744,8 @@ class DatabaseUpdates():
         finally:
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
 
 
 

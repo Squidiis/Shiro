@@ -65,6 +65,17 @@ CREATE TABLE BonusXpList (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+DROP TABLE IF EXISTS `AntiLinkWhiteList`;
+
+CREATE TABLE AntiLinkWhiteList (
+    guildId BIGINT UNSIGNED NOT NULL,
+    channelId BIGINT UNSIGNED NULL,
+    categoryId BIGINT UNSIGNED NULL,
+    roleId BIGINT UNSIGNED NULL,
+    userId BIGINT UNSIGNED NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 ------------- Table for the Marry system --------------
 
 DROP TABLE IF EXISTS `MarryStats`;

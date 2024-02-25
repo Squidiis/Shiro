@@ -76,7 +76,7 @@ class ModeratorCommands(commands.Cog):
                     await message.author.timeout_for(timedelta(minutes = check_settings[4]))
 
 
-    # TODO Noch einen show command machen 
+    # TODO: Testen
     @commands.slash_command(name = "set-anti-link", description = "Set the anti-link system the way you want it!")
     @commands.has_permissions(administrator = True)
     async def set_anti_link(self, ctx:discord.ApplicationContext,
@@ -91,21 +91,144 @@ class ModeratorCommands(commands.Cog):
             description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
             choices = [0, 5, 10, 20, 30, 40, 50, 60])):
 
-        DatabaseUpdates.update_bot_settings(guild_id=ctx.guild.id, anti_link=int(settings), anti_link_timeout=timeout)
+        check_settings = DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
 
-        # Text passages for the embed
+        if check_settings[3] == int(settings) and check_settings[4] == timeout:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} Aktuell ist das Antilink system schon genau so eingestellt", 
+                description=f"""{Emojis.dot_emoji} Das Antilink system ist genau so berreits eigestellt wie du es gerade einstellen wolltest""", color=bot_colour)
+            await ctx.respond(embed=emb, ephemeral=True)
+
+        else:
+
+            DatabaseUpdates.update_bot_settings(guild_id=ctx.guild.id, anti_link=int(settings), anti_link_timeout=timeout)
+
+            # Text passages for the embed
+            settings_text = {
+                "0":"All messages that contain a discord invitation link.",
+                "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
+                "2":"All messages with a link will be deleted this also includes pictures and videoso",
+                "3":"Nothing because the anti-link system is deactivated"}
+
+            emb = discord.Embed(title=f"{Emojis.settings_emoji} The anti-link system was set up", 
+                description=f"""{Emojis.dot_emoji} The anti-link system will now delete the following messages:
+                `{settings_text[settings]}`
+                {f'{Emojis.dot_emoji} Users who still send links will receive a timeout of **{timeout}** minutes' if settings != '3' else ''}""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+    
+    @commands.slash_command(name = "show-anti-link-settings")
+    async def show_anti_link_settings(self, ctx:discord.ApplicationContext):
+
         settings_text = {
-            "0":"All messages that contain a discord invitation link.",
-            "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
-            "2":"All messages with a link will be deleted this also includes pictures and videoso",
-            "3":"Nothing because the anti-link system is deactivated"}
+            0:"All messages that contain a discord invitation link.",
+            1:"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
+            2:"All messages with a link will be deleted this also includes pictures and videoso",
+            3:"Nothing because the anti-link system is deactivated"}
 
-        emb = discord.Embed(title=f"{Emojis.settings_emoji} The anti-link system was set up", 
-            description=f"""{Emojis.dot_emoji} The anti-link system will now delete the following messages:
-            `{settings_text[settings]}`
-            {f'{Emojis.dot_emoji} Users who still send links will receive a timeout of **{timeout}** minutes' if settings != '3' else ''}""", color=bot_colour)
+        settings = DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
+
+        emb = discord.Embed(description=f"""# {Emojis.help_emoji} Hier siehst du die aktuelle anti link einstellungen
+            {Emojis.dot_emoji} Aktuelle ist das Anti link system auf:\n`{settings_text[settings[3]]}`
+            {Emojis.dot_emoji} Bei verstohs erhält man einen Timeout von: {settings[4]} Minuten""", color=bot_colour)
         await ctx.respond(embed=emb)
 
+    
+    # Anpassen und testen
+    async def config_antilink_white_list(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
+
+        if [x for x in [channel, category, role, user] if x]:
+            
+            check_channel = DatabaseCheck.check_antilink_white_list(guild_id = guild_id, channel_id = channel.id) if channel != None else False
+            check_category = DatabaseCheck.check_antilink_white_list(guild_id = guild_id, category_id = category.id) if category != None else False
+            check_role = DatabaseCheck.check_antilink_white_list(guild_id = guild_id, role_id = role.id) if role != None else False
+            check_user = DatabaseCheck.check_antilink_white_list(guild_id = guild_id, user_id = user.id) if user != None else False
+
+
+            items = {0:check_channel, 1:check_category, 2:check_role, 3:check_user}
+            items_list = [channel, category, role, user]
+            
+            if [x for x in items.values() if x is None] and operation == "add" or any(x for x in items.values() if x is not False or None) and operation == "remove":
+
+                res = list({ele for ele in items if items[ele]}) if operation == "add" else list({ele for ele in items if items[ele] is None})
+                second_res = list({ele for ele in items if items[ele] is None}) if operation == "add" else list({ele for ele in items if items[ele]})
+            
+                item = [(f"> {Emojis.dot_emoji} {items_list[i].mention}") for i in res] 
+                second_item = [(f"> {Emojis.dot_emoji} {items_list[i].mention}") for i in second_res]
+        
+                items_dict = {
+                    0:channel.id if 0 in second_res else None, 
+                    1:category.id if 1 in second_res else None, 
+                    2:role.id if 2 in second_res else None,
+                    3:user.id if 3 in second_res else None
+                }
+            
+                if operation == "add":
+                    
+                    formatted_items = "\n".join(item) if item != [] else "\n> Keines dieser Items ist auf der anti link white list"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> Keines dieser Items kann von der anti link white list entfernt werden da sie dort nicht gelistet sind"
+                    
+                    DatabaseUpdates.manage_anti_link_white_list(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
+                   
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the anti link white list or were already there", 
+                        description=f"""### {Emojis.dot_emoji} The following were already on the white list:
+                        {formatted_items}\n### {Emojis.dot_emoji} Newly added:
+                        {formatted_add_items}
+                        {Emojis.dot_emoji} Die neu hinzugefügten items sind vom anti link system ausgeschlossen""", color=bot_colour)
+                    return emb
+
+                elif operation == "remove":
+                
+                    formatted_items = "\n".join(item) if item != [] else "> All the items you specified were on the anti link white list"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be removed from the anti link white list because they are not on the blacklist"
+
+                    DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
+
+                    emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been removed from the anti link white list or were not listed", 
+                        description=f"""### {Emojis.dot_emoji} The following items were not on the white list:
+                        {formatted_items}\n### {Emojis.dot_emoji} Was deleted from the white list:
+                        {formatted_add_items}""", color=bot_colour)
+                    return emb
+                
+            else:
+
+                emb = discord.Embed(title=f"{Emojis.help_emoji}Nothing can be {'added to the anti lin white list' if operation == 'add' else 'removed from the anti link white list'}", 
+                    description=f"""{Emojis.dot_emoji} {"All the things you have specified are already on the anti link white list" 
+                        if operation == "add" else 
+                        "None of the things you mentioned are on the anti link white list"}""", color=bot_colour)
+                return emb
+            
+        else:
+
+            emb = discord.Embed(title=f"{Emojis.help_emoji} You have not specified anything!", 
+                description=f"""{Emojis.dot_emoji}You have not specified anything {"what should be added to the anti link white list" 
+                    if operation == "add" else
+                    "what should be removed from the bonus XP list"}""", color=bot_colour)
+            return emb
+
+
+    @commands.slash_command(name = "manage-antilink-white-list")
+    async def manage_white_list_antilink(self, ctx:discord.ApplicationContext,
+        operation:Option(
+            description="Wähle aus ob du auf die anti link white list etwas hinzufügen oder entfernen willst!",
+            choices = ["add", "remove"]),
+        channel:Option(discord.TextChannel),
+        category:Option(discord.CategoryChannel),
+        role:Option(discord.Role),
+        user:Option(discord.User)
+        ):
+
+        if user.bot:
+
+            emb = discord.Embed(description=f"""{Emojis.help_emoji} Du kannst keinen Bot auf die White list setzten
+                {Emojis.dot_emoji} Bots sind automatisch vom anti link system ausgeschlossen und können somit immer links senden""", color=bot_colour)
+            await ctx.respond(embed=emb, ephemeral = True)
+
+        else:
+
+            emb = await self.config_antilink_white_list(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation=operation)
+
+            await ctx.respond(embed=emb)
 
 
 ####################################  Moderation commands  ###################################
@@ -431,3 +554,4 @@ class GhostPingButtons(discord.ui.View):
         emb = discord.Embed(title=f"{Emojis.help_emoji} The setting of the anti ghost ping system was canceled", 
             description=f"""{Emojis.dot_emoji} The setting was successfully canceled but you can change the settings at any time.""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
+

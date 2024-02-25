@@ -72,6 +72,15 @@ class Main(commands.Cog):
                 PercentBonusXp INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
+            '''
+            CREATE TABLE If NOT EXISTS AntiLinkWhiteList (
+                guildId BIGINT UNSIGNED NOT NULL,
+                channelId BIGINT UNSIGNED NULL,
+                categoryId BIGINT UNSIGNED NULL,
+                roleId BIGINT UNSIGNED NULL,
+                userId BIGINT UNSIGNED NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
             # Bot settings Table
             '''
             CREATE TABLE IF NOT EXISTS BotSettings (
@@ -148,7 +157,7 @@ class Main(commands.Cog):
 
         await Main.create_db_table()
         
-        
+
 
 async def status_task():
     while True:
@@ -157,11 +166,11 @@ async def status_task():
         await bot.change_presence(activity=discord.Game('Funpark.net'), status=discord.Status.online)
         await asyncio.sleep(15)
 
-
 bot.add_cog(Main(bot))
 
 
 class AntiSpam(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
 

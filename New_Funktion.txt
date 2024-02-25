@@ -6,8 +6,15 @@ Readme adden anleitung wie man den Bot einstellt
 
 Den settings command erweitern das man da auch die anderen einstellungen vor nehmen kann
 
-Noch machen das man auch die einzelnen sachen zurück auf default stellen kann
+Noch machen das man auch die einzelnen sachen zurück auf default stellen kann (testen)
 
-Noch das in ein View packen was geht
+White list für links für das antilink system (testen)
 
-White list für links für das antilink system
+leader bourd besser machen 
+
+(Rank card mehr optionen)
+
+
+Texte übersetzten
+
+Noch die add und remove commands zusammen fassen
