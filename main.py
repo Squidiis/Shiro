@@ -1,10 +1,10 @@
 
-from import_file import *
-
 from cogs.level_system import *
 from cogs.mod_tools import *
 from dotenv import load_dotenv
 from cogs.fun_commands import *
+from utils import *
+
 
 
 @bot.slash_command(description="Shows you the ping.")
@@ -81,6 +81,11 @@ class Main(commands.Cog):
                 userId BIGINT UNSIGNED NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
+            '''
+            CREATE TABLE IF NOT EXISTS TempDatas (
+                guildId BIGINT UNSIGNED NOT NULL
+            )
+            '''
             # Bot settings Table
             '''
             CREATE TABLE IF NOT EXISTS BotSettings (

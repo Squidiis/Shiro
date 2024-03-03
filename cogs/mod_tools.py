@@ -1,5 +1,5 @@
 
-from import_file import *
+from utils import *
 import calendar
 
 
@@ -47,7 +47,7 @@ class ModeratorCommands(commands.Cog):
                 # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
                 if check_settings[3] == 0:
             
-                    if "discord.gg/" in message.content:
+                    if "discord.gg/" in message.content or "discord.com" in message.content:
                         await message.delete()
                         rule_violation = True
 
@@ -207,15 +207,15 @@ class ModeratorCommands(commands.Cog):
             return emb
 
 
-    @commands.slash_command(name = "manage-antilink-white-list")
+    @commands.slash_command(name = "manage-antilink-white-list", description = "Wähle ein Item das vom anti link system ausgeschlossen werden soll!")
     async def manage_white_list_antilink(self, ctx:discord.ApplicationContext,
         operation:Option(
             description="Wähle aus ob du auf die anti link white list etwas hinzufügen oder entfernen willst!",
             choices = ["add", "remove"]),
-        channel:Option(discord.TextChannel),
-        category:Option(discord.CategoryChannel),
-        role:Option(discord.Role),
-        user:Option(discord.User)
+        channel:Option(discord.TextChannel, description="Wähle einen channel der vom anti link system ausgelöschssen werden soll!") = None,
+        category:Option(discord.CategoryChannel, description="Wähle eine Kategorie die vom anti link system ausgeschlossen werden soll!") = None,
+        role:Option(discord.Role, description="Wähle eine Rolle die vom anti link system ausgeschlossen werden soll!") = None,
+        user:Option(discord.User, description="Wähle einen user der vom anti link system ausgeschlossen werden soll!") = None
         ):
 
         if user.bot:

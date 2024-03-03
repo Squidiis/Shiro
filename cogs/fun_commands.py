@@ -11,7 +11,7 @@
 from datetime import * 
 from discord import ButtonStyle, Interaction
 import requests
-from import_file import * 
+from utils import *
 from typing import List
 
 
@@ -20,6 +20,7 @@ from typing import List
 
 
 class RPSButtons(discord.ui.View):
+    
     def __init__(self, game_mode, second_user, first_user):
         self.game_mode = game_mode
         self.second_user = second_user

@@ -1,4 +1,4 @@
-from import_file import requests, discord, os, random, bot_colour
+from utils import *
 from discord.ext import commands
 from discord.commands import Option, slash_command, SlashCommandGroup
 import aiohttp
@@ -152,7 +152,7 @@ class ApiSearchCommands(commands.Cog):
                 emb.set_footer(text=f"Meme send by {ctx.author}")
                 await ctx.send(embed=emb)
 
-    
+
 def setup(bot):
     bot.add_cog(ApiSearchCommands(bot))
 
