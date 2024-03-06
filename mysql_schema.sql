@@ -76,6 +76,19 @@ CREATE TABLE AntiLinkWhiteList (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+DROP TABLE IF EXISTS `TempDatas`;
+
+CREATE TABLE TempDatas (
+    guildId BIGINT UNSIGNED NOT NULL,
+    operation VARCHAR(10) NOT NULL,
+    channelIdBlacklist BIGINT UNSIGNED NOT NULL,
+    categoryIdBlacklist BIGINT UNSIGNED NULL,
+    roleIdBlacklist BIGINT UNSIGNED NULL,
+    userIdBlacklist BIGINT UNSIGNED NULL,
+    ExpiryDate DATE NOT NULL 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 ------------- Table for the Marry system --------------
 
 DROP TABLE IF EXISTS `MarryStats`;

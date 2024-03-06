@@ -83,9 +83,15 @@ class Main(commands.Cog):
             ''',
             '''
             CREATE TABLE IF NOT EXISTS TempDatas (
-                guildId BIGINT UNSIGNED NOT NULL
+                guildId BIGINT UNSIGNED NOT NULL,
+                operation VARCHAR(10) NOT NULL,
+                channelIdBlacklist BIGINT UNSIGNED NOT NULL,
+                categoryIdBlacklist BIGINT UNSIGNED NULL,
+                roleIdBlacklist BIGINT UNSIGNED NULL,
+                userIdBlacklist BIGINT UNSIGNED NULL,
+                ExpiryDate DATE NOT NULL 
             )
-            '''
+            ''',
             # Bot settings Table
             '''
             CREATE TABLE IF NOT EXISTS BotSettings (

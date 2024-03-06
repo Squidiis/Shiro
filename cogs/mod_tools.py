@@ -357,7 +357,7 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "clear", description = "Delete messages in the channel!")
     @commands.has_permissions(manage_messages=True)
-    async def clear(self, ctx, quantity:Option(int, description = "How many messages do you want to delete?", required = True)):
+    async def clear(self, ctx:discord.ApplicationContext, quantity:Option(int, description = "How many messages do you want to delete?", required = True)):
         await ctx.defer()
         z = await ctx.channel.purge(limit = quantity)
         await ctx.send(f"I have deleted {len(z)} messages.")
@@ -406,7 +406,7 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(name = "ghost-ping-settings", description = "Schalte das ghost ping system ein oder aus!")
-    async def ghost_ping_settings(self, ctx:commands.Context):
+    async def ghost_ping_settings(self, ctx:discord.ApplicationContext):
 
         # If the database contains 0, the system is deactivated; if it contains 1, it is activated
         check_settings = DatabaseCheck.check_bot_settings(guild_id=ctx.guild.id)

@@ -142,7 +142,7 @@ class Fun(commands.Cog):
       
 
     @commands.slash_command(name = "rps", description = "Play scissors, stone, paper against your friends or a bot!")
-    async def rps(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user with whom you want to challenge you can also play against a bot") = None):
+    async def rps(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user with whom you want to challenge you can also play against a bot") = None):
 
         if user == None or user.bot:
             user = user if user != None else bot.get_user(928073958891347989)

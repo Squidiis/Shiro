@@ -16,8 +16,15 @@ leader bourd besser machen
 
 code einfacher machen
 
-die texte in dei neue file auslagern die doppelt sind
+die texte in einer neue file auslagern die doppelt sind
 
 Texte übersetzten
 
 Noch die add und remove commands zusammen fassen
+
+Zum blacklist manager hinzufügen das die einträge nach ner woche gelöscht werden und erwähnen
+
+
+weiter testen der setting commands
+
+texte überschriften auf ## setzten

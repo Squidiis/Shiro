@@ -531,7 +531,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-xp", description = "Give a user a quantity of XP chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def give_xp(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user who should receive the xp!"),
+    async def give_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user who should receive the xp!"),
         xp:Option(int, description="Specify a quantity of XP to be added!")):
 
         if user.bot:
@@ -592,7 +592,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-xp", description = "Remove a chosen amount of Xp from a user!")
     @commands.has_permissions(administrator = True)
-    async def remove_xp(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user from which you want to remove xp!"),
+    async def remove_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user from which you want to remove xp!"),
         xp:Option(int, description="Specify a quantity of Xp to be removed!")):
             
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
@@ -635,7 +635,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-level", description = "Give a user a selected amount of levels!")
     @commands.has_permissions(administrator = True)
-    async def give_level(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
+    async def give_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
         level:Option(int, description="Specify a set of levels that you want to assign!")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild=ctx.guild.id, user=user.id)
@@ -678,7 +678,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-level", description = "Remove a quantity of levels chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def remove_level(self, ctx:commands.Context, user:Option(discord.Member, description="Select a user from whom you want to remove the level!"), 
+    async def remove_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user from whom you want to remove the level!"), 
         level:Option(int, description="Specify how many levels should be removed!")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
@@ -721,7 +721,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "reset-level-system-stats", description = "Reset all levels and xp of everyone!")
     @commands.has_permissions(administrator = True)
-    async def reset_level(self, ctx:commands.Context):
+    async def reset_level(self, ctx:discord.ApplicationContext):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id)
 
@@ -743,7 +743,7 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "reset-user-stats", description = "Resets all stats of the specified user in the level system!")
     @commands.has_permissions(administrator = True)
-    async def reset_user_stats(self, ctx:commands.Context, user:Option(discord.Member, description="Choose a user whose stats you want to reset!")):
+    async def reset_user_stats(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user whose stats you want to reset!")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
 
@@ -763,7 +763,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "rank", description = "Shows you the rank of a user in the level system!")
-    async def rank(self, ctx:commands.Context, user:Option(discord.Member, description="Look at the rank of others!")):
+    async def rank(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Look at the rank of others!")):
 
         count = 0
         rank = 0
@@ -881,7 +881,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "leaderboard-level", description = "Shows the highest ranks in the lavel system!")
-    async def leaderboard(self, ctx:commands.Context):
+    async def leaderboard(self, ctx:discord.ApplicationContext):
 
         leaderboard_connect = DatabaseSetup.db_connector()
         my_cursor = leaderboard_connect.cursor()
@@ -914,7 +914,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "level-system-settings", description = "Set the level system freely!")
     @commands.has_permissions(administrator = True)
-    async def level_system_settings(self, ctx:commands.Context):
+    async def level_system_settings(self, ctx:discord.ApplicationContext):
 
         level_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1076,7 +1076,7 @@ class LevelSystem(commands.Cog):
 
    
     @commands.slash_command(name = "show-level-blacklist", description = "Shows you everything that is blacklisted!")
-    async def show_blacklist(self, ctx:commands.Context):
+    async def show_blacklist(self, ctx:discord.ApplicationContext):
 
         blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
 
@@ -1092,7 +1092,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "reset-level-blacklist", description="Reset the blacklist of the level system and remove all entries!")
     @commands.has_permissions(administrator = True)
-    async def reset_blacklist(self, ctx:commands.Context):
+    async def reset_blacklist(self, ctx:discord.ApplicationContext):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
 
@@ -1121,7 +1121,7 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "add-level-role", description = "Add a role that you get from a certain level!")
     @commands.has_permissions(administrator = True)
-    async def add_level_role(self, ctx:commands.Context, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
+    async def add_level_role(self, ctx:discord.ApplicationContext, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
         level:Option(int, description = "Enter a level from which this role should be assigned")):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status="check")
@@ -1190,7 +1190,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-level-role", description = "Choose a role that you want to remove as a level role!")
     @commands.has_permissions(administrator = True)
-    async def remove_level_role(self, ctx:commands.Context, role:Option(discord.Role, description="Select a level role that you want to remove")):
+    async def remove_level_role(self, ctx:discord.ApplicationContext, role:Option(discord.Role, description="Select a level role that you want to remove")):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id)
 
@@ -1223,7 +1223,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "show-level-roles", description = "View all rolls that are available with a level!")
-    async def show_level_roles(self, ctx:commands.Context):
+    async def show_level_roles(self, ctx:discord.ApplicationContext):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
         
@@ -1248,7 +1248,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(nanme = "set-level-up-channel", description = "Set a channel for the level up notifications!")
     @commands.has_permissions(administrator = True)
-    async def set_levelup_channel(self, ctx:commands.Context, channel:Option(discord.TextChannel, description="Select a channel in which the level up message should be sent")):
+    async def set_levelup_channel(self, ctx:discord.ApplicationContext, channel:Option(discord.TextChannel, description="Select a channel in which the level up message should be sent")):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1280,7 +1280,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "disable-level-up-channel", description = "Deactivate the level up channel!")
     @commands.has_permissions(administrator = True)
-    async def disable_levelup_channel(self, ctx:commands.Context):
+    async def disable_levelup_channel(self, ctx:discord.ApplicationContext):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1300,7 +1300,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "show-level-up-channel", description = "Let them show the current level up channel!")
-    async def show_levelup_channel(self, ctx:commands.Context):
+    async def show_levelup_channel(self, ctx:discord.ApplicationContext):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
         
@@ -1323,7 +1323,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "set-xp-rate", description = "Set how much XP will be awarded per message!")
     @commands.has_permissions(administrator = True)
-    async def set_xp_rate(self, ctx:commands.Context, xp:Option(int, description="Set a base value how much XP you earn per message!")):
+    async def set_xp_rate(self, ctx:discord.ApplicationContext, xp:Option(int, description="Set a base value how much XP you earn per message!")):
 
         if xp <= 0:
 
@@ -1343,7 +1343,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "default-xp-rate", description = "Set the XP you get per message back to default settings!")
     @commands.has_permissions(administrator = True)
-    async def default_xp_rate(self, ctx:commands.Context):
+    async def default_xp_rate(self, ctx:discord.ApplicationContext):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1363,13 +1363,13 @@ class LevelSystem(commands.Cog):
         
        
     @commands.slash_command(name = "show-xp-rate", description = "Let us show you how much xp you currently get per message!")
-    async def show_xp_rate(self, ctx:commands.Context):
+    async def show_xp_rate(self, ctx:discord.ApplicationContext):
         
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
         emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see how much XP you get per message",
-            description=f"""{Emojis.dot_emoji} Per message you get {check_settings[1]} XP.
-            {Emojis.dot_emoji} We recommend that you do not set this value too high if you adjust it, otherwise the level system will lose much of its meaning {Emojis.exclamation_mark_emoji}""")
+            description=f"""{Emojis.dot_emoji} Per message you get **{check_settings[1]}** XP.
+            {Emojis.dot_emoji} This amount of XP is awarded as a reward for each activity and can be influenced by the bonus xp percentage""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 
@@ -1496,7 +1496,7 @@ class LevelSystem(commands.Cog):
     
 
     @commands.slash_command(name = "show-bonus-xp-list", description = "Display everything that is on the bonus xp list!")
-    async def show_bonus_xp_list(self, ctx:commands.Context):
+    async def show_bonus_xp_list(self, ctx:discord.ApplicationContext):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
         check_bonus = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
@@ -1522,7 +1522,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "reset-bonus-xp-list", description = "Reset the bonus XP list!")
     @commands.has_permissions(administrator = True)
-    async def reset_bonus_xp_list(self, ctx:commands.Context):
+    async def reset_bonus_xp_list(self, ctx:discord.ApplicationContext):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
 
@@ -1547,7 +1547,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "set-bonus-xp-percentage", description = "Set a default percentage for the bonus XP system (this is set to 10 % by default)!")
     @commands.has_permissions(administrator = True)
-    async def set_bonus_xp_percentage(self, ctx:commands.Context, percentage:Option(int, description="Specify a percentage to be used as the default percentage for the bonus XP system!",max_value=100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
+    async def set_bonus_xp_percentage(self, ctx:discord.ApplicationContext, percentage:Option(int, description="Specify a percentage to be used as the default percentage for the bonus XP system!",max_value=100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1570,7 +1570,7 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "default-bonus-xp-percentage", description = "Set the percentage value for the bonus XP system back to the default value!")
     @commands.has_permissions(administrator = True)
-    async def default_bonus_xp_percentage(self, ctx:commands.Context):
+    async def default_bonus_xp_percentage(self, ctx:discord.ApplicationContext):
         
         check_settigns = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1591,7 +1591,7 @@ class LevelSystem(commands.Cog):
 
     
     @commands.slash_command(name = "show-bonus-xp-percentage", description = "Let the display where the default percentage value for the bonus XP system is!")
-    async def show_bonus_xp_percentage(self, ctx:commands.Context):
+    async def show_bonus_xp_percentage(self, ctx:discord.ApplicationContext):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1634,7 +1634,7 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "default-level-up-message", description = "Reset the level-up message to the default message!")
     @commands.has_permissions(administrator = True)
-    async def default_level_up_message(self, ctx:commands.Context):
+    async def default_level_up_message(self, ctx:discord.ApplicationContext):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1655,7 +1655,7 @@ class LevelSystem(commands.Cog):
 
         
     @commands.slash_command(name = "show-level-up-message", description = "Shows the current level-up message from your server")
-    async def show_level_up_message(self, ctx:commands.Context):
+    async def show_level_up_message(self, ctx:discord.ApplicationContext):
 
         level_up_message = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
@@ -1748,8 +1748,8 @@ class LevelSystemSetting(discord.ui.View):
                 
                 emb = discord.Embed(description=f"""# {'Lege eine level up message fest' if check_settings[4] == default_message else 'überschreibe die aktuelle level up message'}
                     {Emojis.dot_emoji} Eine level up message wird immer dann geschickt wenn ein user ein level aufsteigt diese wird dann entweder in einen level up channel geschickt (Wenn vorhanden) oder einfach direkt nach der letzten nachricht
-                    {Emojis.dot_emoji} Die aktuelle level up nachricht ist: `{check_settings[4]}` 
-                    {Emojis.dot_emoji} An den Parameter {'{user}'} wird der name des nutzers eingesetzt und an der setelle von{'{level}'} wird das neue level des nutzers gesetzt
+                    {Emojis.dot_emoji} Die aktuelle level up nachricht ist:\n`{check_settings[4]}` 
+                    {Emojis.dot_emoji} An den Parameter **{'{user}'}** wird der name des nutzers eingesetzt und an der setelle von **{'{level}'}** wird das neue level des nutzers gesetzt
                     {Emojis.dot_emoji} Drücke auf den unteren button um eine level up message fest zu legen""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=view, ephemeral=True)
 
@@ -1809,7 +1809,7 @@ class LevelUpMessageButton(discord.ui.Button):
 
         if interaction.user.guild_permissions.administrator:
 
-            await interaction.response.send_modal(LevelUpMessageModal(title="Set a level-up message for your server!"))
+            await interaction.response.send_modal(LevelUpMessageModal())
         
         else:
 
@@ -1819,7 +1819,7 @@ class LevelUpMessageButton(discord.ui.Button):
 class LevelUpMessageModal(discord.ui.Modal):
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__()
+        super().__init__(title="Set a level-up message for your server!")
         self.add_item(discord.ui.InputText(label="Insert here the text for the level-up message", style=discord.InputTextStyle.long))
 
     async def callback(self, interaction: discord.Interaction):
@@ -1830,10 +1830,10 @@ class LevelUpMessageModal(discord.ui.Modal):
 
         DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
 
-        embed = discord.Embed(description=f"""# The level-up message was successfully set {Emojis.succesfully_emoji}
-            {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}` {Emojis.exclamation_mark_emoji}
+        embed = discord.Embed(description=f"""## The level-up message was successfully set
+            {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} **{level_up_message}** {Emojis.exclamation_mark_emoji}
             {Emojis.dot_emoji} When someone receives a level-up this message is sent""", color=bot_colour)
-        await interaction.response.edit_message(embeds=[embed], view=None, ephemeral=True)
+        await interaction.response.edit_message(embeds=[embed], view=None)
 
 
 
@@ -1899,7 +1899,7 @@ class SetLevelUpChannelSelect(discord.ui.View):
             
             else:
 
-                emb = discord.Embed(description=f"""# {Emojis.help_emoji} Dieser Channel ist bereits als level up channel festgelegt 
+                emb = discord.Embed(description=f"""## {Emojis.help_emoji} Dieser Channel ist bereits als level up channel festgelegt 
                     {Emojis.dot_emoji} <#{select.values[0].id}> ist bereits als level up channel festgelegt""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
@@ -1929,7 +1929,7 @@ class SetBonusXpPercentageButton(discord.ui.Button):
                 {Emojis.dot_emoji} Mit den unteren Dropdown menü kannst du einen bonus XP prozent satz der auf der auf die Noamle XP menge drauf gerechnet wird angeben
                 {Emojis.dot_emoji} Wenn dir keinen der vorgeschlagenen Prozentsätze gefällt kannst du auch mit den unteren button einen ganz eigenen angeben bedenke aber das dieser nicht über 100 % liegen darf!
                 auch muss diese dann eine ganzzahl sein und darf kein kommer oder zeichen enthalten""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, view=BonusXpPercentage(), ephemeral=True)
+            await interaction.response.edit_message(embed=emb, view=BonusXpPercentage())
 
         else:
 
@@ -1978,10 +1978,9 @@ class BonusXpPercentage(discord.ui.View):
             
                 DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=int(select.values[0]))
 
-                emb = discord.Embed(description=f"""# Ein neuer bonus XP prozensatz wurde festgelegt
-                    {Emojis.dot_emoji} Der neu festgelegte bonus Prozentsatzt leigt ab jetzt bei {select.values[0]}
-                    {Emojis.dot_emoji} Ab jetzt werden alle aktivitäten die in einem Channe, Kategorie oder von einem user, user mit einer rolle die auf der Bonus XP list ist mit extra XP belohnt
-                    {Emojis.dot_emoji} Hier siehst du auch noch mal eine übersicht über die gesammte bonus XP list:\n
+                emb = discord.Embed(description=f"""## Ein neuer bonus XP prozensatz wurde festgelegt
+                    {Emojis.dot_emoji} Der neu festgelegte bonus Prozentsatzt leigt ab jetzt bei **{select.values[0]}**
+                    {Emojis.dot_emoji} Ab jetzt werden alle aktivitäten die in einem Channe, Kategorie oder von einem user, user mit einer rolle die auf der Bonus XP list ist mit extra XP belohnt\n### {Emojis.dot_emoji} Hier siehst du auch noch mal eine übersicht über die gesammte bonus XP list:\n
                     {CheckLevelSystem.bonus_xp_list(guild_id = interaction.guild.id)}""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
@@ -2003,7 +2002,7 @@ class SendXpBonusModal(discord.ui.Button):
 
         if interaction.user.guild_permissions.administrator:
 
-            await interaction.response.send_modal(BonusXpPercentageModal(title="Enter your own bonus XP percentage!"))
+            await interaction.response.send_modal(BonusXpPercentageModal())
 
         else:
 
@@ -2035,8 +2034,9 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
                         DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
 
-                        embed = discord.Embed(description=f"""# Dein Bonus XP prozentsatz wurde festgelegt
-                            {Emojis.dot_emoji} Der Bonus XP Prozentsatz wurde auf {self.children[0].value} % festgelegt\n### {Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt
+                        embed = discord.Embed(description=f"""## Dein Bonus XP prozentsatz wurde festgelegt
+                            {Emojis.dot_emoji} Der Bonus XP Prozentsatz wurde auf **{self.children[0].value}** % festgelegt
+                            **{Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt auch sind die aufgelistet die einen eigenen prozentwert haben
                             {CheckLevelSystem.bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
                         await interaction.response.edit_message(embeds=[embed], view=None)
 
@@ -2045,7 +2045,7 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
                 except:
 
-                    emb = discord.Embed(description=f"""# Deine eingabe ist invalide
+                    emb = discord.Embed(description=f"""## Deine eingabe ist invalide
                         {Emojis.dot_emoji} Deine eingabe ist entweder größer als 100 oder beinhaltet Buchstaben, sonderzeichen oder ein komma
                         {Emojis.dot_emoji} Du kannst einen neuen anderen wert eingeben in dem du noch einmal auf den Button drückst oder du brichst die einstellung ab dafür musst du nur auf den Roten button drücken.""", color=bot_colour)
                     await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
@@ -2072,7 +2072,7 @@ class CancelSetLevelSystem(discord.ui.Button):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(description=f"""# Einstellung Abgebrochen
+            emb = discord.Embed(description=f"""## Einstellung Abgebrochen
                 {Emojis.dot_emoji} Die einstellung des Level Systems wurde abgebrochen
                 {Emojis.dot_emoji} Wenn du es dir anders überlegen solltest kannst du jederzeit den Command erneut ausführen""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
@@ -2122,8 +2122,8 @@ class SetXpRate(discord.ui.View):
 
             DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, xp_rate = int(select.values[0]))
 
-            emb = discord.Embed(description=f"""# Der XP bonus wert wurde festgelegt
-                {Emojis.dot_emoji} Du hast den neuen XP bonus wert auf {select.values[0]} XP festgelegt
+            emb = discord.Embed(description=f"""## Der XP bonus wert wurde festgelegt
+                {Emojis.dot_emoji} Du hast den neuen XP bonus wert auf **{select.values[0]}** XP festgelegt
                 {Emojis.dot_emoji} Nach jeder aktivität wird dieser XP wert als belohnung vergeben""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
@@ -2151,6 +2151,7 @@ class LevelSystemDefault(discord.ui.View):
     async def level_system_default_select(self, select, interaction:discord.Interaction):
 
         settings_dict = {
+            "xp_rate":1,
             "level_up_channel":2,
             "level_up_message":3,
             "bonus_xp_percentage":4
@@ -2174,25 +2175,22 @@ class LevelSystemDefault(discord.ui.View):
 
         reset_list, default_list = [], []
         for i in select.values:
-            reset_list.append(settings_list["reset"][i])
+            reset_list.append(settings_list['reset'][i])
 
         for i in select.values:
-            default_list.append(settings_list["default"][i])
+            default_list.append(settings_list['default'][i])
 
-        reset_list.append(f"{Emojis.dot_emoji} Es können keine einstellungen zurückgesetzt werden da sie bereits alle auf standart einstellungen sind") if reset_list == [''] else ""
-        reset = "\n".join(reset_list)
-        
-        default_list.append(f"{Emojis.dot_emoji} Keine einstellungen waren auf Standart einstellungen") if default_list == [''] else ""
-        default = "\n".join(default_list)
-
+        reset_new_list = "\n".join(reset_list)
+        default_new_list = "\n".join(default_list)
+  
         for i in select.values:
             DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = settings_dict[i])
 
-        emb = discord.Embed(description=f"""# Zurückgesetzte einstellungen
-            **{Emojis.dot_emoji} Die folgenden einstellungen des level systems wurden zurückgesetzt:**\n
-            {reset}\n
+        emb = discord.Embed(description=f"""## Zurückgesetzte einstellungen
+            **{Emojis.dot_emoji} Die folgenden einstellungen des level systems wurden zurückgesetzt:**
+            {reset_new_list if any(x for x in reset_list if x is not '') else f'{Emojis.dot_emoji} Es können keine einstellungen zurückgesetzt werden da sie bereits alle auf standart einstellungen sind'}
             **{Emojis.dot_emoji} Die folgenden einstellungen waren bereits auf standart:**
-            {default}
+            {default_new_list if any(x for x in default_list if x is not '') else f'{Emojis.dot_emoji} Keine einstellungen waren auf Standart einstellungen'}
             """, color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
 
@@ -2209,7 +2207,7 @@ class LevelSystemDefault(discord.ui.View):
             for i in [0, 2, 3, 4]:
                 DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = i)
 
-            emb = discord.Embed(description=f"""# Alle daten wurden zurück auf standart gesetzt
+            emb = discord.Embed(description=f"""## Alle daten wurden zurück auf standart gesetzt
                 {Emojis.dot_emoji} Du hast erfolgreich alle level system einstellungen zurück auf standart gesetzt
                 {Emojis.dot_emoji} Du kannst diese jederzeit wieder ändern""")
             await interaction.response.edit_message(embed=emb, view=None)
@@ -2240,7 +2238,7 @@ class BlacklistManagerButtons(discord.ui.View):
         view.add_item(TempBlackklistLevelSaveButton())
         view.add_item(ShowBlacklistLevelSystemButton())
 
-        emb = discord.Embed(title=f"Here you can select what you want to blacklist", 
+        emb = discord.Embed(title=f"## Here you can select what you want to blacklist", 
             description=f"""{Emojis.dot_emoji} With the lower select menus you can choose what you want to put on the blacklist!
             {Emojis.dot_emoji} You can freely choose what you want, but you can only select a maximum of 5 items per menu.
             {Emojis.dot_emoji} When you have selected everything you want, confirm your selection by pressing the safe configuration button.
@@ -2270,6 +2268,7 @@ class BlacklistManagerButtons(discord.ui.View):
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
 
 # All functions for the blacklist manager
 class BlacklistManagerChecks():
