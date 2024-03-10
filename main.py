@@ -13,6 +13,9 @@ async def ping(ctx):
 
    
 
+ 
+
+
 class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

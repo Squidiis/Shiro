@@ -1542,7 +1542,7 @@ class LevelSystem(commands.Cog):
 
 
 
-#################################################  Bonus XP percentage  ###########################################
+#################################################  Bonus XP percentage  #################################################
 
 
     @commands.slash_command(name = "set-bonus-xp-percentage", description = "Set a default percentage for the bonus XP system (this is set to 10 % by default)!")
@@ -2036,7 +2036,7 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
                         embed = discord.Embed(description=f"""## Dein Bonus XP prozentsatz wurde festgelegt
                             {Emojis.dot_emoji} Der Bonus XP Prozentsatz wurde auf **{self.children[0].value}** % festgelegt
-                            **{Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt auch sind die aufgelistet die einen eigenen prozentwert haben
+                            {Emojis.dot_emoji} Hier siehst du auch eine übersicht für was der neue Bonus XP prozentsatz gilt auch sind die aufgelistet die einen eigenen prozentwert haben
                             {CheckLevelSystem.bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
                         await interaction.response.edit_message(embeds=[embed], view=None)
 
@@ -2129,6 +2129,9 @@ class SetXpRate(discord.ui.View):
 
 
 
+#########################################################  Set on Default  ##################################################
+
+
 class LevelSystemDefault(discord.ui.View):
 
     def __init__(self):
@@ -2186,10 +2189,13 @@ class LevelSystemDefault(discord.ui.View):
         for i in select.values:
             DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = settings_dict[i])
 
-        emb = discord.Embed(description=f"""## Zurückgesetzte einstellungen
-            **{Emojis.dot_emoji} Die folgenden einstellungen des level systems wurden zurückgesetzt:**
+        emb = discord.Embed(description=f"""## Zurückgesetzte einstellungen                
+            **{Emojis.arrow_emoji} Die folgenden einstellungen des level systems wurden zurückgesetzt:**
+
             {reset_new_list if any(x for x in reset_list if x is not '') else f'{Emojis.dot_emoji} Es können keine einstellungen zurückgesetzt werden da sie bereits alle auf standart einstellungen sind'}
-            **{Emojis.dot_emoji} Die folgenden einstellungen waren bereits auf standart:**
+            
+            **{Emojis.arrow_emoji} Die folgenden einstellungen waren bereits auf standart:**
+            
             {default_new_list if any(x for x in default_list if x is not '') else f'{Emojis.dot_emoji} Keine einstellungen waren auf Standart einstellungen'}
             """, color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
@@ -2209,7 +2215,7 @@ class LevelSystemDefault(discord.ui.View):
 
             emb = discord.Embed(description=f"""## Alle daten wurden zurück auf standart gesetzt
                 {Emojis.dot_emoji} Du hast erfolgreich alle level system einstellungen zurück auf standart gesetzt
-                {Emojis.dot_emoji} Du kannst diese jederzeit wieder ändern""")
+                {Emojis.dot_emoji} Du kannst diese jederzeit wieder ändern""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:

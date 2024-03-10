@@ -82,7 +82,7 @@ class DatabaseCheck():
 
 #################################################  Checks Level System  ##############################################################
 
-
+    
     # Checks the Blacklist from the level system
     def check_blacklist(
         guild_id:int, 
@@ -343,7 +343,18 @@ class DatabaseUpdates():
 
 ###############################################  Bot Settings  ###############################################
 
+    '''
+    Erstellt einträge für einen server auf den der bot neu begetreten ist
 
+    Parameters
+    ----------
+    Table Daten:
+        guildId BIGINT UNSIGNED NOT NULL
+        botColour VARCHAR(20) NULL
+        ghostPing BIT DEFAULT 0
+        antiLink BIT(4) DEFAULT 3
+        antiLinkTimeout INT DEFAULT 0
+    '''
     def _create_bot_settings(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
