@@ -136,6 +136,11 @@ class Main(commands.Cog):
             print("parameterized query failed {}".format(error))
 
 
+    def check_buttons():
+
+        label = ""
+        return label
+
     @commands.Cog.listener()
     async def on_ready(self):
 
@@ -157,8 +162,19 @@ class Main(commands.Cog):
         self.bot.add_view(ResetLevelStatsButton())
         self.bot.add_view(LevelSystemSettings())
         self.bot.add_view(ResetBlacklistLevelButton())
+
+        # Level system settings
         self.bot.add_view(LevelSystemSetting())
+        self.bot.add_view(SetLevelUpChannelSelect())
+        self.bot.add_view(BonusXpPercentage())
+        self.bot.add_view(SetXpRate())
+        self.bot.add_view(LevelSystemDefault())
+        view.add_item(LevelUpMessageButton())
+        view.add_item(SetLevelUpChannelButton())
+        view.add_item(SetBonusXpPercentageButton())
         view.add_item(ShowBlacklistLevelSystemButton())
+        view.add_item(CancelSetLevelSystem())
+
         
         # Mod tools
         self.bot.add_view(GhostPingButtons())

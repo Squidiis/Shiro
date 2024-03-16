@@ -165,14 +165,8 @@ class HelpMenu(commands.Cog):
                 .add_field(name="/reset-user-stats", value="", inline=False)
                 .add_field(name="/rank", value="", inline=False)
                 .add_field(name="/leaderboard-level", value="", inline=False)
-                .add_field(name="/set-level-up-channel", value="", inline=False)
-                .add_field(name="/disable-level-up-channel", value="", inline=False)
                 .add_field(name="/show-level-up-channel", value="", inline=False)
-                .add_field(name="/set-bonus-xp-percentage", value="", inline=False)
-                .add_field(name="/default-bonus-xp-percentage", value="", inline=False)
                 .add_field(name="/show-bonus-xp-percentage", value="", inline=False)
-                .add_field(name="/set-level-up-message", value="", inline=False)
-                .add_field(name="/default-level-up-message", value="", inline=False)
                 .add_field(name="/show-level-up-message", value="", inline=False)
                 ]),
             
@@ -186,8 +180,6 @@ class HelpMenu(commands.Cog):
                 .add_field(name="/add-level-role", value="", inline=False)
                 .add_field(name="/remove-level-role", value="", inline=False)
                 .add_field(name="/show-level-roles", value="", inline=False)
-                .add_field(name="/set-xp-rate", value="", inline=False)
-                .add_field(name="/default-xp-rate", value="", inline=False)
                 .add_field(name="/show-xp-rate", value="", inline=False)
                 .add_field(name="/add-bonus-xp-list", value="", inline=False)
                 .add_field(name="/remove-bonus-xp-list", value="", inline=False)

@@ -514,22 +514,26 @@ class LevelSystem(commands.Cog):
    
 
 
-    @commands.slash_command(name = "set-level-system")
+    @commands.slash_command(name = "set-level-system", description = "Set the level system the way you want it!")
     @commands.has_permissions(administrator = True)
     async def set_level_system(self, ctx:discord.ApplicationContext):
 
         emb = discord.Embed(
             description=f"""# {Emojis.settings_emoji} Set the level system
-            {Emojis.dot_emoji} With the lower select menu you can choose which function of the level system you want to set\n## {Emojis.dot_emoji} Individual systems:
+            With the lower select menu you can choose which function of the level system you want to set\n## Individual systems:
             **{Emojis.dot_emoji} Level up channel:** 
-            > set a channel to which all level up notifications and all notifications for new roles are sent
+            > Set a channel to which all level up notifications and all notifications for new roles are sent
+
             **{Emojis.dot_emoji} Level up message:** 
-            > set a custom message that is sent when you get level up
+            > Set a custom message that is sent when you get level up
+
             **{Emojis.dot_emoji} Bonus XP rate:** 
-            > set how much XP should be awarded per activity
+            > Set how much XP should be awarded per activity
+
             **{Emojis.dot_emoji} Bonus XP percentage:** 
-            > set a percentage with which all activities in the channel, categories or by the 
+            > Set a percentage with which all activities in the channel, categories or by the 
             > users with a role or the users themselves are rewarded with extra XP
+
             {Emojis.help_emoji} `You can also reset all settings individually`""", color=bot_colour)
         await ctx.response.send_message(embed=emb, view=LevelSystemSetting())
 
@@ -1556,18 +1560,18 @@ class LevelSystemSetting(discord.ui.View):
 
             if "level_up_channel" == select.values[0]:
 
-                view.add_item(SetLevelUpChannelButton(label=f"Set a {'new' if check_settings[3] == None else ''} level up channel"))
+                view.add_item(SetLevelUpChannelButton())
 
-                emb = discord.Embed(description=f"""# {'Set a level up channel' if check_settings[3] == None else 'Overwrite the current level up channel'}
+                emb = discord.Embed(description=f"""## {'Set the level up channel' if check_settings[3] == None else 'Overwrite the current level up channel'}
                     {Emojis.dot_emoji} {'No level up channel has been defined yet' if check_settings[3] == None else f'The current level up channel is <#{check_settings[3]}>'}
                     {Emojis.dot_emoji} Use the lower button to set a level up channel""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=view, ephemeral=True)
 
             elif "level_up_message" == select.values[0]:
 
-                view.add_item(LevelUpMessageButton(label=f"Set a {'new' if check_settings[4] == None else ''} level up message"))
+                view.add_item(LevelUpMessageButton())
                 
-                emb = discord.Embed(description=f"""## {'Set a level up message' if check_settings[4] == default_message else 'overwrite the current level up message'}
+                emb = discord.Embed(description=f"""## {'Set the level up message' if check_settings[4] == default_message else 'overwrite the current level up message'}
                     {Emojis.dot_emoji} A level up message is always sent when a user get a level up and is then either sent to a level up channel (if available) or simply directly after the last message.
                     {Emojis.dot_emoji} The current level up message is:\n`{check_settings[4]}` 
                     {Emojis.dot_emoji} The name of the user is inserted in the parameter **{'{user}'}** and the new level of the user is set in the place of **{'{level}'}**
@@ -1576,18 +1580,19 @@ class LevelSystemSetting(discord.ui.View):
 
             elif "set_bonus_xp_percentage" == select.values[0]:
 
-                view.add_item(SetBonusXpPercentageButton(label=f"Set a{'new' if check_settings[5] == None else ''} bonus XP percentage"))
-
+                view.add_item(SetBonusXpPercentageButton())
+                
                 emb = discord.Embed(description=f"""## Set a {'new' if check_settings[5] == 10 else ''} bonus XP percentage
+                    {Emojis.dot_emoji} Currently the bonus XP percentage is {check_settings[5]} {', by default the bonus XP percentage is **10 %**' if check_settings[5] != 10 else ', this is also the default value'}
                     {Emojis.dot_emoji} Each time an activity is performed by a user, in a channel, a category or by users with a certain role on the Bonus XP list or a user himself who is on the list, it will be rewarded according to the Bonus XP percentage you have set.
-                    This is then always added to the standard XP, the standard percentage rate is **10 %**.
+                    {Emojis.dot_emoji} The bonus XP percentage is always added to the XP received
                     {Emojis.dot_emoji} Press the button below to set the percentage to be used.""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=view, ephemeral=True)
 
             elif "set_xp_rate" == select.values[0]:
-
-                emb = discord.Embed(description=f"""## Set a default XP value
-                    {Emojis.dot_emoji} This is then awarded as XP as a reward for each activity
+             
+                emb = discord.Embed(description=f"""## Set a {'new' if check_settings[1] == 20 else ''} default XP value
+                    {Emojis.dot_emoji} The XP value is the amount of XP you receive per activity, currently you get **{check_settings[1]} XP** per activity {', by default, the amount of XP is 20.' if check_settings[1] != 20 else ', this is also the standard quantity that is set from the start.'}
                     {Emojis.dot_emoji} You can use the select menu to choose one that is suggested to you
                     {Emojis.dot_emoji} By default, the XP value per message is 20 XP""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=SetXpRate(), ephemeral=True)
@@ -1595,9 +1600,10 @@ class LevelSystemSetting(discord.ui.View):
             elif "set_level_system_default" == select.values[0]:
                 
                 settings = [
-                    '' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> is currently set as level up channel means all level up messages and all role notifications are sent to this channel',
-                    '' if check_settings[4] == default_message else f'{Emojis.dot_emoji} Currently is this the level up message `{check_settings[4]}`',
-                    '' if check_settings[5] == 10 else f'{Emojis.dot_emoji} The bonus XP percentage rate is currently {check_settings[5]} %',
+                    '' if check_settings[1] == 20 else f'{Emojis.dot_emoji} Currently, the amount of XP you receive per message is {check_settings[1]} XP per message\n'
+                    '' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> is currently set as level up channel means all level up messages and all role notifications are sent to this channel\n',
+                    '' if check_settings[4] == default_message else f'{Emojis.dot_emoji} Currently is this the level up message `{check_settings[4]}`\n',
+                    '' if check_settings[5] == 10 else f'{Emojis.dot_emoji} The bonus XP percentage rate is currently {check_settings[5]} %\n',
                     f'{Emojis.dot_emoji} All your settings are already at the default value' if check_settings[3] == None and check_settings[4] == default_message and check_settings[5] == 10 else ''
                 ]
 
@@ -1605,6 +1611,7 @@ class LevelSystemSetting(discord.ui.View):
                     {Emojis.dot_emoji} With the lower button you can reset all settings, if you only want to reset individual settings, you can select them from the lower selct menu 
                     
                     **{Emojis.help_emoji} Here you can see a list of the settings that are not set to the default settings and what they are set to**
+
                     {"".join(settings)}
                     """, color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=LevelSystemDefault(), ephemeral=True)
@@ -1617,13 +1624,14 @@ class LevelSystemSetting(discord.ui.View):
 
 ################################################  Level up message  ##############################################
 
+
 class LevelUpMessageButton(discord.ui.Button):
 
-    def __init__(self, label):
+    def __init__(self):
         super().__init__(
-            label=label,
-            style=discord.ButtonStyle.blurple,
-            custom_id="set_level_up_message"
+            label = "Set a level up message",
+            style = discord.ButtonStyle.blurple,
+            custom_id = "set_level_up_message"
         )
 
     async def callback(self, interaction:discord.Interaction):
@@ -1663,11 +1671,11 @@ class LevelUpMessageModal(discord.ui.Modal):
 
 class SetLevelUpChannelButton(discord.ui.Button):
         
-    def __init__(self, label):
+    def __init__(self):
         super().__init__(
-            label=label,
-            style=discord.ButtonStyle.blurple,
-            custom_id="set_level_up_channel_button"
+            label = "Set the level up channel",
+            style = discord.ButtonStyle.blurple,
+            custom_id = "set_level_up_channel_button"
         )
 
     async def callback(self, interaction:discord.Interaction):
@@ -1735,9 +1743,9 @@ class SetLevelUpChannelSelect(discord.ui.View):
 
 class SetBonusXpPercentageButton(discord.ui.Button):
 
-    def __init__(self, label):
+    def __init__(self, ):
         super().__init__(
-            label = label,
+            label = "Set the bonus XP percentage",
             style = discord.ButtonStyle.blurple,
             custom_id = "set_xp_percentage_button"
         )
@@ -1815,8 +1823,8 @@ class SendXpBonusModal(discord.ui.Button):
     def __init__(self):
         super().__init__(
             label = "Set individual XP bonus percentage",
-            style=discord.ButtonStyle.blurple,
-            custom_id="set_individual_percentage"
+            style = discord.ButtonStyle.blurple,
+            custom_id = "set_individual_percentage"
         )
     
     async def callback(self, interaction:discord.Interaction):
@@ -1887,9 +1895,9 @@ class SetXpRate(discord.ui.View):
         self.add_item(CancelSetLevelSystem())
 
     @discord.ui.select(
-        max_values=1,
-        min_values=1,
-        placeholder="Choose how much XP you want to receive per activity and how difficult the level up should be!",
+        max_values = 1,
+        min_values = 1,
+        placeholder = "Choose how much XP you want to receive per activity and how difficult the level up should be!",
         options=[
             discord.SelectOption(label="5 XP", value="5"),
             discord.SelectOption(label="10 XP", value="10"),
@@ -1933,9 +1941,9 @@ class LevelSystemDefault(discord.ui.View):
         self.add_item(CancelSetLevelSystem())
 
     @discord.ui.select(
-        max_values=4,
-        min_values=1,
-        placeholder="Select which components you want to reset to default settings!",
+        max_values = 4,
+        min_values = 1,
+        placeholder = "Select which components you want to reset to default settings!",
         options=[
             discord.SelectOption(label="Level up channel", description="Reset the level up channel", value="level_up_channel"),
             discord.SelectOption(label="Level up message", description="Resets the level up message", value="level_up_message"),
@@ -1996,9 +2004,9 @@ class LevelSystemDefault(discord.ui.View):
 
 
     @discord.ui.button(
-        label="Reset all settings to default values",
-        style=discord.ButtonStyle.blurple,
-        custom_id="set_all_settings_default"
+        label = "Reset all settings to default values",
+        style = discord.ButtonStyle.blurple,
+        custom_id = "set_all_settings_default"
     )
     async def level_system_all_dafault(self, button, interaction:discord.Interaction):
 
@@ -2017,7 +2025,7 @@ class LevelSystemDefault(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-    
+
 #########################################  Cancel Button  ########################################
 
 
@@ -2025,9 +2033,9 @@ class CancelSetLevelSystem(discord.ui.Button):
     
     def __init__(self):
         super().__init__(
-            label="Cancel setting ",
-            style=discord.ButtonStyle.danger,
-            custom_id="cancel_level_set"
+            label = "Cancel setting ",
+            style = discord.ButtonStyle.danger,
+            custom_id = "cancel_level_set"
         )
 
     async def callback(self, interaction:discord.Interaction):
@@ -2035,7 +2043,7 @@ class CancelSetLevelSystem(discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
 
             emb = discord.Embed(description=f"""## Setting canceled
-                {Emojis.dot_emoji} The setting of the level system was canceled
+                {Emojis.dot_emoji} The setting of the level system was canceled.
                 {Emojis.dot_emoji} If you change your mind, you can always execute the command again.""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 

@@ -22,5 +22,7 @@ Noch die add und remove commands zusammen fassen
 
 Zum blacklist manager hinzufügen das die einträge nach ner woche gelöscht werden und erwähnen
 
-
+Ein allgemienen Show command hinzufügen
 texte überschriften auf ## setzten
+
+dem level settings command ein an aus button geben
