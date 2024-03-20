@@ -21,11 +21,13 @@ class ModeratorCommands(commands.Cog):
 
         else:
 
+            formats=['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp']
+
             if message.author.guild_permissions.administrator:
                 return
             
             else:
-                
+
                 # Text additions for the embed
                 anti_link_text = {
                     0:"discord invitation link",
@@ -54,19 +56,20 @@ class ModeratorCommands(commands.Cog):
                 # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
                 elif check_settings[3] == 1:
             
-                    if "https://" in message.content and not message.attachments:
+                    if message.content.startswith('https://') and not any(word in message.content for word in formats) and not message.attachments: 
 
                         await message.delete()
                         rule_violation = True
 
-                # Is triggered when there is a link in the message (when triggered, the message is deleted)
+                # Is triggered when there is any link in the message (when triggered, the message is deleted)
                 elif check_settings[3] == 2:
 
                     if "https://" in message.content or message.attachments:
 
                         await message.delete()
                         rule_violation = True
-
+                
+                # Antilink system is disabled 
                 elif check_settings[3] == 3:
                     return
                 
@@ -84,7 +87,7 @@ class ModeratorCommands(commands.Cog):
             description="Choose how the anti-link system should behave!",
             choices = [
                 discord.OptionChoice(name = "All messages with a discord invitation link will be deleted", value="0"),
-                discord.OptionChoice(name = "All messages with a link will be deleted exceptions: images, videos (discord links will be deleted)", value="1"),
+                discord.OptionChoice(name = "Every link will be deleted exept Pictures and Videos", value="1"),
                 discord.OptionChoice(name = "All messages with a link will be deleted this also includes pictures and videos", value="2"),
                 discord.OptionChoice(name = "Deactivate anti-link system! (no messages are deleted)", value="3")]), 
         timeout:Option(int, max_value = 60, required = True, 
@@ -106,7 +109,7 @@ class ModeratorCommands(commands.Cog):
             # Text passages for the embed
             settings_text = {
                 "0":"All messages that contain a discord invitation link.",
-                "1":"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
+                "1":"Every link will be deleted exept Pictures and Videos",
                 "2":"All messages with a link will be deleted this also includes pictures and videoso",
                 "3":"Nothing because the anti-link system is deactivated"}
 
@@ -122,8 +125,8 @@ class ModeratorCommands(commands.Cog):
 
         settings_text = {
             0:"All messages that contain a discord invitation link.",
-            1:"All messages with a link, pictures and videos will not be deleted (discord invitation links will be deleted)",
-            2:"All messages with a link will be deleted this also includes pictures and videoso",
+            1:"Every link will be deleted exept Pictures and Videos",
+            2:"All messages with a link will be deleted this also includes pictures and videos",
             3:"Nothing because the anti-link system is deactivated"}
 
         settings = DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
@@ -164,6 +167,14 @@ class ModeratorCommands(commands.Cog):
                 }
             
                 if operation == "add":
+
+                    if user != None:
+
+                        if user.bot:
+
+                            emb = discord.Embed(description=f"""{Emojis.help_emoji} Du kannst keinen Bot auf die White list setzten
+                                {Emojis.dot_emoji} Bots sind automatisch vom anti link system ausgeschlossen und können somit immer links senden""", color=bot_colour)
+                            return emb
                     
                     formatted_items = "\n".join(item) if item != [] else "\n> Keines dieser Items ist auf der anti link white list"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> Keines dieser Items kann von der anti link white list entfernt werden da sie dort nicht gelistet sind"
@@ -217,18 +228,9 @@ class ModeratorCommands(commands.Cog):
         role:Option(discord.Role, description="Wähle eine Rolle die vom anti link system ausgeschlossen werden soll!") = None,
         user:Option(discord.User, description="Wähle einen user der vom anti link system ausgeschlossen werden soll!") = None
         ):
-
-        if user.bot:
-
-            emb = discord.Embed(description=f"""{Emojis.help_emoji} Du kannst keinen Bot auf die White list setzten
-                {Emojis.dot_emoji} Bots sind automatisch vom anti link system ausgeschlossen und können somit immer links senden""", color=bot_colour)
-            await ctx.respond(embed=emb, ephemeral = True)
-
-        else:
-
-            emb = await self.config_antilink_white_list(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation=operation)
-
-            await ctx.respond(embed=emb)
+        
+        emb = await self.config_antilink_white_list(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation=operation)
+        await ctx.respond(embed=emb)
 
 
 ####################################  Moderation commands  ###################################

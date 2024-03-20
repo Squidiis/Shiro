@@ -91,14 +91,15 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
 class GetEmbed():
     '''
     :embed_idex:
-        - Wird ein Index übergeben der dann zum richtigen embed führt
+        - If an index is passed which then leads to the correct embed
             0 = Bonux XP procentage
     '''
     def get_embed(embed_index, settings):
 
-        emb = discord.Embed(description=f"""### {Emojis.help_emoji} Der bonus XP Prozentsatz den du festlegen willst ist bereist festgelegt
-            {Emojis.dot_emoji} Der Prozentsatz ist beits auf {settings} % festgelegt.""", color=bot_colour)
-        
+        if embed_index == 0:
+
+            emb = discord.Embed(description=f"""### {Emojis.help_emoji} Der bonus XP Prozentsatz den du festlegen willst ist bereist festgelegt
+                {Emojis.dot_emoji} Der Prozentsatz ist beits auf {settings} % festgelegt.""", color=bot_colour)
 
         return emb
 

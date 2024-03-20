@@ -5,6 +5,8 @@ from io import BytesIO
 import discord
 from discord.ext import commands
 import re
+
+from discord.interactions import Interaction
 from utils import *
 
 # level up message
@@ -1513,6 +1515,7 @@ class LevelSystemSetting(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(CancelSetLevelSystem())
+        self.add_item(LevelSystemOnOffSwitch())
 
     @discord.ui.select( 
         placeholder = "Choose the system you want to set!",
@@ -1583,7 +1586,7 @@ class LevelSystemSetting(discord.ui.View):
                 view.add_item(SetBonusXpPercentageButton())
                 
                 emb = discord.Embed(description=f"""## Set a {'new' if check_settings[5] == 10 else ''} bonus XP percentage
-                    {Emojis.dot_emoji} Currently the bonus XP percentage is {check_settings[5]} {', by default the bonus XP percentage is **10 %**' if check_settings[5] != 10 else ', this is also the default value'}
+                    {Emojis.dot_emoji} Currently the bonus XP percentage is **{check_settings[5]}** {', by default the bonus XP percentage is **10 %**' if check_settings[5] != 10 else ', this is also the default value'}
                     {Emojis.dot_emoji} Each time an activity is performed by a user, in a channel, a category or by users with a certain role on the Bonus XP list or a user himself who is on the list, it will be rewarded according to the Bonus XP percentage you have set.
                     {Emojis.dot_emoji} The bonus XP percentage is always added to the XP received
                     {Emojis.dot_emoji} Press the button below to set the percentage to be used.""", color=bot_colour)
@@ -1600,11 +1603,11 @@ class LevelSystemSetting(discord.ui.View):
             elif "set_level_system_default" == select.values[0]:
                 
                 settings = [
-                    '' if check_settings[1] == 20 else f'{Emojis.dot_emoji} Currently, the amount of XP you receive per message is {check_settings[1]} XP per message\n'
+                    '' if check_settings[1] == 20 else f'{Emojis.dot_emoji} Currently, the amount of XP you receive per message is {check_settings[1]} XP per message\n',
                     '' if check_settings[3] == None else f'{Emojis.dot_emoji} <#{check_settings[3]}> is currently set as level up channel means all level up messages and all role notifications are sent to this channel\n',
                     '' if check_settings[4] == default_message else f'{Emojis.dot_emoji} Currently is this the level up message `{check_settings[4]}`\n',
                     '' if check_settings[5] == 10 else f'{Emojis.dot_emoji} The bonus XP percentage rate is currently {check_settings[5]} %\n',
-                    f'{Emojis.dot_emoji} All your settings are already at the default value' if check_settings[3] == None and check_settings[4] == default_message and check_settings[5] == 10 else ''
+                    f'{Emojis.dot_emoji} All your settings are already at the default value' if check_settings[1] == None and check_settings[3] == None and check_settings[4] == default_message and check_settings[5] == 10 else ''
                 ]
 
                 emb = discord.Embed(description=f"""## Reset settings?
@@ -1616,6 +1619,46 @@ class LevelSystemSetting(discord.ui.View):
                     """, color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=LevelSystemDefault(), ephemeral=True)
         
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+
+################################################  on / off Button  #############################################
+
+
+class LevelSystemOnOffSwitch(discord.ui.Button):
+
+    def __init__(self):
+        super().__init__(
+            label = "Switching the level system on / off",
+            style = discord.ButtonStyle.blurple,
+            custom_id = "on_off_switch"
+        )
+
+    async def callback(self, interaction:Interaction):
+        
+        if interaction.user.guild_permissions.administrator:
+            
+            level_settings = DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
+
+            if level_settings == "on":
+
+                new_status, status = "switched off", "off"
+                opposite_status = "turn on"
+
+            elif level_settings == "off":
+
+                new_status, status = "switched on", "on"
+                opposite_status = "switch off"
+
+            DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status=status)
+                        
+            emb = discord.Embed(title=f"The level system was {new_status}", 
+                description=f"""{Emojis.dot_emoji} If you want to {opposite_status} the level system, just use this command again {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
@@ -1660,7 +1703,7 @@ class LevelUpMessageModal(discord.ui.Modal):
         DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
 
         embed = discord.Embed(description=f"""## The level-up message was successfully set
-            {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} **{level_up_message}** {Emojis.exclamation_mark_emoji}
+            {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}`
             {Emojis.dot_emoji} When someone receives a level-up this message is sent""", color=bot_colour)
         await interaction.response.edit_message(embeds=[embed], view=None)
 
@@ -1984,7 +2027,9 @@ class LevelSystemDefault(discord.ui.View):
 
         for i in select.values:
             default_list.append(settings_list['default'][i])
-
+    
+        reset_list = list(filter(None, reset_list))
+        default_list = list(filter(None, default_list))
         reset_new_list = "\n".join(reset_list)
         default_new_list = "\n".join(default_list)
   
@@ -1994,11 +2039,11 @@ class LevelSystemDefault(discord.ui.View):
         emb = discord.Embed(description=f"""## Reset settings                
             **{Emojis.arrow_emoji} The following level system settings have been reset:**
 
-            {reset_new_list if any(x for x in reset_list if x is not '') else f'{Emojis.dot_emoji} No settings can be reset as they are already all set to default settings'}
+            {reset_new_list if any(x for x in reset_list if x != '') else f'{Emojis.dot_emoji} No settings can be reset as they are already all set to default settings'}
             
             **{Emojis.arrow_emoji} The following settings were already set to default:**
             
-            {default_new_list if any(x for x in default_list if x is not '') else f'{Emojis.dot_emoji} No settings were set to default settings'}
+            {default_new_list if any(x for x in default_list if x != '') else f'{Emojis.dot_emoji} No settings were set to default settings'}
             """, color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
 

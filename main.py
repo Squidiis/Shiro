@@ -162,6 +162,8 @@ class Main(commands.Cog):
         self.bot.add_view(ResetLevelStatsButton())
         self.bot.add_view(LevelSystemSettings())
         self.bot.add_view(ResetBlacklistLevelButton())
+        view.add_item(ShowBlacklistLevelSystemButton())
+
 
         # Level system settings
         self.bot.add_view(LevelSystemSetting())
@@ -171,8 +173,8 @@ class Main(commands.Cog):
         self.bot.add_view(LevelSystemDefault())
         view.add_item(LevelUpMessageButton())
         view.add_item(SetLevelUpChannelButton())
+        view.add_item(LevelSystemOnOffSwitch())
         view.add_item(SetBonusXpPercentageButton())
-        view.add_item(ShowBlacklistLevelSystemButton())
         view.add_item(CancelSetLevelSystem())
 
         

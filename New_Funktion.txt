@@ -4,8 +4,6 @@ Help menü adden
 
 Readme adden anleitung wie man den Bot einstellt
 
-Den settings command erweitern das man da auch die anderen einstellungen vor nehmen kann
-
 White list für links für das antilink system (testen)
 
 leader bourd besser machen 
@@ -25,4 +23,6 @@ Zum blacklist manager hinzufügen das die einträge nach ner woche gelöscht wer
 Ein allgemienen Show command hinzufügen
 texte überschriften auf ## setzten
 
-dem level settings command ein an aus button geben
+dem level settings command ein an aus button geben  testen
+
+hinzufügen das die db gleich eine funktion zum erweitern hat kann code sparen ChatGPT
