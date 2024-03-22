@@ -136,11 +136,6 @@ class Main(commands.Cog):
             print("parameterized query failed {}".format(error))
 
 
-    def check_buttons():
-
-        label = ""
-        return label
-
     @commands.Cog.listener()
     async def on_ready(self):
 
@@ -246,7 +241,7 @@ class AutoReaction(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message:discord.Message):
 
         if message.guild:
             if message.guild.id == 865899808183287848:

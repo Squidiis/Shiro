@@ -26,3 +26,12 @@ texte überschriften auf ## setzten
 dem level settings command ein an aus button geben  testen
 
 hinzufügen das die db gleich eine funktion zum erweitern hat kann code sparen ChatGPT
+
+
+Level settings system alles adden was zum level system gehört heist auch alle show commands also mit einzelnen drop down mit eignenen zweigen
+show info button
+
+
+show antilin white list text anpassen
+
+level role system villeicht nochmal ändern

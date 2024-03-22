@@ -81,7 +81,44 @@ class CheckLevelSystem():
             all_bonus_xp_items = f"{Emojis.dot_emoji} Nothing has been listed on the Bonus XP list"
 
         return all_bonus_xp_items
+    
+    # Als class umarbeiten und dann eine def die alles returnt was in den anderen classen ist
+    def check_all_level_settings(guild_id:int, system:str = None):
 
+        check_system = DatabaseCheck.check_level_settings(guild_id = guild_id)
+        check_bonus = DatabaseCheck.check_xp_bonus_list(guild_id = guild_id)
+        check_blacklist = DatabaseCheck.check_blacklist(guild_id = guild_id)
+        check_level_role = DatabaseCheck.check_level_system_levelroles(guild_id = guild_id)
+
+        if system == None:
+
+            channel_blacklist, category_blacklist, role_blacklist, user_blacklist = [], [], [], []
+            for _, channel, category, role, user in check_blacklist:
+                
+                if channel != None:
+                    channel_blacklist.append(f"> {Emojis.dot_emoji} <#{channel}>\n")
+
+                if category != None:
+                    category_blacklist.append(f"> {Emojis.dot_emoji} <#{category}>\n")
+
+                if role != None:
+                    role_blacklist.append(f"> {Emojis.dot_emoji} <@&{role}>\n")
+
+                if user != None:
+                    user_blacklist.append(f"> {Emojis.dot_emoji} <@{user}>\n")
+
+            if channel_blacklist and category_blacklist and role_blacklist and user_blacklist == []:
+                return f"{Emojis.dot_emoji} Es ist nichts auf der Blacklist gelistet"
+            
+            else:
+
+                final_blacklist = []
+                for lst, label in [(channel_blacklist, "Channels"), (category_blacklist, "Categories"), (role_blacklist, "Roles"), (user_blacklist, "Users")]:
+
+                    if lst != []:
+                        final_blacklist.extend([f"### {Emojis.dot_emoji} All {label} on the Blacklist:"] + lst)
+
+            return "".join(final_blacklist)
 
 #############################################  Level Systen Settings  #############################################
 
@@ -1012,7 +1049,7 @@ class LevelSystem(commands.Cog):
                 
             else:
 
-                emb = discord.Embed(title=f"{Emojis.help_emoji}Nothing can be {'blacklisted' if operation == 'add' else 'removed from the blacklist'}", 
+                emb = discord.Embed(title=f"{Emojis.help_emoji} Nothing can be {'blacklisted' if operation == 'add' else 'removed from the blacklist'}", 
                     description=f"""{Emojis.dot_emoji} {"All the things you have specified are already on the blacklist" 
                         if operation == "add" else 
                         "None of the things you mentioned are on the blacklist"}""", color=bot_colour)
@@ -1043,7 +1080,8 @@ class LevelSystem(commands.Cog):
             for _, channels, _, _, _ in check_blacklist:
 
                 if channels:
-
+                    print(channels)
+                    print(bot.get_channel(int(channels)))
                     if bot.get_channel(channels).category.id == category.id:
 
                         DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channels)
@@ -1516,6 +1554,7 @@ class LevelSystemSetting(discord.ui.View):
         super().__init__(timeout=None)
         self.add_item(CancelSetLevelSystem())
         self.add_item(LevelSystemOnOffSwitch())
+        self.add_item(ShowLevelSettings())
 
     @discord.ui.select( 
         placeholder = "Choose the system you want to set!",
@@ -1641,23 +1680,14 @@ class LevelSystemOnOffSwitch(discord.ui.Button):
         
         if interaction.user.guild_permissions.administrator:
             
-            level_settings = DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
+            settings = DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
 
-            if level_settings == "on":
-
-                new_status, status = "switched off", "off"
-                opposite_status = "turn on"
-
-            elif level_settings == "off":
-
-                new_status, status = "switched on", "on"
-                opposite_status = "switch off"
-
-            DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status=status)
+            DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status='on' if settings == 'off' else 'on')
                         
-            emb = discord.Embed(title=f"The level system was {new_status}", 
-                description=f"""{Emojis.dot_emoji} If you want to {opposite_status} the level system, just use this command again {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
+            emb = discord.Embed(description=f"""## The level system was switched {' off' if settings == 'on' else 'on'}
+                {Emojis.dot_emoji} {'From now on, XP will no longer be given as a reward.' if settings == 'on' else 'From now on all activities will be rewarded with XP, you can adjust the amount manually using the **/set-level-system** command'}
+                {Emojis.help_emoji} If you want to {'turn on' if settings == 'on' else 'switch off'} the level system, just use this command again""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
         else:
 
@@ -2097,6 +2127,20 @@ class CancelSetLevelSystem(discord.ui.Button):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
+
+class ShowLevelSettings(discord.ui.Button):
+
+    def __init__(self):
+        super().__init__(
+            label = "Show all Level system settings",
+            style = discord.ButtonStyle.blurple,
+            custom_id = "show_level_settings"
+        )
+    
+    async def callback(self, interaction: discord.Interaction):
+
+        emb = discord.Embed(description=f"""{CheckLevelSystem.check_all_level_settings(guild_id = interaction.guild.id)}""")
+        await interaction.response.send_message(embed=emb)
 
 
 ##############################################  Blacklist manager  ##############################################

@@ -258,10 +258,10 @@ class DatabaseCheck():
 
     def check_antilink_white_list(
         guild_id:int, 
-        channel_id:int, 
-        category_id:int, 
-        role_id:int, 
-        user_id:int
+        channel_id:int = None, 
+        category_id:int = None, 
+        role_id:int = None, 
+        user_id:int = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
