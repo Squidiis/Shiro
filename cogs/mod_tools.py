@@ -153,7 +153,7 @@ class ModeratorCommands(commands.Cog):
 
         settings = DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
 
-        emb = discord.Embed(description=f"""# {Emojis.help_emoji} Hier siehst du die aktuelle anti link einstellungen
+        emb = discord.Embed(description=f"""## {Emojis.help_emoji} Hier siehst du die aktuelle anti link einstellungen
             {Emojis.dot_emoji} Aktuelle ist das Anti link system auf:\n`{settings_text[settings[3]]}`
             {Emojis.dot_emoji} Bei verstohs erhält man einen Timeout von: {settings[4]} Minuten""", color=bot_colour)
         await ctx.respond(embed=emb)
@@ -260,10 +260,11 @@ class ModeratorCommands(commands.Cog):
 
         white_list = self.show_antilink_system_white_list(guild_id = ctx.guild.id)
 
-        emb = discord.Embed(description=f"""## Hier siehst du alles was auf der Antilink white list gelitet ist
-            
+        emb = discord.Embed(description=f"""## Anti link white list
+            {Emojis.dot_emoji} Here you can see all entries of the anti link white list:
+
             {f'{"".join(white_list[0])}' if white_list[0] != [] else ""}{f'{"".join(white_list[1])}' if white_list[1] != [] else ""}{f'{"".join(white_list[2])}' if white_list[2] != [] else ""}{f'{"".join(white_list[3])}' if white_list[3] != [] else ""}
-            {f'{Emojis.dot_emoji} Es ist nichts auf der antilink white list gelistet' if white_list[0] and white_list[1] and white_list[2] and white_list[3] == None else ''}""", color=bot_colour)
+            {f'{Emojis.dot_emoji} Nothing is listed on the antilink white list' if white_list[0] and white_list[1] and white_list[2] and white_list[3] == None else ''}""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 

@@ -4,11 +4,7 @@ Help menü adden
 
 Readme adden anleitung wie man den Bot einstellt
 
-White list für links für das antilink system (testen)
-
 leader bourd besser machen 
-
-(Rank card mehr optionen)
 
 code einfacher machen
 
@@ -16,22 +12,13 @@ die texte in einer neue file auslagern die doppelt sind
 
 Texte übersetzten
 
-Noch die add und remove commands zusammen fassen
-
-Zum blacklist manager hinzufügen das die einträge nach ner woche gelöscht werden und erwähnen
-
-Ein allgemienen Show command hinzufügen
-texte überschriften auf ## setzten
-
-dem level settings command ein an aus button geben  testen
+Anti white list in 2 commands splitten
 
 hinzufügen das die db gleich eine funktion zum erweitern hat kann code sparen ChatGPT
 
-
-Level settings system alles adden was zum level system gehört heist auch alle show commands also mit einzelnen drop down mit eignenen zweigen
-show info button
-
-
-show antilin white list text anpassen
-
 level role system villeicht nochmal ändern
+
+
+rps gewinner ansicht bisschen schöner machen
+
+Entferne alle punkte aus den texten

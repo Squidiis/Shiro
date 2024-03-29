@@ -85,7 +85,10 @@ user_not_found_emb = discord.Embed(title=f"The user was not found {Emojis.fail_e
     description = f"{Emojis.dot_emoji} No entry was found the user is also no longer on the server", color = error_red)
 
 no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", 
-    description = f"{Emojis.dot_emoji} Therefore, one was created just try again.", color = bot_colour) 
+    description = f"{Emojis.dot_emoji} Therefore, one was created just try again.", color = bot_colour)
+
+# default message for level up message system
+default_message = 'Oh nice {user} you have a new level, your newlevel is {level}' 
 
 
 class GetEmbed():
@@ -166,9 +169,6 @@ class HelpMenu(commands.Cog):
                 .add_field(name="/reset-user-stats", value="", inline=False)
                 .add_field(name="/rank", value="", inline=False)
                 .add_field(name="/leaderboard-level", value="", inline=False)
-                .add_field(name="/show-level-up-channel", value="", inline=False)
-                .add_field(name="/show-bonus-xp-percentage", value="", inline=False)
-                .add_field(name="/show-level-up-message", value="", inline=False)
                 ]),
             
             Page(embeds=[discord.Embed(title="Level System commands Teil 2", 
@@ -181,7 +181,6 @@ class HelpMenu(commands.Cog):
                 .add_field(name="/add-level-role", value="", inline=False)
                 .add_field(name="/remove-level-role", value="", inline=False)
                 .add_field(name="/show-level-roles", value="", inline=False)
-                .add_field(name="/show-xp-rate", value="", inline=False)
                 .add_field(name="/add-bonus-xp-list", value="", inline=False)
                 .add_field(name="/remove-bonus-xp-list", value="", inline=False)
                 .add_field(name="/show-bonus-xp-list", value="", inline=False)

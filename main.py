@@ -11,9 +11,6 @@ from utils import *
 async def ping(ctx):
     await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
-   
-
- 
 
 
 class Main(commands.Cog):
@@ -84,17 +81,6 @@ class Main(commands.Cog):
                 userId BIGINT UNSIGNED NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
-            '''
-            CREATE TABLE IF NOT EXISTS TempDatas (
-                guildId BIGINT UNSIGNED NOT NULL,
-                operation VARCHAR(10) NOT NULL,
-                channelIdBlacklist BIGINT UNSIGNED NOT NULL,
-                categoryIdBlacklist BIGINT UNSIGNED NULL,
-                roleIdBlacklist BIGINT UNSIGNED NULL,
-                userIdBlacklist BIGINT UNSIGNED NULL,
-                ExpiryDate DATE NOT NULL 
-            )
-            ''',
             # Bot settings Table
             '''
             CREATE TABLE IF NOT EXISTS BotSettings (
@@ -152,13 +138,10 @@ class Main(commands.Cog):
         print("┗━━━┛    ┗┛ ┗━━━┛ ┗━━┛ ┗━━━┛ ┗━━┛")
 
         # level system
-        self.bot.add_view(LevelUpChannelButtons(channel=None))
         self.bot.add_view(LevelRolesButtons(role_id=None, role_level=None, status=None))
         self.bot.add_view(ResetLevelStatsButton())
-        self.bot.add_view(LevelSystemSettings())
         self.bot.add_view(ResetBlacklistLevelButton())
         view.add_item(ShowBlacklistLevelSystemButton())
-
 
         # Level system settings
         self.bot.add_view(LevelSystemSetting())

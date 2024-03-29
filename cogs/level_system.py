@@ -19,20 +19,7 @@ def level_message(guild_id:int, user_id:int, level:int):
 
 # Check the different parts of the level system and the database
 class CheckLevelSystem():
-
-    # Function that returns all items of the blacklist 
-    def show_blacklist_level(guild_id:int):
-
-        blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
     
-        check_channel = [i for _, i, _, _, _ in blacklist if i is not None]; checked_channel = [f"> {Emojis.dot_emoji} There are no channels on the blacklist"] if check_channel == [] else [f"> {Emojis.dot_emoji} <#{i}>" for i in check_channel]
-        check_category = [i for _, _, i, _, _ in blacklist if i is not None]; checked_category = [f"> {Emojis.dot_emoji} There are no categories on the blacklist"] if check_category == [] else [f"> {Emojis.dot_emoji} <#{i}>" for i in check_category]
-        check_role = [i for _, _, _, i, _ in blacklist if i is not None]; checked_role = [f"> {Emojis.dot_emoji} There are no roles on the blacklist"] if check_role == [] else [f"> {Emojis.dot_emoji} <@&{i}>" for i in check_role]
-        check_user = [i for _, _, _, _, i in blacklist if i is not None]; checked_user = [f"> {Emojis.dot_emoji} There are no users on the blacklist"] if check_user == [] else [f"> {Emojis.dot_emoji} <@{i}>" for i in check_user]
-        
-        return ["\n".join(checked_channel), "\n".join(checked_category), "\n".join(checked_role), "\n".join(checked_user)]
-    
-
     # Function that checks how high the bonus xp percentage rate is
     def check_bonus_xp(guild_id:int, message:discord.Message):
 
@@ -60,112 +47,82 @@ class CheckLevelSystem():
         
         else:
             return None
-        
-    def bonus_xp_list(guild_id:int):
+    
 
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id)
-        check_bonus = DatabaseCheck.check_level_settings(guild_id=guild_id)
-        bonus = check_bonus[5]
+    def show_level_roles(guild_id:int):
 
-        if check_list:
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id = guild_id, status = "level_role")
 
-            bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> activities in this channel are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[1] else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <#{i[2]}> activities of this category are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[2] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <@&{i[3]}> activities of users with this role are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[3] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <@{i[4]}> activities of this user will be rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[4] != None else None for i in check_list]
-            filtered_list = [x for x in bonus_xp_list if x is not None]
-            all_bonus_xp_items = "\n".join(filtered_list)
+        if level_roles:
+
+            final_level_roles = []
+            for _, role, lvl, _ in level_roles:
+
+                final_level_roles.append(f"{Emojis.dot_emoji} die rolle <@&{role}> wird bei level {lvl} vergeben")
+
+            return "\n".join(final_level_roles)
 
         else:
 
-            all_bonus_xp_items = f"{Emojis.dot_emoji} Nothing has been listed on the Bonus XP list"
-
-        return all_bonus_xp_items
+            return f"{Emojis.dot_emoji} Es wurden keine Level roles eingestellt"
     
     # Als class umarbeiten und dann eine def die alles returnt was in den anderen classen ist
-    def check_all_level_settings(guild_id:int, system:str = None):
+    def show_blacklist(guild_id:int):
 
-        check_system = DatabaseCheck.check_level_settings(guild_id = guild_id)
-        check_bonus = DatabaseCheck.check_xp_bonus_list(guild_id = guild_id)
-        check_blacklist = DatabaseCheck.check_blacklist(guild_id = guild_id)
-        check_level_role = DatabaseCheck.check_level_system_levelroles(guild_id = guild_id)
+        blacklist = DatabaseCheck.check_blacklist(guild_id = guild_id)
 
-        if system == None:
-
-            channel_blacklist, category_blacklist, role_blacklist, user_blacklist = [], [], [], []
-            for _, channel, category, role, user in check_blacklist:
+        channel_blacklist, category_blacklist, role_blacklist, user_blacklist = [], [], [], []
+        for _, channel, category, role, user in blacklist:
                 
-                if channel != None:
-                    channel_blacklist.append(f"> {Emojis.dot_emoji} <#{channel}>\n")
+            if channel != None:
+                channel_blacklist.append(f"> {Emojis.dot_emoji} <#{channel}>\n")
 
-                if category != None:
-                    category_blacklist.append(f"> {Emojis.dot_emoji} <#{category}>\n")
+            if category != None:
+                category_blacklist.append(f"> {Emojis.dot_emoji} <#{category}>\n")
 
-                if role != None:
-                    role_blacklist.append(f"> {Emojis.dot_emoji} <@&{role}>\n")
+            if role != None:
+                role_blacklist.append(f"> {Emojis.dot_emoji} <@&{role}>\n")
 
-                if user != None:
-                    user_blacklist.append(f"> {Emojis.dot_emoji} <@{user}>\n")
+            if user != None:
+                user_blacklist.append(f"> {Emojis.dot_emoji} <@{user}>\n")
 
-            if channel_blacklist and category_blacklist and role_blacklist and user_blacklist == []:
-                return f"{Emojis.dot_emoji} Es ist nichts auf der Blacklist gelistet"
+        if channel_blacklist and category_blacklist and role_blacklist and user_blacklist == []:
+            return f"{Emojis.dot_emoji} Es ist nichts auf der Blacklist gelistet"
             
-            else:
+        else:
 
-                final_blacklist = []
-                for lst, label in [(channel_blacklist, "Channels"), (category_blacklist, "Categories"), (role_blacklist, "Roles"), (user_blacklist, "Users")]:
+            final_blacklist = []
+            for lst, label in [(channel_blacklist, "Channels"), (category_blacklist, "Categories"), (role_blacklist, "Roles"), (user_blacklist, "Users")]:
 
-                    if lst != []:
-                        final_blacklist.extend([f"### {Emojis.dot_emoji} All {label} on the Blacklist:"] + lst)
+                if lst != []:
+                    final_blacklist.extend([f"**{Emojis.dot_emoji} All {label} on the Blacklist:**\n"] + lst)
 
             return "".join(final_blacklist)
-
-#############################################  Level Systen Settings  #############################################
-
-
-class LevelSystemSettings(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-    
-    # Button to set the status of the level system to on
-    @discord.ui.button(label="On/Off Level system", style=discord.ButtonStyle.blurple, custom_id="on_off_level_system")
-    async def level_system_settings(self, button, interaction:discord.Interaction):
-
-        guild_id = interaction.guild.id
         
-        check_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
 
-        if interaction.user.guild_permissions.administrator:
+    def show_bonus_xp_list(guild_id:int):
 
-            if check_status == None:
+        bonus_list = DatabaseCheck.check_xp_bonus_list(guild_id = guild_id)
 
-                emb = discord.Embed(title=f"{Emojis.help_emoji} No entry was found", 
-                    description=f"""No entry was found so one was created for your server. 
-                    {Emojis.dot_emoji} The level system was also switched on automatically.
-                    {Emojis.dot_emoji} If you want to disable it just use this command again""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb)
+        if bonus_list:
 
-            else:
+            final_bonus_xp_list = []
+            for _, channel, category, role, user, percentage in bonus_list:
 
-                if check_status[2] == "on":
+                for lst, percent, text in [
+                    (f"<#{channel}>", percentage, "in"), 
+                    (f"<#{category}>", percentage, "innerhalb der Kategorie"), 
+                    (f"<@&{role}>", percentage, "von usern mit der rolle"), 
+                    (f"<@{user}>", percentage, "vom user")]:
 
-                    new_status, status = "switched off", "off"
-                    opposite_status = "turn on"
+                    if "None" not in lst:
+                        final_bonus_xp_list.append(f"{Emojis.dot_emoji} Aktivitäten {text} {lst} werden mit {percent if percent != None else '10'} % mehr XP belohnt")
 
-                elif check_status[2] == "off":
-
-                    new_status, status = "switched on", "on"
-                    opposite_status = "switch off"
-
-                DatabaseUpdates.update_level_settings(guild_id=guild_id, level_status=status)
-                        
-                emb = discord.Embed(title=f"The level system was {new_status}", 
-                    description=f"""{Emojis.dot_emoji} If you want to {opposite_status} the level system, just use this command again {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
+            return "\n".join(final_bonus_xp_list)
         
         else:
 
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+            return f"{Emojis.dot_emoji} Es ist nichts auder der bonus XP list gelistet"
 
   
 
@@ -235,58 +192,6 @@ class LevelRolesButtons(discord.ui.View):
                         description=f"""{Emojis.dot_emoji} When reaching level {self.role_level} you still get the role {check_level_roles[1]}""", color=bot_colour)
                     await interaction.response.edit_message(embed=emb, view=None)
 
-        else:
-            
-            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
-
-
-
-#############################################  Level up Channel button  ###########################################
-
-
-class LevelUpChannelButtons(discord.ui.View):
-    def __init__(self, channel:int = None):
-        self.channel = channel
-        super().__init__(timeout=None)
-
-    # Button to change a level up channel
-    @discord.ui.button(label="Yes", style=discord.ButtonStyle.gray, custom_id="yes_button_level_up")
-    async def yes_button_levelup(self, button, interaction:discord.Interaction):
-            
-        if interaction.user.guild_permissions.administrator:
-
-            if self.channel == None:
-
-                emb = discord.Embed(title=f"{Emojis.help_emoji} The level up channel could not be overwritten", 
-                    description=f"""{Emojis.dot_emoji} The level up channel could not be overwritten because the process has expired.
-                    {Emojis.dot_emoji} This happens when you wait too long to react to the button.
-                    {Emojis.dot_emoji} You can simply run the command again if you still want to overwrite the level up channel {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
-
-
-            else:
-
-                DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_channel=self.channel)
-
-                emb = discord.Embed(title=f"The level up channel was successfully overwritten {Emojis.succesfully_emoji}", 
-                    description=f"""{Emojis.dot_emoji} From now on the channel <#{self.channel}> is assigned as level up channel.""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
-
-
-    # Button to cancel the overwriting of the level up channel 
-    @discord.ui.button(label="No", style=discord.ButtonStyle.gray, custom_id="no_button_level_up")
-    async def no_button_levelup(self, button, interaction:discord.Interaction):
-        
-        if interaction.user.guild_permissions.administrator:
-
-            emb = discord.Embed(title=f"Successfully canceled {Emojis.succesfully_emoji}", 
-                description=f"{Emojis.dot_emoji} You have successfully canceled the overwriting of the level up channel", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
-        
         else:
             
             await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
@@ -959,36 +864,6 @@ class LevelSystem(commands.Cog):
         emb.set_thumbnail(url=ctx.guild.icon.url)
         await ctx.respond(embed=emb)
 
-               
-
-#############################################  Level system Settings  #####################################################    
-
-
-    @commands.slash_command(name = "level-system-settings", description = "Set the level system freely!")
-    @commands.has_permissions(administrator = True)
-    async def level_system_settings(self, ctx:discord.ApplicationContext):
-
-        level_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
-
-        if level_settings:
-
-            if level_settings[2] == "on":
-                active_deactive = "enabled "
-            elif level_settings[2] == "off":
-                active_deactive = "disabled"
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see all the settings of the level system", 
-                description=f"{Emojis.dot_emoji} With the lower button you can set the level system, you can enable or disable it. At the moment it is: **{active_deactive}**",color=bot_colour)
-            await ctx.respond(embed=emb, view=LevelSystemSettings())
-
-        else:
-
-            DatabaseUpdates._create_bot_settings(guild_id=ctx.guild.id)
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found", 
-                description=f"{Emojis.dot_emoji} No entry was found so one was created the level system was also activated immediately.", color=bot_colour)
-            await ctx.respond(embed=emb)
-
     
 
 #################################################  Level Blacklist settings  ###############################################
@@ -1131,15 +1006,11 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-level-blacklist", description = "Shows you everything that is blacklisted!")
     async def show_blacklist(self, ctx:discord.ApplicationContext):
 
-        blacklist = CheckLevelSystem.show_blacklist_level(guild_id=ctx.guild.id)
-
-        emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see the complete level system blacklist", 
-            description=f"""Here you can see everything that is on the level system blacklist:""", color=bot_colour)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Channels on the Blacklist", value=f" {blacklist[0]}", inline=False)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Categories on the Blacklist", value=f" {blacklist[1]}", inline=False)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Roles on the Blacklist", value=f" {blacklist[2]}", inline=False)
-        emb.add_field(name=f"{Emojis.arrow_emoji} All Users on the Blacklist", value=f" {blacklist[3]}", inline=False)
-        emb.set_footer(icon_url=ctx.guild.icon, text=f"Blacklist from {ctx.guild.name}")
+        emb = discord.Embed(description=f"""## Current level system blacklist
+            {Emojis.dot_emoji} Everything that is on the blacklist is excluded from the level system so you will not receive any XP when you perform an activity
+            Here you can see all items that are on the blacklist:
+                
+            {CheckLevelSystem.show_blacklist(guild_id = ctx.guild.id)}""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 
@@ -1282,56 +1153,21 @@ class LevelSystem(commands.Cog):
         
         if level_roles:
             
-            result_strings = [f"{Emojis.dot_emoji} <@&{i[1]}> you get from level: {i[2]}" for i in level_roles]
-            result = '\n'.join(result_strings)
-            
-            emb = discord.Embed(title="Here you can find all level roles", 
-                description=f"{Emojis.help_emoji} Here you can see all level rolls sorted by level in descending order:\n\n {result}", color=bot_colour)
+            emb = discord.Embed(description=f"""## Current level roles
+                {Emojis.dot_emoji} Level roles are always assigned when the user has reached the required level
+                **{Emojis.dot_emoji} Here you can see all currently set level roles:**
+                
+                {CheckLevelSystem.show_level_roles(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
-            emb = discord.Embed(title=f"No level rolls have been added yet", 
-                description=f"{Emojis.help_emoji} There are no level rolls added yet if you want to add some use the {add_level_role} command.", color=bot_colour)
+
+            emb = discord.Embed(description=f"""## No level roles have currently been defined
+                {Emojis.help_emoji} Currently no level roles have been defined yet if you want to add some you can simply use the `/add-level-role` command for it
+                {Emojis.dot_emoji} If you define some you have to specify a role and a level if a user reaches the given level he gets the role""", color=bot_colour)
             await ctx.respond(embed=emb)
        
     
-    
-#############################################  Level up channel settings  #################################
-
-
-    @commands.slash_command(name = "show-level-up-channel", description = "Let them show the current level up channel!")
-    async def show_levelup_channel(self, ctx:discord.ApplicationContext):
-
-        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
-        
-        if check_settings[3]:
-        
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see the current level up channel", 
-                description=f"""{Emojis.dot_emoji} The current level up channel is <#{check_settings[3]}> all level up notifications are sent to this channel.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-        
-        else:
-            
-            emb = discord.Embed(title=f"{Emojis.help_emoji} No level up channel has been set", 
-                description=f"""{Emojis.dot_emoji} No level up channel has been set if you want to set one use that:\n{add_level_up_channel} command.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-
-
-
-##########################################  Set xp rate system  ###################################
-        
-       
-    @commands.slash_command(name = "show-xp-rate", description = "Let us show you how much xp you currently get per message!")
-    async def show_xp_rate(self, ctx:discord.ApplicationContext):
-        
-        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
-
-        emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see how much XP you get per message",
-            description=f"""{Emojis.dot_emoji} Per message you get **{check_settings[1]}** XP.
-            {Emojis.dot_emoji} This amount of XP is awarded as a reward for each activity and can be influenced by the bonus xp percentage""", color=bot_colour)
-        await ctx.respond(embed=emb)
-
-
 
 #########################################  Bonus xp system  #############################################
 
@@ -1458,17 +1294,15 @@ class LevelSystem(commands.Cog):
     async def show_bonus_xp_list(self, ctx:discord.ApplicationContext):
 
         check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
-        check_bonus = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
-        bonus = check_bonus[5]
 
         if check_list:
 
-            bonus_xp_list = [f"{Emojis.dot_emoji} <#{i[1]}> activities in this channel are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[1] else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <#{i[2]}> activities of this category are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[2] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <@&{i[3]}> activities of users with this role are rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[3] != None else None for i in check_list] + [
-                f"{Emojis.dot_emoji} <@{i[4]}> activities of this user will be rewarded with **{i[5] if i[5] else bonus} %** more XP" if i[4] != None else None for i in check_list]
-            filtered_list = [x for x in bonus_xp_list if x is not None]
-            all_bonus_xp_items = "\n".join(filtered_list)
+            emb = discord.Embed(description=f"""## Current bonus XP list
+                {Emojis.dot_emoji} All things that are listed on the bonus XP list are rewarded with a percentage of extra XP when activities take place there this can be divided for each item individually
+                **Here you can see everything on the bonus XP list:**
+                
+                {CheckLevelSystem.show_bonus_xp_list(guild_id = ctx.guild.id)}""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
         else:
 
@@ -1498,52 +1332,6 @@ class LevelSystem(commands.Cog):
             emb = discord.Embed(title=f"{Emojis.help_emoji} The bonus XP list cannot be reset", 
                 description=f"""{Emojis.dot_emoji} The bonus XP list cannot be reset because it does not contain any entries.""", color=bot_colour)
             await ctx.respond(embed=emb)
-
-
-
-#################################################  Bonus XP percentage  #################################################
-
-    
-    @commands.slash_command(name = "show-bonus-xp-percentage", description = "Let the display where the default percentage value for the bonus XP system is!")
-    async def show_bonus_xp_percentage(self, ctx:discord.ApplicationContext):
-
-        check_settings = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
-
-        emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see how many percent more XP you get with the Bonus XP system", 
-            description=f"""{Emojis.dot_emoji} You currently get **{check_settings[5]} %** more XP for activities in channels or categories that are part of the bonus XP system.
-            You also get this bonus if you have a role that is on the list for the bonus XP system or if you are a user that is listed on the bonus XP list.""", color=bot_colour)
-        await ctx.respond(embed=emb)
-
-
-
-##########################################  Custom level up message  ########################################
-
-        
-    @commands.slash_command(name = "show-level-up-message", description = "Shows the current level-up message from your server")
-    async def show_level_up_message(self, ctx:discord.ApplicationContext):
-
-        level_up_message = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
-
-        if level_up_message:
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see the current level-up message", 
-                description=f"""{Emojis.dot_emoji} The current level-up message is:\n\n{Emojis.arrow_emoji} {level_up_message[4]}\n
-                {Emojis.dot_emoji} This message is always sent when a user receives a level-up.
-                {Emojis.exclamation_mark_emoji} If you set a level-up channel, this message will only be sent to this selected channel.""", color=bot_colour)
-            await ctx.respond(embed=emb)
-        
-        else:
-
-            DatabaseUpdates._create_bot_settings(guild_id=ctx.guild.id)
-            await ctx.respond(embed=no_entry_emb)
-
-
-    @commands.slash_command(name = "manage-level-blacklist")
-    async def manage_level_blacklist(self, ctx):
-
-        emb = discord.Embed(description=f"Hier sieht du den black list manager")
-        await ctx.respond(embed=emb, view = BlacklistManagerButtons())
-
 
 
 
@@ -1987,20 +1775,26 @@ class SetXpRate(discord.ui.View):
         
         check_xp_rate = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]
 
-        if select.values[0] == check_xp_rate:
+        if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(description=f"""## {Emojis.help_emoji} This value is already set as the bonus XP value
-                {Emojis.dot_emoji} The bonus XP value is already set to {check_xp_rate} XP per message""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+            if select.values[0] == check_xp_rate:
 
+                emb = discord.Embed(description=f"""## {Emojis.help_emoji} This value is already set as the bonus XP value
+                    {Emojis.dot_emoji} The bonus XP value is already set to {check_xp_rate} XP per message""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+
+            else:
+
+                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, xp_rate = int(select.values[0]))
+
+                emb = discord.Embed(description=f"""## The XP bonus value has been set
+                    {Emojis.dot_emoji} You have set the new XP bonus value to **{select.values[0]}** XP
+                    {Emojis.dot_emoji} After each activity, this XP value is awarded as a reward""", color=bot_colour)
+                await interaction.response.edit_message(embed=emb, view=None)
+        
         else:
 
-            DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, xp_rate = int(select.values[0]))
-
-            emb = discord.Embed(description=f"""## The XP bonus value has been set
-                {Emojis.dot_emoji} You have set the new XP bonus value to **{select.values[0]}** XP
-                {Emojis.dot_emoji} After each activity, this XP value is awarded as a reward""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 
@@ -2108,7 +1902,7 @@ class CancelSetLevelSystem(discord.ui.Button):
     
     def __init__(self):
         super().__init__(
-            label = "Cancel setting ",
+            label = "Cancel setting",
             style = discord.ButtonStyle.danger,
             custom_id = "cancel_level_set"
         )
@@ -2134,320 +1928,107 @@ class ShowLevelSettings(discord.ui.Button):
         super().__init__(
             label = "Show all Level system settings",
             style = discord.ButtonStyle.blurple,
-            custom_id = "show_level_settings"
+            custom_id = "show_level_settings",
+            row=3
         )
     
     async def callback(self, interaction: discord.Interaction):
 
-        emb = discord.Embed(description=f"""{CheckLevelSystem.check_all_level_settings(guild_id = interaction.guild.id)}""")
-        await interaction.response.send_message(embed=emb)
+        emb = discord.Embed(description=f"""## Select which settings you want to see
+            {Emojis.help_emoji} Here you have a small overview of what the individual systems can do and what they are currently set to:
+                            
+            **{Emojis.dot_emoji} Level up Channel**
+            > All level up notifications as well as the notifications for receiving a level role are sent to a channel specified by you
+
+            **{Emojis.dot_emoji} Level up Message**
+            > A custom message that is sent after a level up
+
+            **{Emojis.dot_emoji} Level system Blacklist**
+            > Channels, categories, roles or users that are excluded from the level system
+
+            **{Emojis.dot_emoji} Level Roles**
+            > Roles that are assigned when you reach a specified level
+
+            **{Emojis.dot_emoji} XP rate**
+            > Indicates how much XP you get per activity can be customized and can be influenced by items on the Bonus XP list
+
+            **{Emojis.dot_emoji} Bonus XP perventage**
+            > A percentage value that is added to the individual items of the Bonus XP list if no own items are specified
+
+            **{Emojis.dot_emoji} Bonus XP list**
+            > Channel, category, role and user can be added to this list and rewarded either 
+            > with an individual percentage of bonus XP per activity or with
+            > the bonus XP percentage as a bonus.           
+            
+            **{Emojis.dot_emoji} Level System status**
+            > Shows whether the level system is switched on or off""", color=bot_colour)
+        await interaction.response.send_message(embed=emb, ephemeral=True, view=ShowLevelSettingsSelect())
 
 
-##############################################  Blacklist manager  ##############################################
+# Fertig machen 
+class ShowLevelSettingsSelect(discord.ui.View):
 
-
-class BlacklistManagerButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelSetLevelSystem())
 
-    # Button for adding items to the Blacklist Manager
-    @discord.ui.button(label="add to blacklist", style=discord.ButtonStyle.blurple, custom_id="add_blacklist")
-    async def add_blacklist_manager_button(self, button, interaction:discord.Interaction):
-
-        view = BlacklistManagerSelect(status = "add")
-        view.add_item(TempBlackklistLevelSaveButton())
-        view.add_item(ShowBlacklistLevelSystemButton())
-
-        emb = discord.Embed(title=f"## Here you can select what you want to blacklist", 
-            description=f"""{Emojis.dot_emoji} With the lower select menus you can choose what you want to put on the blacklist!
-            {Emojis.dot_emoji} You can freely choose what you want, but you can only select a maximum of 5 items per menu.
-            {Emojis.dot_emoji} When you have selected everything you want, confirm your selection by pressing the safe configuration button.
-            {Emojis.dot_emoji} If you want to see already everything on the blacklist use the show blacklist button.
-            {Emojis.help_emoji} If you select something that is already on the blacklist it will be automatically sorted out. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=view)
-
-
-    # Button for removing items from the Blacklist Manager
-    @discord.ui.button(label="remove from blacklist", style=discord.ButtonStyle.blurple, custom_id="remove_blacklist")
-    async def remove_blacklist_manager_button(self, button, interaction:discord.Interaction):
+    @discord.ui.select(
+        max_values = 1,
+        min_values = 1,
+        placeholder = "Wähle aus von welchem System du die einstellungen sehen willst",
+        options=[
+            discord.SelectOption(label="Level up channel", description="Zeigt dir dem aktuellen Levl up channel", value="show_level_up_channel"),
+            discord.SelectOption(label="Level up message", description="Zeigt dir die Aktuelle level up message", value="show_level_up_message"),
+            discord.SelectOption(label="XP rate", description="Zeigt dir wie viel XP man pro aktivität erhält", value="show_xp_rate"),
+            discord.SelectOption(label="Bonus XP percentage", description="Zeigt dir den Aktuellen Bonus XP prozentsatz", value="show_bonus_xp_percentage"),
+            discord.SelectOption(label="Level System status", description="Zeigt dir ob das level system an- oder ausgeschalten ist", value="show_level_status"),
+        ],
+        custom_id="show_level_settigs_select")
         
-        view = BlacklistManagerSelect(status = "remove")
-        view.add_item(TempBlackklistLevelSaveButton())
-        view.add_item(ShowBlacklistLevelSystemButton())
+    async def show_level_settings(self, select, interaction: discord.Interaction):
 
-        if interaction.user.guild_permissions.administrator:
-            
-            # show level blacklist hinzufügen
-            emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can select what you want to remove from the blacklist", 
-                description=f"""{Emojis.dot_emoji} With our selectmenus you can choose what to remove from the blacklist.
-                {Emojis.dot_emoji} When you have selected everything you want, confirm your selection by pressing the Safe configuaration button.
-                {Emojis.dot_emoji} If you don't know what is on the blacklist you can either press the show blacklist button or use the command.
-                {Emojis.help_emoji} If you select something that is not on the blacklist it will be sorted out automatically.  {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, view=view)
+        if select.values[0] == "show_level_up_channel":
 
-        else:
+            level_up_channel = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
 
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+            emb = discord.Embed(description=f"""## Aktueller Level up channel
+                {Emojis.dot_emoji} {f'Der Aktuelle level up channel ist {level_up_channel}' if level_up_channel != None else 'Es wurde bisher kein Level up channel festgelegt'}
+                {Emojis.dot_emoji} Wenn ein level up channel festgelgt ist werden alle level up benachrichtigungen in diesen gesendet sowie alle benachrichtigungen für erhalt einer level role
+                {Emojis.dot_emoji} Sollte kein level up channel festgelegt sein werden alle benachrichtigungen in den channel gesendet indem die letzte aktivität statt fand""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
+        elif select.values[0] == "show_level_up_message":
 
-# All functions for the blacklist manager
-class BlacklistManagerChecks():
+            level_up_message = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[4]
 
-    # Checks each entry to see if any of them are blacklisted.
-    def check_items_blacklist_manager(
-        guild_id:str,
-        channels = None, 
-        categories = None, 
-        roles = None, 
-        users = None, 
-        operation = None
-        ):
-        
-        sorted_list = []
-        item_list = channels or categories or roles or users
-        
-        for item in item_list:
-                
-            if channels != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=item.id)
-            if categories != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=item.id)
-            if roles != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, role_id=item.id)
-            if users != None:
-                blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id, user_id=item.id)
+            emb = discord.Embed(description=f"""## Aktuelle Level up message
+                {Emojis.dot_emoji} Aktuell ist:\n{f'`{level_up_message}`' if level_up_message != default_message else f'`{default_message}`'} die level up message.
+                {Emojis.dot_emoji} Die level up message wird immer dan gesendet wenn jemand ein level aufsteigt
+                {Emojis.help_emoji} You also have several parameters to customize them exactly in the curly brackets you can either use the parameter user or level""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-            if operation == "add":
+        elif select.values[0] == "show_xp_rate":
 
-                if blacklist == None or blacklist == []:
-                    sorted_list.append(str(item.id))
-            
-            else:
-                
-                if blacklist != None and blacklist != []:
-                    sorted_list.append(str(item.id))
-            
-        return sorted_list
-    
+            emb = discord.Embed(description=f"""## Aktuelle XP rate
+                {Emojis.dot_emoji} Die XP rate ist die Menge an XP die man pro aktivität als belohnung erhält
+                {Emojis.dot_emoji} Aktuell liegt die XP rate bei {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]} XP pro aktivität
+                {Emojis.help_emoji} Die XP rate kann von den einträgen auf der bonus XP list beeinflusst werden wenn aktivitäten in einen channel, Kategorie, rolle oder user stattfinden der auf dieser liste ist wird extra XP vergeben""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-    # Checks the temp blacklist 
-    def check_temp_blacklist_level(guild_id:int, system:str):
+        elif select.values[0] == "show_bonus_xp_percentage":
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+            emb = discord.Embed(description=f"""## Aktueller bonus XP prozensatz 
+                {Emojis.dot_emoji} Der Bonus Prozentsatz ist der standart wert der bonus XP list und wird immer dann angerechnet wenn kein eigener spezifiziert wurde
+                {Emojis.dot_emoji} Aktuell ligt der Bonus XP porzentsatz bei {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]} % mehr XP pro aktivität solang der channel, Kategorie, rolle oder der user auf der bonus XP list steht""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-        if system == "level":
-          
-            check_temp_blacklist = f"SELECT * FROM ManageBlacklistTemp WHERE guildId = %s AND systemStatus = %s"
-            check_temp_blacklist_values = [guild_id, system]
+        elif select.values[0] == "show_level_status":
 
-        cursor.execute(check_temp_blacklist, check_temp_blacklist_values)
-        temp_blacklist = cursor.fetchone()
-    
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        return temp_blacklist
+            emb = discord.Embed(description=f"""## Aktueller status des level systems
+                {Emojis.dot_emoji} Das level system ist aktuell {'eingeschalten' if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 'on' else 'aussgeschalten'}
+                {Emojis.dot_emoji} Alle aktivitäten werden mit XP belohnt sofern sie nicht der channel, Kategorie, rolle oder user auf der Blacklist stehene""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-
-    # Update or insert elements into the temporary black list 
-    def configure_temp_blacklist_level(guild_id:int, operation:str, channel_id:int = None, category_id:int = None, role_id:int = None, user_id:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=guild_id, system="level")
-
-        item = channel_id or category_id or role_id or user_id
-        count = 0
-
-        if channel_id != None and channel_id != [] or category_id != None and category_id != [] or role_id != None and role_id != [] or user_id != None and user_id != []:
-
-            for item in channel_id, category_id, role_id, user_id:
-        
-                column_name = ["channelId", "categoryId", "roleId", "userId"]
-                
-                if item != None:
-                    sorted_list = ", ".join(item)
-                    if temp_blacklist:
-                                
-                        temp_blacklist_operation = f"UPDATE ManageBlacklistTemp SET {column_name[count]} = %s, operation = %s WHERE guildId = %s AND systemStatus = %s"
-                        temp_blacklist_operation_values = [sorted_list, operation, guild_id, 'level']
-
-                    else:
-                                
-                        temp_blacklist_operation = f"INSERT INTO ManageBlacklistTemp (guildId, {column_name[count]}, operation, systemStatus) VALUES (%s, %s, %s, %s)"
-                        temp_blacklist_operation_values = [guild_id, sorted_list, operation, 'level']   
-                count = count + 1 
-            cursor.execute(temp_blacklist_operation, temp_blacklist_operation_values)
-            db_connect.commit()
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-
-
-    # Deletes the entire temporary blacklist after the transfer is complete
-    def delete_temp_blacklist_level(guild_id:int):
-        
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        delete_temp_blacklist = "DELETE FROM ManageBlacklistTemp WHERE guildId = %s"
-        delete_temp_blacklist_values = [guild_id]
-        cursor.execute(delete_temp_blacklist, delete_temp_blacklist_values)
-        db_connect.commit()
-
-
-class BlacklistManagerSelect(discord.ui.View):
-    def __init__(self, status):
-        self.table = "level"
-        self.status = status
-        super().__init__(timeout=None)
-
-    def get_placeholder(status, item):
-
-        items = ["channels", "categories", "roles", "users"]
-        if status == "add":
-            return f"Select the {items[item]} you want to blacklist!"
-        
-        else:
-            return f"Select the {items[item]} you want to remove from the blacklist!"
-
-    @discord.ui.channel_select(placeholder=get_placeholder(item=0, status="add"), min_values=1, max_values=5, 
-        channel_types=[discord.ChannelType.text, discord.ChannelType.voice, discord.ChannelType.forum, discord.ChannelType.news], custom_id="channel_blacklist_select")
-    async def add_blacklist_channel_level_select(self, select, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            channel_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, channels=select.values, operation="add" if self.status == "add" else "remove")
-            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add" if self.status == "add" else "remove", channel_id=channel_list)
-            await interaction.response.defer()
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-    @discord.ui.channel_select(placeholder=get_placeholder(item=1, status="add"), min_values=1, max_values=5, 
-        channel_types=[discord.ChannelType.category], custom_id="category_blacklist_select")
-    async def add_blacklist_category_level_select(self, select, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            category_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, categories=select.values, operation="add" if self.status == "add" else "remove")
-            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add" if self.status == "add" else "remove", category_id=category_list)
-            await interaction.response.defer()
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-    @discord.ui.role_select(placeholder=get_placeholder(item=2, status="add"), min_values=1, max_values=5, custom_id="role_blacklist_select")
-    async def add_blacklist_role_level_select(self, select, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            role_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, roles=select.values, operation="add" if self.status == "add" else "remove")
-            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add" if self.status == "add" else "remove", role_id=role_list)
-            await interaction.response.defer()
-        
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-        
-    @discord.ui.user_select(placeholder=get_placeholder(item=3, status="add"), min_values=1, max_values=5, custom_id="user_blacklist_select")
-    async def add_blacklist_user_level_select(self, select, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            user_list = BlacklistManagerChecks.check_items_blacklist_manager(guild_id=interaction.guild.id, users=select.values, operation="add" if self.status == "add" else "remove")
-            BlacklistManagerChecks.configure_temp_blacklist_level(guild_id=interaction.guild.id, operation="add" if self.status == "add" else "remove", user_id=user_list)
-            await interaction.response.defer()
-        
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-
-class TempBlackklistLevelSaveButton(discord.ui.Button):
-    def __init__(self):
-        super().__init__(
-            label="Safe all configurations", style=discord.enums.ButtonStyle.blurple,custom_id="safe_configuration")
-    async def callback(self, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-            
-            await interaction.response.defer()
-            temp_blacklist = BlacklistManagerChecks.check_temp_blacklist_level(guild_id=interaction.guild.id, system="level")
-            
-            operation = "add" if temp_blacklist[5] == "add" else "remove"
-
-            if temp_blacklist:
-                    
-                mention = []
-                    
-                if temp_blacklist[1]:
-                    
-                    channel_list = (list(map(int, re.findall('\d+', temp_blacklist[1]))))
-                    
-                    for channel in channel_list:
-                            
-                        mention.append(f"{Emojis.dot_emoji} <#{channel}>")
-                        
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, channel_id=channel)
-
-                if temp_blacklist[2]: 
-
-                    category_list = (list(map(int, re.findall('\d+', temp_blacklist[2]))))
-                    for category in category_list:
-
-                        mention.append(f"{Emojis.dot_emoji} <#{category}>")
-
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, category_id=category)
-                      
-                if temp_blacklist[3]:
-                        
-                    role_list = (list(map(int, re.findall('\d+', temp_blacklist[3]))))
-                    for role in role_list:
-                            
-                        mention.append(f"{Emojis.dot_emoji} <@&{role}>")
-                        
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, role_id=role)
-                                
-                if temp_blacklist[4]:
-                        
-                    user_list = (list(map(int, re.findall('\d+', temp_blacklist[4]))))
-                    for user in user_list:
-
-                        mention.append(f"{Emojis.dot_emoji} <@{user}>")
-                        
-                        DatabaseUpdates.manage_blacklist(guild_id=temp_blacklist[0], operation=operation, user_id=user)
-
-                BlacklistManagerChecks.delete_temp_blacklist_level(guild_id=temp_blacklist[0])
-                    
-                mentions = "\n".join(mention)
-
-                if temp_blacklist[5] == "add":
-
-                    emb = discord.Embed(title=f"The selected elements were set on the blacklist {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} Everything you selected was blacklisted.
-                        {Emojis.dot_emoji} Here you can see again everything that was added:\n\n{mentions}\n
-                        {Emojis.help_emoji} If something is not listed it is already on the blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                    await interaction.edit_original_response(embed=emb, view=None)
-
-                if temp_blacklist[5] == "remove":
-
-                    emb = discord.Embed(title=f"The selected elements have been removed from the blacklist {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} Everything you selected was removed from the blacklist.
-                        {Emojis.dot_emoji} Here you can see again everything that was removed:\n\n{mentions}\n
-                        {Emojis.help_emoji} If something is not listed it is not on the blacklist {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                    await interaction.edit_original_response(embed=emb, view=None)
-
-            else:
-
-                emb = discord.Embed(title=f"{Emojis.help_emoji} Nothing was selected", 
-                    description=f"""{Emojis.dot_emoji} Nothing has been selected to be blacklisted or removed.
-                    {Emojis.dot_emoji} If you want to blacklist or remove items from the blacklist you can simply use this command again.""", color=bot_colour)
-                await interaction.edit_original_response(embed=emb, view=None)
-
-        else: 
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 
