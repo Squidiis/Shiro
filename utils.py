@@ -25,31 +25,15 @@ from discord.ext.pages import Paginator, Page
 ┗━━━┛    ┗┛ ┗━━━┛ ┗━━┛ ┗━━━┛ ┗━━┛
 """
 
-disable_level_up_channel = ""
-add_level_up_channel = ""
-remove_xp = ""
-give_xp = ""
-give_level = ""
-remove_level = ""
-show_level_role = ""
-add_level_role = ""
-
 
 # These are all emojis used in this bot the individual eimojis are stored again in this folder: discord_bot/emojis
 class Emojis:
 
     arrow_emoji = "<a:shiro_arrow:1092443788900831355>"
-    load_emoji = "<a:shiro_load:1092862133181612133>"
     fail_emoji = "<a:shiro_failed:1092862110381383762>"
-    diamond_emoji = "<a:shiro_diamant:1092862078731161771>"
-    fire_emoji = "<a:shiro_blueflame:1092862057432481792>"
     dot_emoji = "<:shiro_dot_blue:1092871145075781662>"
-    ban_hammer_emoji = "<:shiro_hammer:1092871051500855297>"
-    party_girl_emoji = "<a:shiro_partygirl:1092871048879419412>"
     settings_emoji = "<a:shiro_settings:1092871148494143499>"
     help_emoji = "<:shiro_help:1092872576017109033>"
-    dollar_emoji = "<:shiro_dollar:1092876159894683712>"
-    dollar_animation_emoji = "<a:shiro_dollar_animation:1092876162805534820>"
     exclamation_mark_emoji = "<a:shiro_important:1092870970785665055>"
     succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
         
@@ -95,7 +79,8 @@ class GetEmbed():
     '''
     :embed_idex:
         - If an index is passed which then leads to the correct embed
-            0 = Bonux XP procentage
+            0 = Bonus XP procentage
+            1 = User not found 
     '''
     def get_embed(embed_index, settings):
 
@@ -104,7 +89,16 @@ class GetEmbed():
             emb = discord.Embed(description=f"""### {Emojis.help_emoji} Der bonus XP Prozentsatz den du festlegen willst ist bereist festgelegt
                 {Emojis.dot_emoji} Der Prozentsatz ist beits auf {settings} % festgelegt.""", color=bot_colour)
 
+
+        elif embed_index == 1:
+
+            emb = discord.Embed(description=f"""## The user was not found
+                {Emojis.dot_emoji} No entry was found for **{settings}**, so one was created
+                {Emojis.dot_emoji} **{settings}** now starts at level 0 with 0 XP""", color=bot_colour)
+            
         return emb
+    
+
 
 
 

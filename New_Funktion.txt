@@ -2,23 +2,15 @@
 
 Help menü adden
 
-Readme adden anleitung wie man den Bot einstellt
-
 leader bourd besser machen 
-
-code einfacher machen
-
-die texte in einer neue file auslagern die doppelt sind
-
-Texte übersetzten
-
-Anti white list in 2 commands splitten
+emojis zu den files adden
 
 hinzufügen das die db gleich eine funktion zum erweitern hat kann code sparen ChatGPT
 
-level role system villeicht nochmal ändern
+Auch die anti link white list commands zur readme adden
 
+teste die level role add command vorallem mit überschreiben
 
-rps gewinner ansicht bisschen schöner machen
+checken ob alle buttons und so im on_ready sind
 
-Entferne alle punkte aus den texten
+paar kommentare adden für die komplexen sachen

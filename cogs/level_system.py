@@ -58,13 +58,13 @@ class CheckLevelSystem():
             final_level_roles = []
             for _, role, lvl, _ in level_roles:
 
-                final_level_roles.append(f"{Emojis.dot_emoji} die rolle <@&{role}> wird bei level {lvl} vergeben")
+                final_level_roles.append(f"{Emojis.dot_emoji} the role <@&{role}> is assigned at level {lvl}")
 
             return "\n".join(final_level_roles)
 
         else:
 
-            return f"{Emojis.dot_emoji} Es wurden keine Level roles eingestellt"
+            return f"{Emojis.dot_emoji} No level roles have been set"
     
     # Als class umarbeiten und dann eine def die alles returnt was in den anderen classen ist
     def show_blacklist(guild_id:int):
@@ -87,7 +87,7 @@ class CheckLevelSystem():
                 user_blacklist.append(f"> {Emojis.dot_emoji} <@{user}>\n")
 
         if channel_blacklist and category_blacklist and role_blacklist and user_blacklist == []:
-            return f"{Emojis.dot_emoji} Es ist nichts auf der Blacklist gelistet"
+            return f"{Emojis.dot_emoji} Nothing is listed on the blacklist"
             
         else:
 
@@ -111,18 +111,18 @@ class CheckLevelSystem():
 
                 for lst, percent, text in [
                     (f"<#{channel}>", percentage, "in"), 
-                    (f"<#{category}>", percentage, "innerhalb der Kategorie"), 
-                    (f"<@&{role}>", percentage, "von usern mit der rolle"), 
-                    (f"<@{user}>", percentage, "vom user")]:
+                    (f"<#{category}>", percentage, "within the category"), 
+                    (f"<@&{role}>", percentage, "of users with the role"), 
+                    (f"<@{user}>", percentage, "from")]:
 
                     if "None" not in lst:
-                        final_bonus_xp_list.append(f"{Emojis.dot_emoji} Aktivitäten {text} {lst} werden mit {percent if percent != None else '10'} % mehr XP belohnt")
+                        final_bonus_xp_list.append(f"{Emojis.dot_emoji} Activities {text} {lst} are rewarded with {percent if percent != None else '10'} % more XP")
 
             return "\n".join(final_bonus_xp_list)
         
         else:
 
-            return f"{Emojis.dot_emoji} Es ist nichts auder der bonus XP list gelistet"
+            return f"{Emojis.dot_emoji} There is nothing listed on the bonus XP list"
 
   
 
@@ -143,9 +143,9 @@ class LevelRolesButtons(discord.ui.View):
 
             if self.role_id == None and self.role_level == None and self.status == None:
 
-                emb = discord.Embed(title=f"{Emojis.help_emoji} The role or level could not be overwritten", 
-                    description=f"""{Emojis.dot_emoji} The role or level could not be overwritten because the process has expired.
-                    {Emojis.dot_emoji} This happens when you wait too long to react to the button.
+                emb = discord.Embed(description=f"""## The role or level could not be overwritten
+                    {Emojis.dot_emoji} The role or level could not be overwritten because the process has expired
+                    {Emojis.dot_emoji} This happens when you wait too long to react to the button
                     {Emojis.dot_emoji} You can simply run the command again if you still want to overwrite the level or role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
@@ -153,9 +153,9 @@ class LevelRolesButtons(discord.ui.View):
 
                 DatabaseUpdates.update_level_roles(guild_id=interaction.guild.id , role_id=self.role_id, role_level=self.role_level, status=self.status)
                             
-                emb = discord.Embed(title=f"Successful override of the level role {Emojis.succesfully_emoji}", 
-                    description=f"""{Emojis.dot_emoji} The level role was successfully overwritten.
-                    {Emojis.dot_emoji} The role <@&{self.role_id}> will be assigned at level {self.role_level} from now on.""", color=bot_colour)
+                emb = discord.Embed(description=f"""## Successful override of the level role
+                    {Emojis.dot_emoji} The level role was successfully overwritten
+                    {Emojis.dot_emoji} The role <@&{self.role_id}> will be assigned at level {self.role_level} from now on""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -169,28 +169,10 @@ class LevelRolesButtons(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            title = "The overwriting of the level role was canceled"
-            check_level_roles = DatabaseCheck.check_level_system_levelroles(guild=interaction.guild.id, level_role=self.role_id, needed_level=self.role_level, status="check")
-
-            if self.role_id == None and self.role_level == None and self.status == None:
-
-                emb = discord.Embed(title=title,
-                    description=f"""{Emojis.dot_emoji} If you want to see all level roles use the {show_level_role} command.""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
-
-            else:
-
-                if check_level_roles[1] == self.role_id:
-
-                    emb = discord.Embed(title=title, 
-                        description=f"""{Emojis.dot_emoji} The role <@&{self.role_id}> will still be assigned when level {check_level_roles[2]} is reached""", color=bot_colour)
-                    await interaction.response.edit_message(embed=emb, view=None)
-
-                if check_level_roles[2] == self.role_level:
-
-                    emb = discord.Embed(title=title, 
-                        description=f"""{Emojis.dot_emoji} When reaching level {self.role_level} you still get the role {check_level_roles[1]}""", color=bot_colour)
-                    await interaction.response.edit_message(embed=emb, view=None)
+            emb = discord.Embed(description=f"""## The overwriting of the level roles was successfully canceled
+                {Emojis.dot_emoji} The overwriting of the level role has been canceled, so it is still available at the level it had before
+                {Emojis.help_emoji} If you change your mind, you can re-execute the command at any time""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
 
         else:
             
@@ -213,9 +195,9 @@ class ResetLevelStatsButton(discord.ui.View):
             guild_id = interaction.guild.id
             DatabaseRemoveDatas._remove_level_system_stats(guild_id=guild_id)
 
-            emb = discord.Embed(title=f"You have reset all the stats of the level system {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.arrow_emoji} All user files have been deleted every user is now level 0 again and has 0 XP.
-                New entries will be created again when there is activity, if you do not want this, turn off the level system. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(description=f"""## You have reset all the stats of the level system
+                {Emojis.dot_emoji} All user files have been deleted every user is now level 0 again and has 0 XP
+                {Emojis.help_emoji} New entries will be created again when there is an activity""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
 
@@ -229,9 +211,9 @@ class ResetLevelStatsButton(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
         
-            emb = discord.Embed(title=f"The operation was successfully canceled {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Resetting the stats was successfully aborted.
-                {Emojis.dot_emoji} All users keep their stats in the level system.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The operation was successfully canceled
+                {Emojis.dot_emoji} Resetting the stats was successfully aborted
+                {Emojis.dot_emoji} All users keep their stats in the level system""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
                     
         else:
@@ -255,9 +237,9 @@ class ResetBlacklistLevelButton(discord.ui.View):
 
             DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="reset")
 
-            emb = discord.Embed(title=f"The blacklist has been reset {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.arrow_emoji} All channels, users, roles and categories have been removed from the blacklist.
-                {Emojis.dot_emoji} If you want to blacklist things again you can use the commands as before {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The blacklist has been reset
+                {Emojis.dot_emoji} All channels, users, roles and categories have been removed from the blacklist
+                {Emojis.help_emoji} If you want to blacklist things again you can use the commands as before""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -270,35 +252,11 @@ class ResetBlacklistLevelButton(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(title=f"The operation was successfully canceled {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} Resetting the blacklist was successfully aborted.
-                {Emojis.dot_emoji} All channels, roles, categories and users are still listed on the blacklist.
-                {Emojis.dot_emoji} If you want to remove single elements from the blacklist you can remove them with the Remove commands {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(description=f"""Resetting the level system blacklist has been canceled 
+                {Emojis.dot_emoji} Resetting the blacklist was successfully aborted
+                {Emojis.dot_emoji} All channels, roles, categories and users are still listed on the blacklist
+                {Emojis.help_emoji} If you want to remove single elements from the blacklist you can remove them with the `/remove-level-blacklist` command""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb)
-
-            
-class ShowBlacklistLevelSystemButton(discord.ui.Button):
-    def __init__(self):
-        super().__init__(label="Show all items on the blacklist", style=discord.ButtonStyle.blurple, custom_id="show_blacklist_button_level")
-    async def callback(self, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            guild_id = interaction.guild.id
-            blacklist = CheckLevelSystem.show_blacklist_level(guild_id=guild_id) 
-
-            emb = discord.Embed(title=f"Here you can see all the elements that are on the blacklist of the level system {Emojis.exclamation_mark_emoji}", 
-                description=f"""Here are listed all the elements that are on the level system blacklist.""", color=bot_colour)
-            emb.add_field(name="Channels:", value=f"{blacklist[0]}", inline=False)
-            emb.add_field(name="Categories:", value=f"{blacklist[1]}", inline=False)
-            emb.add_field(name="Roles", value=f"{blacklist[2]}", inline=False)
-            emb.add_field(name="Users", value=f"{blacklist[3]}", inline=False)
-            emb.set_footer(icon_url=bot.user.avatar ,text="This message is only visible to you")
-            await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
         else:
 
@@ -444,7 +402,6 @@ class LevelSystem(commands.Cog):
                             try:
 
                                 DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp, whole_xp=whole_xp)                       
-                                print("Data were changed")
 
                             except mysql.connector.Error as error:
                                 print("parameterized query failed {}".format(error))
@@ -510,9 +467,9 @@ class LevelSystem(commands.Cog):
 
                     DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp, whole_xp=new_whole_xp)
                         
-                    emb = discord.Embed(title=f"You have successfully given {user.name} {xp} XP {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} You have transferred **{user.name}** {xp} XP **{user.name}** has from now on **{new_xp}** XP.
-                        {Emojis.dot_emoji} If you want to remove **{user.name}** XP again use the:\n{remove_xp} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## You have successfully given {user.mention} {xp} XP
+                    {Emojis.dot_emoji} You have given **{user.mention}** {xp} XP, **{user.mention}** has from now on **{new_xp}** XP
+                    {Emojis.help_emoji} If you want to remove {user.mention} XP you can use the `/remove-xp` command or use the `/give-level` command to enter level""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                     if xp >= xp_need_next_level:
@@ -532,19 +489,16 @@ class LevelSystem(commands.Cog):
                             await levelup_channel.send(level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
                 else:
         
-                    emb = discord.Embed(title=f"{Emojis.help_emoji} The XP you want to give {user.name} is too high", 
-                        description=f"""{Emojis.dot_emoji} The XP you want to pass to **{user.name}** is too high.
-                        {Emojis.dot_emoji} You can only give **{user.name}** a maximum of **{xp_need_next_level}** XP.""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## The XP you want to give is too high
+                        {Emojis.dot_emoji} The XP you want to pass to **{user.mention}** is too high
+                        {Emojis.dot_emoji} You can only give **{user.mention}** a maximum of **{xp_need_next_level}** XP, as it then reaches a new level""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
             else:
 
                 DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                 
-                emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
-                    description=f"""{Emojis.dot_emoji} No entry was found for **{user.name}**, so one was created.
-                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp.""", color=bot_colour)
-                await ctx.respond(embed=emb)
+                await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name)) 
 
 
     @commands.slash_command(name = "remove-xp", description = "Remove a chosen amount of Xp from a user!")
@@ -566,28 +520,25 @@ class LevelSystem(commands.Cog):
 
                 if xp > user_xp:
                             
-                    emb = discord.Embed(title=f"{Emojis.help_emoji} The XP you want to remove from {user.name} is too high", 
-                        description=f"""{Emojis.dot_emoji} The XP you want to remove from **{user.name}** is too high.
-                        {Emojis.dot_emoji} You can remove **{user.name}** only maximum **{user_xp}** XP.""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## The XP you want to remove from is too high
+                        {Emojis.dot_emoji} The XP you want to remove from **{user.mention}** is too high
+                        {Emojis.dot_emoji} You can only remove a maximum of **{user_xp}** XP from **{user.mention}**""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                 else:
 
                     DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp)
 
-                    emb = discord.Embed(title=f"You have successfully removed {user.name} {xp} XP {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} You have removed **{user.name}** {xp} XP **{user.name}** has **{new_xp}** XP from now on.
-                        {Emojis.dot_emoji} If you want to give **{user.name}** XP again use the:\n{give_xp} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## You have successfully removed the XP
+                        {Emojis.dot_emoji} You have removed **{user.mention}** {xp} XP **{user.mention}** has **{new_xp}** XP from now on
+                        {Emojis.dot_emoji} If you want to give **{user.mention}** XP again use the /give-xp command""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
             else:
                     
                 DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                     
-                emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
-                    description=f"""{Emojis.dot_emoji} No entry was found for **{user.name}**, so one was created.
-                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp.""", color=bot_colour)
-                await ctx.respond(embed=emb)  
+                await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name))  
 
 
     @commands.slash_command(name = "give-level", description = "Give a user a selected amount of levels!")
@@ -609,28 +560,25 @@ class LevelSystem(commands.Cog):
                             
                 if level > 999 or new_level >= 999:
 
-                    emb = discord.Embed(title=f"{Emojis.help_emoji} The level you want to give {user.name} is too high", 
-                        description=f"""{Emojis.dot_emoji} The level you want to give **{user.name}** is too high because the maximum level is **999**.
-                        {Emojis.dot_emoji} You can only give **{user.name}** a maximum {levels_to_maxlevel} level.""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## The level you want to give is too high
+                        {Emojis.dot_emoji} The level you want to give **{user.mention}** is too high because the maximum level is **999**
+                        {Emojis.dot_emoji} You can only give **{user.mention}** a maximum of {levels_to_maxlevel} levels""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                 else:
 
                     DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level)
 
-                    emb = discord.Embed(title=f"You have successfully added {user.name} {level} level {Emojis.succesfully_emoji}",
-                        description=f"""{Emojis.dot_emoji} You gave **{user.name}** {level} level **{user.name}** now has **{new_level}** level.
-                        {Emojis.dot_emoji} If you want to remove **{user.name}** level again use the:\n{remove_level} command {Emojis.exclamation_mark_emoji}""", colour=bot_colour)
+                    emb = discord.Embed(description=f"""## You have successfully added the levels
+                        {Emojis.dot_emoji} You gave **{user.mention}** {level} levels, from now on **{user.mention}** has **{new_level}** level
+                        {Emojis.dot_emoji} If you want to remove **{user.mention}** levels again use the /remove-level command""", colour=bot_colour)
                     await ctx.respond(embed=emb)
 
             else:
 
                 DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
 
-                emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
-                    description=f"""{Emojis.dot_emoji} No entry was found for **{user.name}**, so one was created.
-                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp.""", color=bot_colour)
-                await ctx.respond(embed=emb)
+                await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name)) 
                 
 
     @commands.slash_command(name = "remove-level", description = "Remove a quantity of levels chosen by you!")
@@ -651,9 +599,9 @@ class LevelSystem(commands.Cog):
 
                 if level > check_stats[2] :
 
-                    emb = discord.Embed(title=f"{Emojis.help_emoji} The number of levels you want to remove from {user.name} is too high", 
-                        description=f"""{Emojis.dot_emoji} The number of levels you want to remove from {user.name} is too high.
-                        {Emojis.dot_emoji} You can remove **{user.name}** only up to **{check_stats[2] }** level.""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## The number of levels you want to remove is too high
+                        {Emojis.dot_emoji} The number of levels you want to remove from {user.mention} is too high
+                        {Emojis.dot_emoji} You can remove from **{user.mention}** only up to **{check_stats[2] }** levels""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                 
@@ -661,19 +609,16 @@ class LevelSystem(commands.Cog):
 
                     DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id,  level=new_level)
 
-                    emb = discord.Embed(title=f"You have successfully removed {user.name} {level} level {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} You have removed **{user.name}** {level} level **{user.name}** is now level **{new_level}**
-                        {Emojis.dot_emoji} If you want to give **{user.name}** level again use the:\n{give_level} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## You have successfully removed the levels
+                        {Emojis.dot_emoji} You have removed **{user.mention}** {level} levels, **{user.mention}** is now level **{new_level}**
+                        {Emojis.dot_emoji} If you want to give **{user.mention}** levels again use the /give-level command""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
             else:
 
                 DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                 
-                emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
-                    description=f"""{Emojis.dot_emoji} No entry was found for **{user.name}**, so one was created.
-                    {Emojis.dot_emoji} **{user.name}** now starts at level 0 with 0 xp""", color=bot_colour)
-                await ctx.respond(embed=emb)    
+                await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name))  
     
 
     @commands.slash_command(name = "reset-level-system-stats", description = "Reset all levels and xp of everyone!")
@@ -684,17 +629,17 @@ class LevelSystem(commands.Cog):
 
         if check_stats:
 
-            emb = discord.Embed(title="Are you sure you want to reset the level system?", 
-                description=f"""{Emojis.help_emoji} With the buttuns you can confirm your decision!
-                {Emojis.dot_emoji} If you press the **Yes button** all user stats will be deleted.
-                {Emojis.dot_emoji} If you press the **No button** the process will be aborted.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## Are you sure you want to reset the level system?
+                {Emojis.dot_emoji} With the buttons you can confirm your decision
+                {Emojis.dot_emoji} If you press the **Yes button** all user stats will be deleted
+                {Emojis.dot_emoji} If you press the **No button** the process will be aborted""", color=bot_colour)
             await ctx.respond(embed=emb, view=ResetLevelStatsButton())
 
         else:
             
-            emb = discord.Embed(title=f"{Emojis.help_emoji} No data found for this server", 
-                description=f"""{Emojis.dot_emoji} No data was found for this server, so nothing could be deleted.
-                {Emojis.dot_emoji} Data is created automatically as soon as messages are sent and the level system is switched on.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## No data found for this server
+                {Emojis.dot_emoji} No data was found for this server, so nothing could be deleted
+                {Emojis.dot_emoji} Data is created automatically as soon as messages are sent and the level system is switched on""", color=bot_colour)
             await ctx.respond(embed=emb)
 
     
@@ -708,15 +653,16 @@ class LevelSystem(commands.Cog):
 
             DatabaseRemoveDatas._remove_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
-            emb = discord.Embed(title=f"The user data of {user.name} has been reset {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} {user.mention} is now level 0 again with 0 XP.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The user data has been reset
+                {Emojis.dot_emoji} The user stats of {user.mention} have been reset
+                {Emojis.dot_emoji} {user.mention} is now level 0 again with 0 XP""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This user has not yet collected XP", 
-                description=f"""{Emojis.dot_emoji} This user has not yet collected XP, so his data cannot be reset.""", color=bot_colour)
-            await ctx.respond(embed=emb)
+            emb = discord.Embed(description=f"""## No entry was found
+                {Emojis.dot_emoji} No entry was found for {user.mention}
+                {Emojis.dot_emoji} Therefore the stats could not be reset""", color=bot_colour)
 
 
     @commands.slash_command(name = "rank", description = "Shows you the rank of a user in the level system!")
@@ -869,7 +815,14 @@ class LevelSystem(commands.Cog):
 #################################################  Level Blacklist settings  ###############################################
 
 
-    async def config_level_blacklist(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
+    async def config_level_blacklist(
+            self, 
+            guild_id:int, 
+            operation:str, 
+            channel = None, 
+            category = None, 
+            role = None, 
+            user = None):
 
         if [x for x in [channel, category, role, user] if x]:
             
@@ -964,8 +917,8 @@ class LevelSystem(commands.Cog):
         
         if channel != None and any(channel.category.id == x[2] for x in check_blacklist):
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} The channel is already indirectly on the blacklist", 
-                description=f"""{Emojis.dot_emoji} The channel {channel.mention} that you want to blacklist is already on the blacklist because it is listed under the category {channel.category.mention} and is therefore automatically excluded.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The channel is already indirectly on the blacklist
+                {Emojis.dot_emoji} The channel {channel.mention} that you want to blacklist is already on the blacklist because it is listed under the category {channel.category.mention} and is therefore automatically excluded.""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         elif category != None and filtered_list != []:
@@ -973,16 +926,17 @@ class LevelSystem(commands.Cog):
             channel_list = "\n".join(filtered_list)
             DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id)
                     
-            emb = discord.Embed(title=f"{Emojis.help_emoji} {'One channel' if len(filtered_list) == 1 else 'Several channels'} in this category is already blacklisted", 
-                description=f"""{Emojis.dot_emoji} The following {'channel is' if len(filtered_list) == 1 else 'channels are'} already blacklisted \n\n{channel_list}
-                    {Emojis.arrow_emoji} Therefore {'this' if len(filtered_list) == 1 else 'these'} channel will be removed from the blacklist and the category will be added instead.
-                   This excludes all channels in the category from the level system.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## {Emojis.help_emoji} {'One channel' if len(filtered_list) == 1 else 'Several channels'} in this category {'is' if len(filtered_list) == 1 else 'are'} already blacklisted
+                    {Emojis.dot_emoji} The following {'channel is' if len(filtered_list) == 1 else 'channels are'} already blacklisted \n\n{channel_list}
+                    {Emojis.arrow_emoji} Therefore {'this' if len(filtered_list) == 1 else 'these'} channel will be removed from the blacklist and the category will be added instead
+                   This excludes all channels in the category from the level system""", color=bot_colour)
             await ctx.respond(embed=emb) 
 
         elif user != None and user.bot:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} You cannot put a bot on the blacklist", 
-                description=f"{Emojis.dot_emoji} All bots are automatically excluded from the level system.", color=bot_colour)
+            emb = discord.Embed(description=f"""## You cannot put a bot on the blacklist
+                {Emojis.dot_emoji} All bots are automatically excluded from the level system
+                {Emojis.dot_emoji} Bots also do not receive XP and cannot level up""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -995,8 +949,8 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_level_blacklist(self, ctx:discord.ApplicationContext, 
         channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the blacklist!"),
-        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the blacklist "),
-        role:Option(discord.Role, required = False, description="Select a role you want to remove from the blacklist "),
+        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the blacklist"),
+        role:Option(discord.Role, required = False, description="Select a role you want to remove from the blacklist"),
         user:Option(discord.User, required = False, description="Select a user that you want to remove from the blacklist!")):
 
         emb = await self.config_level_blacklist(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
@@ -1023,19 +977,18 @@ class LevelSystem(commands.Cog):
         if blacklist:
 
             view = ResetBlacklistLevelButton()
-            view.add_item(ShowBlacklistLevelSystemButton())
 
-            emb = discord.Embed(title="Are you sure you want to remove everything from the blacklist?", 
-                description=f"""{Emojis.help_emoji} With the buttons you can confirm your decisions!
-                {Emojis.dot_emoji} If you press the **Yes button** all channels, categories, users and roles will be removed from the blacklist.
-                {Emojis.dot_emoji} If you press the **No button** the process will be aborted.
-                {Emojis.dot_emoji} The **Shows all elements button** shows you what is currently on the blacklist.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## Are you sure you want to remove everything from the blacklist?
+                {Emojis.help_emoji} With the buttons you can confirm your decisions!
+                {Emojis.dot_emoji} If you press the **Yes button** all channels, categories, users and roles will be removed from the blacklist
+                {Emojis.dot_emoji} If you press the **No button** the process will be aborted""", color=bot_colour)
             await ctx.respond(embed=emb, view=view)
         
         else:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} There is nothing on the blacklist", 
-                description=f"""{Emojis.dot_emoji} The blacklist could not be reset because nothing is stored on it.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## {Emojis.help_emoji} There is nothing on the blacklist
+                {Emojis.dot_emoji} No entries have been created yet
+                {Emojis.dot_emoji} Therefore nothing can be deleted from the blacklist""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1050,15 +1003,19 @@ class LevelSystem(commands.Cog):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status="check")
 
-        emb_level_0 = discord.Embed(title=f"{Emojis.help_emoji} The level you want to set is 0", 
-            description=f"""{Emojis.dot_emoji} The level to vest a level role must be at least **1**.""", color=bot_colour)
-        emb_higher = discord.Embed(title=f"{Emojis.help_emoji} The level you want to set for the level role is too high", 
-            description=f"""{Emojis.dot_emoji} The level you want to set for the level role is too high you can only set a value that is below or equal to **999**.""", color=bot_colour)
+        emb_level_0 = discord.Embed(description=f"""## The level you want to set is 0
+            {Emojis.dot_emoji} The level to vest a level role must be at least level **1**
+            {Emojis.help_emoji} You can simply run the command again to assign this role to a different level""", color=bot_colour)
+        
+        emb_higher = discord.Embed(description=f"""## The level you want to set is too high
+            {Emojis.dot_emoji} The level you want to set for the level role is too high
+            {Emojis.dot_emoji} You can only set a value that is below or equal to **999**""", color=bot_colour)
         
         if role.permissions.administrator or role.permissions.moderate_members:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This role cannot be assigned as a level role", 
-                description=f"""{Emojis.dot_emoji} This role has administration rights and therefore cannot be assigned as a level role. {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(description=f"""## This role cannot be assigned as a level role
+                {Emojis.dot_emoji} This role has administration or moderation rights and therefore cannot be assigned as a level role
+                {Emojis.dot_emoji} In order to protect your server, you should not carelessly assign roles with important authorizations""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1069,9 +1026,9 @@ class LevelSystem(commands.Cog):
                             
                     DatabaseUpdates._insert_level_roles(guild_id=ctx.guild.id, role_id=role.id, level=level, guild_name=ctx.guild.name)
 
-                    emb = discord.Embed(title=f"The role was assigned successfully {Emojis.succesfully_emoji}", 
-                        description=f"""{Emojis.dot_emoji} The role {role.mention} was successfully assigned to the level {level}.
-                        {Emojis.dot_emoji} As soon as a user reaches {level} he gets the {role.mention} role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    emb = discord.Embed(description=f"""## The role was assigned successfully as a level role
+                        {Emojis.dot_emoji} The role {role.mention} was successfully assigned to the level {level}
+                        {Emojis.dot_emoji} As soon as a user reaches level {level} he gets the {role.mention} role""", color=bot_colour)
                     await ctx.respond(embed=emb)
 
                 await ctx.respond(embed=emb_level_0) if level == 0 else None
@@ -1084,32 +1041,20 @@ class LevelSystem(commands.Cog):
                     
                 if check_same:
 
-                    same_emb = discord.Embed(title=f"{Emojis.help_emoji} This role has already been set at this level",
-                        description=f"""{Emojis.dot_emoji} The role {role.mention} is already assigned to the level {level}.
-                        {Emojis.dot_emoji} If you want to change it you can assign this role to another level or another role to this level {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+                    same_emb = discord.Embed(description=f"""## This role has already been set at this level
+                        {Emojis.dot_emoji} The role {role.mention} is already assigned to the level {level}
+                        {Emojis.dot_emoji} If you want to change it you can assign this role to another level or another role to this level""", color=bot_colour)
                     await ctx.respond(embed=same_emb)
 
                 else:
                     
-                    if role.id == level_roles[1]:
-
-                        level_needed = level_roles[2]
+                    if role.id == level_roles[1] or level == level_roles[2]:
             
-                        emb = discord.Embed(title=f"{Emojis.help_emoji} This role is already assigned", 
-                            description=f"""{Emojis.dot_emoji} Do you want to override the required level for this role? 
-                            {Emojis.dot_emoji} The role {role.mention} is currently assigned at level **{level_needed}**.
-                            {Emojis.dot_emoji} If you want to override the required level for this role select the yes buttons otherwise the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                        await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status="role"))
-        
-                    elif level == level_roles[2]:
-                        
-                        level_role = level_roles[1]
-
-                        emb = discord.Embed(title=f"{Emojis.help_emoji} This level is already assigned", 
-                            description=f"""{Emojis.dot_emoji} Do you want to overwrite the role for this level?
-                            {Emojis.dot_emoji} For the level {level} the role <@&{level_role}> is currently assigned.
-                            {Emojis.dot_emoji} If you want to override the role for this level select the yes buttons otherwise select the no button {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                        await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status="level"))   
+                        emb = discord.Embed(description=f"""## This {'role' if role.id == level_roles[1] else 'level'} is already assigned
+                            {Emojis.dot_emoji} Do you want to override {'the required level for this role?' if role.id == level_roles[1] else 'the role for this level?'} 
+                            {Emojis.dot_emoji} {f'The role {role.mention} is currently assigned at level **{level_roles[2]}**' if role.id == level_roles[1] else f'For the level {level} the role <@&{level_roles[1]}> is currently assigned'}
+                            {Emojis.dot_emoji} If you want to override the {'required level for this role' if role.id == level_roles[1] else 'role for this level'} select the yes buttons otherwise the no button""", color=bot_colour)
+                        await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status='role' if role.id == level_roles[1] else 'level'))
 
 
     @commands.slash_command(name = "remove-level-role", description = "Choose a role that you want to remove as a level role!")
@@ -1122,28 +1067,39 @@ class LevelSystem(commands.Cog):
             
             DatabaseRemoveDatas._remove_level_system_level_roles(guild_id=ctx.guild.id, role_id=role.id)
 
-            emb = discord.Embed(f"This role has been removed as a level role {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} The role <@&{role.id}> was successfully removed as a level role.
-                {Emojis.dot_emoji} If you want to add them again you can do this with the {add_level_role} command {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            emb = discord.Embed(description=f"""## This role has been removed as a level role
+                {Emojis.dot_emoji} The role <@&{role.id}> was successfully removed as a level role
+                {Emojis.dot_emoji} If you want to add them again you can do this with the /add-level-role command""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
 
-            if level_roles:
-                
-                result_strings = [f"{Emojis.dot_emoji} <@&{i[1]}> you get from level: {i[2]}" for i in level_roles]
-                result = '\n'.join(result_strings)
-
-            else:
-
-                result = f"{Emojis.dot_emoji} No level roles have been assigned!"
-
-            emb = discord.Embed(title=f"{Emojis.help_emoji} This role is not defined as a level role", 
-                description=f"""{Emojis.dot_emoji} This role cannot be removed because it is not set as a level role.
-                {Emojis.dot_emoji} Here you can see all the level rolls.\n\n{result}""", color=bot_colour)
+            emb = discord.Embed(description=f"""## This role is not defined as a level role
+                {Emojis.dot_emoji} This role cannot be removed because it is not set as a level role
+                {Emojis.dot_emoji} Here you can see all the level roles\n\n{level_roles}""", color=bot_colour)
             await ctx.respond(embed=emb)
+
+
+    @commands.slash_command(name = "reset-level-roles", description = "Setze alle level roles zurück!")
+    @commands.has_permissions(administrator = True)
+    async def reset_level_roles(self, ctx:discord.ApplicationContext):
+
+        check_level_roles = DatabaseCheck.check_level_system_levelroles(guild_id = ctx.guild.id)
+
+        if check_level_roles:
+
+            emb = discord.Embed(description=f"""## All level roles have been successfully reset
+                {Emojis.dot_emoji} All level roles have been removed so no more level roles will be assigned
+                {Emojis.dot_emoji} If you want to add some again use the /add-level-role command""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        else:
+
+            emb = discord.Embed(description=f"""## Level roles could not be reset
+                {Emojis.dot_emoji} No entries were found
+                {Emojis.dot_emoji} Therefore the level roles could not be reset""", color=bot_colour)
 
 
     @commands.slash_command(name = "show-level-roles", description = "View all rolls that are available with a level!")
@@ -1186,7 +1142,15 @@ class LevelSystem(commands.Cog):
         return bonus_percentage
     
     
-    async def config_bonus_xp_list(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None, bonus = None):
+    async def config_bonus_xp_list(
+        self, 
+        guild_id:int, 
+        operation:str, 
+        channel = None, 
+        category = None, 
+        role = None, 
+        user = None, 
+        bonus = None):
 
         if [x for x in [channel, category, role, user] if x]:
             
@@ -1215,8 +1179,8 @@ class LevelSystem(commands.Cog):
             
                 if operation == "add":
                     
-                    formatted_items = "\n".join(item) if item != [] else "\n> Keines dieser Items ist auf der Bonus XP list"
-                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> Keines dieser Items kann von der Bonus XP list entfernt werden da sie dort nicht gelistet sind"
+                    formatted_items = "\n".join(item) if item != [] else "\n> None of these items are on the Bonus XP list"
+                    formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of these items can be removed from the Bonus XP list as they are not listed there"
                     
                     DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3], bonus = bonus)    
                     server_bonus = DatabaseCheck.check_level_settings(guild_id=guild_id)[5]
@@ -1260,16 +1224,17 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "add-bonus-xp-list", description = "Choose what you want to reward with more XP!")
     @commands.has_permissions(administrator = True)
     async def add_bonus_xp_list(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Choose a channel in which messages should be rewarded with more XP!"),
-        category:Option(discord.CategoryChannel, required = False, description="Choose a category in which messages should be rewarded with more XP!"),
-        role:Option(discord.Role, required = False, description="Choose a role where the one who owns it gets more XP when writing messages!"),
-        user:Option(discord.User, required = False, description="Select a user who should receive more XP per message!"),
-        bonus:Option(int, required = False, description="Choose how much more xp to give in percent (if nothing is specified the default value is used!)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Choose a channel in which messages should be rewarded with more XP"),
+        category:Option(discord.CategoryChannel, required = False, description="Choose a category in which messages should be rewarded with more XP"),
+        role:Option(discord.Role, required = False, description="Choose a role where the one who owns it gets more XP when writing messages"),
+        user:Option(discord.User, required = False, description="Select a user who should receive more XP per message"),
+        bonus:Option(int, required = False, description="Choose how much more xp to give in percent (if nothing is specified the default value is used)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
 
         if user.bot:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} You cannot put a bot on the bonus XP list", 
-                description=f"{Emojis.dot_emoji} Bots don't get XP so you can't put them on the bonus XP list", color=bot_colour)
+            emb = discord.Embed(description=f"""## You cannot put a bot on the bonus XP list
+                {Emojis.dot_emoji} Bots are excluded from the level system from the start
+                {Emojis.dot_emoji} Thus they do not receive XP and cannot be set to this level""", color=bot_colour)
             await ctx.respond(embed=emb)
         
         else:
@@ -1278,13 +1243,13 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "remove-bonus-xp-list", description = "Wähle was du von der bonus XP list entgernen möchtest!")
+    @commands.slash_command(name = "remove-bonus-xp-list", description = "Choose what you want to remove from the bonus XP list!")
     @commands.has_permissions(administrator = True)
     async def remove_bonus_xp_list(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the bonus XP list!"),
-        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the bonus XP list!"),
-        role:Option(discord.Role, required = False, description="Select a role you want to remove from the bonus XP list!"),
-        user:Option(discord.User, required = False, description="Select a user that you want to remove from the bonus XP list!")):
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the bonus XP list"),
+        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the bonus XP list"),
+        role:Option(discord.Role, required = False, description="Select a role you want to remove from the bonus XP list"),
+        user:Option(discord.User, required = False, description="Select a user that you want to remove from the bonus XP list")):
 
         emb = await self.config_bonus_xp_list(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
         await ctx.respond(embed=emb)
@@ -1309,7 +1274,7 @@ class LevelSystem(commands.Cog):
             all_bonus_xp_items = f"{Emojis.dot_emoji} No channel, category, role or user has been given an XP bonus!"
 
         emb = discord.Embed(title=f"{Emojis.help_emoji} Here you can see everything that is on the bonus XP list", 
-            description=f"""{Emojis.dot_emoji} Here you can see all channels, categories, roles and users that get bonus XP and their XP bonus!\n\n{all_bonus_xp_items}""", color=bot_colour)
+            description=f"""{Emojis.dot_emoji} Here you can see all channels, categories, roles and users that get bonus XP and their XP bonus:\n\n{all_bonus_xp_items}""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 
@@ -1322,15 +1287,17 @@ class LevelSystem(commands.Cog):
         if check_list:
 
             DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove")
-            emb = discord.Embed(title=f"The bonus xp list was reset {Emojis.succesfully_emoji}", 
-                description=f"""{Emojis.dot_emoji} All channels, users, roles and categories have been deleted from the xp bonus list.
-                {Emojis.dot_emoji} So every activity will be rewarded with {self.xp_generator(guild_id=ctx.guild.id, message=None)} XP.""", color=bot_colour)
+
+            emb = discord.Embed(description=f"""## The bonus xp list was reset
+                {Emojis.dot_emoji} All channels, users, roles and categories have been deleted from the xp bonus list
+                {Emojis.dot_emoji} So every activity will be rewarded with {self.xp_generator(guild_id=ctx.guild.id, message=None)} XP""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
-            emb = discord.Embed(title=f"{Emojis.help_emoji} The bonus XP list cannot be reset", 
-                description=f"""{Emojis.dot_emoji} The bonus XP list cannot be reset because it does not contain any entries.""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The bonus XP list cannot be reset
+                {Emojis.dot_emoji} No entries were found
+                {Emojis.dot_emoji} Therefore the list cannot be reset either""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -1352,12 +1319,12 @@ class LevelSystemSetting(discord.ui.View):
         options = [
             discord.SelectOption(
                 label="Level up channel",
-                description="Set a level up channel!",
+                description="Set a level up channel",
                 value="level_up_channel"
             ),
             discord.SelectOption(
                 label="Level up message",
-                description="Set a level up message!",
+                description="Set a level up message",
                 value="level_up_message"
             ),
             discord.SelectOption(
@@ -1367,12 +1334,12 @@ class LevelSystemSetting(discord.ui.View):
             ),
             discord.SelectOption(
                 label="Set bonus xp percentage",
-                description="Set a default percentage for the bonus XP system (this is set to 10 % by default)!",
+                description="Set a default percentage for the bonus XP system (this is set to 10 % by default)",
                 value="set_bonus_xp_percentage"
             ),
             discord.SelectOption(
                 label="Set all level settings on default",
-                description="Resets all level system settings to default!",
+                description="Resets all level system settings to default",
                 value="set_level_system_default"
             )
         ]

@@ -38,7 +38,7 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 * Moderation System
     - ban, kick, mute, unmute, clear commands
     - server-info, user-info commands
-    - anti discord invite link system 
+    - anti link system (with whitelist function) 
 
 * Fun commands
     - RPS (Rock, Paper, Scissors) alone against a bot or against your friends
@@ -107,23 +107,12 @@ If you encounter problems use the discord server linked above or press [here](ht
 |reset-level-blacklist|Resets the entire blacklist.|
 |add-level-role|Adds a level role when you reach a certain level that you can freely choose, this is then awarded.|
 |remove-level-role|Removes a role as a level role.|
+|reset-level-role|Removes all level roles|
 |show-level-roles|Displays all level roles.|
-|set-level-up-channel|Defines a channel as the level up channel to which all level up messages are then sent.|
-|disable-level-up-channel|Resets the channel set as level up then the level up notifications are always set to the channel in which the last activity took place.|
-|show-level-up-channel|Shows the currently set level up channel.|
-|set-xp-rate|Sets a value for how much XP should be awarded per message.|
-|default-xp-rate|Sets the value of XP to be awarded per message back to default: 20 XP per message.|
-|show-xp-rate|Shows the current value of how much XP is awarded per message.|
 |add_bonus_xp_list|Reward activities in a category or channel with more XP you can also select roles and users the percentage rate for the bonus XP items can be chosen freely.|
 |remove_bonus_xp_list|Remove categories, channels, roles and users from the Bonus XP list.|
 |show-bonus-xp-list|Shows all channels, categories, roles and users that are rewarded with extra XP for activities.|
 |reset-bonus-xp-list|Resets the entire bonus XP list.|
-|set-bonus-xp-percentage|Defines a stadart bonus XP percentage how much more XP should be awarded as a percentage per activity (only applies to channels, categories, roles and users on the bonus XP list).|
-|default-bonus-xp-percentage|Resets the bonus XP percentage to default: 10% more XP per activity (this percentage only applies to the channels, categories, roles and users on the bonus XP list).|
-|show-bonus-xp-percentage|Shows you the bonus XP percentage.|
-|set-level-up-message|Defines an individual level up message for a server: 2 arguments are given (user and level).|
-|default-level-up-message|Resets the level up message to default.|
-|show-level-up-message|Shows the current level up message.|
 |rps|Play rock, paper, scissors against another user or a bot.|
 |cocktails|Send a recipe of a random cocktail.|
 |coinflip|Toss a coin where heads or tails can come out.|

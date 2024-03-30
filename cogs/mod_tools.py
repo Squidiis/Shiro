@@ -193,7 +193,7 @@ class ModeratorCommands(commands.Cog):
 
                         if user.bot:
 
-                            emb = discord.Embed(description=f"""{Emojis.help_emoji} You cannot put a bot on the white list
+                            emb = discord.Embed(description=f"""## {Emojis.help_emoji} You cannot put a bot on the white list
                                 {Emojis.dot_emoji} Bots are automatically excluded from the anti link system and can therefore always send links""", color=bot_colour)
                             return emb
                     
@@ -239,21 +239,31 @@ class ModeratorCommands(commands.Cog):
             return emb
 
 
-    @commands.slash_command(name = "manage-antilink-white-list", description = "Wähle ein Item das vom anti link system ausgeschlossen werden soll!")
-    @commands.has_permissions(ban_members = True, administrator = True)
-    async def manage_white_list_antilink(self, ctx:discord.ApplicationContext,
-        operation:Option(
-            description="Wähle aus ob du auf die anti link white list etwas hinzufügen oder entfernen willst!",
-            choices = ["add", "remove"]),
-        channel:Option(discord.TextChannel, description="Wähle einen channel der vom anti link system ausgelöschssen werden soll!") = None,
-        category:Option(discord.CategoryChannel, description="Wähle eine Kategorie die vom anti link system ausgeschlossen werden soll!") = None,
-        role:Option(discord.Role, description="Wähle eine Rolle die vom anti link system ausgeschlossen werden soll!") = None,
-        user:Option(discord.User, description="Wähle einen user der vom anti link system ausgeschlossen werden soll!") = None
+    @commands.slash_command(name = "add-antilink-white-list", description = "Exclude channels, roles, and categories from the Antilink system!")
+    @commands.has_permissions(administrator = True)
+    async def add_antilink_white_list(self, ctx:discord.ApplicationContext,
+        channel:Option(discord.TextChannel, description="Select a channel to be excluded from the antilink system") = None,
+        category:Option(discord.CategoryChannel, description="Select a category to be excluded from the anti link system") = None,
+        role:Option(discord.Role, description="Select a role to be excluded from the anti link system") = None,
+        user:Option(discord.User, description="Select a user to be excluded from the anti link system") = None
         ):
-        
-        emb = await self.config_antilink_white_list(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation=operation)
+
+        emb = await self.config_antilink_white_list(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation="add")
         await ctx.respond(embed=emb)
+
     
+    @commands.slash_command(name = "remove-antilink-white-list", description = "Select channels, categories, roles or users to be removed from the white list!")
+    @commands.has_permissions(administrator = True)
+    async def remove_antilink_white_list(self, ctx:discord.ApplicationContext,
+        channel:Option(discord.TextChannel, description="Select a channel to be removed from the antilink white list") = None,
+        category:Option(discord.CategoryChannel, description="Select a category to be removed from the antilink white list") = None,
+        role:Option(discord.Role, description="Select a role to be removed from the antilink whitelist") = None,
+        user:Option(discord.User, description="Select a user to be removed from the antilink white list") = None
+        ):
+
+        emb = await self.config_antilink_white_list(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation="remove")
+        await ctx.respond(embed=emb)
+        
 
     @commands.slash_command(name = "show-antilink-white-list")
     async def show_antilink_white_list(self, ctx:discord.ApplicationContext):

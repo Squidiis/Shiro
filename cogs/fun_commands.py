@@ -42,10 +42,10 @@ class RPSButtons(discord.ui.View):
         bot_choice = random.choice(["rock", "paper", "scissors"])
         choice_line = f"""{Emojis.dot_emoji} {f'Choice from {self.second_user.mention}: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Choice from {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
     
-        win_emb = discord.Embed(description=f"""{'## :tada: You have won!' if self.game_mode == 0 else f'## :tada: {self.first_user.name} has won against {self.second_user.name}'}
+        win_emb = discord.Embed(description=f"""{'## :tada: You have won!' if self.game_mode == 0 else f'## :tada: {self.first_user.name} has won'}
             {Emojis.dot_emoji} Choice from {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""",color=bot_colour)
 
-        lose_emb = discord.Embed(description=f"""{'## You have lost!' if self.game_mode == 0 else f'## :tada: {self.second_user.name} has won against {self.first_user.name}'}
+        lose_emb = discord.Embed(description=f"""{'## You have lost!' if self.game_mode == 0 else f'## :tada: {self.second_user.name} has won'}
             {Emojis.dot_emoji} Choice from {self.first_user.mention}: {self.user_choice["first_user_choice"]}\n{choice_line}""", color=bot_colour)
 
         tie_emb = discord.Embed(description=f"""## Tie!
