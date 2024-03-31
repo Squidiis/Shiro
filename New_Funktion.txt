@@ -1,16 +1,5 @@
 
 
-Help menü adden
+Help menü adden (select menü)
 
 leader bourd besser machen 
-emojis zu den files adden
-
-hinzufügen das die db gleich eine funktion zum erweitern hat kann code sparen ChatGPT
-
-Auch die anti link white list commands zur readme adden
-
-teste die level role add command vorallem mit überschreiben
-
-checken ob alle buttons und so im on_ready sind
-
-paar kommentare adden für die komplexen sachen

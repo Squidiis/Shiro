@@ -31,14 +31,15 @@ class DeleteData(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
 
-        tables = ["LevelSystemStats", 
-                  "LevelSystemBlacklist", 
-                  "LevelSystemRoles", 
-                  "LevelSystemSettings",
-                  "BonusXpList",  
-                  "BotSettings", 
-                  "AutoReactionSetup", 
-                  "AutoReactionSettings"]
+        tables = [
+            "LevelSystemStats", 
+            "LevelSystemBlacklist", 
+            "LevelSystemRoles", 
+            "LevelSystemSettings",
+            "BonusXpList",
+            "AntiLinkWhiteList",
+            "BotSettings"
+            ]
 
         for table in tables:
 
@@ -51,24 +52,29 @@ class DeleteData(commands.Cog):
 
         if not member.bot:
 
-            tables = ["LevelSystemBlacklist", 
-                      "LevelSystemStats",
-                      "BonusXpList"]
+            tables = [
+                "LevelSystemBlacklist", 
+                "LevelSystemStats",
+                "BonusXpList",
+                "AntiLinkWhiteList"
+                ]
             
             for table in tables:
 
                 DeleteData.delete_data(table=table, column='userId', item=member)   
 
 
-   # Deletes the tags of a channel when it is deleted
+    # Deletes the entries of a channel when it is deleted
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
 
-        tables = ["LevelSystemBlacklist", 
-                  "AutoReactionSetup", 
-                  "LevelSystemSettings", 
-                  "BonusXpList",
-                  "AutoReactionSetup"]
+        tables = [
+            "LevelSystemBlacklist", 
+            "AntiLinkWhiteList", 
+            "LevelSystemSettings", 
+            "BonusXpList",
+            "AntiLinkWhiteList"
+            ]
         
         for table in tables:
             
@@ -76,11 +82,13 @@ class DeleteData(commands.Cog):
             DeleteData.delete_data(table=table, column=column, item=channel)
 
 
+    # Deletes the entries of a role when it is deleted
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role):
 
         tables = ['LevelSystemBlacklist',
                   'BonusXpList',
+                  "AntiLinkWhiteList",
                   'LevelSystemRoles']
         
         for table in tables:

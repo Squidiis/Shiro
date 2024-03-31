@@ -73,6 +73,8 @@ To run the code on your bot customize the [`.env`](.env) file simply fill in all
 |user|Enter the user name of your MySQL database here this can be `root` if you run it locally or a custom name of your choice.|
 |discord_db|Here the name of the database schema.|
 
+In the [`ultils.py`](ultils.py) file add the emojis to the variables if you don't know here is a YouTube tutorial just click [here](https://www.youtube.com/watch?app=desktop&v=-w7XYr22UEw&t=182)
+
 # How to start?
 
 Once you have configured everything and adjusted the required variables in [`config.yaml`](config.yaml) and [`.env`](.env), all you have to do is install the required packages
@@ -109,8 +111,8 @@ If you encounter problems use the discord server linked above or press [here](ht
 |remove-level-role|Removes a role as a level role.|
 |reset-level-role|Removes all level roles|
 |show-level-roles|Displays all level roles.|
-|add_bonus_xp_list|Reward activities in a category or channel with more XP you can also select roles and users the percentage rate for the bonus XP items can be chosen freely.|
-|remove_bonus_xp_list|Remove categories, channels, roles and users from the Bonus XP list.|
+|add-bonus-xp-list|Reward activities in a category or channel with more XP you can also select roles and users the percentage rate for the bonus XP items can be chosen freely.|
+|remove-bonus-xp-list|Remove categories, channels, roles and users from the Bonus XP list.|
 |show-bonus-xp-list|Shows all channels, categories, roles and users that are rewarded with extra XP for activities.|
 |reset-bonus-xp-list|Resets the entire bonus XP list.|
 |rps|Play rock, paper, scissors against another user or a bot.|
@@ -127,7 +129,12 @@ If you encounter problems use the discord server linked above or press [here](ht
 |gif embarres|Send an anime gif (You can also mark a user).|
 |gif pet|Send an anime gif of a head pet (a user can also be tagged).|
 |animememe|Displays a random anime meme from Reddit.|
-|set-anti-link|Deletes all messages with a link you can choose what to delete (options: Everything, only invite links to other servers, everything except pictures and vidoes, nothing).|
+|set-antilink-system|Deletes all messages with a link you can choose what to delete (options: Everything, only invite links to other servers, everything except pictures and vidoes, nothing).|
+|show-antilink-settings|Shows you how the antilink system is set up|
+|add-antilink-whitelist|Excludes channels, categories, roles and users from the antilink system|
+|remove-antilink-whitelist|Deletes channels, categories, roles and users from the antilyk system white list|
+|show-antilink-whitelist|Shows what is already listed on the antilink white list|
+|reset-antilink-whitelist|Resets the antilink whitelist|
 |ban|Bans a user of your choice who can no longer enter the server.|
 |unban|Unban a user of your choice.|
 |kick|Kicks a user from the server.|

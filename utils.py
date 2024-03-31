@@ -49,7 +49,6 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
 
 
-
 # The red colour for the fail / error embeds
 error_red = discord.Colour.brand_red()
 
@@ -75,6 +74,7 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
 default_message = 'Oh nice {user} you have a new level, your newlevel is {level}' 
 
 
+# Embeds that are used multiple times within the bot
 class GetEmbed():
     '''
     :embed_idex:
@@ -86,8 +86,8 @@ class GetEmbed():
 
         if embed_index == 0:
 
-            emb = discord.Embed(description=f"""### {Emojis.help_emoji} Der bonus XP Prozentsatz den du festlegen willst ist bereist festgelegt
-                {Emojis.dot_emoji} Der Prozentsatz ist beits auf {settings} % festgelegt.""", color=bot_colour)
+            emb = discord.Embed(description=f"""### {Emojis.help_emoji} The bonus XP percentage you want to set is already set
+                {Emojis.dot_emoji} The percentage is already set to {settings} %.""", color=bot_colour)
 
 
         elif embed_index == 1:
@@ -98,7 +98,6 @@ class GetEmbed():
             
         return emb
     
-
 
 
 
@@ -115,88 +114,282 @@ class HelpMenu(commands.Cog):
             Page(embeds=[discord.Embed(title="Mod Commands", 
                 description="All mod commands are listed on this page", color=bot_colour)
                 .add_field(name="set-anti-link", 
-                    value="Set the anti-link system, you can choose if only dischrd invitation links should be deleted, if everything except pictures and videos should be deleted or if everything should be deleted", inline=False)
+                    value="Set the anti-link system", inline=True)
+                .add_field(name="/show-antilink-settings", 
+                    value="Zeigt wie das antilin system eingestellt ist", inline=True)
+                .add_field(name="/add-antilink-whitelist", 
+                    value="Fügt items auf die Whitelist hinzu", inline=True)
+                .add_field(name="/remove-antilink-whitelist", 
+                    value="Entfernt items von der whitelist", inline=True)
+                .add_field(name="/show-antilink-whitelist", 
+                    value="Zeigt was alles auf der white list ist", inline=True)
+                .add_field(name="/reset-antilink-whitelist", 
+                    value="Setzt die Whitelist zurück", inline=True)
                 .add_field(name="/ban", 
-                    value="Ban a user from your server who will not be able to join again", inline=False)
+                    value="Ban a user", inline=True)
                 .add_field(name="/unban", 
-                    value="Unban a user from your server who can then rejoin the server", inline=False)
+                    value="Hebe den Ban eines users auf", inline=True)
                 .add_field(name="/kick", 
-                    value="Kick a user from your server", inline=False)
+                    value="Kick a user", inline=True)
                 .add_field(name="/timeout", 
-                    value="Send a user to a timeout you decide how long he needs a timeout", inline=False)
+                    value="Geb einen user einen Timeout", inline=True)
                 .add_field(name="remove-timeout", 
-                    value="Cancel the timeout of a user who can then write messages normally again", inline=False)
+                    value="Hebe den Timeout eines users auf", inline=True)
                 .add_field(name="/clear", 
-                    value="Delete messages you can freely specify how many should be deleted", inline=False)
+                    value="Lösche nachrichten in einen channel", inline=True)
                 .add_field(name="/ghost-ping-settings", 
-                    value="Set the anti ghost ping system when someone tags another user and then deletes the message, a message is sent stating what the user wrote and who they tagged", inline=False)
+                    value="Stelle das ghost ping system ein", inline=True)
                 .add_field(name="/userinfo", 
-                    value="Display all important information about a user", inline=False)
+                    value="Display all important information about a user", inline=True)
                 .add_field(name="/serverinfo", 
-                    value="Show all important information about your server", inline=False)
+                    value="Show all important information about your server", inline=True)
                 ]),
 
             # Fun commands
             Page(embeds=[discord.Embed(title="Fun commands", 
                 description="All fun commands are listed here on this page", color=bot_colour)
                 .add_field(name="/rps", 
-                    value="Play rock, paper, scissors against the bot or another user", inline=False)
+                    value="Play rock, paper, scissors", inline=True)
                 .add_field(name="/coinflip", 
-                    value="Flip a coin either heads or tails", inline=False)
+                    value="Flip a coin", inline=True)
                 .add_field(name="/cocktails", 
-                    value="Get a random cocktail recipe", inline=False)
+                    value="Get a random cocktail recipe", inline=True)
                 .add_field(name="/animememe", 
-                    value="Show you a random anime meme from reddit", inline=False)
-                .add_field(name="Role play commands", 
-                    value="Here are all Role play commands", inline=False)
+                    value="Show you a random anime meme", inline=True)
                 .add_field(name="/anime gif (tag)",
-                    value="Tags: kiss, hug, lick, feed, idk, dance, slap, fbi, embarres, pet", inline=False)
+                    value="Tags: kiss, hug, lick, feed, idk, dance, slap, fbi, embarres, pet", inline=True)
                 ]),
 
             Page(embeds=[discord.Embed(title="Level System commands Teil 1",
                 description="""Hier sihst du alle level system commands""", color=bot_colour)
-                .add_field(name="/give-xp", value="", inline=False)
-                .add_field(name="/remove-xp", value="", inline=False)
-                .add_field(name="/give-level", value="", inline=False)
-                .add_field(name="/remove-level", value="", inline=False)
-                .add_field(name="/reset-level", value="", inline=False)
-                .add_field(name="/reset-user-stats", value="", inline=False)
-                .add_field(name="/rank", value="", inline=False)
-                .add_field(name="/leaderboard-level", value="", inline=False)
+                .add_field(name="/give-xp", 
+                    value="Gebe einen user XP", inline=True)
+                .add_field(name="/remove-xp", 
+                    value="Entferne XP von einen user", inline=True)
+                .add_field(name="/give-level", 
+                    value="Gebe einen user level", inline=True)
+                .add_field(name="/remove-level", 
+                    value="Entferne einen user level", inline=True)
+                .add_field(name="/reset-level", 
+                    value="Setze das level aller user zurück", inline=True)
+                .add_field(name="/reset-user-stats", 
+                    value="Setze das level eines users zurück", inline=True)
+                .add_field(name="/rank", 
+                    value="Zeigt welches level ein user ist", inline=True)
+                .add_field(name="/leaderboard-level", 
+                    value="Zeigt 10 user mit dem höchsten level", inline=True)
+                .add_field(name="/add-level-blacklist", 
+                    value="Füge etwas auf die level system blacklist hinzu", inline=True)
+                .add_field(name="/remove-level-blacklist", 
+                    value="Entferne etwas von der level system blacklist", inline=True)
+                .add_field(name="/show-level-blacklist", 
+                    value="Zeigt dir was alles auf der level system blacklist ist", inline=True)
+                .add_field(name="/reset-level-blacklist", 
+                    value="Setzt die level system blacklist zurück", inline=True)
                 ]),
             
             Page(embeds=[discord.Embed(title="Level System commands Teil 2", 
                 description="""Hier sind alle level system commands""", color=bot_colour)
-                .add_field(name="/level-system-settings", value="", inline=False)
-                .add_field(name="/reset-level-blacklist", value="", inline=False)
-                .add_field(name="/add-level-blacklist", value="", inline=False)
-                .add_field(name="/remove-level-blacklist", value="", inline=False)
-                .add_field(name="/show-level-blacklist", value="", inline=False)
-                .add_field(name="/add-level-role", value="", inline=False)
-                .add_field(name="/remove-level-role", value="", inline=False)
-                .add_field(name="/show-level-roles", value="", inline=False)
-                .add_field(name="/add-bonus-xp-list", value="", inline=False)
-                .add_field(name="/remove-bonus-xp-list", value="", inline=False)
-                .add_field(name="/show-bonus-xp-list", value="", inline=False)
-                .add_field(name="/reset-bonus-xp-list", value="", inline=False)
+                .add_field(name="/level-system-settings", 
+                    value="Stelle das level system ein", inline=True)
+                .add_field(name="/add-level-role", 
+                    value="Lege Rollen als level roles fest", inline=True)
+                .add_field(name="/remove-level-role", 
+                    value="Entferne rolle als level roles", inline=True)
+                .add_field(name="/show-level-roles", 
+                    value="Zeigt dir alle rollen die als level roles festgelegt sind", inline=True)
+                .add_field(name="/reset-level-roles", 
+                    value="Setze alle level roles zurück", inline=True)
+                .add_field(name="/add-bonus-xp-list", 
+                    value="Füge items auf die bonus XP list hinzu", inline=True)
+                .add_field(name="/remove-bonus-xp-list", 
+                    value="Entferne items von der bonus xp list", inline=True)
+                .add_field(name="/show-bonus-xp-list", 
+                    value="Zeigt dir alles was auf der bonus xp list ist", inline=True)
+                .add_field(name="/reset-bonus-xp-list", 
+                    value="Setzt die gesammte bonus xp list zurück", inline=True)
                 ])]
 
     def get_pages(self):
         return self.pages
     
     
-    @commands.slash_command(name = "help", description = "Do you need a little help!")
+    @commands.slash_command(name = "help", description = "Do you need a small overview!")
     async def help(self, ctx:discord.ApplicationContext):
-        
-        
-        paginator = Paginator(pages=self.get_pages())
+            
+        emb = discord.Embed(description=f"""# {Emojis.settings_emoji} Help menu
+            {Emojis.dot_emoji} Here you can see all the commands that {bot.user.name} has
+            ```Please use the Buttons below to explore the\ncorresponding commands```\n### Table of contents:
+            > {Emojis.dot_emoji} Mod commands
+            > {Emojis.dot_emoji} Fun commands
+            > {Emojis.dot_emoji} Level System commands part 1
+            > {Emojis.dot_emoji} Level System commands part 2
 
-        embed = discord.Embed(description="stuff3")
-        embed.add_field(name="meddl", value="meddl leute")
+            **Bot links:**
+            {Emojis.dot_emoji} Support server: https://discord.gg/9kJaPrWdwM
+            {Emojis.dot_emoji} Githup: https://github.com/Squidiis
+            """, color=bot_colour)
+        
+        file = discord.File('assets/images/shiro_help_banner.png', filename='shiro_help_banner.png')
+        emb.set_image(url=f"attachment://shiro_help_banner.png")
+        await ctx.respond(embed=emb, view=HelpMenüSelect(), file=file)
 
-        self.pages.append(embed)
-        await paginator.respond(ctx.interaction)
-     
+
+class HelpMenüSelect(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.select(
+        placeholder = "Choose from which system you want to see the help menu!",
+        max_values = 1,
+        min_values = 1,
+        options = [
+            discord.SelectOption(label="Mod commands", description="Shows you all commands that belong to the mod system", value="mod"),
+            discord.SelectOption(label="Fun commands", description="Shows you all commands that belong to the Fun system", value="fun"),
+            discord.SelectOption(label="Level commands part 1", description="Shows you all commands that belong to the level system part 1", value="level_one"),
+            discord.SelectOption(label="Level commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two")
+        ],
+        custom_id = "help_menu_select")
+    async def help_menue_select(self, select, interaction:discord.Interaction):
+
+        if select.values[0] == "mod":
+
+            emb = discord.Embed(description="## Mod commands", color=bot_colour)
+            emb.add_field(name="set-anti-link", 
+                value="Set the anti-link system", inline=True)
+            emb.add_field(name="/show-antilink-settings", 
+                value="Shows how the antilin system is set", inline=True)
+            emb.add_field(name="/add-antilink-whitelist", 
+                value="Adds items to the whitelist", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/remove-antilink-whitelist", 
+                value="Removes items from the whitelist", inline=True)
+            emb.add_field(name="/show-antilink-whitelist", 
+                value="Shows what is on the white list", inline=True)
+            emb.add_field(name="/reset-antilink-whitelist", 
+                value="Resets the whitelist", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/ban", 
+                value="Ban a user", inline=True)
+            emb.add_field(name="/unban", 
+                value="Cancel the ban of a user", inline=True)
+            emb.add_field(name="/kick", 
+                value="Kick a user", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/timeout", 
+                value="Give a user a timeout", inline=True)
+            emb.add_field(name="remove-timeout", 
+                value="Cancel the timeout of a user", inline=True)
+            emb.add_field(name="/clear", 
+                value="Delete messages in a channel", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/ghost-ping-settings", 
+                value="Set the ghost ping system", inline=True)
+            emb.add_field(name="/userinfo", 
+                value="Display all information about a user", inline=True)
+            emb.add_field(name="/serverinfo", 
+                value="Show all information about your server", inline=True)
+            await interaction.response.edit_message(embed=emb, attachments=[])
+            
+
+        if select.values[0] == "fun":
+
+            emb = discord.Embed(description=f"""## Fun commands""", color=bot_colour)
+            emb.add_field(name="/rps", 
+                value="Play rock, paper, scissors", inline=True)
+            emb.add_field(name="/coinflip", 
+                value="Flip a coin", inline=True)
+            emb.add_field(name="/cocktails", 
+                value="Get a random cocktail recipe", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/animememe", 
+                value="Show you a random anime meme", inline=True)
+            emb.add_field(name="/anime gif (tag)",
+                value="Tags: kiss, hug, lick, feed, idk, dance, slap, fbi, embarres, pet", inline=True)
+            await interaction.response.edit_message(embed=emb, attachments=[])
+
+
+        if select.values[0] == "level_one":
+
+            emb = discord.Embed(description=f"""## Level system commands from part 1""", color=bot_colour)
+            emb.add_field(name="/give-xp", 
+                value="Give a user XP", inline=True)
+            emb.add_field(name="/remove-xp", 
+                value="Remove XP from a user", inline=True)
+            emb.add_field(name="/give-level", 
+                value="Enter a user level", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/remove-level", 
+                value="Remove a user level", inline=True)
+            emb.add_field(name="/reset-level", 
+                value="Reset the level of all users", inline=True)
+            emb.add_field(name="/reset-user-stats", 
+                value="Reset the level of a user", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/rank", 
+                value="Shows which level a user is", inline=True)
+            emb.add_field(name="/leaderboard-level", 
+                value="Shows 10 users with the highest level", inline=True)
+            emb.add_field(name="/add-level-blacklist", 
+                value="Add something to the level blacklist", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/remove-level-blacklist", 
+                value="Remove something from the level blacklist", inline=True)
+            emb.add_field(name="/show-level-blacklist", 
+                value="Shows you the level blacklist", inline=True)
+            emb.add_field(name="/reset-level-blacklist", 
+                value="Resets the level blacklist", inline=True)
+            await interaction.response.edit_message(embed=emb, attachments=[])
+
+
+        if select.values[0] == "level_two":
+
+            emb = discord.Embed(description=f"""## Level system commands of part 2""", color=bot_colour)
+            emb.add_field(name="/level-system-settings", 
+                value="Set the level system", inline=True)
+            emb.add_field(name="/add-level-role", 
+                value="Define roles as level roles", inline=True)
+            emb.add_field(name="/remove-level-role", 
+                value="Remove role as level roles", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/show-level-roles", 
+                value="Shows you all level roles", inline=True)
+            emb.add_field(name="/reset-level-roles", 
+                value="Reset all level roles", inline=True)
+            emb.add_field(name="/add-bonus-xp-list", 
+                value="Add items to the bonus XP list", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/remove-bonus-xp-list", 
+                value="Remove items from the bonus xp list", inline=True)
+            emb.add_field(name="/show-bonus-xp-list", 
+                value="Shows you the bonus xp list", inline=True)
+            emb.add_field(name="/reset-bonus-xp-list", 
+                value="Resets the bonus xp list", inline=True)
+            await interaction.response.edit_message(embed=emb, attachments=[])
+
+
+    @discord.ui.button(label="<- Back", style=discord.ButtonStyle.gray, custom_id="back_button")
+    async def back_help_button(self, button, interaction:discord.Interaction):
+
+        emb = discord.Embed(description=f"""# {Emojis.settings_emoji} Help menu
+            {Emojis.dot_emoji} Here you can see all the commands that {bot.user.name} has
+            ```Please use the Buttons below to explore the\ncorresponding commands```\n### Table of contents:
+            > {Emojis.dot_emoji} Mod commands
+            > {Emojis.dot_emoji} Fun commands
+            > {Emojis.dot_emoji} Level System commands part 1
+            > {Emojis.dot_emoji} Level System commands part 2
+
+            **Bot links:**
+            {Emojis.dot_emoji} Support server: https://discord.gg/9kJaPrWdwM
+            {Emojis.dot_emoji} Githup: https://github.com/Squidiis
+            """, color=bot_colour)
+        
+        file = discord.File('assets/images/shiro_help_banner.png', filename='shiro_help_banner.png')
+        emb.set_image(url=f"attachment://shiro_help_banner.png")
+        await interaction.response.edit_message(embed=emb, view=HelpMenüSelect(), file=file)
+
+
 bot.add_cog(HelpMenu(bot))
 
 

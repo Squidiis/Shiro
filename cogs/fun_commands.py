@@ -19,6 +19,7 @@ from typing import List
 ##########################################  RPS Game  #############################################
 
 
+# Scissors on paper game can either be played against another user or against a bot
 class RPSButtons(discord.ui.View):
     
     def __init__(self, game_mode, second_user, first_user):
@@ -161,7 +162,8 @@ class Fun(commands.Cog):
         
         Tail = discord.File("assets/coin_flip/tail_coin.png", filename="tail_coin.png")
         Head = discord.File("assets/coin_flip/head_coin.png", filename="head_coin.png")
-        emb = discord.Embed(title="", description=f"**{ctx.author.mention} has flipped the coin!**", color=bot_colour)
+        emb = discord.Embed(title="", description=f"""## {ctx.author.mention} has flipped the coin!
+            Wait 5 seconds until the coin has landed""", color=bot_colour)
         emb.set_image(url = "https://cdn.dribbble.com/users/1102039/screenshots/6574749/multi-coin-flip.gif")
         coin = [Tail, Head]
         coinsite = ""
@@ -177,7 +179,7 @@ class Fun(commands.Cog):
         await asyncio.sleep(5)
         
         emb = discord.Embed(title=f"You flipped {coinsite}", description="", color=bot_colour)
-        emb.set_image(url=f"attachment://{random_flip}")
+        emb.set_image(url=f"attachment://{'tail_coin.png' if coinsite == 'Tale' else 'head_coin.png'}")
         await embed1.edit (embed=emb, file=random_flip)
 
 

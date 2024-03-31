@@ -17,6 +17,7 @@ class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # Creates all the necessary tables that the bot needs right at the beginning
     async def create_db_table():
 
         db_connect = DatabaseSetup.db_connector()
@@ -90,25 +91,6 @@ class Main(commands.Cog):
                 antiLink BIT(4) DEFAULT 3,
                 antiLinkTimeout INT DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-            ''',
-            # Auto reaction system table
-            '''
-            CREATE TABLE IF NOT EXISTS AutoReactionSetup (
-                guildId BIGINT UNSIGNED NOT NULL, 
-                channelId BIGINT UNSIGNED NOT NULL,
-                categoryId BIGINT UNSIGNED NOT NULL,
-                emojiOne VARCHAR(255) NULL,
-                emojiTwo VARCHAR(255) NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-            ''',
-            '''
-            CREATE TABLE IF NOT EXISTS AutoReactionSettings (
-                guildId BIGINT UNSIGNED NOT NULL,
-                teServerReaction INT NULL,
-                reactionParameter VARCHAR(255) NULL,
-                mainReactionEmoji VARCHAR(255) NOT NULL,
-                reactionKeyWords VARCHAR(4000) NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
         ]  
 
@@ -148,13 +130,17 @@ class Main(commands.Cog):
         self.bot.add_view(BonusXpPercentage())
         self.bot.add_view(SetXpRate())
         self.bot.add_view(LevelSystemDefault())
+        self.bot.add_view(ShowLevelSettingsSelect())
         view.add_item(LevelUpMessageButton())
         view.add_item(SetLevelUpChannelButton())
         view.add_item(LevelSystemOnOffSwitch())
         view.add_item(SetBonusXpPercentageButton())
         view.add_item(CancelSetLevelSystem())
+        view.add_item(SendXpBonusModal())
+        view.add_item(ShowLevelSettings())
 
-        
+        self.bot.add_view(HelpMenüSelect())
+
         # Mod tools
         self.bot.add_view(GhostPingButtons())
 
@@ -167,12 +153,12 @@ class Main(commands.Cog):
         await Main.create_db_table()
         
 
-
+# Status task while the bot is active, the status is permanently updated
 async def status_task():
     while True:
         await bot.change_presence(activity=discord.Game('/help to see all commands'), status=discord.Status.online)
         await asyncio.sleep(15)
-        await bot.change_presence(activity=discord.Game('Funpark.net'), status=discord.Status.online)
+        await bot.change_presence(activity=discord.Game('Developed by Squidi'), status=discord.Status.online)
         await asyncio.sleep(15)
 
 bot.add_cog(Main(bot))
