@@ -101,9 +101,6 @@ class GetEmbed():
 
 
 
-
-# Help Commands
-#TODO Ein Inhaltsverzeichnis auf die erste seite 
 class HelpMenu(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
