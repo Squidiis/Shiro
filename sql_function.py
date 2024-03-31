@@ -15,7 +15,7 @@ class DatabaseSetup():
 
     def db_connector():
 
-        db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_passwort"), database=os.getenv('discord_db'), buffered=True)
+        db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
         return db_connector
 
     def db_close(cursor, db_connection):
