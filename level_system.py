@@ -1002,7 +1002,7 @@ class LevelSystem(commands.Cog):
     async def add_level_role(self, ctx:discord.ApplicationContext, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
         level:Option(int, description = "Enter a level from which this role should be assigned")):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status="check")
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status = "check")
 
         emb_level_0 = discord.Embed(description=f"""## The level you want to set is 0
             {Emojis.dot_emoji} The level to vest a level role must be at least level **1**
@@ -1117,8 +1117,8 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-level-roles", description = "View all rolls that are available with a level!")
     async def show_level_roles(self, ctx:discord.ApplicationContext):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
-        
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status = "level_role")
+        print(level_roles)
         if level_roles:
             
             emb = discord.Embed(description=f"""## Current level roles
