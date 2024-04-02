@@ -708,7 +708,7 @@ class LevelSystem(commands.Cog):
 
             # Create card
             big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
-            small_font = ImageFont.truetype("arial.ttf", 24)
+            small_font = ImageFont.truetype("assets/rank-card/arial.ttf", 24)
 
             background_color = (8, 120, 151)
             background = Image.new("RGBA", (885, 303), color=background_color)
@@ -910,8 +910,7 @@ class LevelSystem(commands.Cog):
             for _, channels, _, _, _ in check_blacklist:
 
                 if channels:
-                    print(channels)
-                    print(bot.get_channel(int(channels)))
+                    
                     if bot.get_channel(channels).category.id == category.id:
 
                         DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channels)
@@ -1118,8 +1117,8 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-level-roles", description = "View all rolls that are available with a level!")
     async def show_level_roles(self, ctx:discord.ApplicationContext):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
-        
+        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status = "level_role")
+        print(level_roles)
         if level_roles:
             
             emb = discord.Embed(description=f"""## Current level roles
