@@ -1,0 +1,19 @@
+
+user info fixen
+
+
+Updaite 1.1
+
+- Autoreact systen
+    - set-command
+        - settings
+            - Nur bilder
+            - Key words
+            - Alle
+            - Keine
+        - channel, Kategorien, rollen, user
+        - free use emojis oder adde einen von einen anderen server (speichern der id)
+    - show command 
+        als felder feld1 welcher emoji, feld2 an was es hittet
+    - manager / endweder mit slash command oder mit manager
+        drop down für die einzelnen einstellungen button mit modal für emoji oder spezific content
