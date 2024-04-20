@@ -200,7 +200,7 @@ class AntiSpam(commands.Cog):
                 except:
 
                     return
-
+                
 bot.add_cog(AntiSpam(bot))
 
 

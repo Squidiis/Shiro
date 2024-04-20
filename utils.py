@@ -77,12 +77,17 @@ default_message = 'Oh nice {user} you have a new level, your newlevel is {level}
 # Embeds that are used multiple times within the bot
 class GetEmbed():
     '''
-    :embed_idex:
-        - If an index is passed which then leads to the correct embed
-            0 = Bonus XP procentage
-            1 = User not found 
+    Parameters:
+    ------------
+        - embed_index
+            If an index is passed which then leads to the correct embed
+            0: Bonus XP procentage
+            1: User not found 
+            2: Help menu main text
+        - settings
+            The correct information that must be inserted in the embed
     '''
-    def get_embed(embed_index, settings):
+    def get_embed(embed_index, settings = None):
 
         if embed_index == 0:
 
@@ -96,6 +101,22 @@ class GetEmbed():
                 {Emojis.dot_emoji} No entry was found for **{settings}**, so one was created
                 {Emojis.dot_emoji} **{settings}** now starts at level 0 with 0 XP""", color=bot_colour)
             
+        
+        elif embed_index == 2:
+
+            emb = discord.Embed(description=f"""# {Emojis.settings_emoji} Help menu
+                {Emojis.dot_emoji} Here you can see all the commands that {bot.user.name} has
+                ```Please use the Buttons below to explore the\ncorresponding commands```\n### Table of contents:
+                > {Emojis.dot_emoji} Mod commands
+                > {Emojis.dot_emoji} Fun commands
+                > {Emojis.dot_emoji} Level System commands part 1
+                > {Emojis.dot_emoji} Level System commands part 2
+
+                **Bot links:**
+                {Emojis.dot_emoji} Support server: https://discord.gg/9kJaPrWdwM
+                {Emojis.dot_emoji} Githup: https://github.com/Squidiis
+                """, color=bot_colour)
+            
         return emb
     
 
@@ -108,18 +129,7 @@ class HelpMenu(commands.Cog):
     @commands.slash_command(name = "help", description = "Do you need a small overview!")
     async def help(self, ctx:discord.ApplicationContext):
             
-        emb = discord.Embed(description=f"""# {Emojis.settings_emoji} Help menu
-            {Emojis.dot_emoji} Here you can see all the commands that {bot.user.name} has
-            ```Please use the Buttons below to explore the\ncorresponding commands```\n### Table of contents:
-            > {Emojis.dot_emoji} Mod commands
-            > {Emojis.dot_emoji} Fun commands
-            > {Emojis.dot_emoji} Level System commands part 1
-            > {Emojis.dot_emoji} Level System commands part 2
-
-            **Bot links:**
-            {Emojis.dot_emoji} Support server: https://discord.gg/9kJaPrWdwM
-            {Emojis.dot_emoji} Githup: https://github.com/Squidiis
-            """, color=bot_colour)
+        emb = GetEmbed.get_embed(embed_index = 2)
         
         file = discord.File('assets/images/shiro_help_banner.png', filename='shiro_help_banner.png')
         emb.set_image(url=f"attachment://shiro_help_banner.png")
@@ -260,25 +270,15 @@ class HelpMenüSelect(discord.ui.View):
             await interaction.response.edit_message(embed=emb, attachments=[])
 
 
-    @discord.ui.button(label="<- Back", style=discord.ButtonStyle.gray, custom_id="back_button")
+    @discord.ui.button(label=f"🡐 Back", style=discord.ButtonStyle.gray, custom_id="back_button")
     async def back_help_button(self, button, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f"""# {Emojis.settings_emoji} Help menu
-            {Emojis.dot_emoji} Here you can see all the commands that {bot.user.name} has
-            ```Please use the Buttons below to explore the\ncorresponding commands```\n### Table of contents:
-            > {Emojis.dot_emoji} Mod commands
-            > {Emojis.dot_emoji} Fun commands
-            > {Emojis.dot_emoji} Level System commands part 1
-            > {Emojis.dot_emoji} Level System commands part 2
-
-            **Bot links:**
-            {Emojis.dot_emoji} Support server: https://discord.gg/9kJaPrWdwM
-            {Emojis.dot_emoji} Githup: https://github.com/Squidiis
-            """, color=bot_colour)
+        emb = GetEmbed.get_embed(embed_index = 2)
         
         file = discord.File('assets/images/shiro_help_banner.png', filename='shiro_help_banner.png')
         emb.set_image(url=f"attachment://shiro_help_banner.png")
         await interaction.response.edit_message(embed=emb, view=HelpMenüSelect(), file=file)
+
 
 
 bot.add_cog(HelpMenu(bot))

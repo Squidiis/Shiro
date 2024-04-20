@@ -109,7 +109,7 @@ class ModeratorCommands(commands.Cog):
                 # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
                 elif check_settings[3] == 1:
             
-                    if message.content.startswith('https://') and not any(word in message.content for word in formats) and not message.attachments: 
+                    if 'https://' in message.content and not any(word in message.content for word in formats) and not message.attachments: 
 
                         await message.delete()
                         rule_violation = True

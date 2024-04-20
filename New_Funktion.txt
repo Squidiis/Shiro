@@ -17,3 +17,7 @@ Updaite 1.1
         als felder feld1 welcher emoji, feld2 an was es hittet
     - manager / endweder mit slash command oder mit manager
         drop down für die einzelnen einstellungen button mit modal für emoji oder spezific content
+
+
+
+anti link system checken
