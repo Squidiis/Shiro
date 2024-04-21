@@ -15,6 +15,7 @@ from PIL import Image
 from sql_function import *
 import yaml
 from discord.ext.pages import Paginator, Page
+from datetime import timedelta
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
