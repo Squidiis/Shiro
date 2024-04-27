@@ -78,7 +78,7 @@ class ModeratorCommands(commands.Cog):
 
             if message.author.guild_permissions.administrator:
                 return
-            
+
             else:
 
                 # Text additions for the embed

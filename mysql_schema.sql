@@ -106,11 +106,10 @@ DROP TABLE IF EXISTS `AutoReactionSettings`;
 
 CREATE TABLE AutoReactionSettings (
     guildId BIGINT UNSIGNED NOT NULL,
-    teServerReaction INT NULL,
+    ServerReaction INT NULL,
     reactionParameter VARCHAR(255) NULL,
     mainReactionEmoji VARCHAR(255) NOT NULL,
     reactionKeyWords VARCHAR(4000) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 

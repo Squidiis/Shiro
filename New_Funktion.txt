@@ -19,5 +19,24 @@ Updaite 1.1
         drop down für die einzelnen einstellungen button mit modal für emoji oder spezific content
 
 
+server wachstums system (diagramm)
 
-anti link system checken
+inv tracker system 
+- set-command
+    - settings
+        - 7 oder 14 tage überlick
+    - show command
+        - spezifischen user anzeigen wie viele er ingesammt eingeladen hat
+    - leaderbourd 
+        - wer die meisten eigeladen hat 
+
+
+
+chat KI (villeicht)
+
+giverway system
+
+ticket systen
+
+
+aus den LevelSystemRoles table den guildName raussteichen

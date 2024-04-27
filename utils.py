@@ -7,7 +7,6 @@ from discord.ext.commands import MissingPermissions
 import discord
 from discord.ext import commands
 import mysql.connector
-from datetime import *
 import requests
 from discord.ui import Select, View, Button, Modal
 from discord.commands import Option, SlashCommandGroup
@@ -16,6 +15,7 @@ from sql_function import *
 import yaml
 from discord.ext.pages import Paginator, Page
 from datetime import timedelta
+from datetime import datetime
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
