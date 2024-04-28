@@ -1,7 +1,7 @@
 
 from utils import *
 import calendar
-
+import re
 
 
 class ModeratorCommands(commands.Cog):
@@ -39,97 +39,111 @@ class ModeratorCommands(commands.Cog):
 
 ##################################  Anti-link system  #########################################
 
+    
+    def contains_invite(self, content:str):
+
+        invites_re = re.compile(r'(?:discord\.gg|discord\.com\/invite|\.gg)\/(\S+)')
+        matches = invites_re.findall(content)
+        
+        if not matches:
+            return False
+    
+        return True
+    
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-
-        check_whitelist = DatabaseCheck.check_antilink_whitelist(guild_id = message.guild.id)
         
-        if check_whitelist:
+        if message != None:
+
+            check_whitelist = DatabaseCheck.check_antilink_whitelist(guild_id = message.guild.id)
             
-            for _, channel, category, role, user in check_whitelist:
+            if check_whitelist:
                 
-                if isinstance(message.channel, discord.channel.DMChannel):
-                    return
-                
-                else:
-
-                    if user == message.author.id:
-                        return
-
-                    if role != None:
-                                
-                        blacklist_role = message.guild.get_role(role)
-                        if blacklist_role in message.author.roles:
-                            return
+                for _, channel, category, role, user in check_whitelist:
                     
-                    if message.channel.id == channel:
+                    if isinstance(message.channel, discord.channel.DMChannel):
                         return
+                    
+                    else:
 
-                    if message.channel.category_id == category:
-                        return
+                        if user == message.author.id:
+                            return
 
-        if message.author.bot:
-            return
+                        if role != None:
+                                    
+                            blacklist_role = message.guild.get_role(role)
+                            if blacklist_role in message.author.roles:
+                                return
+                        
+                        if message.channel.id == channel:
+                            return
 
-        else:
+                        if message.channel.category_id == category:
+                            return
 
-            formats=['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp']
-
-            if message.author.guild_permissions.administrator:
+            if message.author.bot:
                 return
 
             else:
 
-                # Text additions for the embed
-                anti_link_text = {
-                    0:"discord invitation link",
-                    1:"link or a discord invitations",
-                    2:"link or an image / video",
-                    3:""}
-
-                check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
-                channel = message.channel
-            
-                emb = discord.Embed(title=f'{Emojis.help_emoji} {message.author.name} you have violated the anti-link system', 
-                    description=f"""{Emojis.dot_emoji} You have violated the anti-link system on {message.guild.name} it is forbidden:
-                    {Emojis.dot_emoji} `You have sent an {anti_link_text[check_settings[3]]} to this chat`
-                    {f"{Emojis.dot_emoji} That's why you got a timeout for {check_settings[4]} minutes" if check_settings[4] != 0 else ''}""", colour=bot_colour)
-                emb.set_footer(text=f'{message.author.name}', icon_url=message.author.display_avatar.url)
-                
-                rule_violation = False
-                
-                # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
-                if check_settings[3] == 0:
-            
-                    if "discord.gg/" in message.content or "discord.com" in message.content:
-                        await message.delete()
-                        rule_violation = True
-
-                # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
-                elif check_settings[3] == 1:
-            
-                    if 'https://' in message.content and not any(word in message.content for word in formats) and not message.attachments: 
-
-                        await message.delete()
-                        rule_violation = True
-
-                # Is triggered when there is any link in the message (when triggered, the message is deleted)
-                elif check_settings[3] == 2:
-
-                    if "https://" in message.content or message.attachments:
-
-                        await message.delete()
-                        rule_violation = True
-                
-                # Antilink system is disabled 
-                elif check_settings[3] == 3:
+                formats=['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp']
+        
+                if message.author.guild_permissions.administrator:
                     return
-                
-                if rule_violation == True:
 
-                    await channel.send(embed=emb, delete_after=5)
-                    await message.author.timeout_for(timedelta(minutes = check_settings[4]))
+                else:
+
+                    # Text additions for the embed
+                    anti_link_text = {
+                        0:"discord invitation link",
+                        1:"link or a discord invitations",
+                        2:"link or an image / video",
+                        3:""}
+
+                    check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
+                    channel = message.channel
+                
+                    emb = discord.Embed(title=f'{Emojis.help_emoji} {message.author.name} you have violated the anti-link system', 
+                        description=f"""{Emojis.dot_emoji} You have violated the anti-link system on {message.guild.name} it is forbidden:
+                        {Emojis.dot_emoji} `You have sent an {anti_link_text[check_settings[3]]} to this chat`
+                        {f"{Emojis.dot_emoji} That's why you got a timeout for {check_settings[4]} minutes" if check_settings[4] != 0 else ''}""", colour=bot_colour)
+                    emb.set_footer(text=f'{message.author.name}', icon_url=message.author.display_avatar.url)
+                    
+                    rule_violation = False
+                    check_link = self.contains_invite(message.content.replace(" ", ""))
+                    # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
+                    if check_settings[3] == 0:
+                
+                        if "discord.gg/" in message.content or "discord.com" in message.content or check_link == True:
+
+                            await message.delete()
+                            rule_violation = True
+
+                    # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
+                    elif check_settings[3] == 1:
+                
+                        if 'https://' in message.content and not any(word in message.content for word in formats) and not message.attachments or check_link == True: 
+
+                            await message.delete()
+                            rule_violation = True
+
+                    # Is triggered when there is any link in the message (when triggered, the message is deleted)
+                    elif check_settings[3] == 2:
+
+                        if "https://" in message.content or message.attachments or check_link == True:
+
+                            await message.delete()
+                            rule_violation = True
+                    
+                    # Antilink system is disabled 
+                    elif check_settings[3] == 3:
+                        return
+                    
+                    if rule_violation == True:
+
+                        await channel.send(embed=emb, delete_after=5)
+                        await message.author.timeout_for(timedelta(minutes = check_settings[4]))
 
 
     @commands.slash_command(name = "set-antilink-system", description = "Set the anti-link system the way you want it!")

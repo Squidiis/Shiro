@@ -7,11 +7,11 @@ class InviteTrackerSystem(commands.Cog):
         self.bot = bot
 
     
-    @commands.Cog.listener()
-    async def on_member_join(member):
-        if not member.bot:
-            guild = member.guild
-            invites = await guild.invites()
+    #@commands.Cog.listener()
+    #async def on_member_join(member):
+    #    if not member.bot:
+    #        guild = member.guild
+    #        invites = await guild.invites()
             #for invite in invites:
                 #if invite.uses > 0:
                     # Speichere die Einladung in der Datenbank
@@ -20,16 +20,16 @@ class InviteTrackerSystem(commands.Cog):
 
     @commands.slash_command(name = "show-invites")
     async def show_invites(self, ctx:discord.ApplicationContext, user:Option(discord.Member)):
-        print(1)
+
         if user is None:
-            # Zeige die eigenen Einladungen an
+
             total_invites = 0
             for invite in await ctx.guild.invites():
                 if invite.inviter == ctx.author:
                     total_invites += invite.uses
             await ctx.respond(f"Du hast {total_invites} Mitglied{'er' if total_invites != 1 else ''} auf den Server eingeladen.")
         else:
-            # Zeige die Einladungen des angegebenen Mitglieds an
+
             total_invites = 0
             for invite in await ctx.guild.invites():
                 if invite.inviter == user:

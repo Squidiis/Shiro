@@ -40,3 +40,6 @@ ticket systen
 
 
 aus den LevelSystemRoles table den guildName raussteichen
+
+
+das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird 
