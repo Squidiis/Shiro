@@ -1,7 +1,7 @@
 from utils import *
 
 
-class InviteTrackerSystem(commands.Cog):
+class InviteSystem(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -27,7 +27,12 @@ class InviteTrackerSystem(commands.Cog):
             for invite in await ctx.guild.invites():
                 if invite.inviter == ctx.author:
                     total_invites += invite.uses
-            await ctx.respond(f"Du hast {total_invites} Mitglied{'er' if total_invites != 1 else ''} auf den Server eingeladen.")
+
+            emb = discord.Embed(description=f"""## Anzahl an eingeladenen Mitgliedern {ctx.author.name}
+                {Emojis.dot_emoji} {f'Du hast {total_invites} user' if total_invites != 0 else 'Du hast noch keine anderen user'} auf den Server {ctx.guild.name} eingeladen.
+                {Emojis.help_emoji} Die einladungen werden nur dann gezählt wenn du den einladungs link erstellt hast!""", color=bot_colour)
+            
+            await ctx.respond(embed=emb)
         else:
 
             total_invites = 0
@@ -37,6 +42,12 @@ class InviteTrackerSystem(commands.Cog):
             await ctx.respond(f"{user.mention} hat {total_invites} Mitglied{'er' if total_invites != 1 else ''} auf den Server eingeladen.")
 
 
+    @commands.Cog.listener()
+    async def on_member_join(member):
+
+        Image.open()
+        print(member)
+
 def setup(bot):
-    bot.add_cog(InviteTrackerSystem(bot))
+    bot.add_cog(InviteSystem(bot))
 

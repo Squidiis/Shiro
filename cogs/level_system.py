@@ -50,6 +50,7 @@ class CheckLevelSystem():
             return None
     
 
+    # Returns all entries of the database with the sorted level roles (ascending with level)
     def show_level_roles(guild_id:int):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id = guild_id, status = "level_role")
@@ -675,9 +676,12 @@ class LevelSystem(commands.Cog):
         connection_to_db_level = DatabaseSetup.db_connector()
         my_cursor = connection_to_db_level.cursor()
 
-        error_emb = discord.Embed(title=f"{Emojis.help_emoji} The user was not found", 
-            description=f"""{Emojis.dot_emoji} The user was not found, it may be that he is not yet participating in the level system.
-            {Emojis.dot_emoji} You can only join the level system if you have sent at least one message to a channel that is not blacklisted {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+        with open("config.yaml", 'r') as f:
+            background_color = tuple(yaml.safe_load(f)["Rank_card_colour"])
+        
+        error_emb = discord.Embed(description=f"""## The user was not found
+            {Emojis.dot_emoji} The user was not found, it is possible that no entry has been created yet 
+            {Emojis.dot_emoji} Entries for the level system are only created when the user writes in a message and receives XP for it""", color=bot_colour)
 
         check_user = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
         
@@ -699,7 +703,7 @@ class LevelSystem(commands.Cog):
                         if user.id == rank_count[1]:
 
                             rank = count 
-                            
+                           
             xp = check_user[3]
         
             xp_needed = 5 * (check_user[2] ^ 2) + (50 * check_user[2]) + 100 - check_user[3]
@@ -710,16 +714,15 @@ class LevelSystem(commands.Cog):
             big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
             small_font = ImageFont.truetype("assets/rank-card/arial.ttf", 24)
 
-            background_color = (8, 120, 151)
             background = Image.new("RGBA", (885, 303), color=background_color)
             new_background = self.round_corner_mask(radius=50, rectangle=background, fill=255)
             background.paste(new_background[0], (0, 0), new_background[1])
-
+            
             img = Image.open("assets/rank-card/card2.png").resize((867, 285))
             filtered_image = img.filter(ImageFilter.BoxBlur(4))
             new_img = self.round_corner_mask(radius=50, rectangle=filtered_image, fill=255)
             background.paste(new_img[0], (9, 9), mask=new_img[1])
-
+            
             # Get the profile picture and set it on the background
             pfp = BytesIO(await user.display_avatar.read())
             profile = Image.open(pfp).resize((225, 225))
@@ -729,11 +732,11 @@ class LevelSystem(commands.Cog):
             draw.ellipse((0, 0)+ bigsize, 255)
             mask = mask.resize(profile.size, Image.LANCZOS)
             profile.putalpha(mask)
-
+            
             background.paste(profile, (47, 39), mask=mask)
-
+            
             draw = ImageDraw.Draw(background)
-
+            
             bar_offset_x = 304
             bar_offset_y = 155
         
@@ -750,7 +753,7 @@ class LevelSystem(commands.Cog):
            
             # Progress Bar
             if xp != 0:
-
+                print(1)
                 progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
                 progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255) 
                 background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
@@ -778,6 +781,7 @@ class LevelSystem(commands.Cog):
             background.save(bytes, format="PNG")
             bytes.seek(0)
             dfile = discord.File(bytes, filename="card.png")
+            
             await ctx.respond(file=dfile)
 
         else:

@@ -23,7 +23,7 @@ server wachstums system (diagramm)
 
 inv tracker system 
 - set-command
-    - settings
+    - settings (leaderboard)
         - 7 oder 14 tage überlick
     - show command
         - spezifischen user anzeigen wie viele er ingesammt eingeladen hat
@@ -31,6 +31,7 @@ inv tracker system
         - wer die meisten eigeladen hat 
 
 
+level system adden das ein leaderboard gibt bei dem die aktivsten user nochmal wöchentlich gezeicht werden
 
 chat KI (villeicht)
 
@@ -43,3 +44,5 @@ aus den LevelSystemRoles table den guildName raussteichen
 
 
 das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird 
+
+erklärung in der readme adden für die custom farben für die rank cards

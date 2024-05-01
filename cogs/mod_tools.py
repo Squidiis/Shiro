@@ -40,6 +40,7 @@ class ModeratorCommands(commands.Cog):
 ##################################  Anti-link system  #########################################
 
     
+    # Checks whether the message contains a link
     def contains_invite(self, content:str):
 
         invites_re = re.compile(r'(?:discord\.gg|discord\.com\/invite|\.gg)\/(\S+)')
@@ -51,6 +52,7 @@ class ModeratorCommands(commands.Cog):
         return True
     
 
+    # Antilink system checks whether messages violate the antilink system, distinguishes between links that lead to images, invitation links or links in general
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
         
