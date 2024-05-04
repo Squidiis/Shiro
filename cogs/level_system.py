@@ -5,7 +5,7 @@ from io import BytesIO
 import discord
 from discord.ext import commands
 import re
-
+from sql_function import *
 from discord.interactions import Interaction
 from utils import *
 

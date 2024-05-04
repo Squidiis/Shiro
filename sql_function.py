@@ -1,8 +1,6 @@
 import os
 import mysql.connector
-
-import discord
-from discord.ext import commands
+from utils import *
 
 
 #######################  Database connection  #######################
@@ -377,7 +375,53 @@ class DatabaseCheck():
         return white_list
 
 
+    '''
+    '''
+    def check_leaderbourd_settings(guild_id:int):
 
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        check_settings = "SELECT * FROM LeaderbourdSettings WHERE guildId = %s"
+        check_settings_values = [guild_id]
+        cursor.execute(check_settings, check_settings_values)
+
+        leaderboard_settings = cursor.fetchone()
+        return leaderboard_settings
+    
+
+    '''
+    '''
+    def check_leaderbourd(
+        guild_id:int,
+        user_id:int,
+        interval:str = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        column_name = ["dailyCountMessage", "weeklyCountMessage", "monthlyCountMessage", "inviteCount"]
+
+        if interval:
+
+            check_leaderbourd_count = f"SELECT * FROM LeaderbourdTacking WHERE guildId = %s ORDER BY {column_name[interval]} DESC"
+            check_leaderbourd_count_values = [guild_id]
+        
+        else:
+
+            check_leaderbourd_count = f"SELECT * FROM LeaderbourdTacking WHERE guildId = %s AND userId = %s"
+            check_leaderbourd_count_values = [guild_id, user_id]
+
+        cursor.execute(check_leaderbourd_count, check_leaderbourd_count_values)
+
+        if interval:
+            leaderbourd = cursor.fetchall()
+        else:
+            leaderbourd = cursor.fetchone()
+
+        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return leaderbourd
 
 
 ########################################################  Checks the bot settings  ##############################################
@@ -1042,9 +1086,63 @@ class DatabaseUpdates():
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
+    '''
+    
+    '''
+    def manage_leaderbourd(
+        guild_id:int, 
+        user_id:int,
+        interval:str = None,
+        settings:str = None,
+        message_id:int = None,
+        channel_id:int = None,
+        back_to_none = None
+        ):
 
+        column_name_settings = {
+            "daily":"bourdMessageIdDay", 
+            "weekly":"bourdMessageIdWeek", 
+            "monthly":"bourdMessageIdMonth", 
+            "channel":"leaderbourdChannel"
+        }
 
+        coulmn_values = {
+            "daily":message_id,
+            "weekly":message_id,
+            "monthly":message_id,
+            "channel":channel_id,
+        }
 
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+        
+        check_user = DatabaseCheck.check_leaderbourd(guild_id = guild_id, user_id = user_id)
+
+        if settings:
+
+            settings = f"UPDATE LeaderbourdSettings SET {column_name_settings[settings]} = %s WHERE guildId = %s"
+            settings_values = [coulmn_values[settings], guild_id]
+            cursor.execute(settings, settings_values)
+
+        if check_user and interval:
+
+            update_stats = f"UPDATE LeaderbourdTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s WHERE guildId = %s AND userId = %s"
+            update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, guild_id, user_id]
+            cursor.execute(update_stats, update_stats_values)
+
+        else:
+
+            insert_stats = f"INSERT INTO LeaderbourdTacking (guildId, userId, dailyCountMessage, weeklyCountMessage, monthlyCountMessage) VALUES (%s ,%s, %s, %s, %s)"
+            insert_stats_values = [guild_id, user_id, 1, 1, 1]
+            cursor.execute(insert_stats, insert_stats_values)
+
+        if back_to_none != None:
+
+            set_back_to_none = f"UPDATE LevelSystemSettings SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+            set_back_to_none_values = [guild_id]
+            cursor.execute(set_back_to_none, set_back_to_none_values)
+            
+        db_connect.commit()
 
 class DatabaseRemoveDatas():
 

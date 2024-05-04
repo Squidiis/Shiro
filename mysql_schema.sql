@@ -76,6 +76,32 @@ CREATE TABLE AntiLinkWhiteList (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+---------------- Leaderbourd Settings ---------------------
+
+DROP TABLE IF EXISTS `LeaderbourdSettings`
+
+CREATE TABLE LeaderbourdSettings (
+    guildId BIGINT UNSIGNED NOT NULL,
+    status INT UNSIGNED NOT NULL DEFAULT 0,
+    bourdMessageIdDay BIGINT UNSIGNED NULL,
+    bourdMessageIdWeek BIGINT UNSIGNED NULL,
+    bourdMessageIdMonth  BIGINT UNSIGNED NULL,
+    leaderbourdChannel BIGINT UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `LeaderbourdTacking`;
+
+CREATE TABLE LeaderbourdTacking (
+    guildId BIGINT UNSIGNED NOT NULL,
+    userId BIGINT UNSIGNED NOT NULL,
+    dailyCountMessage INT UNSIGNED DEFAULT 0,
+    weeklyCountMessage INT UNSIGNED DEFAULT 0,
+    monthlyCountMessage INT UNSIGNED DEFAULT 0,
+    inviteCount INT UNSIGNED DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 ------------- Table for the Bot settigs -----------------
 
 DROP TABLE IF EXISTS `BotSettings`;
@@ -85,7 +111,7 @@ CREATE TABLE BotSettings (
     botColour VARCHAR(20) NULL,
     ghostPing BIT DEFAULT 0,
     antiLink BIT(4) DEFAULT 3,
-    antiLinkTimeout INT DEFAULT 0
+    antiLinkTimeout INT DEFAULT 0,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

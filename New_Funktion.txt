@@ -46,3 +46,7 @@ aus den LevelSystemRoles table den guildName raussteichen
 das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird 
 
 erklärung in der readme adden für die custom farben für die rank cards
+
+
+
+leaderboard system (dropdown mit channel und dann noch eines für welche leaderboards er haben will)
