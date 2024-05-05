@@ -49,7 +49,7 @@ class InviteSystem(commands.Cog):
         print(member)
     
 
-    @commands.slash_command("set-message-leaderbourd")
+    @commands.slash_command(name = "set-message-leaderbourd", description = "Set the message leaderbourd system!")
     async def set_message_leaderbourd(self, ctx:discord.ApplicationContext):
 
         emb = discord.Embed(description=f"""## Set the message leaderbourd
@@ -109,19 +109,25 @@ class SetLeaderbourdChannel(discord.ui.View):
             discord.ChannelType.text, 
             discord.ChannelType.forum, 
             discord.ChannelType.news
-        ])
+        ]
+    )
+
     async def set_leaderbourd_channel(self, select, interaction:discord.Interaction):
-        
-        DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+
+        if DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id):
+
+            DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+
+        else:
+
+            DatabaseUpdates.create_leaderbourd_settings(guild_id = interaction.guild.id, settings = "create", channel_id = select.values[0].id)
 
         emb = discord.Embed(description=f"""## Channel für das Leaderbourd wurde festgelegt
-            {Emojis.dot_emoji} Ab sofort wird in {select.value[0].mention} das liederbourd gesendet
+            {Emojis.dot_emoji} Ab sofort wird in {select.values[0].mention} das liederbourd gesendet
             {Emojis.dot_emoji} Mit dem unteren Dropdown menü kannst du auswählen welches Leaderbourd in diesen channel gesendet werden soll
             {Emojis.dot_emoji} Die Leaderbourd unterscheiden sich in der laufzeit nach wie viel Zeit die stats aktualisiert werden
             {Emojis.help_emoji} Es können auch mehrere intervalle ausgewählt werden dann werden mehrere Verschiedene Leaderbourds gesendet""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
-
-        DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
 
 
 class SetLeaderbourd(discord.ui.View):
@@ -130,74 +136,49 @@ class SetLeaderbourd(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.select(
-        placeholder = "Wähle aus in welchen intervallen die aktivitäten angezeigt werden sollen",
+        placeholder = "Select the intervals at which the activities should be displayed!",
         min_values = 1,
         max_values = 3,
         custom_id = "set_leaderbourd",
         options = [
-            discord.SelectOption(label="Taglich aktualisieren", description="Das Leaderbourd wird jeden Tag aktualisiert", value="daily"),
-            discord.SelectOption(label="Wöchentlich aktualisieren", default="Das Leaderbourd wird jede Woche aktualisiert", value="weekly"),
-            discord.SelectOption(label="Monatschlich aktualisieren", default="Das Leaderbourd wird jedes Monat aktualisiert)", value="monthly")
-        ])
+            discord.SelectOption(label="Update daily", description="Das Leaderbourd wird jeden Tag aktualisiert", value="daily"),
+            discord.SelectOption(label="Update weekly", description="Das Leaderbourd wird jede Woche aktualisiert", value="weekly"),
+            discord.SelectOption(label="Update monthly", description="Das Leaderbourd wird jedes Monat aktualisiert", value="monthly")
+        ]
+    )
+    
     async def set_leaderbourd_select(self, select, interaction:discord.Interaction):
+
+        text_dict = {
+            "daily":"einen Tag",
+            "weekly":"eine Woche",
+            "monthly":"ein Monat"
+        }
+
+        channel_id = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]
 
         option_list, check_list = [], []
         for i in select.values:
             option_list.append(f"{Emojis.dot_emoji} {i} aktualisierung\n")
             check_list.append(i)
 
-            DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = i)
+            if i != None:
+
+                emb = discord.Embed(
+                    description=f"""## Die anzahl der nachrichten wird für {text_dict[i]} gespeichert
+                        {Emojis.dot_emoji} Wenn die Zeit dann um ist wird diese Nachricht zu einen leaderbourd editiert die die user anzeigt die am meisten Nachrichten geschrieben haben""", color=bot_colour)
+
+                channel = bot.get_channel(channel_id)
+                message = await channel.send(embed=emb)
+                DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = i, message_id = message.id)
 
         for i in [value for value in ["daily", "weekly", "monthly"] if value not in check_list]:
 
             DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, back_to_none = i)
 
         emb = discord.Embed(description=f"""## Intervall wurde festgelegt
-            {Emojis.dot_emoji} {'Die folgenden leaderbourd optionen wurden ausgewählt' if len(select.value) != 1 else 'Die foldende leaderbourd option wurde ausgewählt'}:
+            {Emojis.dot_emoji} {'Die folgenden leaderbourd optionen wurden ausgewählt' if len(select.values) != 1 else 'Die foldende leaderbourd option wurde ausgewählt'}:
                 {"".join(option_list)}
-            {Emojis.dot_emoji} {'Das leaderbourd wird' if len(select.values) == 1 else 'Die leaderbourds werden'} in <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> gesendet""", color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=None)
-
-
-class ActivateLeaderbourd(discord.ui.Button):
-    def __init__(self):
-        super().__init__(
-            label = "Leaderbourd jetzt aktivieren",
-            style = discord.ButtonStyle.blurple,
-            custom_id = "activate_leaderbourd" 
-        )
-
-    async def callback(self, interaction:discord.Interaction):
-
-        check_settings = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
-
-        interval_list = {
-            check_settings[2]:"daily",
-            check_settings[3]:"wekkly",
-            check_settings[4]:"monthly"
-        }
-
-        text_dict = {
-            check_settings[2]:"einen Tag",
-            check_settings[3]:"eine Woche",
-            check_settings[4]:"ein Monat"
-        }
-
-        leaderbourd_list = []
-        for i in check_settings[4], check_settings[3], check_settings[2]:
-
-            if i != None:
-                leaderbourd_list.append(f"{Emojis.dot_emoji} {interval_list[i]} aktualisierendes leaderbourd")
-
-                emb = discord.Embed(
-                    description=f"""## Die anzahl der nachrichten wird für {text_dict[i]} gespeichert
-                        {Emojis.dot_emoji} Wenn die Zeit dann um ist wird diese Nachricht zu einen leaderbourd editiert die die user anzeigt die am meisten Nachrichten geschrieben haben""", color=bot_colour)
-
-                message = await bot.get_message(i)
-                await message.channel.send(embed=emb)
-
-        emb = discord.Embed(description=f"""## Die einstellungen wurden nun vorgenommen
-            {Emojis.dot_emoji} {'Das leaderbourd wird' if len(check_settings[2], check_settings[3], check_settings[4]) == 1 else 'Die leaderbourds werden'} in den channel <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> gesendet
-            {Emojis.dot_emoji} Folgende Intervall leaderbourds sind ab jetzt aktiv:
-            """, color=bot_colour)
+            {Emojis.dot_emoji} {'Das leaderbourd wird' if len(select.values) == 1 else 'Die leaderbourds werden'} in <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> gesendet
+            {Emojis.help_emoji} Die Leaderbourds werden erst nach dem ersten intervall zu den volständigen Leaderbourds""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)

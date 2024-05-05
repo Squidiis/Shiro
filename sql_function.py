@@ -394,7 +394,7 @@ class DatabaseCheck():
     '''
     def check_leaderbourd(
         guild_id:int,
-        user_id:int,
+        user_id:int = None,
         interval:str = None
         ):
 
@@ -1087,11 +1087,38 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     '''
-    
+    Verwaltet das message leaderbourd system
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+        - user_id
+            Id des users der eine nachricht geschrieben hat
+        - interval 
+            In welchen interfall das Leaderbourd aktualisiert werden soll
+                - daily: Täglche aktualisierung
+                - weekly: Wöchentliche aktualisierung
+                - monthly: Monantliche aktualisierung
+                - channel: Der channel in dem die Leaderbourds gesendet werden sollen
+        - message_id 
+            Die nachrichten id des leaderbourds
+        - channel_id
+            Die id des channels in den die leaderbourds gesendet werden sollen
+        - back_to_none
+            Was zurück auf die default einstellungen gesetzt werden soll
+                - daily
+                - weekly
+                - monthly
+                - channel
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified either add, remove or reset
     '''
     def manage_leaderbourd(
         guild_id:int, 
-        user_id:int,
+        user_id:int = None,
         interval:str = None,
         settings:str = None,
         message_id:int = None,
@@ -1116,33 +1143,57 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         
-        check_user = DatabaseCheck.check_leaderbourd(guild_id = guild_id, user_id = user_id)
-
         if settings:
 
+            vlaue = coulmn_values[settings]
             settings = f"UPDATE LeaderbourdSettings SET {column_name_settings[settings]} = %s WHERE guildId = %s"
-            settings_values = [coulmn_values[settings], guild_id]
+            settings_values = [vlaue, guild_id]
             cursor.execute(settings, settings_values)
 
-        if check_user and interval:
+        elif interval:
+
+            check_user = DatabaseCheck.check_leaderbourd(guild_id = guild_id, user_id = user_id)
 
             update_stats = f"UPDATE LeaderbourdTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s WHERE guildId = %s AND userId = %s"
             update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, guild_id, user_id]
             cursor.execute(update_stats, update_stats_values)
 
-        else:
+        elif back_to_none != None:
 
-            insert_stats = f"INSERT INTO LeaderbourdTacking (guildId, userId, dailyCountMessage, weeklyCountMessage, monthlyCountMessage) VALUES (%s ,%s, %s, %s, %s)"
-            insert_stats_values = [guild_id, user_id, 1, 1, 1]
-            cursor.execute(insert_stats, insert_stats_values)
-
-        if back_to_none != None:
-
-            set_back_to_none = f"UPDATE LevelSystemSettings SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+            set_back_to_none = f"UPDATE LeaderbourdSettings SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
             set_back_to_none_values = [guild_id]
             cursor.execute(set_back_to_none, set_back_to_none_values)
             
         db_connect.commit()
+
+
+    '''
+    
+    '''
+    def create_leaderbourd_settings(
+        guild_id:int, 
+        user_id:int = None,
+        channel_id:int = None,
+        settings:int = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        if settings != None:
+
+            create_settings = f"INSERT INTO LeaderbourdSettings (guildId, leaderbourdChannel) VALUES (%s, %s)"
+            create_settings_values = [guild_id, channel_id]
+
+        else:
+
+            create_settings = f"INSERT INTO LeaderbourdTacking (guildId, userId, dailyCountMessage, weeklyCountMessage, monthlyCountMessage) VALUES (%s ,%s, %s, %s, %s)"
+            create_settings_values = [guild_id, user_id, 1, 1, 1]
+
+        cursor.execute(create_settings, create_settings_values)
+        db_connect.commit()
+
+
 
 class DatabaseRemoveDatas():
 

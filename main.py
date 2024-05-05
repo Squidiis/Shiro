@@ -91,8 +91,30 @@ class Main(commands.Cog):
                 antiLink BIT(4) DEFAULT 3,
                 antiLinkTimeout INT DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            # Message Leaderbourd
             '''
-        ]  
+            CREATE TABLE IF NOT EXISTS LeaderbourdSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                status INT UNSIGNED NOT NULL DEFAULT 0,
+                bourdMessageIdDay BIGINT UNSIGNED NULL,
+                bourdMessageIdWeek BIGINT UNSIGNED NULL,
+                bourdMessageIdMonth  BIGINT UNSIGNED NULL,
+                leaderbourdChannel BIGINT UNSIGNED NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LeaderbourdTacking (
+                guildId BIGINT UNSIGNED NOT NULL,
+                userId BIGINT UNSIGNED NOT NULL,
+                dailyCountMessage INT UNSIGNED DEFAULT 0,
+                weeklyCountMessage INT UNSIGNED DEFAULT 0,
+                monthlyCountMessage INT UNSIGNED DEFAULT 0,
+                inviteCount INT UNSIGNED DEFAULT 0
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            '''
+            ]  
 
         try:
 
@@ -214,7 +236,9 @@ class AutoReaction(commands.Cog):
 
         if message.guild:
             if message.guild.id == 865899808183287848:
-                categorys = [996846958536835203, 927683692695027772, 998934946708205598, 930157270275350598, 897544467266011177, 873622071484252200, 927668688239353926, 1084219817269149747]
+                categorys = [996846958536835203, 927683692695027772, 998934946708205598, 930157270275350598, 
+                             897544467266011177, 873622071484252200, 927668688239353926, 1084219817269149747,
+                             927683692695027772, 996846958536835203, 1145775400983744522]
                 if message.channel.category_id in categorys:
                     if len(message.attachments) > 0 or message.content.startswith("https://"):
                         await message.add_reaction("❤")

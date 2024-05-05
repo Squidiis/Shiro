@@ -2,7 +2,7 @@
 from utils import *
 import calendar
 import re
-
+from sql_function import *
 
 class ModeratorCommands(commands.Cog):
     

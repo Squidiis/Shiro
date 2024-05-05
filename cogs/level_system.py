@@ -798,15 +798,18 @@ class LevelSystem(commands.Cog):
         leaderboard_levels = "SELECT userId, userLevel, userXp FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC, userXp DESC"
         leaderboard_levels_values = [ctx.guild.id]
         my_cursor.execute(leaderboard_levels, leaderboard_levels_values)
-
         leaderboard_members =  my_cursor.fetchall()
+
+        spaces = "     "
+        len_spaces = len(spaces)
+
         c = []
         for i, pos in enumerate(leaderboard_members, start=1):
             member_id, lvl, xp = pos
             
             if i <= 10:
-
-                c.append(f"{i}. `level {lvl: }` `{xp} XP`    <@{member_id}>")
+                
+                c.append(f"{i}. `level {lvl:2}` `{xp:2} XP`    <@{member_id}>")
             
         level_roles_mention_end = '\n'.join(c)
 

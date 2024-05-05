@@ -49,4 +49,9 @@ erklärung in der readme adden für die custom farben für die rank cards
 
 
 
-leaderboard system (dropdown mit channel und dann noch eines für welche leaderboards er haben will)
+leaderboard system (cancel button, übersetzen, task funktion überarbeiten, checken ob die einstellungen schon so sind)
+
+
+back button zum close button machen help
+
+
