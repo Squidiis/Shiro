@@ -1757,6 +1757,7 @@ class SetXpRate(discord.ui.View):
         ],
         custom_id="set_xp_rate"
     )
+    
     async def set_xp_rate_selct(self, select, interaction:discord.Interaction):
         
         check_xp_rate = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]

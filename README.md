@@ -11,7 +11,7 @@
 </h4>
 
 <h4 align="center">
-    <a href="https://discord.gg/Zv5JtYhd9r"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
+    <a href="https://discord.gg/UKZkmeJYsA"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
     <br>Start of development Tue, Jan 04, 2022
 </h4>
 
@@ -87,7 +87,7 @@ After that you can start it with
 ```
 python bot.py
 ```
-If you encounter problems use the discord server linked above or press [here](https://discord.gg/Zv5JtYhd9r) to be redirected directly to in.
+If you encounter problems use the discord server linked above or press [here](https://discord.gg/UKZkmeJYsA) to be redirected directly to in.
 
 ## All commands
 

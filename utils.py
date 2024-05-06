@@ -85,6 +85,7 @@ class GetEmbed():
             0: Bonus XP procentage
             1: User not found 
             2: Help menu main text
+            3: Message leaderbourd text
         - settings
             The correct information that must be inserted in the embed
     '''
@@ -117,6 +118,14 @@ class GetEmbed():
                 {Emojis.dot_emoji} Support server: https://discord.gg/9kJaPrWdwM
                 {Emojis.dot_emoji} Githup: https://github.com/Squidiis
                 """, color=bot_colour)
+            
+        elif embed_index == 3:
+            
+            emb = f"""
+            {Emojis.dot_emoji} With the dropdown menu below you can select which leaderboard should be sent to this channel
+            {Emojis.dot_emoji} The leaderboard differs in the duration after how much time the stats are updated
+            {Emojis.help_emoji} You can also select several intervals, in which case several different leaderboards will be sent
+            """
             
         return emb
     

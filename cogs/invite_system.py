@@ -113,10 +113,26 @@ class SetLeaderbourdChannel(discord.ui.View):
     )
 
     async def set_leaderbourd_channel(self, select, interaction:discord.Interaction):
+        
+        settings = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
 
-        if DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id):
+        if settings:
 
-            DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+            if settings[5] == select.values[0].id:
+
+                emb = discord.Embed(description=f"""## Dieser channel wurde bereits als leaderbourd channel festgelegt
+                    {Emojis.dot_emoji} Dieser channel wurde bereits für das message leaderbourd festgelegt
+                    {Emojis.dot_emoji} Möchstest du mit dem einstellen des message leaderbourds vortfaren oder einen anderen channel festlegen?""", color=bot_colour)
+                await interaction.response.edit_message(embed=emb, view=SameChannelButtons())
+
+            else:
+                
+                emb = discord.Embed(description=f""" ## Es wurde bereits ein channel für das leaderbourd festgelegt
+                    {Emojis.dot_emoji} Möchstest du diesen überschreibe?
+                    {Emojis.dot_emoji} aktuell ist <#{settings[5]}> als channel für das leaderbourd festlegegt""", color=bot_colour)
+                await interaction.response.edit_message(embed=emb, view=OverwriteChannel())
+
+                DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
 
         else:
 
@@ -124,9 +140,8 @@ class SetLeaderbourdChannel(discord.ui.View):
 
         emb = discord.Embed(description=f"""## Channel für das Leaderbourd wurde festgelegt
             {Emojis.dot_emoji} Ab sofort wird in {select.values[0].mention} das liederbourd gesendet
-            {Emojis.dot_emoji} Mit dem unteren Dropdown menü kannst du auswählen welches Leaderbourd in diesen channel gesendet werden soll
-            {Emojis.dot_emoji} Die Leaderbourd unterscheiden sich in der laufzeit nach wie viel Zeit die stats aktualisiert werden
-            {Emojis.help_emoji} Es können auch mehrere intervalle ausgewählt werden dann werden mehrere Verschiedene Leaderbourds gesendet""", color=bot_colour)
+            {GetEmbed.get_embed(embed_index=3)}
+            """, color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
 
 
@@ -182,3 +197,42 @@ class SetLeaderbourd(discord.ui.View):
             {Emojis.dot_emoji} {'Das leaderbourd wird' if len(select.values) == 1 else 'Die leaderbourds werden'} in <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> gesendet
             {Emojis.help_emoji} Die Leaderbourds werden erst nach dem ersten intervall zu den volständigen Leaderbourds""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
+
+
+class SameChannelButtons(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="Continue with the settings", 
+        style=discord.ButtonStyle.blurple, 
+        custom_id="continue_settings"
+    )
+
+    async def continue_set_leaderbourd(self, button, interaction:discord.Interaction):
+
+        emb = discord.Embed(description=f"""## Weitere einstellung des leaderbourds
+            {Emojis.dot_emoji} Der leaderbourd channel wird beibehalten
+            {GetEmbed.get_embed(embed_index=3)}""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb)
+
+
+    @discord.ui.button(
+        label="set new channel",
+        style=discord.ButtonStyle.blurple,
+        custom_id="set_new_channel"
+    )
+
+    async def set_new_channel(self, button, interaction:discord.Interaction):
+
+        emb = discord.Embed(description=f"""## Wähle einen neuen channel
+            {Emojis.dot_emoji} Wähle aus den unteren select menü einen neuen channel aus in den das message leaderbourd gesendet werden soll
+            {Emojis.dot_emoji} Aktuell ist der channel <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> als leaderbourd channel festgelegt""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=SetLeaderbourdChannel())
+
+
+class OverwriteChannel(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
