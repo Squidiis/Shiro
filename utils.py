@@ -130,6 +130,31 @@ class GetEmbed():
         return emb
     
 
+#########################################  Cancel Button  ########################################
+
+
+class CancelButton(discord.ui.Button):
+    
+    def __init__(self, system):
+        super().__init__(
+            label = "Cancel setting",
+            style = discord.ButtonStyle.danger,
+            custom_id = "cancel_button"
+        )
+        self.system = system
+
+    async def callback(self, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""## Setting canceled
+                {Emojis.dot_emoji} The setting of the {self.system} was canceled.
+                {Emojis.dot_emoji} If you change your mind, you can always execute the command again.""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 class HelpMenu(commands.Cog):

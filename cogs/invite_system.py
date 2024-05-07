@@ -99,6 +99,7 @@ class SetLeaderbourdChannel(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system = "message leaderbourd system"))
 
     @discord.ui.channel_select(
         placeholder = "Choose a channel that you want to set as the leaderbourd channel!",
@@ -149,6 +150,7 @@ class SetLeaderbourd(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system = "message leaderbourd system"))
 
     @discord.ui.select(
         placeholder = "Select the intervals at which the activities should be displayed!",
@@ -203,6 +205,7 @@ class SameChannelButtons(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system = "message leaderbourd system"))
 
     @discord.ui.button(
         label="Continue with the settings", 
@@ -234,5 +237,44 @@ class SameChannelButtons(discord.ui.View):
 
 class OverwriteChannel(discord.ui.View):
 
-    def __init__(self):
+    def __init__(
+            self,
+            channel_id = None
+        ):
         super().__init__(timeout=None)
+        self.channel_id = channel_id
+        self.add_item(CancelButton(system = "message leaderbourd system"))
+
+    @discord.ui.button(
+        label="overwrite channel",
+        style=discord.ButtonStyle.blurple,
+        custom_id="overwrite_channel"
+    )
+
+    async def overwrite_channel(self, button, interaction:discord.Interaction):
+        
+        if self.channel_id == None:
+
+            emb = discord.Embed(description=f"""## Ein fehler ist aufgetreten
+                {Emojis.dot_emoji} Der channel konnte nicht überschrieben werden das passiert wenn die option zu lange unbeantwortet bleibt oder wenn ich die verbindung verliere
+                {Emojis.dot_emoji} Wenn du das leaderbourd weiter einstellen möchtest muss du nur den command `/set-message-leaderbourd` neu ausführen""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+
+        else:
+
+            emb = discord.Embed(description=f"""## Leaderbourd channel wurde überschrieben
+                {Emojis.dot_emoji} Ab sofort ist <#{self.channel_id}> der neue leaderbourd channel
+                {Emojis.dot_emoji} Das leaderbourd wird aus dem alten leaderbourd channel gelöscht
+                {Emojis.dot_emoji} Mit den unseren select menü kannst du mit dem einstellen fortfahren
+                {Emojis.help_emoji} Du kannst mehrere intervalle auswählen auch ist jedes intervall ein einzelnes leaderbourd""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+        
+    @discord.ui.button()
+    async def keep_channel(self, button, interaction:discord.Interaction):
+
+        emb = discord.Embed(description=f"""## Channel wird beibehalten
+            {Emojis.dot_emoji} Der channel <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> wird als leaderbourd channel beibehalten
+            {Emojis.dot_emoji} Mit den unseren select menü kannst du mit dem einstellen fortfahren
+            {Emojis.help_emoji} Du kannst mehrere intervalle auswählen auch ist jedes intervall ein einzelnes leaderbourd""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+

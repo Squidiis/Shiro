@@ -1326,7 +1326,7 @@ class LevelSystemSetting(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(CancelSetLevelSystem())
+        self.add_item(CancelButton(system = "level system"))
         self.add_item(LevelSystemOnOffSwitch())
         self.add_item(ShowLevelSettings())
 
@@ -1369,7 +1369,7 @@ class LevelSystemSetting(discord.ui.View):
         check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
         view = View(timeout=None)
-        view.add_item(CancelSetLevelSystem())
+        view.add_item(CancelButton(system = "level system"))
         default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
 
         if interaction.user.guild_permissions.administrator:
@@ -1543,7 +1543,7 @@ class SetLevelUpChannelSelect(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(CancelSetLevelSystem())
+        self.add_item(CancelButton(system = "level system"))
         
     @discord.ui.channel_select(
         placeholder = "Choose a channel that you want to set as a level up channel!",
@@ -1617,7 +1617,7 @@ class BonusXpPercentage(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(SendXpBonusModal())
-        self.add_item(CancelSetLevelSystem())
+        self.add_item(CancelButton(system = "level system"))
 
     @discord.ui.string_select(
         placeholder = "Select a percentage",
@@ -1739,7 +1739,7 @@ class SetXpRate(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(CancelSetLevelSystem())
+        self.add_item(CancelButton(system = "level system"))
 
     @discord.ui.select(
         max_values = 1,
@@ -1792,7 +1792,7 @@ class LevelSystemDefault(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(CancelSetLevelSystem())
+        self.add_item(CancelButton(system = "level system"))
 
     @discord.ui.select(
         max_values = 4,
@@ -1882,32 +1882,8 @@ class LevelSystemDefault(discord.ui.View):
 
 
 
-#########################################  Cancel Button  ########################################
-
-
-class CancelSetLevelSystem(discord.ui.Button):
-    
-    def __init__(self):
-        super().__init__(
-            label = "Cancel setting",
-            style = discord.ButtonStyle.danger,
-            custom_id = "cancel_level_set"
-        )
-
-    async def callback(self, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            emb = discord.Embed(description=f"""## Setting canceled
-                {Emojis.dot_emoji} The setting of the level system was canceled.
-                {Emojis.dot_emoji} If you change your mind, you can always execute the command again.""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-
+###############################  Show settings  ###################################
+            
 
 class ShowLevelSettings(discord.ui.Button):
 
@@ -1957,7 +1933,7 @@ class ShowLevelSettingsSelect(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(CancelSetLevelSystem())
+        self.add_item(CancelButton(system = "level system"))
 
     @discord.ui.select(
         max_values = 1,

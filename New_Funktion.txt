@@ -50,6 +50,7 @@ erklärung in der readme adden für die custom farben für die rank cards
 
 
 leaderboard system (cancel button, übersetzen, task funktion überarbeiten, checken ob die einstellungen schon so sind)
+überschreibungs buttons fertig machen
 
 
 back button zum close button machen help
