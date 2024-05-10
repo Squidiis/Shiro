@@ -148,7 +148,7 @@ class CancelButton(discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
 
             emb = discord.Embed(description=f"""## Setting canceled
-                {Emojis.dot_emoji} The setting of the {self.system} was canceled.
+                {Emojis.dot_emoji} The setting of the {self.system if self.system != None else 'system'} was canceled.
                 {Emojis.dot_emoji} If you change your mind, you can always execute the command again.""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 

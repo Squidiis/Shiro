@@ -1,7 +1,7 @@
 import os
 import mysql.connector
 from utils import *
-
+import discord
 
 #######################  Database connection  #######################
 
