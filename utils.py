@@ -75,6 +75,22 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
 default_message = 'Oh nice {user} you have a new level, your newlevel is {level}' 
 
 
+
+def is_admin():
+    async def predicate(ctx):
+        # Überprüfe, ob der Benutzer Administrator ist
+        if ctx.guild is None:
+            return False
+        member = ctx.guild.get_member(ctx.author.id)
+        if member is None:
+            return False
+        return member.guild_permissions.administrator
+
+    return commands.check(predicate)
+
+
+
+
 # Embeds that are used multiple times within the bot
 class GetEmbed():
     '''
@@ -86,6 +102,7 @@ class GetEmbed():
             1: User not found 
             2: Help menu main text
             3: Message leaderbourd text
+            4: Same channel message leaderbourd
         - settings
             The correct information that must be inserted in the embed
     '''
@@ -126,6 +143,12 @@ class GetEmbed():
             {Emojis.dot_emoji} The leaderboard differs in the duration after how much time the stats are updated
             {Emojis.help_emoji} You can also select several intervals, in which case several different leaderboards will be sent
             """
+        
+        elif embed_index == 4:
+
+            emb = discord.Embed(description=f"""## This channel has already been set as a leaderbourd channel
+                {Emojis.dot_emoji} This channel has already been set for the message leaderbourd
+                {Emojis.dot_emoji} Would you like to continue setting the message leaderbourd (the channel will not be changed) or set a different channel?""", color=bot_colour)
             
         return emb
     

@@ -55,7 +55,7 @@ class InviteSystem(commands.Cog):
         emb = discord.Embed(description=f"""## Set the message leaderbourd
             {Emojis.dot_emoji} Mit den unteren Select menü kannst du einen channel festlegen in dem das leaderbourd gesendet werden soll
             {Emojis.dot_emoji} Danach kannst du auch ein Intervall festlegen in welchen Zeit abständen das leaderbourd aktualisiert werden soll
-            {Emojis.help_emoji} Das leaderbourd wird beim aktualisieren editiert daher solltest du sicher stellen das kein anderer in den von dir angegeben channel schreiben kann""", color=bot_colour)
+            {Emojis.help_emoji} Das leaderbourd wird beim aktualisieren editiert daher solltest du sicher stellen das kein anderer in den von dir angegeben channel schreiben kann""", color=bot_colour)        
         await ctx.respond(embed=emb, view=SetLeaderbourdChannel())
 
 
@@ -94,7 +94,6 @@ def setup(bot):
     bot.add_cog(InviteSystem(bot))
 
 
-
 class SetLeaderbourdChannel(discord.ui.View):
 
     def __init__(self):
@@ -121,10 +120,7 @@ class SetLeaderbourdChannel(discord.ui.View):
 
             if settings[5] == select.values[0].id:
 
-                emb = discord.Embed(description=f"""## Dieser channel wurde bereits als leaderbourd channel festgelegt
-                    {Emojis.dot_emoji} Dieser channel wurde bereits für das message leaderbourd festgelegt
-                    {Emojis.dot_emoji} Möchstest du mit dem einstellen des message leaderbourds vortfaren oder einen anderen channel festlegen?""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=SameChannelButtons())
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4), view=SameChannelButtons())
 
             else:
                 
@@ -286,9 +282,21 @@ class SetNewChannel(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.channel_select()
-    async def set_new_channel_select():
+    async def set_new_channel_select(self, select, interaction:discord.Interaction):
 
-        emb = discord.Embed()
+        if DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5] == select.values[0]:
+
+            await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4), view=SameChannelButtons())
+
+        else:
+
+            emb = discord.Embed(description=f"""## Channel wurde festgeleght
+                {Emojis.dot_emoji} Der neue channel für das message leaderbourd ist <#{select.values[0]}>
+                {Emojis.dot_emoji} Das leaderbourd wird aus den alten channel gelöscht
+                {Emojis.dot_emoji} Mit den unteren select menü kannst du intervalle auswählen diese werden dann die aktivitäten der user in den angegeben Zeit tracken
+                {Emojis.help_emoji} Du kannst mehrere Intervalle auswählen und die neuen leaderbourds werden erst dann gesendet wenn mindestens ein intervall ausgewählt hast""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+
 
 class OverwriteChannel(discord.ui.View):
 
