@@ -1086,6 +1086,7 @@ class DatabaseUpdates():
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
+
     '''
     Verwaltet das message leaderbourd system
 
@@ -1142,29 +1143,37 @@ class DatabaseUpdates():
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
-        
-        if settings:
+        try:
 
-            vlaue = coulmn_values[settings]
-            settings = f"UPDATE LeaderbourdSettings SET {column_name_settings[settings]} = %s WHERE guildId = %s"
-            settings_values = [vlaue, guild_id]
-            cursor.execute(settings, settings_values)
+            if settings:
 
-        elif interval:
+                vlaue = coulmn_values[settings]
+                settings = f"UPDATE LeaderbourdSettings SET {column_name_settings[settings]} = %s WHERE guildId = %s"
+                settings_values = [vlaue, guild_id]
+                cursor.execute(settings, settings_values)
 
-            check_user = DatabaseCheck.check_leaderbourd(guild_id = guild_id, user_id = user_id)
+            elif interval:
 
-            update_stats = f"UPDATE LeaderbourdTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s WHERE guildId = %s AND userId = %s"
-            update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, guild_id, user_id]
-            cursor.execute(update_stats, update_stats_values)
+                check_user = DatabaseCheck.check_leaderbourd(guild_id = guild_id, user_id = user_id)
 
-        elif back_to_none != None:
+                update_stats = f"UPDATE LeaderbourdTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s WHERE guildId = %s AND userId = %s"
+                update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, guild_id, user_id]
+                cursor.execute(update_stats, update_stats_values)
 
-            set_back_to_none = f"UPDATE LeaderbourdSettings SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
-            set_back_to_none_values = [guild_id]
-            cursor.execute(set_back_to_none, set_back_to_none_values)
+            elif back_to_none != None:
+
+                set_back_to_none = f"UPDATE LeaderbourdSettings SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+                set_back_to_none_values = [guild_id]
+                cursor.execute(set_back_to_none, set_back_to_none_values)
             
-        db_connect.commit()
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -1180,18 +1189,27 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        if settings != None:
+        try:
 
-            create_settings = f"INSERT INTO LeaderbourdSettings (guildId, leaderbourdChannel) VALUES (%s, %s)"
-            create_settings_values = [guild_id, channel_id]
+            if settings != None:
 
-        else:
+                create_settings = f"INSERT INTO LeaderbourdSettings (guildId, leaderbourdChannel) VALUES (%s, %s)"
+                create_settings_values = [guild_id, channel_id]
 
-            create_settings = f"INSERT INTO LeaderbourdTacking (guildId, userId, dailyCountMessage, weeklyCountMessage, monthlyCountMessage) VALUES (%s ,%s, %s, %s, %s)"
-            create_settings_values = [guild_id, user_id, 1, 1, 1]
+            else:
 
-        cursor.execute(create_settings, create_settings_values)
-        db_connect.commit()
+                create_settings = f"INSERT INTO LeaderbourdTacking (guildId, userId, dailyCountMessage, weeklyCountMessage, monthlyCountMessage) VALUES (%s ,%s, %s, %s, %s)"
+                create_settings_values = [guild_id, user_id, 1, 1, 1]
+
+            cursor.execute(create_settings, create_settings_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
 

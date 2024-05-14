@@ -1864,6 +1864,7 @@ class LevelSystemDefault(discord.ui.View):
         style = discord.ButtonStyle.blurple,
         custom_id = "set_all_settings_default"
     )
+    
     async def level_system_all_dafault(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:

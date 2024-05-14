@@ -56,3 +56,16 @@ leaderboard system (cancel button, übersetzen, task funktion überarbeiten, che
 back button zum close button machen help
 
 
+
+message leaderbourd
+
+commands
+funktionsweise 
+
+    - Blacklist
+    - Rollen für die die eine hohe position haben
+    - lagern der einträge das man auch ein rückblick auf die letzten 3 runden hat
+    - Ein / aus button
+    
+
+

@@ -148,7 +148,7 @@ class GetEmbed():
 
             emb = discord.Embed(description=f"""## This channel has already been set as a leaderbourd channel
                 {Emojis.dot_emoji} This channel has already been set for the message leaderbourd
-                {Emojis.dot_emoji} Would you like to continue setting the message leaderbourd (the channel will not be changed) or set a different channel?""", color=bot_colour)
+                {Emojis.dot_emoji} Would you like to continue setting the message leaderbourd (the channel will not be changed) or re-execute the command and set a different channel for the message leaderbourd""", color=bot_colour)
             
         return emb
     
