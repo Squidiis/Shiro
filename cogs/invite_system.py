@@ -79,7 +79,7 @@ class InviteSystem(commands.Cog):
         emb = discord.Embed(description=f"""## Hier siehst du alle einstellungen des message leaderbourds
             {Emojis.dot_emoji} {f'Aktuell ist <#{settings[5]}> als' if settings[5] != None else 'Es wurde kein'} message leaderbourd channel festgelegt
             {Emojis.dot_emoji} Aktuell sind folgende Intervalle festgelegt für die ein Leaderbourd existiert:
-            {intervals_text if intervals_text != [] else f'{Emojis.dot_emoji} Es wurden bisher keine Intervalle festgelegt'}""", color=bot_colour)
+            {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} Es wurden bisher keine Intervalle festgelegt'}""", color=bot_colour)
         await ctx.respond(embed = emb)
 
 
@@ -164,7 +164,7 @@ class SetLeaderbourdChannel(discord.ui.View):
                 emb = discord.Embed(description=f"""## Es wurde bereits ein channel für das leaderbourd festgelegt
                     {Emojis.dot_emoji} Möchstest du diesen überschreibe?
                     {Emojis.dot_emoji} aktuell ist <#{settings[5]}> als channel für das leaderbourd festlegegt""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=OverwriteChannel())
+                await interaction.response.edit_message(embed=emb, view=OverwriteChannel(channel_id=select.values[0].id))
 
         else:
 
@@ -254,7 +254,7 @@ class SetLeaderbourd(discord.ui.View):
                 emb = discord.Embed(description=f"""## Es wurden bereits intervalle festgelegt
                     {Emojis.dot_emoji} Aktuell sind folgende intervalle aktiv:
                         {check_list}
-                    {Emojis.dot_emoji} Willst du dieser überschreiben?""")
+                    {Emojis.dot_emoji} Willst du dieser überschreiben?""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb)
 
         else:
@@ -290,9 +290,7 @@ class SetLeaderbourd(discord.ui.View):
 class OverwriteChannel(discord.ui.View):
 
     def __init__(
-            self,
-            channel_id = None
-        ):
+            self, channel_id):
         super().__init__(timeout=None)
         self.channel_id = channel_id
         self.add_item(CancelButton(system = "message leaderbourd system"))
@@ -318,13 +316,21 @@ class OverwriteChannel(discord.ui.View):
 
         else:
             
-            DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
             get_messages = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
+            DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
 
-            for i in get_messages[2], get_messages[3], get_messages[4]:
+            for i, index in (get_messages[2], "daily"), (get_messages[3], "weekly"), (get_messages[4], "monthly"):
+                
+                if i != None:
+                
+                    leaderbourd_channel = bot.get_channel(get_messages[5])
+                    print(leaderbourd_channel)
+                    print(i)
+                    msg = await leaderbourd_channel.fetch_message(i)
+                    print(msg)
+                    await msg.delete()
 
-                msg = bot.get_message(i)
-                msg.delete()
+                    DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, back_to_none = index)
 
             emb = discord.Embed(description=f"""## Leaderbourd channel wurde überschrieben
                 {Emojis.dot_emoji} Ab sofort ist <#{self.channel_id}> der neue leaderbourd channel

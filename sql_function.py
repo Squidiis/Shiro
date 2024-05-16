@@ -1115,7 +1115,7 @@ class DatabaseUpdates():
 
     Info:
         - guild_id must be specified
-        - An operation must be specified either add, remove or reset
+        - An operation must be specified
     '''
     def manage_leaderbourd(
         guild_id:int, 

@@ -31,12 +31,6 @@ inv tracker system
         - wer die meisten eigeladen hat 
 
 
-level system adden das ein leaderboard gibt bei dem die aktivsten user nochmal wöchentlich gezeicht werden
-
-chat KI (villeicht)
-
-giverway system
-
 ticket systen
 
 
@@ -49,14 +43,12 @@ erklärung in der readme adden für die custom farben für die rank cards
 
 
 
-leaderboard system (cancel button, übersetzen, task funktion überarbeiten, checken ob die einstellungen schon so sind)
-überschreibungs buttons fertig machen
-
+leaderboard system  übersetzen, task funktion überarbeiten, Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
 
 back button zum close button machen help
 
 
-
+(
 message leaderbourd
 
 commands
@@ -66,6 +58,6 @@ funktionsweise
     - Rollen für die die eine hohe position haben
     - lagern der einträge das man auch ein rückblick auf die letzten 3 runden hat
     - Ein / aus button
-    
+)    
 
 
