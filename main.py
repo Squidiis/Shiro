@@ -4,8 +4,7 @@ from cogs.mod_tools import *
 from dotenv import load_dotenv
 from cogs.fun_commands import *
 from utils import *
-
-
+from cogs.invite_system import *
 
 @bot.slash_command(description="Shows you the ping.")
 async def ping(ctx):
@@ -114,7 +113,7 @@ class Main(commands.Cog):
                 inviteCount INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
-            ]  
+            ]
 
         try:
 
@@ -171,8 +170,14 @@ class Main(commands.Cog):
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
 
         self.bot.add_view(view)
+        
+        if not edit_leaderbourd.is_running():
+            edit_leaderbourd.start(self.bot)
+
 
         await Main.create_db_table()
+
+
 
 
 # Status task while the bot is active, the status is permanently updated
@@ -184,7 +189,6 @@ async def status_task():
         await asyncio.sleep(15)
 
 bot.add_cog(Main(bot))
-
 
 
 class AntiSpam(commands.Cog):

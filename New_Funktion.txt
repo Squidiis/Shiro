@@ -19,21 +19,6 @@ Updaite 1.1
         drop down für die einzelnen einstellungen button mit modal für emoji oder spezific content
 
 
-server wachstums system (diagramm)
-
-inv tracker system 
-- set-command
-    - settings (leaderboard)
-        - 7 oder 14 tage überlick
-    - show command
-        - spezifischen user anzeigen wie viele er ingesammt eingeladen hat
-    - leaderbourd 
-        - wer die meisten eigeladen hat 
-
-
-ticket systen
-
-
 aus den LevelSystemRoles table den guildName raussteichen
 
 
@@ -44,20 +29,7 @@ erklärung in der readme adden für die custom farben für die rank cards
 
 
 leaderboard system  übersetzen, task funktion überarbeiten, Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
-
+Sicherheits funktion die checkt wenn nachrichten gelöscht werden ob die in der db sind wenn ja nichricht in den channel
 back button zum close button machen help
-
-
-(
-message leaderbourd
-
-commands
-funktionsweise 
-
-    - Blacklist
-    - Rollen für die die eine hohe position haben
-    - lagern der einträge das man auch ein rückblick auf die letzten 3 runden hat
-    - Ein / aus button
-)    
 
 
