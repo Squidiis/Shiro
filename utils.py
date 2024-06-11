@@ -15,7 +15,7 @@ from sql_function import *
 import yaml
 from discord.ext.pages import Paginator, Page
 from datetime import timedelta
-from datetime import datetime
+from datetime import datetime, UTC
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓

@@ -432,7 +432,6 @@ class DatabaseCheck():
         if interval != None:
 
             check_leaderbourd_count = f"SELECT * FROM LeaderbourdTacking WHERE guildId = %s ORDER BY {column_name[interval]} DESC"
-            print(f"check: {check_leaderbourd_count}")
             check_leaderbourd_count_values = [guild_id]
         
         else:
@@ -448,7 +447,6 @@ class DatabaseCheck():
             leaderbourd = cursor.fetchone()
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        print(leaderbourd)
         return leaderbourd
             
 

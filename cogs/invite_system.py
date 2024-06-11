@@ -19,9 +19,9 @@ class InviteSystem(commands.Cog):
                 if invite.inviter == ctx.author:
                     total_invites += invite.uses
 
-            emb = discord.Embed(description=f"""## Anzahl an eingeladenen Mitgliedern von {user.name}
-                {Emojis.dot_emoji} {f'{user.mention} hat {total_invites} user' if total_invites != 0 else f'{user.mention} hat noch keine anderen user'} auf den Server {ctx.guild.name} eingeladen.
-                {Emojis.help_emoji} Die einladungen werden nur dann gezählt wenn der user den einladungs link erstellt hat!""", color=bot_colour)
+            emb = discord.Embed(description=f"""## Number of invited members of {user.name}
+                {Emojis.dot_emoji} {f'{user.mention} has invited {total_invites} users' if total_invites != 0 else f'{user.mention} has not yet invited any other users'} to the server {ctx.guild.name}.
+                {Emojis.help_emoji} The invitations are only counted if the user has created the invitation link!""", color=bot_colour)
             
             await ctx.respond(embed=emb)
         else:
@@ -30,7 +30,7 @@ class InviteSystem(commands.Cog):
             for invite in await ctx.guild.invites():
                 if invite.inviter == user:
                     total_invites += invite.uses
-            await ctx.respond(f"{user.mention} hat {total_invites} Mitglied{'er' if total_invites != 1 else ''} auf den Server eingeladen.")
+            await ctx.respond(f"{user.mention} has invited {total_invites} member to the server.")
 
 
     @commands.slash_command(name = "set-message-leaderbourd", description = "Set the message leaderbourd system!")
@@ -39,14 +39,14 @@ class InviteSystem(commands.Cog):
         settings = DatabaseCheck.check_leaderbourd_settings(guild_id = ctx.guild_id)
 
         emb = discord.Embed(description=f"""## Set the message leaderbourd
-            {Emojis.dot_emoji} Mit den unteren Select menü kannst du einen channel festlegen in dem das leaderbourd gesendet werden soll
-            {Emojis.dot_emoji} Danach kannst du auch ein Intervall festlegen in welchen Zeit abständen das leaderbourd aktualisiert werden soll
-            {Emojis.dot_emoji} Auch kannst du das system aus oder anschalten aktuell ist es {'ausgeschallten' if settings[0] else 'eingeschalten'} (sobald es ausgeschalten ist werden auch keine nachrichten mehr gezählt und beim einschalten wird das leaderbourd zurück gesetzt)
-            {Emojis.help_emoji} Das leaderbourd wird beim aktualisieren editiert daher solltest du sicher stellen das kein anderer in den von dir angegeben channel schreiben kann""", color=bot_colour)        
+            {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderbourd should be sent
+            {Emojis.dot_emoji} Then you can also set an interval at which time intervals the leaderboard should be updated
+            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[0] else 'switched on'}. (as soon as it is switched off, no more messages are counted and when it is switched on, the leaderbourd is reset)
+            {Emojis.help_emoji} The leaderbourd is edited when you update it, so you should make sure that no one else can write in the channel you specified""", color=bot_colour)        
         await ctx.respond(embed=emb, view=SetLeaderbourdChannel())
 
 
-    @commands.slash_command(name = "show-message-leaderbourd-setting", description = "Alle dir zeigen wie das message leaderbourd eingestellt ist!")
+    @commands.slash_command(name = "show-message-leaderbourd-setting", description = "All show you how the message leaderbourd is set!")
     async def show_message_leaderbourd_settings(self, ctx:discord.ApplicationContext):
         
         settings = DatabaseCheck.check_leaderbourd_settings(guild_id = ctx.guild.id)
@@ -61,12 +61,12 @@ class InviteSystem(commands.Cog):
 
             if i != None:
 
-                intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} aktualisierendes Message Leaderbourd\n")
+                intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating Message leaderbourd\n")
 
-        emb = discord.Embed(description=f"""## Hier siehst du alle einstellungen des message leaderbourds
-            {Emojis.dot_emoji} {f'Aktuell ist <#{settings[5]}> als' if settings[5] != None else 'Es wurde kein'} message leaderbourd channel festgelegt
-            {Emojis.dot_emoji} Aktuell sind folgende Intervalle festgelegt für die ein Leaderbourd existiert:
-            {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} Es wurden bisher keine Intervalle festgelegt'}""", color=bot_colour)
+        emb = discord.Embed(description=f"""## Here you can see all the settings of the message leaderboard
+            {Emojis.dot_emoji} {f'Currently <#{settings[5]}> is set as' if settings[5] != None else 'No'} message leaderbourd channel has been set
+            {Emojis.dot_emoji} The following intervals are currently defined for which a leaderboard exists:
+            {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} No intervals have been defined yet'}""", color=bot_colour)
         await ctx.respond(embed = emb)
 
 
@@ -85,25 +85,46 @@ class InviteSystem(commands.Cog):
 def setup(bot):
     bot.add_cog(InviteSystem(bot))
 
-def sort_leaderbourd(user_list, interval):
 
-    leaderbourd = []
-    for i, pos in enumerate(user_list, start=1):
+async def sort_leaderbourd(user_list, interval):
 
-        interval_list = {
-        "day":pos[2],
-        "week":pos[3],
-        "month":pos[4]
-        }
-                
-        if i <= 10:
-                    
-            leaderbourd.append(f"{i}. <@{pos[1]}>   nachrichten: {interval_list[interval]}")
+    max_lengths = [
+        max(len(str(t[i])) for t in user_list)
+        for i in range(6)
+    ]
 
-    return leaderbourd
+    user_names = []
+    for t in user_list:
+
+        user = await bot.get_or_fetch_user(t[1])
+        user_names.append(user.name)
+        max_lengths[0] = max(max_lengths[0], len(user.name))
+    
+    padded_tuples = [
+        (
+            user_names[i].ljust(max_lengths[0]), 
+            str(t[1]).ljust(max_lengths[1]),
+            str(t[2]).ljust(max_lengths[2]),
+            str(t[3]).ljust(max_lengths[3]),
+            str(t[4]).ljust(max_lengths[4])
+        )
+        for i, t in enumerate(user_list)
+    ]
+
+    leaderboard = []
+    for i in range(min(len(user_list), 15)):
+        num_str = str(i + 1)
+        if len(num_str) == 1:
+            num_str = f" #{num_str}  "
+        elif len(num_str) == 2:
+            num_str = f" #{num_str} "
+
+        leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `messages {padded_tuples[i][interval]}`\n")
+
+    return "".join(leaderboard)
 
 
-@tasks.loop(minutes=2)  # Intervall von 24 Stunden (einmal täglich)
+@tasks.loop(minutes=2)
 async def edit_leaderbourd(bot):
 
     for guild in bot.guilds:
@@ -122,32 +143,27 @@ async def edit_leaderbourd(bot):
 
                 try:
                     
-                    current_date = datetime.utcnow()
+                    current_date = datetime.now(UTC)
 
                     for message_name, message_id in message_ids:
-                        print(1)
-                        print(message_id)
+                        
                         channel = bot.get_channel(leaderboard_settings[5])
                         message = await channel.fetch_message(message_id)
 
-                        format_current_date = current_date.astimezone(pytz.utc)
-
                         if leaderboard_settings[2] != None:
 
-                            
                             if message.edited_at != None:
-                                print(abs(format_current_date - message.edited_at))
-                                print(format_current_date - message.edited_at)
-                                if abs(format_current_date - message.edited_at) > timedelta(minutes=5) and message_name == "1_day_old":
+                                
+                                if (current_date - message.edited_at) > timedelta(minutes=5) and message_name == "1_day_old":
                                     
                                     user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 0)
-                                    users = "\n".join(sort_leaderbourd(user_list=user_list, interval="day"))
+                                    users = await sort_leaderbourd(user_list=user_list, interval=2)
                                     emb = discord.Embed(description=f"""**Daily Messages Leaderboard**
-                                        {users} editet""", color=bot_colour)
-                                    print(emb)
+                                        {users} editet5""", color=bot_colour)
+                                    
                                     await message.edit(embed = emb)
 
-                            elif format_current_date - message.created_at > timedelta(days=1) and message_name == "1_day_old":
+                            elif (current_date - message.created_at) > timedelta(days=1) and message_name == "1_day_old":
 
                                 emb = discord.Embed(description=f"""**Daily Messages Leaderboard**
                                     {DatabaseCheck.check_leaderbourd(guild_id = bot.guild.id, interval = 0)}""", color=bot_colour)
@@ -156,7 +172,7 @@ async def edit_leaderbourd(bot):
 
                         if leaderboard_settings[3] != None:
 
-                            if format_current_date - message.created_at > timedelta(weeks=1) and message_name == "1_week_old":
+                            if (current_date - message.created_at) > timedelta(weeks=1) and message_name == "1_week_old":
 
                                 emb = discord.Embed(description=f"""**weekly Messages Leaderboard**
                                     {DatabaseCheck.check_leaderbourd(guild_id = bot.guild.id, interval = 1)}""", color=bot_colour)
@@ -165,7 +181,7 @@ async def edit_leaderbourd(bot):
 
                         if leaderboard_settings[4] != None:
 
-                            if format_current_date - message.created_at > timedelta(days=30) and message_name == "1_month_old":
+                            if (current_date - message.created_at) > timedelta(days=30) and message_name == "1_month_old":
                                     
                                 emb = discord.Embed(description=f"""**Monthly Messages Leaderboard (30 days)**
                                     {DatabaseCheck.check_leaderbourd(guild_id = bot.guild.id, interval = 2)}""", color=bot_colour)

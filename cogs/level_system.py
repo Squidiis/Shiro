@@ -753,7 +753,7 @@ class LevelSystem(commands.Cog):
            
             # Progress Bar
             if xp != 0:
-                print(1)
+                
                 progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
                 progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255) 
                 background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
@@ -795,27 +795,37 @@ class LevelSystem(commands.Cog):
         leaderboard_connect = DatabaseSetup.db_connector()
         my_cursor = leaderboard_connect.cursor()
 
-        leaderboard_levels = "SELECT userId, userLevel, userXp FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC, userXp DESC"
+        leaderboard_levels = "SELECT userName, userLevel, userXp FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC, userXp DESC"
         leaderboard_levels_values = [ctx.guild.id]
         my_cursor.execute(leaderboard_levels, leaderboard_levels_values)
         leaderboard_members =  my_cursor.fetchall()
+        
+        max_lengths = [
+        max(len(str(t[i])) for t in leaderboard_members)
+        for i in range(3)
+        ]
+    
+        padded_tuples = [
+            (
+                str(t[0]).ljust(max_lengths[0]),
+                str(t[1]).ljust(max_lengths[1]),
+                str(t[2]).ljust(max_lengths[2])
+            )
+            for t in leaderboard_members
+        ]
 
-        spaces = "     "
-        len_spaces = len(spaces)
-
-        c = []
-        for i, pos in enumerate(leaderboard_members, start=1):
-            member_id, lvl, xp = pos
+        leaderbourd = []
+        for i in range(min(len(leaderboard_members), 15)):
+            num_str = str(i + 1)
+            if len(num_str) == 1:
+                num_str = f" #{num_str}  "
+            elif len(num_str) == 2:
+                num_str = f" #{num_str} "
             
-            if i <= 10:
-                
-                c.append(f"{i}. `level {lvl:2}` `{xp:2} XP`    <@{member_id}>")
-            
-        level_roles_mention_end = '\n'.join(c)
-
+            leaderbourd.append(f"""`{num_str}` `{padded_tuples[i][0]}` `lvl {padded_tuples[i][1]}` `XP {padded_tuples[i][2]}`\n""")
         DatabaseSetup.db_close(cursor=my_cursor, db_connection=leaderboard_connect)
 
-        emb = discord.Embed(title="Leaderboard", description=f"{level_roles_mention_end}", color=bot_colour)
+        emb = discord.Embed(title="Leaderboard", description=f"{''.join(leaderbourd)}", color=bot_colour)
         emb.set_footer(icon_url=ctx.guild.icon.url, text="These are the most active users of this server")
         await ctx.respond(embed=emb)
 
@@ -825,13 +835,14 @@ class LevelSystem(commands.Cog):
 
 
     async def config_level_blacklist(
-            self, 
-            guild_id:int, 
-            operation:str, 
-            channel = None, 
-            category = None, 
-            role = None, 
-            user = None):
+        self, 
+        guild_id:int, 
+        operation:str, 
+        channel = None, 
+        category = None, 
+        role = None, 
+        user = None
+        ):
 
         if [x for x in [channel, category, role, user] if x]:
             
@@ -1125,7 +1136,7 @@ class LevelSystem(commands.Cog):
     async def show_level_roles(self, ctx:discord.ApplicationContext):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status = "level_role")
-        print(level_roles)
+        
         if level_roles:
             
             emb = discord.Embed(description=f"""## Current level roles

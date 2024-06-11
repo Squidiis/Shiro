@@ -117,25 +117,14 @@ CREATE TABLE BotSettings (
 
 -------------- Table for the Autoreaction ---------------
 
-DROP TABLE IF EXISTS `AutoReactionSetup`;
-
-CREATE TABLE AutoReactionSetup (
-    guildId BIGINT UNSIGNED NOT NULL, 
-    channelId BIGINT UNSIGNED NOT NULL,
-    categoryId BIGINT UNSIGNED NOT NULL,
-    emojiOne VARCHAR(255) NULL,
-    emojiTwo VARCHAR(255) NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
 DROP TABLE IF EXISTS `AutoReactionSettings`;
 
 CREATE TABLE AutoReactionSettings (
     guildId BIGINT UNSIGNED NOT NULL,
-    ServerReaction INT NULL,
-    reactionParameter VARCHAR(255) NULL,
-    mainReactionEmoji VARCHAR(255) NOT NULL,
-    reactionKeyWords VARCHAR(4000) NULL
+    channelId BIGINT UNSIGNED NOT NULL,
+    categoryId BIGINT UNSIGNED NOT NULL,
+    parameter VARCHAR(255) NOT NULL,
+    emoji VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
