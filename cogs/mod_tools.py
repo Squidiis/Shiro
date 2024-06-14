@@ -539,6 +539,30 @@ class ModeratorCommands(commands.Cog):
         await ctx.respond(embed=emb, view=GhostPingButtons())
 
 
+    @commands.slash_command(name = "show-invites")
+    async def show_invites(self, ctx:discord.ApplicationContext, user:Option(discord.Member)):
+
+        if user is None:
+
+            total_invites = 0
+            for invite in await ctx.guild.invites():
+                if invite.inviter == ctx.author:
+                    total_invites += invite.uses
+
+            emb = discord.Embed(description=f"""## Number of invited members of {user.name}
+                {Emojis.dot_emoji} {f'{user.mention} has invited {total_invites} users' if total_invites != 0 else f'{user.mention} has not yet invited any other users'} to the server {ctx.guild.name}.
+                {Emojis.help_emoji} The invitations are only counted if the user has created the invitation link!""", color=bot_colour)
+            
+            await ctx.respond(embed=emb)
+        else:
+
+            total_invites = 0
+            for invite in await ctx.guild.invites():
+                if invite.inviter == user:
+                    total_invites += invite.uses
+            await ctx.respond(f"{user.mention} has invited {total_invites} member to the server.")
+
+
     @commands.slash_command()
     async def userinfo(ctx:discord.ApplicationContext, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
         member = ctx.author if not member else member

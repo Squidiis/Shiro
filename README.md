@@ -38,7 +38,9 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 * Moderation System
     - ban, kick, mute, unmute, clear commands
     - server-info, user-info commands
-    - anti link system (with whitelist function) 
+    - anti link system (with whitelist function)
+    - anti ghost ping system
+    - invite tracker
 
 * Fun commands
     - RPS (Rock, Paper, Scissors) alone against a bot or against your friends
@@ -73,7 +75,7 @@ To run the code on your bot customize the [`.env`](.env) file simply fill in all
 |user|Enter the user name of your MySQL database here this can be `root` if you run it locally or a custom name of your choice.|
 |discord_db|Here the name of the database schema.|
 
-In the [`ultils.py`](ultils.py) file add the emojis to the variables if you don't know here is a YouTube tutorial just click [here](https://www.youtube.com/watch?app=desktop&v=-w7XYr22UEw&t=182)
+In the [`ultils.py`](ultils.py) file add the emojis to the variables [emojis](emojis)
 
 # How to start?
 
@@ -144,4 +146,5 @@ If you encounter problems use the discord server linked above or press [here](ht
 |serverinfo-slash|Displays all relevant information about the server.|
 |userinfo|Displays all relevant information about a user.|
 |ghost-ping-settings|Set the ghost ping system if someone tags you and deletes the message a message will be sent with the content and the sender can be turned on/off.|
+|show-invites|Shows how many members a user has invited|
 

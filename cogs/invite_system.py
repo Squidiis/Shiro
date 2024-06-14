@@ -4,7 +4,7 @@ from sql_function import *
 from discord.ext import tasks
 import pytz
 
-class InviteSystem(commands.Cog):
+class MessageLeaderbourd(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -83,7 +83,7 @@ class InviteSystem(commands.Cog):
             DatabaseUpdates.manage_leaderbourd(guild_id = message.guild.id, user_id = message.author.id, interval = "count")
 
 def setup(bot):
-    bot.add_cog(InviteSystem(bot))
+    bot.add_cog(MessageLeaderbourd(bot))
 
 
 async def sort_leaderbourd(user_list, interval):
@@ -92,7 +92,7 @@ async def sort_leaderbourd(user_list, interval):
         max(len(str(t[i])) for t in user_list)
         for i in range(6)
     ]
-
+    
     user_names = []
     for t in user_list:
 
@@ -146,47 +146,53 @@ async def edit_leaderbourd(bot):
                     current_date = datetime.now(UTC)
 
                     for message_name, message_id in message_ids:
-                        
-                        channel = bot.get_channel(leaderboard_settings[5])
-                        message = await channel.fetch_message(message_id)
 
-                        if leaderboard_settings[2] != None:
+                        if message_id != None:
+                            
+                            channel = bot.get_channel(leaderboard_settings[5])
+                            message = await channel.fetch_message(message_id)
 
-                            if message.edited_at != None:
-                                
-                                if (current_date - message.edited_at) > timedelta(minutes=5) and message_name == "1_day_old":
+                            if leaderboard_settings[2] != None:
                                     
+                                    #if (current_date - message.edited_at) > timedelta(minutes=5) and message_name == "1_day_old":
+                                    #    
+                                    #    user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 0)
+                                    #    users = await sort_leaderbourd(user_list=user_list, interval=2)
+                                    #    emb = discord.Embed(description=f"""**Daily Messages Leaderboard**
+                                    #        {users} editet5""", color=bot_colour)
+                                        
+                                    #    await message.edit(embed = emb)
+
+                                if (current_date - message.edited_at) > timedelta(days=1) and message_name == "1_day_old":
+
                                     user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 0)
-                                    users = await sort_leaderbourd(user_list=user_list, interval=2)
+                                    users = await sort_leaderbourd(user_list=user_list, interval=3)
                                     emb = discord.Embed(description=f"""**Daily Messages Leaderboard**
-                                        {users} editet5""", color=bot_colour)
-                                    
+                                        {users} edit 3""", color=bot_colour)
+
                                     await message.edit(embed = emb)
 
-                            elif (current_date - message.created_at) > timedelta(days=1) and message_name == "1_day_old":
+                            if leaderboard_settings[3] != None:
 
-                                emb = discord.Embed(description=f"""**Daily Messages Leaderboard**
-                                    {DatabaseCheck.check_leaderbourd(guild_id = bot.guild.id, interval = 0)}""", color=bot_colour)
-
-                                await message.edit(embed = emb)
-
-                        if leaderboard_settings[3] != None:
-
-                            if (current_date - message.created_at) > timedelta(weeks=1) and message_name == "1_week_old":
-
-                                emb = discord.Embed(description=f"""**weekly Messages Leaderboard**
-                                    {DatabaseCheck.check_leaderbourd(guild_id = bot.guild.id, interval = 1)}""", color=bot_colour)
-
-                                await message.edit(embed = emb)
-
-                        if leaderboard_settings[4] != None:
-
-                            if (current_date - message.created_at) > timedelta(days=30) and message_name == "1_month_old":
+                                if (current_date - message.edited_at) > timedelta(weeks=1) and message_name == "1_week_old":
                                     
-                                emb = discord.Embed(description=f"""**Monthly Messages Leaderboard (30 days)**
-                                    {DatabaseCheck.check_leaderbourd(guild_id = bot.guild.id, interval = 2)}""", color=bot_colour)
+                                    user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 1)
+                                    users = await sort_leaderbourd(user_list=user_list, interval=3)
+                                    emb = discord.Embed(description=f"""**weekly Messages Leaderboard**
+                                        {users}""", color=bot_colour)
 
-                                await message.edit(embed = emb)
+                                    await message.edit(embed = emb)
+
+                            if leaderboard_settings[4] != None:
+
+                                if (current_date - message.edited_at) > timedelta(days=30) and message_name == "1_month_old":
+                                    
+                                    user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 2)
+                                    users = await sort_leaderbourd(user_list=user_list, interval=4)
+                                    emb = discord.Embed(description=f"""**Monthly Messages Leaderboard (30 days)**
+                                        {users}""", color=bot_colour)
+
+                                    await message.edit(embed = emb)
 
                 except Exception as e:
                     print(f"Ein Fehler ist aufgetreten: {e}")
