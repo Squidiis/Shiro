@@ -101,8 +101,8 @@ class GetEmbed():
             0: Bonus XP procentage
             1: User not found 
             2: Help menu main text
-            3: Message leaderbourd text
-            4: Same channel message leaderbourd
+            3: Message leaderboard text
+            4: Same channel message leaderboard
         - settings
             The correct information that must be inserted in the embed
     '''
@@ -146,9 +146,9 @@ class GetEmbed():
         
         elif embed_index == 4:
 
-            emb = discord.Embed(description=f"""## This channel has already been set as a leaderbourd channel
-                {Emojis.dot_emoji} This channel has already been set for the message leaderbourd
-                {Emojis.dot_emoji} Would you like to continue setting the message leaderbourd (the channel will not be changed) or re-execute the command and set a different channel for the message leaderbourd""", color=bot_colour)
+            emb = discord.Embed(description=f"""## This channel has already been set as a leaderboard channel
+                {Emojis.dot_emoji} This channel has already been set for the message leaderboard
+                {Emojis.dot_emoji} Would you like to continue setting the message leaderboard (the channel will not be changed) or re-execute the command and set a different channel for the message leaderboard""", color=bot_colour)
             
         return emb
     
@@ -191,10 +191,10 @@ class HelpMenu(commands.Cog):
         
         file = discord.File('assets/images/shiro_help_banner.png', filename='shiro_help_banner.png')
         emb.set_image(url=f"attachment://shiro_help_banner.png")
-        await ctx.respond(embed=emb, view=HelpMenüSelect(), file=file)
+        await ctx.respond(embed=emb, view=HelpMenuSelect(), file=file)
 
 
-class HelpMenüSelect(discord.ui.View):
+class HelpMenuSelect(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
@@ -335,7 +335,7 @@ class HelpMenüSelect(discord.ui.View):
         
         file = discord.File('assets/images/shiro_help_banner.png', filename='shiro_help_banner.png')
         emb.set_image(url=f"attachment://shiro_help_banner.png")
-        await interaction.response.edit_message(embed=emb, view=HelpMenüSelect(), file=file)
+        await interaction.response.edit_message(embed=emb, view=HelpMenuSelect(), file=file)
 
 
 

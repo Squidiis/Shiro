@@ -38,6 +38,8 @@ class DeleteData(commands.Cog):
             "LevelSystemSettings",
             "BonusXpList",
             "AntiLinkWhiteList",
+            "LeaderboardSettings",
+            "LeaderboardTacking",
             "BotSettings"
             ]
 
@@ -56,7 +58,8 @@ class DeleteData(commands.Cog):
                 "LevelSystemBlacklist", 
                 "LevelSystemStats",
                 "BonusXpList",
-                "AntiLinkWhiteList"
+                "AntiLinkWhiteList",
+                "LeaderboardTacking"
                 ]
             
             for table in tables:

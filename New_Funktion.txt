@@ -28,8 +28,7 @@ erklärung in der readme adden für die custom farben für die rank cards
 
 
 
-leaderboard system  übersetzen, task funktion überarbeiten, Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
-Sicherheits funktion die checkt wenn nachrichten gelöscht werden ob die in der db sind wenn ja nichricht in den channel
+Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
 back button zum close button machen help
 
-
+leaderboard in Help menu adden und in readme

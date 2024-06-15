@@ -76,23 +76,23 @@ CREATE TABLE AntiLinkWhiteList (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
----------------- Leaderbourd Settings ---------------------
+---------------- leaderboard Settings ---------------------
 
-DROP TABLE IF EXISTS `LeaderbourdSettings`
+DROP TABLE IF EXISTS `LeaderboardSettings`
 
-CREATE TABLE LeaderbourdSettings (
+CREATE TABLE LeaderboardSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     status INT UNSIGNED NOT NULL DEFAULT 0,
     bourdMessageIdDay BIGINT UNSIGNED NULL,
     bourdMessageIdWeek BIGINT UNSIGNED NULL,
     bourdMessageIdMonth  BIGINT UNSIGNED NULL,
-    leaderbourdChannel BIGINT UNSIGNED NOT NULL
+    leaderboardChannel BIGINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-DROP TABLE IF EXISTS `LeaderbourdTacking`;
+DROP TABLE IF EXISTS `LeaderboardTacking`;
 
-CREATE TABLE LeaderbourdTacking (
+CREATE TABLE LeaderboardTacking (
     guildId BIGINT UNSIGNED NOT NULL,
     userId BIGINT UNSIGNED NOT NULL,
     dailyCountMessage INT UNSIGNED DEFAULT 0,

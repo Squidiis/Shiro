@@ -814,7 +814,7 @@ class LevelSystem(commands.Cog):
             for t in leaderboard_members
         ]
 
-        leaderbourd = []
+        leaderboard = []
         for i in range(min(len(leaderboard_members), 15)):
             num_str = str(i + 1)
             if len(num_str) == 1:
@@ -822,10 +822,10 @@ class LevelSystem(commands.Cog):
             elif len(num_str) == 2:
                 num_str = f" #{num_str} "
             
-            leaderbourd.append(f"""`{num_str}` `{padded_tuples[i][0]}` `lvl {padded_tuples[i][1]}` `XP {padded_tuples[i][2]}`\n""")
+            leaderboard.append(f"""`{num_str}` `{padded_tuples[i][0]}` `lvl {padded_tuples[i][1]}` `XP {padded_tuples[i][2]}`\n""")
         DatabaseSetup.db_close(cursor=my_cursor, db_connection=leaderboard_connect)
 
-        emb = discord.Embed(title="Leaderboard", description=f"{''.join(leaderbourd)}", color=bot_colour)
+        emb = discord.Embed(title="Leaderboard", description=f"{''.join(leaderboard)}", color=bot_colour)
         emb.set_footer(icon_url=ctx.guild.icon.url, text="These are the most active users of this server")
         await ctx.respond(embed=emb)
 

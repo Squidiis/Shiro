@@ -91,20 +91,20 @@ class Main(commands.Cog):
                 antiLinkTimeout INT DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
-            # Message Leaderbourd
+            # Message leaderboard
             '''
-            CREATE TABLE IF NOT EXISTS LeaderbourdSettings (
+            CREATE TABLE IF NOT EXISTS LeaderboardSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 status INT UNSIGNED NOT NULL DEFAULT 0,
                 bourdMessageIdDay BIGINT UNSIGNED NULL,
                 bourdMessageIdWeek BIGINT UNSIGNED NULL,
                 bourdMessageIdMonth  BIGINT UNSIGNED NULL,
-                leaderbourdChannel BIGINT UNSIGNED NOT NULL
+                leaderboardChannel BIGINT UNSIGNED NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
             ''',
             '''
-            CREATE TABLE IF NOT EXISTS LeaderbourdTacking (
+            CREATE TABLE IF NOT EXISTS LeaderboardTacking (
                 guildId BIGINT UNSIGNED NOT NULL,
                 userId BIGINT UNSIGNED NOT NULL,
                 dailyCountMessage INT UNSIGNED DEFAULT 0,
@@ -160,10 +160,19 @@ class Main(commands.Cog):
         view.add_item(SendXpBonusModal())
         view.add_item(ShowLevelSettings())
 
-        self.bot.add_view(HelpMenüSelect())
+        self.bot.add_view(HelpMenuSelect())
 
         # Mod tools
         self.bot.add_view(GhostPingButtons())
+
+        # Message leaderboard
+
+        self.bot.add_view(Setleaderboard())
+        self.bot.add_view(OverwriteChannel(channel_id=None))
+        self.bot.add_view(ContinueSetting())
+        view.add_item(LeaderboardOnOffSwitch())
+
+
 
         # Other Systems
         self.bot.add_view(GhostPingButtons())
@@ -171,9 +180,8 @@ class Main(commands.Cog):
 
         self.bot.add_view(view)
         
-        if not edit_leaderbourd.is_running():
-            edit_leaderbourd.start(self.bot)
-
+        if not edit_leaderboard.is_running():
+            edit_leaderboard.start(self.bot)
 
         await Main.create_db_table()
 

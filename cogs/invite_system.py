@@ -4,52 +4,28 @@ from sql_function import *
 from discord.ext import tasks
 import pytz
 
-class MessageLeaderbourd(commands.Cog):
+class Messageleaderboard(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command(name = "show-invites")
-    async def show_invites(self, ctx:discord.ApplicationContext, user:Option(discord.Member)):
+    @commands.slash_command(name = "set-message-leaderboard", description = "Set the message leaderboard system!")
+    async def set_message_leaderboard(self, ctx:discord.ApplicationContext):
 
-        if user is None:
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id)
 
-            total_invites = 0
-            for invite in await ctx.guild.invites():
-                if invite.inviter == ctx.author:
-                    total_invites += invite.uses
-
-            emb = discord.Embed(description=f"""## Number of invited members of {user.name}
-                {Emojis.dot_emoji} {f'{user.mention} has invited {total_invites} users' if total_invites != 0 else f'{user.mention} has not yet invited any other users'} to the server {ctx.guild.name}.
-                {Emojis.help_emoji} The invitations are only counted if the user has created the invitation link!""", color=bot_colour)
-            
-            await ctx.respond(embed=emb)
-        else:
-
-            total_invites = 0
-            for invite in await ctx.guild.invites():
-                if invite.inviter == user:
-                    total_invites += invite.uses
-            await ctx.respond(f"{user.mention} has invited {total_invites} member to the server.")
-
-
-    @commands.slash_command(name = "set-message-leaderbourd", description = "Set the message leaderbourd system!")
-    async def set_message_leaderbourd(self, ctx:discord.ApplicationContext):
-
-        settings = DatabaseCheck.check_leaderbourd_settings(guild_id = ctx.guild_id)
-
-        emb = discord.Embed(description=f"""## Set the message leaderbourd
-            {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderbourd should be sent
+        emb = discord.Embed(description=f"""## Set the message leaderboard
+            {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderboard should be sent
             {Emojis.dot_emoji} Then you can also set an interval at which time intervals the leaderboard should be updated
-            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[0] else 'switched on'}. (as soon as it is switched off, no more messages are counted and when it is switched on, the leaderbourd is reset)
-            {Emojis.help_emoji} The leaderbourd is edited when you update it, so you should make sure that no one else can write in the channel you specified""", color=bot_colour)        
-        await ctx.respond(embed=emb, view=SetLeaderbourdChannel())
+            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[0] else 'switched on'}. (as soon as it is switched off, no more messages are counted and when it is switched on, the leaderboard is reset)
+            {Emojis.help_emoji} The leaderboard is edited when you update it, so you should make sure that no one else can write in the channel you specified""", color=bot_colour)        
+        await ctx.respond(embed=emb, view=SetleaderboardChannel())
 
 
-    @commands.slash_command(name = "show-message-leaderbourd-setting", description = "All show you how the message leaderbourd is set!")
-    async def show_message_leaderbourd_settings(self, ctx:discord.ApplicationContext):
+    @commands.slash_command(name = "show-message-leaderboard-setting", description = "All show you how the message leaderboard is set!")
+    async def show_message_leaderboard_settings(self, ctx:discord.ApplicationContext):
         
-        settings = DatabaseCheck.check_leaderbourd_settings(guild_id = ctx.guild.id)
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild.id)
 
         intervals = {
             settings[2]:"Daily",
@@ -61,10 +37,10 @@ class MessageLeaderbourd(commands.Cog):
 
             if i != None:
 
-                intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating Message leaderbourd\n")
+                intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating Message leaderboard\n")
 
         emb = discord.Embed(description=f"""## Here you can see all the settings of the message leaderboard
-            {Emojis.dot_emoji} {f'Currently <#{settings[5]}> is set as' if settings[5] != None else 'No'} message leaderbourd channel has been set
+            {Emojis.dot_emoji} {f'Currently <#{settings[5]}> is set as' if settings[5] != None else 'No'} message leaderboard channel has been set
             {Emojis.dot_emoji} The following intervals are currently defined for which a leaderboard exists:
             {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} No intervals have been defined yet'}""", color=bot_colour)
         await ctx.respond(embed = emb)
@@ -73,20 +49,52 @@ class MessageLeaderbourd(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
         
-        check = DatabaseCheck.check_leaderbourd_settings(guild_id = message.guild.id)
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id)
 
         if message.author.bot:
             return
         
         if check[1] == 1:
             
-            DatabaseUpdates.manage_leaderbourd(guild_id = message.guild.id, user_id = message.author.id, interval = "count")
+            DatabaseUpdates.manage_leaderboard(guild_id = message.guild.id, user_id = message.author.id, interval = "count")
 
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message:discord.Message):
+
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id)
+
+        if check[1] == 1:
+
+            if message.id == check[2]:
+
+                DatabaseUpdates.manage_leaderboard(guild_id = message.guild.id, back_to_none = "daily")
+
+            elif message.id == check[3]:
+
+                DatabaseUpdates.manage_leaderboard(guild_id = message.guild.id, back_to_none = "weekly")
+
+
+            elif message.id == check[4]:
+
+                DatabaseUpdates.manage_leaderboard(guild_id = message.guild.id, back_to_none = "monthlyv")
+
+
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel):
+
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = channel.guild.id)
+
+        if check[5] == channel.id:
+
+            DatabaseRemoveDatas._remove_leaderboard_settings(guild_id = channel.guild.id)
+
+    
 def setup(bot):
-    bot.add_cog(MessageLeaderbourd(bot))
+    bot.add_cog(Messageleaderboard(bot))
 
 
-async def sort_leaderbourd(user_list, interval):
+async def sort_leaderboard(user_list, interval):
 
     max_lengths = [
         max(len(str(t[i])) for t in user_list)
@@ -124,92 +132,86 @@ async def sort_leaderbourd(user_list, interval):
     return "".join(leaderboard)
 
 
-@tasks.loop(minutes=2)
-async def edit_leaderbourd(bot):
+@tasks.loop(hours=1)
+async def edit_leaderboard(bot):
 
     for guild in bot.guilds:
 
-        leaderboard_settings = DatabaseCheck.check_leaderbourd_settings(guild_id = guild.id)
+        leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id = guild.id)
 
         if leaderboard_settings:
 
-            message_ids = [
-                ("1_day_old", leaderboard_settings[2]),
-                ("1_week_old", leaderboard_settings[3]),
-                ("1_month_old", leaderboard_settings[4])
-            ]
-            
-            if leaderboard_settings[1] == 1 and leaderboard_settings[5] != None:
+            if leaderboard_settings[1] == 1:
+                message_ids = [
+                    ("1_day_old", leaderboard_settings[2]),
+                    ("1_week_old", leaderboard_settings[3]),
+                    ("1_month_old", leaderboard_settings[4])
+                ]
+                
+                if leaderboard_settings[1] == 1 and leaderboard_settings[5] != None:
 
-                try:
-                    
-                    current_date = datetime.now(UTC)
+                    try:
+                        
+                        current_date = datetime.now(UTC)
 
-                    for message_name, message_id in message_ids:
+                        for message_name, message_id in message_ids:
 
-                        if message_id != None:
-                            
-                            channel = bot.get_channel(leaderboard_settings[5])
-                            message = await channel.fetch_message(message_id)
+                            if message_id != None:
+                                
+                                channel = bot.get_channel(leaderboard_settings[5])
+                                message = await channel.fetch_message(message_id)
 
-                            if leaderboard_settings[2] != None:
-                                    
-                                    #if (current_date - message.edited_at) > timedelta(minutes=5) and message_name == "1_day_old":
-                                    #    
-                                    #    user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 0)
-                                    #    users = await sort_leaderbourd(user_list=user_list, interval=2)
-                                    #    emb = discord.Embed(description=f"""**Daily Messages Leaderboard**
-                                    #        {users} editet5""", color=bot_colour)
+                                message_age = message.edited_at if message.edited_at != None else message.created_at
+
+                                if leaderboard_settings[2] != None:
+
+                                    if (current_date - message_age) > timedelta(days=1) and message_name == "1_day_old":
+
+                                        user_list = DatabaseCheck.check_leaderboard(guild_id = guild.id, interval = 0)
+                                        users = await sort_leaderboard(user_list=user_list, interval=3)
+                                        emb = discord.Embed(description=f"""## Daily Messages Leaderboard
+                                            {users}""", color=bot_colour)
+
+                                        await message.edit(embed = emb)
+
+                                if leaderboard_settings[3] != None:
+
+                                    if (current_date - message_age) > timedelta(weeks=1) and message_name == "1_week_old":
                                         
-                                    #    await message.edit(embed = emb)
+                                        user_list = DatabaseCheck.check_leaderboard(guild_id = guild.id, interval = 1)
+                                        users = await sort_leaderboard(user_list=user_list, interval=3)
+                                        emb = discord.Embed(description=f"""## Weekly Messages Leaderboard
+                                            {users}""", color=bot_colour)
 
-                                if (current_date - message.edited_at) > timedelta(days=1) and message_name == "1_day_old":
+                                        await message.edit(embed = emb)
 
-                                    user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 0)
-                                    users = await sort_leaderbourd(user_list=user_list, interval=3)
-                                    emb = discord.Embed(description=f"""**Daily Messages Leaderboard**
-                                        {users} edit 3""", color=bot_colour)
+                                if leaderboard_settings[4] != None:
 
-                                    await message.edit(embed = emb)
+                                    if (current_date - message_age) > timedelta(days=30) and message_name == "1_month_old":
+                                        
+                                        user_list = DatabaseCheck.check_leaderboard(guild_id = guild.id, interval = 2)
+                                        users = await sort_leaderboard(user_list=user_list, interval=4)
+                                        emb = discord.Embed(description=f"""## Monthly Messages Leaderboard (30 days)
+                                            {users}""", color=bot_colour)
 
-                            if leaderboard_settings[3] != None:
+                                        await message.edit(embed = emb)
 
-                                if (current_date - message.edited_at) > timedelta(weeks=1) and message_name == "1_week_old":
-                                    
-                                    user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 1)
-                                    users = await sort_leaderbourd(user_list=user_list, interval=3)
-                                    emb = discord.Embed(description=f"""**weekly Messages Leaderboard**
-                                        {users}""", color=bot_colour)
-
-                                    await message.edit(embed = emb)
-
-                            if leaderboard_settings[4] != None:
-
-                                if (current_date - message.edited_at) > timedelta(days=30) and message_name == "1_month_old":
-                                    
-                                    user_list = DatabaseCheck.check_leaderbourd(guild_id = guild.id, interval = 2)
-                                    users = await sort_leaderbourd(user_list=user_list, interval=4)
-                                    emb = discord.Embed(description=f"""**Monthly Messages Leaderboard (30 days)**
-                                        {users}""", color=bot_colour)
-
-                                    await message.edit(embed = emb)
-
-                except Exception as e:
-                    print(f"Ein Fehler ist aufgetreten: {e}")
+                    except Exception as error:
+                        print("parameterized query failed {}".format(error))
 
 
-class SetLeaderbourdChannel(discord.ui.View):
+class SetleaderboardChannel(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(LeaderbourdOnOffSwitch())
-        self.add_item(CancelButton(system = "message leaderbourd system"))
+        self.add_item(LeaderboardOnOffSwitch())
+        self.add_item(CancelButton(system = "message leaderboard system"))
 
     @discord.ui.channel_select(
-        placeholder = "Choose a channel that you want to set as the leaderbourd channel!",
+        placeholder = "Choose a channel that you want to set as the leaderboard channel!",
         min_values = 1,
         max_values = 1,
-        custom_id = "leaderbourd_channel_select",
+        custom_id = "leaderboard_channel_select",
         channel_types = [
             discord.ChannelType.text, 
             discord.ChannelType.forum, 
@@ -217,9 +219,9 @@ class SetLeaderbourdChannel(discord.ui.View):
         ]
     )
 
-    async def set_leaderbourd_channel(self, select, interaction:discord.Interaction):
+    async def set_leaderboard_channel(self, select, interaction:discord.Interaction):
         
-        settings = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)
 
         if settings:
 
@@ -229,20 +231,20 @@ class SetLeaderbourdChannel(discord.ui.View):
 
             else:
                 
-                emb = discord.Embed(description=f"""## Es wurde bereits ein channel für das leaderbourd festgelegt
-                    {Emojis.dot_emoji} Möchstest du diesen überschreibe?
-                    {Emojis.dot_emoji} aktuell ist <#{settings[5]}> als channel für das leaderbourd festlegegt""", color=bot_colour)
+                emb = discord.Embed(description=f"""## A channel has already been defined for the leaderboard
+                    {Emojis.dot_emoji} Would you like to overwrite this?
+                    {Emojis.dot_emoji} Currently is <#{settings[5]}> set as the channel for the leaderboard""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=OverwriteChannel(channel_id=select.values[0].id))
 
         else:
 
-            DatabaseUpdates.create_leaderbourd_settings(guild_id = interaction.guild.id, settings = "create", channel_id = select.values[0].id)
+            DatabaseUpdates.create_leaderboard_settings(guild_id = interaction.guild.id, settings = "create", channel_id = select.values[0].id)
 
-        emb = discord.Embed(description=f"""## Channel für das Leaderbourd wurde festgelegt
-            {Emojis.dot_emoji} Ab sofort wird in {select.values[0].mention} das liederbourd gesendet
+        emb = discord.Embed(description=f"""## Channel for the leaderboard has been defined
+            {Emojis.dot_emoji} From now on, the leaderboard is sent in {select.values[0].mention}
             {GetEmbed.get_embed(embed_index=3)}
             """, color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+        await interaction.response.edit_message(embed=emb, view=Setleaderboard())
 
 
     @discord.ui.button(
@@ -252,25 +254,25 @@ class SetLeaderbourdChannel(discord.ui.View):
     )
     async def skip_set_channel(self, button, interaction:discord.Interaction):
         
-        if DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]:
+        if DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)[5]:
 
-            emb = discord.Embed(description=f"""## Einstellen des Channel wurde übersprungen
+            emb = discord.Embed(description=f"""## Setting the channel was skipped
                 {GetEmbed.get_embed(embed_index=3)}""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+            await interaction.response.edit_message(embed=emb, view=Setleaderboard())
 
         else:
 
-            emb = discord.Embed(description=f"""## Einstellung kann nicht übersprungen werden
-                {Emojis.dot_emoji} Die einstellung kann nur übersprungen werden wenn ein channel dem message leaderbourd zugeweisen wurde
-                {Emojis.dot_emoji} Du musst erst einen channel festlegen bevor du weiter machen kannst""", color=bot_colour)
+            emb = discord.Embed(description=f"""## Setting cannot be skipped
+                {Emojis.dot_emoji} The setting can only be skipped if a channel has been assigned to the message leaderboard
+                {Emojis.dot_emoji} You must first set a channel before you can continue""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
 
-class SetLeaderbourd(discord.ui.View):
+class Setleaderboard(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(CancelButton(system = "message leaderbourd system"))
+        self.add_item(CancelButton(system = "message leaderboard system"))
 
     def compare_lists(self, list1, list2):
 
@@ -284,31 +286,31 @@ class SetLeaderbourd(discord.ui.View):
         placeholder = "Select the intervals at which the activities should be displayed!",
         min_values = 1,
         max_values = 3,
-        custom_id = "set_leaderbourd",
+        custom_id = "set_leaderboard",
         options = [
-            discord.SelectOption(label="Update daily", description="Das Leaderbourd wird jeden Tag aktualisiert", value="daily"),
-            discord.SelectOption(label="Update weekly", description="Das Leaderbourd wird jede Woche aktualisiert", value="weekly"),
-            discord.SelectOption(label="Update monthly", description="Das Leaderbourd wird jedes Monat aktualisiert", value="monthly")
+            discord.SelectOption(label="Update daily", description="The leaderboard is updated every day", value="daily"),
+            discord.SelectOption(label="Update weekly", description="The leaderboard is updated every week", value="weekly"),
+            discord.SelectOption(label="Update monthly", description="The leaderboard is updated every month", value="monthly")
         ]
     )
     
-    async def set_leaderbourd_select(self, select, interaction:discord.Interaction):
+    async def set_leaderboard_select(self, select, interaction:discord.Interaction):
 
         text_dict = {
-            "daily":"einen Tag",
-            "weekly":"eine Woche",
-            "monthly":"ein Monat"
+            "daily":"one day",
+            "weekly":"one week",
+            "monthly":"one month"
         }
 
-        settings = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)
         check_list = []
         if any(elem is not None for elem in [settings[2], settings[3], settings[4]]):
             
             if self.compare_lists(list1=select.values, list2=[settings[2], settings[3], settings[4]]):
 
-                emb = discord.Embed(description=f"""## Diese Intervalle sind bereits festgelegt
-                    {Emojis.dot_emoji} Du hast bereits diese Intervalle für das Message leaderbourd festgelegt
-                    {Emojis.help_emoji} Wenn du andere Intervalle haben möchstest kannst du diesen command einfach nochmal ausführen und sie überschreiben""", color=bot_colour)
+                emb = discord.Embed(description=f"""## These intervals are already set
+                    {Emojis.dot_emoji} You have already defined these intervals for the message leaderboard
+                    {Emojis.help_emoji} If you want to have other intervals you can simply execute this command again and overwrite them""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
             else:
@@ -317,41 +319,41 @@ class SetLeaderbourd(discord.ui.View):
 
                     if i in [settings[2], settings[3], settings[4]]:
 
-                        check_list.append(f"{Emojis.dot_emoji} {i} aktualisierung\n")
+                        check_list.append(f"{Emojis.dot_emoji} {i} update\n")
 
-                emb = discord.Embed(description=f"""## Es wurden bereits intervalle festgelegt
-                    {Emojis.dot_emoji} Aktuell sind folgende intervalle aktiv:
+                emb = discord.Embed(description=f"""## Intervals have already been defined
+                    {Emojis.dot_emoji} The following intervals are currently active:
                         {check_list}
-                    {Emojis.dot_emoji} Willst du dieser überschreiben?""", color=bot_colour)
+                    {Emojis.dot_emoji} Do you want to overwrite them?""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb)
 
         else:
 
             option_list, check_list = [], []
             for i in select.values:
-                option_list.append(f"{Emojis.dot_emoji} {i} aktualisierung\n")
+                option_list.append(f"{Emojis.dot_emoji} {i} update\n")
                 check_list.append(i)
 
                 if i != None:
 
                     emb = discord.Embed(
-                        description=f"""## Die anzahl der nachrichten wird für {text_dict[i]} gespeichert
-                            {Emojis.dot_emoji} Wenn die Zeit dann um ist wird diese Nachricht zu einen leaderbourd editiert die die user anzeigt die am meisten Nachrichten geschrieben haben""", color=bot_colour)
+                        description=f"""## The number of messages is saved for {text_dict[i]}.
+                            {Emojis.dot_emoji} When the time is up, this message will be edited into a leaderboard showing the users who have written the most messages""", color=bot_colour)
 
                     channel = bot.get_channel(settings[5])
                     message = await channel.send(embed=emb)
                     
-                    DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = i, message_id = message.id)
+                    DatabaseUpdates.manage_leaderboard(guild_id = interaction.guild.id, settings = i, message_id = message.id)
 
             for i in [value for value in ["daily", "weekly", "monthly"] if value not in check_list]:
 
-                DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, back_to_none = i)
+                DatabaseUpdates.manage_leaderboard(guild_id = interaction.guild.id, back_to_none = i)
 
-            emb = discord.Embed(description=f"""## Intervall wurde festgelegt
-                {Emojis.dot_emoji} {'Die folgenden leaderbourd optionen wurden ausgewählt' if len(select.values) != 1 else 'Die foldende leaderbourd option wurde ausgewählt'}:
+            emb = discord.Embed(description=f"""## Interval has been set
+                {Emojis.dot_emoji} The following leaderboard option{'s' if len(select.values) != 1 else ''}
                     {"".join(option_list)}
-                {Emojis.dot_emoji} {'Das leaderbourd wird' if len(select.values) == 1 else 'Die leaderbourds werden'} in <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> gesendet
-                {Emojis.help_emoji} Die Leaderbourds werden erst nach dem ersten intervall zu den volständigen Leaderbourds""", color=bot_colour)
+                {Emojis.dot_emoji} The leaderboard{'s is' if len(select.values) == 1 else ''} sent in <#{DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)[5]}>
+                {Emojis.help_emoji} The leaderboard only become full leaderboard after the first interval""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
 
@@ -362,7 +364,7 @@ class SetLeaderbourd(discord.ui.View):
     )
     async def skip_set_channel(self, button, interaction:discord.Interaction):
         
-        interval = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
+        interval = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)
 
         intervals = {
             interval[2]:"daily",
@@ -374,15 +376,14 @@ class SetLeaderbourd(discord.ui.View):
             
             check_interval = "".join([intervals[i] for i in [interval[2], interval[3], interval[4]] if i is not None])
 
-            emb = discord.Embed(description=f"""## Einstellen der intervalle wurde übersprungen
-                {Emojis.dot_emoji} {f'Die intervalle {check_interval} werden als intervalle' if len(check_interval) != 1 else f'Das interval {check_interval} wird'} beibehalten""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
-
+            emb = discord.Embed(description=f"""## Setting the intervals was skipped
+                {Emojis.dot_emoji} {f'The intervals {check_interval} will be kept as intervals' if len(check_interval) != 1 else f'The interval {check_interval} will be kept'}""", color=bot_colour)
+            
         else:
 
-            emb = discord.Embed(description=f"""## Einstellung kann nicht übersprungen werden
-                {Emojis.dot_emoji} Die einstellung kann nur übersprungen werden wenn mindestens ein interval dem message leaderbourd zugeweisen wurde
-                {Emojis.dot_emoji} Du musst erst ein interval festlegen bevor du weiter machen kannst""", color=bot_colour)
+            emb = discord.Embed(description=f"""## Setting cannot be skipped
+                {Emojis.dot_emoji} The setting can only be skipped if at least one interval has been assigned to the message leaderboard
+                {Emojis.dot_emoji} You must first set an interval before you can continue""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
 
@@ -393,7 +394,7 @@ class OverwriteChannel(discord.ui.View):
             self, channel_id):
         super().__init__(timeout=None)
         self.channel_id = channel_id
-        self.add_item(CancelButton(system = "message leaderbourd system"))
+        self.add_item(CancelButton(system = "message leaderboard system"))
 
     @discord.ui.button(
         label="overwrite channel",
@@ -405,37 +406,37 @@ class OverwriteChannel(discord.ui.View):
         
         if self.channel_id == None:
 
-            emb = discord.Embed(description=f"""## Ein fehler ist aufgetreten
-                {Emojis.dot_emoji} Der channel konnte nicht überschrieben werden das passiert wenn die option zu lange unbeantwortet bleibt oder wenn ich die verbindung verliere
-                {Emojis.dot_emoji} Wenn du das leaderbourd weiter einstellen möchtest muss du nur den command `/set-message-leaderbourd` neu ausführen""", color=bot_colour)
+            emb = discord.Embed(description=f"""## An error has occurred
+                {Emojis.dot_emoji} The channel could not be overwritten this happens if the option remains unanswered for too long or if I lose the connection
+                {Emojis.dot_emoji} If you want to set the leaderboard further, you just have to execute the command `/set-message-leaderboard` again""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
-        elif self.channel_id == DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]:
+        elif self.channel_id == DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)[5]:
             
             await interaction.response.edit_message(GetEmbed.get_embed(embed_index=4), view=ContinueSetting())
 
         else:
             
-            get_messages = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
-            DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
+            get_messages = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)
+            DatabaseUpdates.manage_leaderboard(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
 
             for i, index in (get_messages[2], "daily"), (get_messages[3], "weekly"), (get_messages[4], "monthly"):
                 
                 if i != None:
                 
-                    leaderbourd_channel = bot.get_channel(get_messages[5])
+                    leaderboard_channel = bot.get_channel(get_messages[5])
                     
-                    msg = await leaderbourd_channel.fetch_message(i)
+                    msg = await leaderboard_channel.fetch_message(i)
                     await msg.delete()
 
-                    DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, back_to_none = index)
+                    DatabaseUpdates.manage_leaderboard(guild_id = interaction.guild.id, back_to_none = index)
 
-            emb = discord.Embed(description=f"""## Leaderbourd channel wurde überschrieben
-                {Emojis.dot_emoji} Ab sofort ist <#{self.channel_id}> der neue leaderbourd channel
-                {Emojis.dot_emoji} Das leaderbourd wird aus dem alten leaderbourd channel gelöscht
-                {Emojis.dot_emoji} Mit den unseren select menü kannst du mit dem einstellen fortfahren
-                {Emojis.help_emoji} Du kannst mehrere intervalle auswählen auch ist jedes intervall ein einzelnes leaderbourd""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+            emb = discord.Embed(description=f"""## Leaderboard channel has been overwritten
+                {Emojis.dot_emoji} As of now, <#{self.channel_id}> is the new leaderboard channel
+                {Emojis.dot_emoji} The leaderboard is deleted from the old leaderboard channel
+                {Emojis.dot_emoji} You can continue with the setting using the selection menu below
+                {Emojis.help_emoji} You can select several intervals and each interval is a single leaderboard""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=Setleaderboard())
         
 
     @discord.ui.button(
@@ -446,11 +447,11 @@ class OverwriteChannel(discord.ui.View):
 
     async def keep_channel(self, button, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f"""## Channel wird beibehalten
-            {Emojis.dot_emoji} Der channel <#{DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)[5]}> wird als leaderbourd channel beibehalten
-            {Emojis.dot_emoji} Mit den unseren select menü kannst du mit dem einstellen fortfahren
-            {Emojis.help_emoji} Du kannst mehrere intervalle auswählen auch ist jedes intervall ein einzelnes leaderbourd""", color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+        emb = discord.Embed(description=f"""## Channel is retained
+            {Emojis.dot_emoji} The channel <#{DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)[5]}> will be retained as a leaderboard channel
+            {Emojis.dot_emoji} You can continue with the setting using the selection menu below
+            {Emojis.help_emoji} You can select several intervals and each interval is a single leaderboard""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=Setleaderboard())
 
 
 class ContinueSetting(discord.ui.View):
@@ -466,32 +467,32 @@ class ContinueSetting(discord.ui.View):
 
     async def continue_setting_button(self, button, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f"""## Lege Intervalle fest
-            {Emojis.dot_emoji} Mit den unteren Selectmenü kannst du einen Intervall festlegen in welchen zeiträumen das message leaderbourd geupdaitet werden soll
-            {Emojis.dot_emoji} Du kannst auch merhrere Intervalle auswählen es muss aber nur mindestens eines gewählt werden
-            {Emojis.help_emoji} Sobald du die Intervalle ausgewählt hast werden die leaderbourds in den vorher verstgelegten channel gesendet und dann immer in den entsprechenden Zeit räumen geupdaitet""", color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=SetLeaderbourd())
+        emb = discord.Embed(description=f"""## Set intervals
+            {Emojis.dot_emoji} With the lower select menu you can define an interval in which periods the message leaderboard should be updated
+            {Emojis.dot_emoji} You can also select several intervals, but you only need to select at least one
+            {Emojis.help_emoji} As soon as you have selected the intervals, the leaderboards are sent to the channel you have previously set up and then always updated in the corresponding time periods""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=Setleaderboard())
 
 
-class LeaderbourdOnOffSwitch(discord.ui.Button):
+class LeaderboardOnOffSwitch(discord.ui.Button):
 
     def __init__(self):
         super().__init__(
-            label = "On / Off switch",
+            label = "on / off switch",
             style = discord.ButtonStyle.blurple,
             custom_id = "on_off_switch"
         )
 
     async def callback(self, interaction:discord.Interaction):
         
-        settings = DatabaseCheck.check_leaderbourd_settings(guild_id = interaction.guild.id)
-        DatabaseUpdates.manage_leaderbourd(guild_id = interaction.guild.id, settings = "status")
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id)
+        DatabaseUpdates.manage_leaderboard(guild_id = interaction.guild.id, settings = "status")
 
-        emb = discord.Embed(description=f"""## Das message Leaderbourd system ist jetzt {'aktiviert' if settings[1] == 0 else 'deaktiviert'}
-            {Emojis.dot_emoji} {f'''Ab jetzt werden alle Nachrichten zu dem message leaderbourd zu gerechnet und eine Rangliste erstellt die zeigt wer am meisten nachrichten geschrieben hat
-            {Emojis.help_emoji} dafür muss jedoch auch ein Intervall und ein Channel festgelegt werden'''
-            if settings[1] == 0 else f'''Ab jetzt werden keine Nachrichten menr zu den Message leaderbourd dazu gezählt die rangliste wird auch nicht mehr geupdaitet wenn du es wieder aktivierst wird das leaderbourd zurück gesetzt und ab dem neuen intervall gezählt
-            {Emojis.dot_emoji} Die anderen einstellungen bleiben wie so wie sind'''}""", color=bot_colour)
+        emb = discord.Embed(description=f"""## The message leaderboard system is now {'activated' if settings[1] == 0 else 'deactivated'}.
+            {Emojis.dot_emoji} {f'''From now on all messages will be added to the message leaderboard and a ranking will be created showing who has written the most messages
+            {Emojis.help_emoji} However, an interval and a channel must also be defined for this'''
+            if settings[1] == 0 else f'''From now on, no messages will be added to the message leaderboard and the ranking will no longer be updated when you activate it again, the leaderboard will be reset and counted from the new interval.
+            {Emojis.dot_emoji} The other settings remain as they are'''}""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
 
 

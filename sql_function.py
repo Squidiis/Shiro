@@ -386,12 +386,12 @@ class DatabaseCheck():
     Info:
         - guild_id must be specified
     '''
-    def check_leaderbourd_settings(guild_id:int):
+    def check_leaderboard_settings(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        check_settings = "SELECT * FROM LeaderbourdSettings WHERE guildId = %s"
+        check_settings = "SELECT * FROM LeaderboardSettings WHERE guildId = %s"
         check_settings_values = [guild_id]
         cursor.execute(check_settings, check_settings_values)
 
@@ -400,7 +400,7 @@ class DatabaseCheck():
     
 
     '''
-    Returns either all entries of the leaderbourd or only specific ones depending on which item is specified
+    Returns either all entries of the leaderboard or only specific ones depending on which item is specified
 
     Parameters:
     -----------
@@ -409,7 +409,7 @@ class DatabaseCheck():
         - user_id
             Id of the user to be checked
         - interval
-            the interval in which the leaderbourd is updated
+            the interval in which the leaderboard is updated
             - 0 day
             - 1 week
             - 2  month
@@ -418,7 +418,7 @@ class DatabaseCheck():
         - Depending on which item you specify, you will receive the respective entries from the database
         - If you do not specify a channel, category, role or user id, the entire whitelist will be returned
     '''
-    def check_leaderbourd(
+    def check_leaderboard(
         guild_id:int,
         user_id:int = None,
         interval:int = None
@@ -431,23 +431,23 @@ class DatabaseCheck():
 
         if interval != None:
 
-            check_leaderbourd_count = f"SELECT * FROM LeaderbourdTacking WHERE guildId = %s ORDER BY {column_name[interval]} DESC"
-            check_leaderbourd_count_values = [guild_id]
+            check_leaderboard_count = f"SELECT * FROM LeaderboardTacking WHERE guildId = %s ORDER BY {column_name[interval]} DESC"
+            check_leaderboard_count_values = [guild_id]
         
         else:
 
-            check_leaderbourd_count = f"SELECT * FROM LeaderbourdTacking WHERE guildId = %s AND userId = %s"
-            check_leaderbourd_count_values = [guild_id, user_id]
+            check_leaderboard_count = f"SELECT * FROM LeaderboardTacking WHERE guildId = %s AND userId = %s"
+            check_leaderboard_count_values = [guild_id, user_id]
 
-        cursor.execute(check_leaderbourd_count, check_leaderbourd_count_values)
+        cursor.execute(check_leaderboard_count, check_leaderboard_count_values)
 
         if interval != None:
-            leaderbourd = cursor.fetchall()
+            leaderboard = cursor.fetchall()
         else:
-            leaderbourd = cursor.fetchone()
+            leaderboard = cursor.fetchone()
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        return leaderbourd
+        return leaderboard
             
 
 
@@ -1115,7 +1115,7 @@ class DatabaseUpdates():
 
 
     '''
-    Manages the message leaderbourd system
+    Manages the message leaderboard system
 
     Parameters:
     -----------
@@ -1132,14 +1132,14 @@ class DatabaseUpdates():
         - settings
             Which column should be customized
             - status: Switching the system on/off
-            - channel: Channel for the leaderbourd
+            - channel: Channel for the leaderboard
             - daily
             - weekly
             - monthly 
         - message_id 
-            The message id of the leaderbourd
+            The message id of the leaderboard
         - channel_id
-            The id of the channel to which the leaderbourds are to be sent
+            The id of the channel to which the leaderboards are to be sent
         - back_to_none
             What should be set back to the default settings
                 - daily
@@ -1151,7 +1151,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified
     '''
-    def manage_leaderbourd(
+    def manage_leaderboard(
         guild_id:int, 
         user_id:int = None,
         interval:str = None,
@@ -1165,7 +1165,7 @@ class DatabaseUpdates():
             "daily":"bourdMessageIdDay", 
             "weekly":"bourdMessageIdWeek", 
             "monthly":"bourdMessageIdMonth", 
-            "channel":"leaderbourdChannel",
+            "channel":"leaderboardChannel",
             "status":"status"
         }
 
@@ -1174,7 +1174,7 @@ class DatabaseUpdates():
             "weekly":message_id,
             "monthly":message_id,
             "channel":channel_id,
-            "status":0 if DatabaseCheck.check_leaderbourd_settings(guild_id = guild_id) == 1 else 1
+            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id) == 1 else 1
         }
 
         db_connect = DatabaseSetup.db_connector()
@@ -1184,29 +1184,29 @@ class DatabaseUpdates():
             if settings:
 
                 value = coulmn_values[settings]
-                settings = f"UPDATE LeaderbourdSettings SET {column_name_settings[settings]} = %s WHERE guildId = %s"
+                settings = f"UPDATE LeaderboardSettings SET {column_name_settings[settings]} = %s WHERE guildId = %s"
                 settings_values = [value, guild_id]
                 cursor.execute(settings, settings_values)
 
             elif interval:
                 
-                check_user = DatabaseCheck.check_leaderbourd(guild_id = guild_id, user_id = user_id)
+                check_user = DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id)
 
                 if check_user:
                     
-                    update_stats = f"UPDATE LeaderbourdTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s WHERE guildId = %s AND userId = %s"
+                    update_stats = f"UPDATE LeaderboardTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s WHERE guildId = %s AND userId = %s"
                     update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, guild_id, user_id]
 
                 else:   
                     
-                    update_stats = f"INSERT INTO LeaderbourdTacking (guildId, userId) VALUES (%s, %s)"
+                    update_stats = f"INSERT INTO LeaderboardTacking (guildId, userId) VALUES (%s, %s)"
                     update_stats_values = [guild_id, user_id]
                 
                 cursor.execute(update_stats, update_stats_values)
 
             elif back_to_none != None:
 
-                set_back_to_none = f"UPDATE LeaderbourdSettings SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+                set_back_to_none = f"UPDATE LeaderboardSettings SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
                 set_back_to_none_values = [guild_id]
                 cursor.execute(set_back_to_none, set_back_to_none_values)
             
@@ -1234,7 +1234,7 @@ class DatabaseUpdates():
         - settings
             If not None, new entries are created
     '''
-    def create_leaderbourd_settings(
+    def create_leaderboard_settings(
         guild_id:int, 
         user_id:int = None,
         channel_id:int = None,
@@ -1248,12 +1248,12 @@ class DatabaseUpdates():
 
             if settings != None:
 
-                create_settings = f"INSERT INTO LeaderbourdSettings (guildId, leaderbourdChannel, editTimestamp) VALUES (%s, %s)"
+                create_settings = f"INSERT INTO LeaderboardSettings (guildId, leaderboardChannel, editTimestamp) VALUES (%s, %s)"
                 create_settings_values = [guild_id, channel_id]
 
             else:
 
-                create_settings = f"INSERT INTO LeaderbourdTacking (guildId, userId, dailyCountMessage, weeklyCountMessage, monthlyCountMessage) VALUES (%s ,%s, %s, %s, %s)"
+                create_settings = f"INSERT INTO LeaderboardTacking (guildId, userId, dailyCountMessage, weeklyCountMessage, monthlyCountMessage) VALUES (%s ,%s, %s, %s, %s)"
                 create_settings_values = [guild_id, user_id, 1, 1, 1]
 
             cursor.execute(create_settings, create_settings_values)
@@ -1350,3 +1350,33 @@ class DatabaseRemoveDatas():
 
 
 
+###########################################  Remove values from the message leaderboard system  #########################################
+
+
+    '''
+    
+    '''
+    def _remove_leaderboard_settings(guild_id:int):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        time_interval = {
+            "day":"bourdMessageIdDay",
+            "week":"bourdMessageIdWeek",
+            "month":"bourdMessageIdMonth"
+        }
+
+        try:
+
+            delete_message_id = f"DELETE FROM LeaderboardSettings WHERE guildId = %s"
+            delete_message_id_values = [guild_id]
+            cursor.execute(delete_message_id, delete_message_id_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
