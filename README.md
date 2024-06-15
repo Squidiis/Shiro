@@ -103,7 +103,7 @@ If you encounter problems use the discord server linked above or press [here](ht
 |reset-level|Resets the forward step of all users on the server to 0|
 |reset-user-stats|Resets all stats of a user to 0.|
 |rank|Shows the progress of a user in the level system with the help of a rank card, for example [press here](https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/rank-card/example_rank_card.png?raw=true).|
-|leaderboard|Shows the 10 best on the server.|
+|leaderboard-level|Shows the 15 users with the highest level on the server.|
 |level-system-settings|Enables the level system to be set.|
 |add-level-blacklist|Excludes a channel, category, role or user from the level system, after which activities in the channel or categories and by users or role holders are no longer rewarded with XP.|
 |remove-level-blacklist|Deletes a channel, category, role or user from the level system blacklist then you can get XP again by being active.|

@@ -4,7 +4,7 @@ from cogs.mod_tools import *
 from dotenv import load_dotenv
 from cogs.fun_commands import *
 from utils import *
-from cogs.invite_system import *
+from cogs.message_leaderboard import *
 
 @bot.slash_command(description="Shows you the ping.")
 async def ping(ctx):
@@ -23,7 +23,7 @@ class Main(commands.Cog):
         cursor = db_connect.cursor()
 
         tables = [
-            # Level system Tables
+            # Level system tables
             '''
             CREATE TABLE IF NOT EXISTS `LevelSystemStats` (
                 guildId BIGINT UNSIGNED NOT NULL, 
@@ -81,7 +81,7 @@ class Main(commands.Cog):
                 userId BIGINT UNSIGNED NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
-            # Bot settings Table
+            # Bot settings table
             '''
             CREATE TABLE IF NOT EXISTS BotSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
@@ -91,14 +91,15 @@ class Main(commands.Cog):
                 antiLinkTimeout INT DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
-            # Message leaderboard
+            # Leaderboard tables
             '''
-            CREATE TABLE IF NOT EXISTS LeaderboardSettings (
+            CREATE TABLE IF NOT EXISTS LeaderboardSettingsMessage (
                 guildId BIGINT UNSIGNED NOT NULL,
-                status INT UNSIGNED NOT NULL DEFAULT 0,
+                statusMessage INT UNSIGNED NOT NULL DEFAULT 0,
                 bourdMessageIdDay BIGINT UNSIGNED NULL,
                 bourdMessageIdWeek BIGINT UNSIGNED NULL,
-                bourdMessageIdMonth  BIGINT UNSIGNED NULL,
+                bourdMessageIdMonth BIGINT UNSIGNED NULL,
+                bourdMessageIdWhole BIGINT UNSIGNED NULL,
                 leaderboardChannel BIGINT UNSIGNED NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -110,7 +111,11 @@ class Main(commands.Cog):
                 dailyCountMessage INT UNSIGNED DEFAULT 0,
                 weeklyCountMessage INT UNSIGNED DEFAULT 0,
                 monthlyCountMessage INT UNSIGNED DEFAULT 0,
-                inviteCount INT UNSIGNED DEFAULT 0
+                wholeMessageCount INT UNSIGNED DEFAULT 0,
+                wholeInviteCount INT UNSIGNED DEFAULT 0,
+                dailyInviteCount INT UNSIGNED DEFAULT 0,
+                weeklyInviteCount INT UNSIGNED DEFAULT 0,
+                monthlyInviteCount INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
             ]
@@ -167,10 +172,10 @@ class Main(commands.Cog):
 
         # Message leaderboard
 
-        self.bot.add_view(Setleaderboard())
-        self.bot.add_view(OverwriteChannel(channel_id=None))
-        self.bot.add_view(ContinueSetting())
-        view.add_item(LeaderboardOnOffSwitch())
+        self.bot.add_view(SetMessageleaderboard())
+        self.bot.add_view(OverwriteMessageChannel(channel_id=None))
+        self.bot.add_view(ContinueMessageSetting())
+        view.add_item(LeaderboardOnOffSwitchMessage())
 
 
 

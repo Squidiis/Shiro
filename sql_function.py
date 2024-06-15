@@ -386,7 +386,7 @@ class DatabaseCheck():
     Info:
         - guild_id must be specified
     '''
-    def check_leaderboard_settings(guild_id:int):
+    def check_leaderboard_settings_message(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -418,7 +418,7 @@ class DatabaseCheck():
         - Depending on which item you specify, you will receive the respective entries from the database
         - If you do not specify a channel, category, role or user id, the entire whitelist will be returned
     '''
-    def check_leaderboard(
+    def check_leaderboard_message(
         guild_id:int,
         user_id:int = None,
         interval:int = None
@@ -1151,7 +1151,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified
     '''
-    def manage_leaderboard(
+    def manage_leaderboard_message(
         guild_id:int, 
         user_id:int = None,
         interval:str = None,
@@ -1164,7 +1164,8 @@ class DatabaseUpdates():
         column_name_settings = {
             "daily":"bourdMessageIdDay", 
             "weekly":"bourdMessageIdWeek", 
-            "monthly":"bourdMessageIdMonth", 
+            "monthly":"bourdMessageIdMonth",
+            "whole":"wholeMessageCount",
             "channel":"leaderboardChannel",
             "status":"status"
         }
@@ -1173,8 +1174,9 @@ class DatabaseUpdates():
             "daily":message_id,
             "weekly":message_id,
             "monthly":message_id,
+            "whole":message_id,
             "channel":channel_id,
-            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id) == 1 else 1
+            "status":0 if DatabaseCheck.check_leaderboard_settings_message(guild_id = guild_id) == 1 else 1
         }
 
         db_connect = DatabaseSetup.db_connector()
@@ -1190,12 +1192,12 @@ class DatabaseUpdates():
 
             elif interval:
                 
-                check_user = DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id)
+                check_user = DatabaseCheck.check_leaderboard_message(guild_id = guild_id, user_id = user_id)
 
                 if check_user:
                     
-                    update_stats = f"UPDATE LeaderboardTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s WHERE guildId = %s AND userId = %s"
-                    update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, guild_id, user_id]
+                    update_stats = f"UPDATE LeaderboardTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s, wholeMessageCount = %s WHERE guildId = %s AND userId = %s"
+                    update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, check_user[5] + 1, guild_id, user_id]
 
                 else:   
                     
@@ -1234,7 +1236,7 @@ class DatabaseUpdates():
         - settings
             If not None, new entries are created
     '''
-    def create_leaderboard_settings(
+    def create_leaderboard_settings_message(
         guild_id:int, 
         user_id:int = None,
         channel_id:int = None,
@@ -1356,16 +1358,10 @@ class DatabaseRemoveDatas():
     '''
     
     '''
-    def _remove_leaderboard_settings(guild_id:int):
+    def _remove_leaderboard_settings_message(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
-
-        time_interval = {
-            "day":"bourdMessageIdDay",
-            "week":"bourdMessageIdWeek",
-            "month":"bourdMessageIdMonth"
-        }
 
         try:
 

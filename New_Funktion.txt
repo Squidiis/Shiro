@@ -32,3 +32,12 @@ Es giebt noch einen error wenn der channel und die intervalle überschreiben wur
 back button zum close button machen help
 
 leaderboard in Help menu adden und in readme
+
+
+statistic section 
+
+- Message Leaderboard
+- Invite Leaderboard
+
+
+(system für 3 intervalle aufbewahren)

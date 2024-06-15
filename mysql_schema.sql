@@ -78,14 +78,27 @@ CREATE TABLE AntiLinkWhiteList (
 
 ---------------- leaderboard Settings ---------------------
 
-DROP TABLE IF EXISTS `LeaderboardSettings`
+DROP TABLE IF EXISTS `LeaderboardSettingsMessage`
 
-CREATE TABLE LeaderboardSettings (
+CREATE TABLE LeaderboardSettingsMessage (
     guildId BIGINT UNSIGNED NOT NULL,
     status INT UNSIGNED NOT NULL DEFAULT 0,
     bourdMessageIdDay BIGINT UNSIGNED NULL,
     bourdMessageIdWeek BIGINT UNSIGNED NULL,
     bourdMessageIdMonth  BIGINT UNSIGNED NULL,
+    leaderboardChannel BIGINT UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `LeaderboardSettingsInvite`
+
+CREATE TABLE LeaderboardSettingsInvite (
+    guildId BIGINT UNSIGNED NOT NULL,
+    status INT UNSIGNED NOT NULL DEFAULT 0,
+    bourdMessageIdDay BIGINT UNSIGNED NULL,
+    bourdMessageIdWeek BIGINT UNSIGNED NULL,
+    bourdMessageIdMonth BIGINT UNSIGNED NULL,
+    bourdMessageIdWhole BIGINT UNSIGNED NULL,
     leaderboardChannel BIGINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -98,7 +111,11 @@ CREATE TABLE LeaderboardTacking (
     dailyCountMessage INT UNSIGNED DEFAULT 0,
     weeklyCountMessage INT UNSIGNED DEFAULT 0,
     monthlyCountMessage INT UNSIGNED DEFAULT 0,
-    inviteCount INT UNSIGNED DEFAULT 0
+    wholeMessageCount INT UNSIGNED DEFAULT 0,
+    wholeInviteCount INT UNSIGNED DEFAULT 0,
+    dailyInviteCount INT UNSIGNED DEFAULT 0,
+    weeklyInviteCount INT UNSIGNED DEFAULT 0,
+    monthlyInviteCount INT UNSIGNED DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
