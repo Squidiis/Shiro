@@ -38,6 +38,8 @@ statistic section
 
 - Message Leaderboard
 - Invite Leaderboard
+adden das bei dem message leaderboard bei show auch ein table erstellt wird 
 
+(system für 3 intervalle aufbewahren
 
-(system für 3 intervalle aufbewahren)
+funktion die den message count zurück setzt)

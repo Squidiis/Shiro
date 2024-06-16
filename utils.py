@@ -106,7 +106,12 @@ class GetEmbed():
         - settings
             The correct information that must be inserted in the embed
     '''
-    def get_embed(embed_index, settings = None):
+    def get_embed(
+        embed_index, 
+        settings = None, 
+        settings2 = None, 
+        settings3 = None
+        ):
 
         if embed_index == 0:
 
@@ -143,13 +148,32 @@ class GetEmbed():
             {Emojis.dot_emoji} The leaderboard differs in the duration after how much time the stats are updated
             {Emojis.help_emoji} You can also select several intervals, in which case several different leaderboards will be sent
             """
-        
+
         elif embed_index == 4:
+
+            emb = discord.Embed(description=f"""## Channel for the leaderboard has been defined
+                {Emojis.dot_emoji} From now on, the leaderboard is sent in {settings}{GetEmbed.get_embed(embed_index=3)}""", color=bot_colour)
+        
+        elif embed_index == 5:
 
             emb = discord.Embed(description=f"""## This channel has already been set as a leaderboard channel
                 {Emojis.dot_emoji} This channel has already been set for the message leaderboard
                 {Emojis.dot_emoji} Would you like to continue setting the message leaderboard (the channel will not be changed) or re-execute the command and set a different channel for the message leaderboard""", color=bot_colour)
-            
+    
+        elif embed_index == 6:
+
+            emb = discord.Embed(description=f"""## Interval has been set
+                {Emojis.dot_emoji} The following leaderboard option{'s' if len(settings) != 1 else ''}
+                    {"".join(settings2)}
+                {Emojis.dot_emoji} The leaderboard{'s is' if len(settings) == 1 else ''} sent in {settings3}
+                {Emojis.help_emoji} The leaderboard only become full leaderboard after the first interval""", color=bot_colour)
+
+        elif embed_index == 7:
+
+            emb = discord.Embed(description=f"""## This is the general leaderboard
+                {Emojis.dot_emoji} Here you can see which users have written the most messages in total
+                {Emojis.help_emoji} It is updated daily and will be edited into the correct leaderboard tomorrow""", color=bot_colour)
+
         return emb
     
 

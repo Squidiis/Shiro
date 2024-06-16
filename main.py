@@ -100,7 +100,7 @@ class Main(commands.Cog):
                 bourdMessageIdWeek BIGINT UNSIGNED NULL,
                 bourdMessageIdMonth BIGINT UNSIGNED NULL,
                 bourdMessageIdWhole BIGINT UNSIGNED NULL,
-                leaderboardChannel BIGINT UNSIGNED NOT NULL
+                leaderboardChannel BIGINT UNSIGNED NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
             ''',
@@ -112,10 +112,10 @@ class Main(commands.Cog):
                 weeklyCountMessage INT UNSIGNED DEFAULT 0,
                 monthlyCountMessage INT UNSIGNED DEFAULT 0,
                 wholeMessageCount INT UNSIGNED DEFAULT 0,
-                wholeInviteCount INT UNSIGNED DEFAULT 0,
                 dailyInviteCount INT UNSIGNED DEFAULT 0,
                 weeklyInviteCount INT UNSIGNED DEFAULT 0,
-                monthlyInviteCount INT UNSIGNED DEFAULT 0
+                monthlyInviteCount INT UNSIGNED DEFAULT 0,
+                wholeInviteCount INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
             ]
@@ -137,6 +137,8 @@ class Main(commands.Cog):
         print(f'Logged in as: {bot.user.name}')
         print(f'With ID: {bot.user.id}')
         self.bot.loop.create_task(status_task())
+        await bot.wait_until_ready() 
+
         
         print("┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓")
         print("┃┏━┓┃ ┃┏━┓┃ ┃┃ ┃┃ ┗┫┣┛ ┗┓┏┓┃ ┗┫┣┛")
@@ -171,7 +173,7 @@ class Main(commands.Cog):
         self.bot.add_view(GhostPingButtons())
 
         # Message leaderboard
-
+        self.bot.add_view(SetleaderboardChannel())
         self.bot.add_view(SetMessageleaderboard())
         self.bot.add_view(OverwriteMessageChannel(channel_id=None))
         self.bot.add_view(ContinueMessageSetting())
@@ -184,11 +186,11 @@ class Main(commands.Cog):
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
 
         self.bot.add_view(view)
-        
-        if not edit_leaderboard.is_running():
-            edit_leaderboard.start(self.bot)
 
         await Main.create_db_table()
+
+        if not edit_leaderboard.is_running():
+            edit_leaderboard.start(self.bot)
 
 
 

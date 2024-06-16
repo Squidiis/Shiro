@@ -86,7 +86,8 @@ CREATE TABLE LeaderboardSettingsMessage (
     bourdMessageIdDay BIGINT UNSIGNED NULL,
     bourdMessageIdWeek BIGINT UNSIGNED NULL,
     bourdMessageIdMonth  BIGINT UNSIGNED NULL,
-    leaderboardChannel BIGINT UNSIGNED NOT NULL
+    bourdMessageIdWhole BIGINT UNSIGNED NULL,
+    leaderboardChannel BIGINT UNSIGNED NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -95,11 +96,11 @@ DROP TABLE IF EXISTS `LeaderboardSettingsInvite`
 CREATE TABLE LeaderboardSettingsInvite (
     guildId BIGINT UNSIGNED NOT NULL,
     status INT UNSIGNED NOT NULL DEFAULT 0,
-    bourdMessageIdDay BIGINT UNSIGNED NULL,
-    bourdMessageIdWeek BIGINT UNSIGNED NULL,
-    bourdMessageIdMonth BIGINT UNSIGNED NULL,
-    bourdMessageIdWhole BIGINT UNSIGNED NULL,
-    leaderboardChannel BIGINT UNSIGNED NOT NULL
+    invitebourdMessageIdDay BIGINT UNSIGNED NULL,
+    invitebourdMessageIdWeek BIGINT UNSIGNED NULL,
+    invitebourdMessageIdMonth BIGINT UNSIGNED NULL,
+    invitebourdMessageIdWhole BIGINT UNSIGNED NULL,
+    leaderboardChannel BIGINT UNSIGNED NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -111,11 +112,11 @@ CREATE TABLE LeaderboardTacking (
     dailyCountMessage INT UNSIGNED DEFAULT 0,
     weeklyCountMessage INT UNSIGNED DEFAULT 0,
     monthlyCountMessage INT UNSIGNED DEFAULT 0,
-    wholeMessageCount INT UNSIGNED DEFAULT 0,
-    wholeInviteCount INT UNSIGNED DEFAULT 0,
-    dailyInviteCount INT UNSIGNED DEFAULT 0,
-    weeklyInviteCount INT UNSIGNED DEFAULT 0,
-    monthlyInviteCount INT UNSIGNED DEFAULT 0
+    wholeCountMessage INT UNSIGNED DEFAULT 0,
+    dailyCountInvite INT UNSIGNED DEFAULT 0,
+    weeklyCountInvite INT UNSIGNED DEFAULT 0,
+    monthlyCountInvite INT UNSIGNED DEFAULT 0,
+    wholeCountInvite INT UNSIGNED DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
