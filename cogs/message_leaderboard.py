@@ -31,25 +31,38 @@ class Messageleaderboard(commands.Cog):
     async def show_message_leaderboard_settings(self, ctx:discord.ApplicationContext):
         
         settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = ctx.guild.id)
+        
+        if settings == None:
 
-        intervals = {
-            settings[2]:"Daily",
-            settings[3]:"Weekly",
-            settings[4]:"Monthly"
-        }
-        intervals_text = []
-        for i in settings[2], settings[3], settings[4]:
+            DatabaseUpdates.create_leaderboard_settings_message(guild_id = ctx.guild.id)
 
-            if i != None:
+            await ctx.respond(embed = GetEmbed.get_embed(embed_index=8))
 
-                intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating Message leaderboard\n")
+        elif settings[6] == None or all(x for x in [settings[2], settings[3], settings[4]]) == None:
 
-        emb = discord.Embed(description=f"""## Here you can see all the settings of the message leaderboard
-            {Emojis.dot_emoji} {f'Currently <#{settings[6]}> is set as' if settings[5] != None else 'No'} message leaderboard channel has been set
-            {Emojis.dot_emoji} **The following intervals are currently defined for which a leaderboard exists:**
+            await ctx.respond(embed = GetEmbed.get_embed(embed_index=8))
 
-            {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} No intervals have been defined yet'}""", color=bot_colour)
-        await ctx.respond(embed = emb)
+        else:
+
+            intervals = {
+                settings[2]:"Daily",
+                settings[3]:"Weekly",
+                settings[4]:"Monthly"
+            }
+            intervals_text = []
+            for i in settings[2], settings[3], settings[4]:
+
+                if i != None:
+
+                    intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating Message leaderboard\n")
+
+            emb = discord.Embed(description=f"""## Here you can see all the settings of the message leaderboard
+                {Emojis.dot_emoji} Das message leaderboard ist aktuell {'angeschalten' if settings[1] == 0 else 'ausgeschalten'}
+                {Emojis.dot_emoji} {f'Currently <#{settings[6]}> is set as' if settings[5] != None else 'No'} message leaderboard channel has been set
+                {Emojis.dot_emoji} **The following intervals are currently defined for which a leaderboard exists:**
+
+                {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} No intervals have been defined yet'}""", color=bot_colour)
+            await ctx.respond(embed = emb)
 
 
     @commands.Cog.listener()
@@ -83,7 +96,7 @@ class Messageleaderboard(commands.Cog):
 
             elif message.id == check[4]:
 
-                DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthlyv")
+                DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly")
 
 
     @commands.Cog.listener()
@@ -191,6 +204,8 @@ async def edit_leaderboard(bot):
 
                                         await message.edit(embed = emb)
 
+                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily")
+
                                 if leaderboard_settings[3] != None:
 
                                     if (current_date - message_age) > timedelta(weeks=1) and message_name == "1_week_old":
@@ -202,6 +217,8 @@ async def edit_leaderboard(bot):
 
                                         await message.edit(embed = emb)
 
+                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly")
+
                                 if leaderboard_settings[4] != None:
 
                                     if (current_date - message_age) > timedelta(days=30) and message_name == "1_month_old":
@@ -212,6 +229,9 @@ async def edit_leaderboard(bot):
                                             {users}""", color=bot_colour)
 
                                         await message.edit(embed = emb)
+
+                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly")
+
 
                     except Exception as error:
                         print("parameterized query failed {}".format(error))
@@ -246,8 +266,7 @@ class SetleaderboardChannel(discord.ui.View):
                 
                 DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
 
-                emb = GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention)
-                await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention), view=SetMessageleaderboard())
 
             elif settings[6] == select.values[0].id:
 
@@ -362,8 +381,7 @@ class SetMessageleaderboard(discord.ui.View):
             option_list = []
             channel = bot.get_channel(settings[6])
 
-            emb = GetEmbed.get_embed(embed_index=7)
-            message = await channel.send(embed=emb)
+            message = await channel.send(embed=GetEmbed.get_embed(embed_index=7))
             DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
 
             order = sorted(select.values, key=lambda item: ["daily", "weekly", "monthly"].index(item))
@@ -385,8 +403,7 @@ class SetMessageleaderboard(discord.ui.View):
 
                 DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
 
-            emb = GetEmbed.get_embed(embed_index=6, settings=select.values, settings2=option_list, settings3=f"<#{interaction.guild.id}>")
-            await interaction.response.edit_message(embed=emb, view=None)
+            await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=6, settings=select.values, settings2=option_list, settings3=channel.mention), view=None)
 
 
     @discord.ui.button(
@@ -539,8 +556,7 @@ class OverwriteMessageInterval(discord.ui.View):
 
             channel = bot.get_channel(settings[6])
 
-            emb = GetEmbed.get_embed(embed_index=7)
-            message = await channel.send(embed=emb)
+            message = await channel.send(embed=GetEmbed.get_embed(embed_index=7))
             DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
 
             for i in order:
@@ -560,8 +576,7 @@ class OverwriteMessageInterval(discord.ui.View):
 
                 DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
 
-            emb = GetEmbed.get_embed(embed_index=6, settings=self.intervals, settings2=option_list, settings3=channel.mention)
-            await interaction.response.edit_message(embed=emb, view=None)
+            await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=6, settings=self.intervals, settings2=option_list, settings3=channel.mention), view=None)
 
 
     @discord.ui.button(

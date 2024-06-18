@@ -24,8 +24,6 @@ aus den LevelSystemRoles table den guildName raussteichen
 
 das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird 
 
-erklärung in der readme adden für die custom farben für die rank cards
-
 
 
 Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
@@ -42,4 +40,6 @@ adden das bei dem message leaderboard bei show auch ein table erstellt wird
 
 (system für 3 intervalle aufbewahren
 
-funktion die den message count zurück setzt)
+funktion die den message count zurück setzt) (testen)
+
+noch ein system adden mit dem man eine rolle bekommt wird man einer der top ränge

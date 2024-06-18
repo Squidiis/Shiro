@@ -1658,8 +1658,7 @@ class BonusXpPercentage(discord.ui.View):
 
             if check_settings == select.values[0]:
 
-                emb = GetEmbed.get_embed(settings=check_settings, embed_index=0)
-                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+                await interaction.response.send_message(embed=GetEmbed.get_embed(settings=check_settings, embed_index=0), ephemeral=True, view=None)
 
             else:
             
@@ -1710,8 +1709,7 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
             if check_settings == self.children[0].value:
 
-                emb = GetEmbed.get_embed(settings=check_settings, embed_index=0)
-                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+                await interaction.response.send_message(embed=GetEmbed.get_embed(settings=check_settings, embed_index=0), ephemeral=True, view=None)
 
             else:
 

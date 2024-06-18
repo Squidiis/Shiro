@@ -173,6 +173,13 @@ class GetEmbed():
             emb = discord.Embed(description=f"""## This is the general leaderboard
                 {Emojis.dot_emoji} Here you can see which users have written the most messages in total
                 {Emojis.help_emoji} It is updated daily and will be edited into the correct leaderboard tomorrow""", color=bot_colour)
+        
+        elif embed_index == 8:
+
+            emb = discord.Embed(description=f"""## Here you can see the settings of the message leaderboard
+                {Emojis.dot_emoji} The message leaderboard is currently {'switched off' if settings[1] == 0 or settings[1] == None else 'switched on'}.
+                {Emojis.dot_emoji} Currently no channel or intervals have been defined for the message leaderboard
+                {Emojis.help_emoji} If you want to set the message leaderboard use the `set-message-leaderboard` command""", color=bot_colour)
 
         return emb
     
