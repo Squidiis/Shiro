@@ -448,7 +448,28 @@ class DatabaseCheck():
 
         DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return leaderboard
-            
+    
+
+    def check_leaderboard_roles(
+        guild_id:int, 
+        role_id:int = None, 
+        position:int = None,
+        settigs:str = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        if settigs == None:
+
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s"
+            check_roles_values = [guild_id]
+        cursor.execute(check_roles, check_roles_values)
+        leaderboard_roles = cursor.fetchall()
+
+        return leaderboard_roles
+
+
 
 
 ########################################################  Checks the bot settings  ##############################################
@@ -1266,6 +1287,22 @@ class DatabaseUpdates():
         finally:
 
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+    
+    def manage_leaderboard_roles(
+        guild_id:int,
+        role_id:int = None,
+        position:int = None,
+        settings:str = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        if settings == "message":
+
+            update_roles = f"INSERT INTO LeaderboardRoles (guildId, roleId, rankingPosition, settigs) VALUES (%s, %s, %s, %s)"
+            update_roles_values = [guild_id, role_id, position, settings]
 
 
 

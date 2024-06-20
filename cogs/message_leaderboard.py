@@ -535,10 +535,10 @@ class OverwriteMessageInterval(discord.ui.View):
         
         if self.intervals == None:
 
-            emb = discord.Embed(description=f"""## Ein fehler ist aufgetreten {Emojis.fail_emoji}
-                {Emojis.dot_emoji} Die intervalle konten nicht überschrieben werden
-                {Emojis.dot_emoji} Das passiert wenn die interaktion zu lange unbeantwortet bleibt oder ich die verbindung verliere
-                {Emojis.help_emoji} Wenn du die intervalle überschreiebn willst führe diesen command einfach nocheinmal aus""")
+            emb = discord.Embed(description=f"""## An error has occurred {Emojis.fail_emoji}
+                {Emojis.dot_emoji} The intervals cannot be overwritten
+                {Emojis.dot_emoji} This happens if the interaction remains unanswered for too long or if I lose the connection
+                {Emojis.help_emoji} If you want to override the intervals simply execute this command again""")
             await interaction.response.edit_message(embed=emb, view=None)
 
         else:
@@ -593,16 +593,16 @@ class OverwriteMessageInterval(discord.ui.View):
         for _, _, day, week, month, _, _ in check_settings:
 
             if day != None:
-                list_intervals.append(f"{Emojis.dot_emoji} Täglich aktualisiertes leaderboard")
+                list_intervals.append(f"{Emojis.dot_emoji} Daily updated leaderboard")
 
             if week != None:
-                list_intervals.append(f"{Emojis.dot_emoji} Wöchentlich aktualiseirtes leaderboard")
+                list_intervals.append(f"{Emojis.dot_emoji} Weekly updated leaderboard")
 
             if month != None:
-                list_intervals.append(f"{Emojis.dot_emoji} Monatlich aktualisiertes leaderboard")
+                list_intervals.append(f"{Emojis.dot_emoji} Monthly updated leaderboard")
 
-        emb = discord.Embed(description=f"""## Die aktuellen intervalle werden beibehalten
-            {Emojis.dot_emoji} Hier siehst du einen überblick über die aktuell festgelegten intervalle
+        emb = discord.Embed(description=f"""## The current intervals are retained
+            {Emojis.dot_emoji} Here you can see an overview of the currently defined intervals
             {"\n".join(list_intervals)}""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
 

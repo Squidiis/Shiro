@@ -117,6 +117,14 @@ class Main(commands.Cog):
                 monthlyInviteCount INT UNSIGNED DEFAULT 0,
                 wholeInviteCount INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LeaderboardRoles (
+                guildId BIGINT UNSIGNED NOT NULL,
+                roleId BIGINT UNSIGNED NOT NULL,
+                rankingPosition INT UNSIGNED NOT NULL,
+                settigs VARCHAR(20) NOT NULL 
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
             ]
 
@@ -178,7 +186,6 @@ class Main(commands.Cog):
         self.bot.add_view(OverwriteMessageChannel(channel_id=None))
         self.bot.add_view(ContinueMessageSetting())
         view.add_item(LeaderboardOnOffSwitchMessage())
-
 
 
         # Other Systems
