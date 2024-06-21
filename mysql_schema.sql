@@ -126,7 +126,8 @@ CREATE TABLE LeaderboardRoles (
     guildId BIGINT UNSIGNED NOT NULL,
     roleId BIGINT UNSIGNED NOT NULL,
     rankingPosition INT UNSIGNED NOT NULL,
-    settigs VARCHAR(20) NOT NULL 
+    status VARCHAR(20) NOT NULL,
+    roleInterval VARCHAR(10) NOT NUll
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

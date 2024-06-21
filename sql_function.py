@@ -396,6 +396,8 @@ class DatabaseCheck():
         cursor.execute(check_settings, check_settings_values)
 
         leaderboard_settings = cursor.fetchone()
+
+        DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
         return leaderboard_settings
     
 
@@ -450,24 +452,38 @@ class DatabaseCheck():
         return leaderboard
     
 
+    '''
+    '''
     def check_leaderboard_roles(
         guild_id:int, 
         role_id:int = None, 
-        position:int = None,
-        settigs:str = None
+        position:int = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        if settigs == None:
+        if role_id == None and position == None:
 
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s"
             check_roles_values = [guild_id]
+
+        elif role_id:
+
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s"
+            check_roles_values = [guild_id, role_id]
+
+        elif position:
+
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND rankingPosition = %s"
+            check_roles_values = [guild_id, position]
+
         cursor.execute(check_roles, check_roles_values)
         leaderboard_roles = cursor.fetchall()
-
+        
+        DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
         return leaderboard_roles
+    
 
 
 
@@ -1293,16 +1309,49 @@ class DatabaseUpdates():
         guild_id:int,
         role_id:int = None,
         position:int = None,
-        settings:str = None
+        status:str = None,
+        settings:str = None,
+        interval:str = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        if settings == "message":
+        leaderboard_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id)
 
-            update_roles = f"INSERT INTO LeaderboardRoles (guildId, roleId, rankingPosition, settigs) VALUES (%s, %s, %s, %s)"
-            update_roles_values = [guild_id, role_id, position, settings]
+        if leaderboard_roles:
+
+            if settings == "role":
+                    
+                update_roles = "UPDATE LeaderboardRoles SET rankingPosition = %s WHERE guildId = %s AND roleId = %s"
+                update_roles_values = [position, guild_id, role_id]
+                
+            elif settings == "level":
+
+                update_roles = "UPDATE LeaderboardRoles SET roleId = %s WHERE guildId = %s AND rankingPosition = %s"
+                update_roles_values = [role_id, guild_id, position]
+
+            elif settings == "status":
+
+                update_roles = "UPDATE LeaderboardRoles SET status = %s WHERE guildId = %s AND roleId = %s"
+                update_roles_values = [status, guild_id, role_id]
+
+            elif settings == "status":
+
+                update_roles = "UPDATE LeaderboardRoles SET roleInterval = %s WHERE guildId = %s AND roleId = %s"
+                update_roles_values = [interval, guild_id, role_id]
+
+        else:
+
+            update_roles = f"INSERT INTO LeaderboardRoles (guildId, roleId, rankingPosition, status, roleInterval) VALUES (%s, %s, %s, %s, %s)"
+            update_roles_values = [guild_id, role_id, position, status, interval]
+
+        cursor.execute(update_roles, update_roles_values)
+        db_connect.commit()
+
+        DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+
+
 
 
 

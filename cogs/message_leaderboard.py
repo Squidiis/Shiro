@@ -64,6 +64,14 @@ class Messageleaderboard(commands.Cog):
                 {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} No intervals have been defined yet'}""", color=bot_colour)
             await ctx.respond(embed = emb)
 
+    
+    @commands.slash_command(name = "add-leaderboard-role-message", description = "Define roles for the message leaderboard that are assigned when you reach a certain position!!")
+    async def add_leaderboard_role(self, ctx:discord.ApplicationContext, 
+        role:Option(discord.Role, required = True, description="Lege eine Rolle für das Leaderboard fest die vergeben werden soll sobald man einen bestimmten platz ereicht hat"), 
+        position:Option(required = True, max_value = 15, choices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, "Allgemeine rolle"], description="Wähle aus auf welcher position diese rolle vergeben werden soll (Wählst du allgemein wird diese rolle immer vergeben wenn man auf dem Leaderboard ist)"),
+        interval:Option(str, description="Wähle aus für welches Leaderboard diese Rolle vergeben werden soll", choices = ["Tägliches Leaderboard", "Wöchentliches Leaderboard", "Monatliches Leaderboard", "Allgemeines Leaderboard"])):
+
+        emb = discord.Embed()
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
