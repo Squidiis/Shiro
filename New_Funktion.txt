@@ -43,3 +43,6 @@ adden das bei dem message leaderboard bei show auch ein table erstellt wird
 funktion die den message count zurück setzt) (testen)
 
 noch ein system adden mit dem man eine rolle bekommt wird man einer der top ränge (auch eine funktion das man eine allgemeine rolle adden kann)
+
+
+verbindungs verlusts embed auch auf get_embed setzten

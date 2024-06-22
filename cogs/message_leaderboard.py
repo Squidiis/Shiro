@@ -69,7 +69,43 @@ class Messageleaderboard(commands.Cog):
     async def add_leaderboard_role(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, required = True, description="Lege eine Rolle für das Leaderboard fest die vergeben werden soll sobald man einen bestimmten platz ereicht hat"), 
         position:Option(required = True, max_value = 15, choices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, "Allgemeine rolle"], description="Wähle aus auf welcher position diese rolle vergeben werden soll (Wählst du allgemein wird diese rolle immer vergeben wenn man auf dem Leaderboard ist)"),
-        interval:Option(str, description="Wähle aus für welches Leaderboard diese Rolle vergeben werden soll", choices = ["Tägliches Leaderboard", "Wöchentliches Leaderboard", "Monatliches Leaderboard", "Allgemeines Leaderboard"])):
+        interval:Option(str, description="Wähle aus für welches Leaderboard diese Rolle vergeben werden soll", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+
+        check_role = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id)
+
+        interval_list = {
+            "day":"daily leaderboard",
+            "week":"weekly leaderboard",
+            "month":"monthly leaderboard",
+            "general":"general leaderboard"
+        }
+
+        if check_role:
+
+            if check_role[2] == 0:
+
+                emb = discord.Embed(description=f"""{'Diese Rolle ist aktuell als allgemeine rolle festgelegt' if check_role[1] == role.id else 'Dieses Intervall hat bereits eine Allgemeine rolle'}
+                    {Emojis.dot_emoji} Aktuell ist die Rolle <@&{check_role[1]}> als allgemeine rolle für das interval {interval_list[check_role[4]]} festgelegt
+                    {Emojis.dot_emoji} {f'Möchtest du die rolle <@&{check_role[1]}> mit der rolle {role.mention} ersetzten und diese als neue allgemeine rolle vestlegen?\n{Emojis.dot_emoji} Jeder der dann auf dem leaderboard gelistet ist wird diese rolle dann erhalten' 
+                    if check_role[1] != role.id else 
+                    f'Möchtest du die rolle <@&{check_role[1]}> als normale rolle für {position} platz vergeben?'}""", color=bot_colour)
+                await ctx.respond(embed = emb)
+
+            else:
+
+                emb = discord.Embed(description=f"""{'Diese Rolle' if check_role[1] == role.id else 'Diese Possition'} wurde bereits vergeben
+                    {Emojis.dot_emoji} Aktuell wird die Rolle <@&{check_role[1]}> für den {check_role[2]} platz vergeben, für das {interval_list[check_role[4]]}
+                    {Emojis.dot_emoji} Möchtest du diese festlegung überschreiben?""", color=bot_colour)
+                await ctx.respond(embed = emb)
+
+        else:
+
+            DatabaseUpdates.manage_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position, status = "message", interval = next((key for key, value in interval_list.items() if value == interval), None))
+
+            emb = discord.Embed(description=f"""Die neue leaderboard rolle wurde erfolgreich festgelegt
+                {Emojis.dot_emoji} Die rolle {role.mention} wurde erfolgreich für den {position} platz verstgelegt
+                {Emojis.dot_emoji} Wenn nun ein user den {position} platz auf den {interval} erreicht bekommt er die rolle {role.mention} verliehen""", color=bot_colour)
+            ctx.respond(embed = emb)
 
         emb = discord.Embed()
 

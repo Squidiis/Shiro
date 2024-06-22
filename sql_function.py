@@ -1317,9 +1317,7 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        leaderboard_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id)
-
-        if leaderboard_roles:
+        if settings:
 
             if settings == "role":
                     
