@@ -448,8 +448,8 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-xp", description = "Give a user a quantity of XP chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def give_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user who should receive the xp!"),
-        xp:Option(int, description="Specify a quantity of XP to be added!")):
+    async def give_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user who should receive the xp"),
+        xp:Option(int, description="Specify a quantity of XP to be added")):
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -506,7 +506,7 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-xp", description = "Remove a chosen amount of Xp from a user!")
     @commands.has_permissions(administrator = True)
-    async def remove_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user from which you want to remove xp!"),
+    async def remove_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user from which you want to remove xp"),
         xp:Option(int, description="Specify a quantity of Xp to be removed!")):
             
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
@@ -546,8 +546,8 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-level", description = "Give a user a selected amount of levels!")
     @commands.has_permissions(administrator = True)
-    async def give_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user you want to give the levels to!"), 
-        level:Option(int, description="Specify a set of levels that you want to assign!")):
+    async def give_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user you want to give the levels to"), 
+        level:Option(int, description="Specify a set of levels that you want to assign")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
 
@@ -586,8 +586,8 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-level", description = "Remove a quantity of levels chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def remove_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user from whom you want to remove the level!"), 
-        level:Option(int, description="Specify how many levels should be removed!")):
+    async def remove_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user from whom you want to remove the level"), 
+        level:Option(int, description="Specify how many levels should be removed")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
         
@@ -648,7 +648,7 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "reset-user-stats", description = "Resets all stats of the specified user in the level system!")
     @commands.has_permissions(administrator = True)
-    async def reset_user_stats(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user whose stats you want to reset!")):
+    async def reset_user_stats(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user whose stats you want to reset")):
 
         check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
 
@@ -915,10 +915,10 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "add-level-blacklist", description = "Add what you want to the blacklist!")
     @commands.has_permissions(administrator = True)
     async def add_level_blacklist(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel that you want to exclude from the level system!"),
-        category:Option(discord.CategoryChannel, required = False, description="Select a category that you want to exclude from the level system!"),
-        role:Option(discord.Role, required = False, description="Select a role that you want to exclude from the level system!"),
-        user:Option(discord.User, required = False, description="Select a user that you want to exclude from the level system!")):
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel that you want to exclude from the level system"),
+        category:Option(discord.CategoryChannel, required = False, description="Select a category that you want to exclude from the level system"),
+        role:Option(discord.Role, required = False, description="Select a role that you want to exclude from the level system"),
+        user:Option(discord.User, required = False, description="Select a user that you want to exclude from the level system")):
 
         check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
 
@@ -967,10 +967,10 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "remove-level-blacklist", description = "Remove what you want from the blacklist!")
     @commands.has_permissions(administrator = True)
     async def remove_level_blacklist(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the blacklist!"),
+        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the blacklist"),
         category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the blacklist"),
         role:Option(discord.Role, required = False, description="Select a role you want to remove from the blacklist"),
-        user:Option(discord.User, required = False, description="Select a user that you want to remove from the blacklist!")):
+        user:Option(discord.User, required = False, description="Select a user that you want to remove from the blacklist")):
 
         emb = await self.config_level_blacklist(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
         await ctx.respond(embed=emb)

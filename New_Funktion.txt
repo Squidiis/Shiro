@@ -46,3 +46,6 @@ noch ein system adden mit dem man eine rolle bekommt wird man einer der top rän
 
 
 verbindungs verlusts embed auch auf get_embed setzten
+
+
+allgemeine rolle für alle leaderboards adden die dann pro platz vergeben wird 

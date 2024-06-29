@@ -468,6 +468,11 @@ class DatabaseCheck():
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s"
             check_roles_values = [guild_id]
 
+        elif role_id != None and position != None:
+
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s OR rankingPosition = %s"
+            check_roles_values = [guild_id, role_id, position]
+
         elif role_id:
 
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s"
@@ -479,7 +484,10 @@ class DatabaseCheck():
             check_roles_values = [guild_id, position]
 
         cursor.execute(check_roles, check_roles_values)
-        leaderboard_roles = cursor.fetchall()
+        if role_id == None and position == None:
+            leaderboard_roles = cursor.fetchall()
+        else:
+            leaderboard_roles = cursor.fetchone()
         
         DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
         return leaderboard_roles
@@ -1319,23 +1327,23 @@ class DatabaseUpdates():
 
         if settings:
 
-            if settings == "role":
-                    
+            if settings == "position":
+                print(1)    
                 update_roles = "UPDATE LeaderboardRoles SET rankingPosition = %s WHERE guildId = %s AND roleId = %s"
                 update_roles_values = [position, guild_id, role_id]
                 
-            elif settings == "level":
-
+            elif settings == "role":
+                print(2)
                 update_roles = "UPDATE LeaderboardRoles SET roleId = %s WHERE guildId = %s AND rankingPosition = %s"
                 update_roles_values = [role_id, guild_id, position]
 
             elif settings == "status":
-
+                print(3)
                 update_roles = "UPDATE LeaderboardRoles SET status = %s WHERE guildId = %s AND roleId = %s"
                 update_roles_values = [status, guild_id, role_id]
 
-            elif settings == "status":
-
+            elif settings == "interval":
+                print(4)
                 update_roles = "UPDATE LeaderboardRoles SET roleInterval = %s WHERE guildId = %s AND roleId = %s"
                 update_roles_values = [interval, guild_id, role_id]
 
