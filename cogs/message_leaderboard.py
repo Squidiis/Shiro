@@ -83,7 +83,7 @@ class Messageleaderboard(commands.Cog):
         role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
         position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
         interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
-
+    
         interval_list = {
             "day":"daily leaderboard",
             "week":"weekly leaderboard",
@@ -91,12 +91,12 @@ class Messageleaderboard(commands.Cog):
             "general":"general leaderboard"
         }
         interval_db = next((key for key, value in interval_list.items() if value == interval), None)
-        position_db = 0 if "general role" == position else int(position) # Alle Texte anpassen das auch unterschieden wird ob es eine allgemeine rolle ist 
+        position_db = 0 if "general role" == position else int(position)
 
         check_role = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position_db)
-        
-        if check_role:
 
+        if check_role is not None and check_role[4] == interval_db: # Reagiert nicht weil kein eintrag vorhanden ist
+            
             if check_role[2] == position_db and check_role[1] == role.id and interval_db == check_role[4]:
                 
                 emb = discord.Embed(description=f"""## This role has already been assigned to this position
@@ -104,21 +104,28 @@ class Messageleaderboard(commands.Cog):
                     {Emojis.dot_emoji} If you want to overwrite the role, position or the associated interval, you can simply execute this command again""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
+            elif check_role[2] == 0 and position_db != 0:
+            
+                emb = discord.Embed(description=f"""## Diese rolle ist aktuell als geneal role festgelegt
+                    {Emojis.dot_emoji} Aktuell ist <@&{check_role[1]}> als generelle rolle festgelegt möchtest du diese rolle für den {position} platz festlegen?
+                    {Emojis.dot_emoji} Mit den unteren Button kannst du deine entscheidung bestätigen""", color=bot_colour)
+                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="position", delete=check_role[1]))
+
             elif check_role[2] == 0 or self.check_interval_role(guild_id=ctx.guild.id, interval=interval_db):
                 
-                emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] == role.id else 'This interval already has a general role'}
+                emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] != role.id else 'This interval already has a general role'}
                     {Emojis.dot_emoji} The role <@&{check_role[1]}> is currently defined as the general role for the interval {interval_list[check_role[4]]}
-                    {Emojis.dot_emoji} {f'Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and create this as a new general role?\n{Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role' 
+                    {Emojis.dot_emoji} {f'Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and set this as a new general role?\n{Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role' 
                     if check_role[1] != role.id else 
                     f'Do you want to assign the role <@&{check_role[1]}> as a normal role for the {position} space?'}""", color=bot_colour)
-                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "interval"))
+                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "interval", delete=check_role))
 
             else:
                 
-                emb = discord.Embed(description=f"""## {'This role' if check_role[1] == role.id else 'This position'} has already been assigned
+                emb = discord.Embed(description=f"""## {'This role' if check_role[1] != role.id else 'This position'} has already been assigned
                     {Emojis.dot_emoji} Currently, the role <@&{check_role[1]}> is assigned for the {check_role[2]} place, for the {interval_list[check_role[4]]}
-                    {Emojis.dot_emoji} Do you want to {f'replace the role <@&{check_role[1]}> with the role {role.mention} for the position {position} for the {interval_list[check_role[4]]}' if check_role[1] == role.id else f'change the place for which the role {role.mention} is assigned to {position}? this role is then always assigned when someone reaches the {position} place on the {interval}'}""", color=bot_colour)
-                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "position"))
+                    {Emojis.dot_emoji} Do you want to {f'replace the role <@&{check_role[1]}> with the role {role.mention} for the position {position} for the {interval_list[check_role[4]]}' if check_role[1] != role.id else f'change the place for which the role {role.mention} is assigned to {position}? this role is then always assigned when someone reaches the {position} place on the {interval}'}""", color=bot_colour)
+                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "position", delete=check_role))
 
         else:
                 
@@ -701,12 +708,14 @@ class OverwriteRole(discord.ui.View):
         role,
         interval,
         position,
-        settings
+        settings,
+        delete
     ):
         self.role = role
         self.interval = interval
         self.position = position
         self.settings = settings
+        self.delete = delete
         super().__init__(timeout=None)
 
     @discord.ui.button(
@@ -717,11 +726,18 @@ class OverwriteRole(discord.ui.View):
 
     async def overwrite_role_button(self, button, interaction:discord.Interaction):
 
-        DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval, settings = self.settings)
+        check_role = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1])
+        if check_role:
+            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1])
+        check_positon = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position)
+        if check_positon:
+            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1])
 
-        emb = discord.Embed(description=f"""## Der eintrag wurde überschrieben
-            {Emojis.dot_emoji} Abjetzt wir die rolle <@&{self.role.id}> auf den {self.position} platz vergeben, dies gielt für das {self.interval}{'ly' if self.interval != 'general' else ''} leaderboard
-            {Emojis.dot_emoji} Wenn du dir die einstellungen des message leaderboard system ändern willst kannst du das mit dem `set-messageleaderboard` command""", color=bot_colour)  
+        DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval)
+
+        emb = discord.Embed(description=f"""## The entry has been overwritten
+            {Emojis.dot_emoji} From now on the role <@&{self.role.id}> is assigned to the {self.position} place, this applies to the {self.interval}{'ly' if self.interval != 'general' else ''} leaderboard
+            {Emojis.dot_emoji} If you want to change the settings of the message leaderboard system you can do this with the `set-messageleaderboard` command""", color=bot_colour)  
         await interaction.response.edit_message(embed=emb, view=None)
 
 
@@ -733,7 +749,7 @@ class OverwriteRole(discord.ui.View):
 
     async def keep_role_button(self, button, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f"""## Rolle und position wird bebehalten
-            {Emojis.dot_emoji} Das überschreiben des eintrags wurde abgebrochen
-            {Emojis.dot_emoji} Solltest du eine rolle oder eine position ändern wollen kannst du einfach diesen command erneut ausführen""", color=bot_colour)
+        emb = discord.Embed(description=f"""## Role and position is retained
+            {Emojis.dot_emoji} The overwriting of the entry was canceled
+            {Emojis.dot_emoji} If you want to change a role or a position, you can simply execute this command again""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)

@@ -463,12 +463,7 @@ class DatabaseCheck():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        if role_id == None and position == None:
-
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s"
-            check_roles_values = [guild_id]
-
-        elif role_id != None and position != None:
+        if role_id != None and position != None:
 
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s OR rankingPosition = %s"
             check_roles_values = [guild_id, role_id, position]
@@ -482,6 +477,12 @@ class DatabaseCheck():
 
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND rankingPosition = %s"
             check_roles_values = [guild_id, position]
+
+        else:
+
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s"
+            check_roles_values = [guild_id]
+
 
         cursor.execute(check_roles, check_roles_values)
         if role_id == None and position == None:
@@ -1324,26 +1325,26 @@ class DatabaseUpdates():
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
-
+        
         if settings:
 
             if settings == "position":
-                print(1)    
-                update_roles = "UPDATE LeaderboardRoles SET rankingPosition = %s WHERE guildId = %s AND roleId = %s"
-                update_roles_values = [position, guild_id, role_id]
+
+                update_roles = "UPDATE LeaderboardRoles SET rankingPosition = %s WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
+                update_roles_values = [position, guild_id, role_id, interval]
                 
             elif settings == "role":
-                print(2)
-                update_roles = "UPDATE LeaderboardRoles SET roleId = %s WHERE guildId = %s AND rankingPosition = %s"
-                update_roles_values = [role_id, guild_id, position]
+                
+                update_roles = "UPDATE LeaderboardRoles SET roleId = %s WHERE guildId = %s AND rankingPosition = %s AND roleInterval = %s"
+                update_roles_values = [role_id, guild_id, position, interval]
 
             elif settings == "status":
-                print(3)
-                update_roles = "UPDATE LeaderboardRoles SET status = %s WHERE guildId = %s AND roleId = %s"
-                update_roles_values = [status, guild_id, role_id]
+                
+                update_roles = "UPDATE LeaderboardRoles SET status = %s WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
+                update_roles_values = [status, guild_id, role_id, interval]
 
             elif settings == "interval":
-                print(4)
+                
                 update_roles = "UPDATE LeaderboardRoles SET roleInterval = %s WHERE guildId = %s AND roleId = %s"
                 update_roles_values = [interval, guild_id, role_id]
 
@@ -1464,6 +1465,29 @@ class DatabaseRemoveDatas():
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))
 
+        finally:
+
+            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+
+
+    '''
+
+    '''
+    def _remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        try:
+
+            delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'}"
+            delete_leaderboard_role_values = [guild_id, role_id if position == None else position]
+            cursor.execute(delete_leaderboard_role, delete_leaderboard_role_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+        
         finally:
 
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
