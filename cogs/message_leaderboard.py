@@ -10,6 +10,7 @@ class Messageleaderboard(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(name = "set-message-leaderboard", description = "Set the message leaderboard system!")
+    @commands.has_permissions(administrator = True)
     async def set_message_leaderboard(self, ctx:discord.ApplicationContext):
 
         settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = ctx.guild_id)
@@ -79,6 +80,7 @@ class Messageleaderboard(commands.Cog):
 
 
     @commands.slash_command(name = "add-leaderboard-role-message", description = "Define roles for the message leaderboard that are assigned when you reach a certain position!")
+    @commands.has_permissions(administrator = True)
     async def add_leaderboard_role(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
         position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
@@ -135,6 +137,41 @@ class Messageleaderboard(commands.Cog):
                 {Emojis.dot_emoji} The role {role.mention} was successfully {f'set for the {position} place' if position_db != 0 else f'set as general role'}
                 {Emojis.dot_emoji} {f'If a user now reaches the {position} place on the {interval} he gets the role {role.mention}' if position_db != 0 else f'If a user is now listed on the {interval} he gets the role {role.mention} until the leaderboard is updated again and a new user gets this role'}""", color=bot_colour)
             await ctx.respond(embed=emb)
+
+    
+    @commands.slash_command(name = "remove-leaderboard-role")
+    @commands.has_permissions(administrator = True)
+    async def remove_leaderboard_role(self, ctx:discord.ApplicationContext, 
+        role:Option(discord.Option, description="Remove a roll from the leaderboard rolls!"), 
+        interval:Option(discord.Option, description="Choose from which leaderboard the roll should be removed!", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+
+        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, interval = interval)
+
+        interval_list = {
+            "daily leaderboard":"daily",
+            "weekly leaderboard":"weekly",
+            "monthly leaderboard":"monthly",
+            "general leaderboard":"general"
+        }
+
+        if check:
+
+            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval)
+            
+            emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
+                {Emojis.dot_emoji} The role {role.mention} was deleted from {interval}
+                {Emojis.dot_emoji} With the button below you can see which other roles are defined as leaderbaord roles""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesButton())
+
+        else:
+
+            emb = discord.Embed(description=f"""## This role has not been set for any interval
+                {Emojis.dot_emoji} The role you specified is not listed for this interval
+                {Emojis.dot_emoji} Here you have an overview of all roles that are listed on the respective intervals with the lower select menu you can display the other intervals
+                {Emojis.dot_emoji} All leaderboard roles for the {interval}
+                
+                {show_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list[interval])}""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
     
 
     @commands.Cog.listener()
@@ -728,10 +765,10 @@ class OverwriteRole(discord.ui.View):
 
         check_role = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1])
         if check_role:
-            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1])
+            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval)
         check_positon = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position)
         if check_positon:
-            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1])
+            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval)
 
         DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval)
 
@@ -753,3 +790,69 @@ class OverwriteRole(discord.ui.View):
             {Emojis.dot_emoji} The overwriting of the entry was canceled
             {Emojis.dot_emoji} If you want to change a role or a position, you can simply execute this command again""", color=bot_colour)
         await interaction.response.edit_message(embed=emb, view=None)
+
+
+def show_leaderboard_roles(guild_id, interval):
+
+    check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval)
+
+    leaderboard = []
+    for _, role, poistion, _, _ in check:
+
+        if poistion != 0:
+
+            leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is used for place {poistion}")
+
+        else:
+
+            leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is defined as a general role and is assigned to every user who is on the leaderboard")
+
+    return "\n".join(leaderboard)
+
+
+class ShowLeaderboardRolesButton(discord.ui.Button):
+
+    def __init__(self):
+        super().__init__(
+            label = "Show all Leaderboard Roles",
+            style = discord.ButtonStyle.blurple,
+            custom_id = "show_leaderboard_roles"
+        )
+
+    async def callback(self, interaction: Interaction):
+        
+        emb = discord.Embed(description=f"""## Leaderboard roles
+            {Emojis.dot_emoji} With the lower select menu you can see which roles are set for which leaderboard
+            {Emojis.dot_emoji} The following leaderboards are available
+            
+            {Emojis.dot_emoji} Daily leaderboard: Every day, the system checks which users have posted the most messages. The previously counted messages are deleted
+            {Emojis.dot_emoji} Weekly leaderboard: Every week, the system checks which users have posted the most messages. The previously counted messages are deleted
+            {Emojis.dot_emoji} Monthly leaderboard: Every month, the system checks which users have posted the most messages. The previously counted messages are deleted
+            {Emojis.dot_emoji} General leaderboard: This checks which users have written the most messages (updated daily). The previously counted messages are not deleted""", color=bot_colour)
+        await interaction.response.edit_message(embed=emb, view=ShowLeaderboardRolesSelect())
+
+
+class ShowLeaderboardRolesSelect(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.select(
+        placeholder = "Choose from which leaderboard you want to see all roles!",
+        min_values = 1,
+        max_values = 1,
+        custom_id = "show_leaderboard_roles",
+        options = [
+            discord.SelectOption(label="Daily leaderboard", description="Take a look at which roles are defined for the Daily leaderboard", value="daily"),
+            discord.SelectOption(label="Weekly leaderboard", description="Take a look at which roles are defined for the weekly leaderboard", value="weekly"),
+            discord.SelectOption(label="Monthly leaderboard", description="Take a look at which roles are defined for the Monthly leaderboard", value="monthly"),
+            discord.SelectOption(label="General leaderboard", description="Take a look at which roles are defined for the Gernal leaderboard", value="general")
+        ]
+    )
+
+    async def show_leaderboard_roles_select(self, select, interaction:discord.Interaction):
+
+        emb = discord.Embed(description=f""""## Leaderboard roles
+            {Emojis.dot_emoji} Here you can see an overview of all roles that are listed on the {select.values[0]} leaderboard
+            {show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0])}""", color=bot_colour)
+        await interaction.response.send_message(embed=emb, view=None, ephemeral=True)

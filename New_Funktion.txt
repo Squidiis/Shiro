@@ -46,8 +46,4 @@ funktion die den message count zurück setzt) (testen)
 verbindungs verlusts embed auch auf get_embed setzten
 
 
-
-Testen noch das eine rolle vorhanden ist und die dann mit einer general rolle überschrieben 
-
-Eine funktion adden bei den gecheckt wird ob eine rolle auf der position vorhanden ist auf die die neue general role überschrieben werden soll
-Und Testen ob es geht eine general role mit einer anderen zu überschreiben
+zu den anderne Show und Remove commands das konzept mit dem Dropdown adden

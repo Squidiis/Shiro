@@ -457,7 +457,8 @@ class DatabaseCheck():
     def check_leaderboard_roles(
         guild_id:int, 
         role_id:int = None, 
-        position:int = None
+        position:int = None,
+        interval:str = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
@@ -478,10 +479,15 @@ class DatabaseCheck():
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND rankingPosition = %s"
             check_roles_values = [guild_id, position]
 
+        elif interval and role_id:
+
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
+            check_roles_values = [guild_id, role_id, interval]
+
         else:
 
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s"
-            check_roles_values = [guild_id]
+            check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
+            check_roles_values = [guild_id] if interval != None else [guild_id, interval]
 
 
         cursor.execute(check_roles, check_roles_values)
@@ -1473,15 +1479,15 @@ class DatabaseRemoveDatas():
     '''
 
     '''
-    def _remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None):
+    def _remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None, interval:str = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
         try:
 
-            delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'}"
-            delete_leaderboard_role_values = [guild_id, role_id if position == None else position]
+            delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'} AND roleInterval = %s"
+            delete_leaderboard_role_values = [guild_id, role_id if position == None else position, interval]
             cursor.execute(delete_leaderboard_role, delete_leaderboard_role_values)
             db_connect.commit()
 
