@@ -79,9 +79,9 @@ class Messageleaderboard(commands.Cog):
         return False 
 
 
-    @commands.slash_command(name = "add-leaderboard-role-message", description = "Define roles for the message leaderboard that are assigned when you reach a certain position!")
+    @commands.slash_command(name = "add-message-leaderboard-role", description = "Define roles for the message leaderboard that are assigned when you reach a certain position!")
     @commands.has_permissions(administrator = True)
-    async def add_leaderboard_role(self, ctx:discord.ApplicationContext, 
+    async def add_leaderboard_role_message(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
         position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
         interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
@@ -139,11 +139,11 @@ class Messageleaderboard(commands.Cog):
             await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "remove-leaderboard-role")
+    @commands.slash_command(name = "remove-message-leaderboard-role")
     @commands.has_permissions(administrator = True)
-    async def remove_leaderboard_role(self, ctx:discord.ApplicationContext, 
-        role:Option(discord.Option, description="Remove a roll from the leaderboard rolls!"), 
-        interval:Option(discord.Option, description="Choose from which leaderboard the roll should be removed!", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+    async def remove_leaderboard_role_message(self, ctx:discord.ApplicationContext, 
+        role:Option(discord.Role, description="Remove a roll from the leaderboard rolls!"), 
+        interval:Option(str, description="Choose from which leaderboard the roll should be removed!", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
 
         check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, interval = interval)
 
@@ -172,7 +172,20 @@ class Messageleaderboard(commands.Cog):
                 
                 {show_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list[interval])}""", color=bot_colour)
             await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+
     
+    @commands.slash_command(name = "show-message-leaderboard-roles")
+    async def show_leaderboard_roles(self, ctx:discord.ApplicationContext):
+
+        emb = discord.Embed(description=f"""## Wähle von welchen Leaderboard du die rollen sehen willst
+            {Emojis.dot_emoji} Mit den Unteren Select menü kannst du auswählen von welchen Interval du die dazugehörigen rollen sehen willst zur auswahl stehen
+            
+            > {Emojis.dot_emoji} Daily leaderboard: Every day, the system checks which users have posted the most messages. The previously counted messages are deleted
+            > {Emojis.dot_emoji} Weekly leaderboard: Every week, the system checks which users have posted the most messages. The previously counted messages are deleted
+            > {Emojis.dot_emoji} Monthly leaderboard: Every month, the system checks which users have posted the most messages. The previously counted messages are deleted
+            > {Emojis.dot_emoji} General leaderboard: This checks which users have written the most messages (updated daily). The previously counted messages are not deleted""", color=bot_colour)
+        await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -795,17 +808,23 @@ class OverwriteRole(discord.ui.View):
 def show_leaderboard_roles(guild_id, interval):
 
     check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval)
-
     leaderboard = []
-    for _, role, poistion, _, _ in check:
 
-        if poistion != 0:
+    if check:
 
-            leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is used for place {poistion}")
+        for _, role, poistion, _, _ in check:
 
-        else:
+            if poistion != 0:
 
-            leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is defined as a general role and is assigned to every user who is on the leaderboard")
+                leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is used for place {poistion}")
+
+            else:
+
+                leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is defined as a general role and is assigned to every user who is on the leaderboard")
+    
+    else:
+
+        leaderboard.append(f"**{Emojis.dot_emoji} No roles have been defined for this leaderboard**")
 
     return "\n".join(leaderboard)
 

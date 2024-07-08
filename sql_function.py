@@ -463,7 +463,8 @@ class DatabaseCheck():
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
-
+        
+        check = False
         if role_id != None and position != None:
 
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s OR rankingPosition = %s"
@@ -481,6 +482,7 @@ class DatabaseCheck():
 
         elif interval and role_id:
 
+            check = True
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
             check_roles_values = [guild_id, role_id, interval]
 
@@ -491,7 +493,7 @@ class DatabaseCheck():
 
 
         cursor.execute(check_roles, check_roles_values)
-        if role_id == None and position == None:
+        if role_id == None and position == None or check == True:
             leaderboard_roles = cursor.fetchall()
         else:
             leaderboard_roles = cursor.fetchone()
