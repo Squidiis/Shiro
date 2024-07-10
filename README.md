@@ -147,4 +147,9 @@ If you encounter problems use the discord server linked above or press [here](ht
 |userinfo|Displays all relevant information about a user.|
 |ghost-ping-settings|Set the ghost ping system if someone tags you and deletes the message a message will be sent with the content and the sender can be turned on/off.|
 |show-invites|Shows how many members a user has invited|
-
+|set-message-leaderboard||
+|show-message-leaderboard-setting||
+|add-message-leaderboard-role||
+|remove-message-leaderboard-role||
+|show-message-leaderboard-roles||
+|reset-message-leaderboard-roles||

@@ -58,7 +58,7 @@ class CheckLevelSystem():
         if level_roles:
 
             final_level_roles = []
-            for _, role, lvl, _ in level_roles:
+            for _, role, lvl in level_roles:
 
                 final_level_roles.append(f"{Emojis.dot_emoji} The role <@&{role}> is assigned at level {lvl}")
 
@@ -67,6 +67,7 @@ class CheckLevelSystem():
         else:
 
             return f"{Emojis.dot_emoji} No level roles have been set"
+    
     
     # Returns the blacklist completely formatted 
     def show_blacklist(guild_id:int):
@@ -1043,7 +1044,7 @@ class LevelSystem(commands.Cog):
                 
                 if level <= 999:
                             
-                    DatabaseUpdates._insert_level_roles(guild_id=ctx.guild.id, role_id=role.id, level=level, guild_name=ctx.guild.name)
+                    DatabaseUpdates._insert_level_roles(guild_id=ctx.guild.id, role_id=role.id, level=level)
 
                     emb = discord.Embed(description=f"""## The role was assigned successfully as a level role
                         {Emojis.dot_emoji} The role {role.mention} was successfully assigned to the level {level}
@@ -1133,7 +1134,7 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "show-level-roles", description = "View all rolls that are available with a level!")
-    async def show_level_roles(self, ctx:discord.ApplicationContext):
+    async def show_level_system_roles(self, ctx:discord.ApplicationContext):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status = "level_role")
         
@@ -1938,7 +1939,6 @@ class ShowLevelSettings(discord.ui.Button):
         await interaction.response.send_message(embed=emb, ephemeral=True, view=ShowLevelSettingsSelect())
 
 
-# Fertig machen 
 class ShowLevelSettingsSelect(discord.ui.View):
 
     def __init__(self):

@@ -3,6 +3,14 @@ from utils import *
 from sql_function import *
 from discord.ext import tasks
 
+# Dictionary for the check functions (does not have to be in each command individually)
+interval_list = {
+    "day":"daily leaderboard",
+    "week":"weekly leaderboard",
+    "month":"monthly leaderboard",
+    "general":"general leaderboard"
+    }
+
 
 class Messageleaderboard(commands.Cog):
 
@@ -86,12 +94,6 @@ class Messageleaderboard(commands.Cog):
         position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
         interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
     
-        interval_list = {
-            "day":"daily leaderboard",
-            "week":"weekly leaderboard",
-            "month":"monthly leaderboard",
-            "general":"general leaderboard"
-        }
         interval_db = next((key for key, value in interval_list.items() if value == interval), None)
         position_db = 0 if "general role" == position else int(position)
 
@@ -142,21 +144,14 @@ class Messageleaderboard(commands.Cog):
     @commands.slash_command(name = "remove-message-leaderboard-role")
     @commands.has_permissions(administrator = True)
     async def remove_leaderboard_role_message(self, ctx:discord.ApplicationContext, 
-        role:Option(discord.Role, description="Remove a roll from the leaderboard rolls!"), 
+        role:Option(discord.Role, description="Remove a role from the leaderboard roles!"), 
         interval:Option(str, description="Choose from which leaderboard the roll should be removed!", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
 
         check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, interval = interval)
 
-        interval_list = {
-            "daily leaderboard":"daily",
-            "weekly leaderboard":"weekly",
-            "monthly leaderboard":"monthly",
-            "general leaderboard":"general"
-        }
-
         if check:
 
-            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval)
+            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval_list[interval])
             
             emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
                 {Emojis.dot_emoji} The role {role.mention} was deleted from {interval}
@@ -165,7 +160,7 @@ class Messageleaderboard(commands.Cog):
 
         else:
 
-            emb = discord.Embed(description=f"""## This role has not been set for any interval
+            emb = discord.Embed(description=f"""## This role has not been set for this interval
                 {Emojis.dot_emoji} The role you specified is not listed for this interval
                 {Emojis.dot_emoji} Here you have an overview of all roles that are listed on the respective intervals with the lower select menu you can display the other intervals
                 {Emojis.dot_emoji} All leaderboard roles for the {interval}
@@ -175,7 +170,7 @@ class Messageleaderboard(commands.Cog):
 
     
     @commands.slash_command(name = "show-message-leaderboard-roles")
-    async def show_leaderboard_roles(self, ctx:discord.ApplicationContext):
+    async def show_leaderboard_roles_message(self, ctx:discord.ApplicationContext):
 
         emb = discord.Embed(description=f"""## Wähle von welchen Leaderboard du die rollen sehen willst
             {Emojis.dot_emoji} Mit den Unteren Select menü kannst du auswählen von welchen Interval du die dazugehörigen rollen sehen willst zur auswahl stehen
@@ -185,6 +180,27 @@ class Messageleaderboard(commands.Cog):
             > {Emojis.dot_emoji} Monthly leaderboard: Every month, the system checks which users have posted the most messages. The previously counted messages are deleted
             > {Emojis.dot_emoji} General leaderboard: This checks which users have written the most messages (updated daily). The previously counted messages are not deleted""", color=bot_colour)
         await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+
+
+    @commands.slash_command(name = "reset-message-leaderboard-roles")
+    @commands.has_permissions(administrator = True)
+    async def reset_leaderboard_roles_message(self, ctx:discord.ApplicationContext, interval:Option(str, description="Wähle welche Leaderboard rollen zurück gesetzt werden sollen", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+
+        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, interval = interval_list[interval])
+
+        if check:
+
+            emb = discord.Embed(description=f"""## Leaderboard rollen wurden zurückgesetzt
+                {Emojis.dot_emoji} Alle leaderbaord rollen des {interval} wurden erfolgreich zurückgesetzt
+                {Emojis.dot_emoji} Wenn du sehen möchtest welche rollen auf den anderen intervallen gelistet sind nutzte das untere select menü""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+
+        else:
+
+            emb = discord.Embed(description=f"""## Auf diesen leaderboard wurden keine rollen hinzugefügt
+                {Emojis.dot_emoji} Auf den {interval} wurden keine rollen hinzugefügt
+                {Emojis.dot_emoji} Mit den unteren select menü kannst du die anderen intervalle überprüfen und die festgelegten rollen ansehen""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
 
 
     @commands.Cog.listener()
@@ -829,16 +845,17 @@ def show_leaderboard_roles(guild_id, interval):
     return "\n".join(leaderboard)
 
 
-class ShowLeaderboardRolesButton(discord.ui.Button):
+class ShowLeaderboardRolesButton(discord.ui.View):
 
     def __init__(self):
-        super().__init__(
-            label = "Show all Leaderboard Roles",
-            style = discord.ButtonStyle.blurple,
-            custom_id = "show_leaderboard_roles"
-        )
+        super().__init__(timeout=None)
 
-    async def callback(self, interaction: Interaction):
+    @discord.ui.button(
+            label = "show all Leaderboard Roles",
+            style = discord.ButtonStyle.blurple,
+            custom_id = "show_leaderboard_roles_button"
+        )
+    async def callback(self, button, interaction:discord.Interaction):
         
         emb = discord.Embed(description=f"""## Leaderboard roles
             {Emojis.dot_emoji} With the lower select menu you can see which roles are set for which leaderboard
@@ -871,7 +888,8 @@ class ShowLeaderboardRolesSelect(discord.ui.View):
 
     async def show_leaderboard_roles_select(self, select, interaction:discord.Interaction):
 
-        emb = discord.Embed(description=f""""## Leaderboard roles
+        emb = discord.Embed(description=f"""## Leaderboard roles
             {Emojis.dot_emoji} Here you can see an overview of all roles that are listed on the {select.values[0]} leaderboard
+
             {show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0])}""", color=bot_colour)
         await interaction.response.send_message(embed=emb, view=None, ephemeral=True)

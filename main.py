@@ -193,6 +193,8 @@ class Main(commands.Cog):
         self.bot.add_view(GhostPingButtons())
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
 
+        view.add_item(CancelButton())
+
         self.bot.add_view(view)
 
         await Main.create_db_table()

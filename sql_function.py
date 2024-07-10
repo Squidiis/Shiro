@@ -489,8 +489,7 @@ class DatabaseCheck():
         else:
 
             check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
-            check_roles_values = [guild_id] if interval != None else [guild_id, interval]
-
+            check_roles_values = [guild_id] if interval == None else [guild_id, interval]
 
         cursor.execute(check_roles, check_roles_values)
         if role_id == None and position == None or check == True:
@@ -797,8 +796,6 @@ class DatabaseUpdates():
             Id of the new level role
         - level
             Level from which the level role should be assigned
-        - guild_name
-            Name of the server
     
     Info:
         - All values must be specified
@@ -806,16 +803,16 @@ class DatabaseUpdates():
     def _insert_level_roles(
         guild_id:int, 
         role_id:int, 
-        level:int, 
-        guild_name:str):
+        level:int
+        ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
         try:
 
-            insert_level_role = "INSERT INTO LevelSystemRoles (guildId, roleId, roleLevel, guildName) VALUES (%s, %s, %s, %s)"
-            insert_level_role_values = [guild_id, role_id, level, guild_name]
+            insert_level_role = "INSERT INTO LevelSystemRoles (guildId, roleId, roleLevel) VALUES (%s, %s, %s)"
+            insert_level_role_values = [guild_id, role_id, level]
             cursor.execute(insert_level_role, insert_level_role_values)
             db_connect.commit()
 
@@ -1482,7 +1479,7 @@ class DatabaseRemoveDatas():
 
     '''
     def _remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None, interval:str = None):
-
+        
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 

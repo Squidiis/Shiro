@@ -18,32 +18,23 @@ Updaite 1.1
     - manager / endweder mit slash command oder mit manager
         drop down für die einzelnen einstellungen button mit modal für emoji oder spezific content
 
-
-aus den LevelSystemRoles table den guildName raussteichen
-
-
 das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird 
-
-
 
 Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
 back button zum close button machen help
 
 leaderboard in Help menu adden und in readme
 
-
 statistic section 
 
 - Message Leaderboard
 - Invite Leaderboard
-adden das bei dem message leaderboard bei show auch ein table erstellt wird 
 
 (system für 3 intervalle aufbewahren
 
 funktion die den message count zurück setzt) (testen)
 
-
 verbindungs verlusts embed auch auf get_embed setzten
-
+design anpassen für show role command
 
 zu den anderne Show und Remove commands das konzept mit dem Dropdown adden
