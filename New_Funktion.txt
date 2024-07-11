@@ -23,8 +23,6 @@ das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu 
 Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
 back button zum close button machen help
 
-leaderboard in Help menu adden und in readme
-
 statistic section 
 
 - Message Leaderboard
@@ -38,3 +36,9 @@ verbindungs verlusts embed auch auf get_embed setzten
 design anpassen für show role command
 
 zu den anderne Show und Remove commands das konzept mit dem Dropdown adden
+
+back to default funktion adden für message leaderboard
+
+nochmal gesammt test machen für das message leaderboard
+
+das rollen system integieren in das leaderboard

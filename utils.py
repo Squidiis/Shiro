@@ -189,7 +189,8 @@ class GetEmbed():
 
 class CancelButton(discord.ui.Button):
     
-    def __init__(self):
+    def __init__(self, system):
+        self.system = system
         super().__init__(
             label = "Cancel setting",
             style = discord.ButtonStyle.danger,
@@ -201,7 +202,7 @@ class CancelButton(discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
 
             emb = discord.Embed(description=f"""## Setting canceled
-                {Emojis.dot_emoji} The setting of the system was canceled.
+                {Emojis.dot_emoji} The setting of the {'system' if self.system == None else self.system} was canceled.
                 {Emojis.dot_emoji} If you change your mind, you can always execute the command again.""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 
@@ -237,7 +238,8 @@ class HelpMenuSelect(discord.ui.View):
             discord.SelectOption(label="Mod commands", description="Shows you all commands that belong to the mod system", value="mod"),
             discord.SelectOption(label="Fun commands", description="Shows you all commands that belong to the Fun system", value="fun"),
             discord.SelectOption(label="Level commands part 1", description="Shows you all commands that belong to the level system part 1", value="level_one"),
-            discord.SelectOption(label="Level commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two")
+            discord.SelectOption(label="Level commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two"),
+            discord.SelectOption(label="Statistics commands", description="Shows you all commands that belong to the statistics system", value="statistic")
         ],
         custom_id = "help_menu_select")
     async def help_menue_select(self, select, interaction:discord.Interaction):
@@ -275,10 +277,6 @@ class HelpMenuSelect(discord.ui.View):
             emb.add_field(name=" ", value=" ", inline=False)
             emb.add_field(name="/ghost-ping-settings", 
                 value="Set the ghost ping system", inline=True)
-            emb.add_field(name="/userinfo", 
-                value="Display all information about a user", inline=True)
-            emb.add_field(name="/serverinfo", 
-                value="Show all information about your server", inline=True)
             await interaction.response.edit_message(embed=emb, attachments=[])
             
 
@@ -335,7 +333,7 @@ class HelpMenuSelect(discord.ui.View):
         if select.values[0] == "level_two":
 
             emb = discord.Embed(description=f"""## Level system commands of part 2""", color=bot_colour)
-            emb.add_field(name="/level-system-settings", 
+            emb.add_field(name="/set-level-system", 
                 value="Set the level system", inline=True)
             emb.add_field(name="/add-level-role", 
                 value="Define roles as level roles", inline=True)
@@ -355,6 +353,31 @@ class HelpMenuSelect(discord.ui.View):
                 value="Shows you the bonus xp list", inline=True)
             emb.add_field(name="/reset-bonus-xp-list", 
                 value="Resets the bonus xp list", inline=True)
+            await interaction.response.edit_message(embed=emb, attachments=[])
+
+        if select.values[0] == "statistic":
+
+            emb = discord.Embed(description="""## Statistics system commands """, color=bot_colour)
+            emb.add_field(name="set-message-leaderboard",
+                value="Set the message leaderboard", inline=True),
+            emb.add_field(name="show-message-leaderboard-setting",
+                value="Shows you how the message leaderboard is set", inline=True),
+            emb.add_field(name="add-message-leaderboard-role",
+                value="Specify roles that are assigned to certain places", inline=True),
+            emb.add_field(name=" ", value=" ", inline=False),
+            emb.add_field(name="remove-message-leaderboard-role",
+                value="Removes roles as leaderboard roles", inline=True),
+            emb.add_field(name="show-message-leaderboard-roles",
+                value="Shows all roles that are set for the leaderbaord", inline=True),
+            emb.add_field(name="reset-message-leaderboard-roles",
+                value="Resets all leaderboard roles", inline=True),
+            emb.add_field(name=" ", value=" ", inline=False),
+            emb.add_field(name="show-invites",
+                value="Shows how many users have been invited by a specific user", inline=True),
+            emb.add_field(name="/userinfo", 
+                value="Display all information about a user", inline=True)
+            emb.add_field(name="/serverinfo", 
+                value="Show all information about your server", inline=True)
             await interaction.response.edit_message(embed=emb, attachments=[])
 
 

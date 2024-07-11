@@ -432,6 +432,7 @@ class SetleaderboardChannel(discord.ui.View):
         style=discord.ButtonStyle.blurple,
         custom_id="skip_channel"
     )
+    
     async def skip_set_channel(self, button, interaction:discord.Interaction):
         
         if DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)[6]:
@@ -641,6 +642,7 @@ class ContinueMessageSetting(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system = "message leaderboard system"))
 
     @discord.ui.button(
         label="continue settings",
@@ -662,6 +664,7 @@ class OverwriteMessageInterval(discord.ui.View):
     def __init__(self, intervals):
         self.intervals = intervals
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system = "message leaderboard system"))
 
     @discord.ui.button(
         label="overwrite the intervals",
@@ -783,6 +786,7 @@ class OverwriteRole(discord.ui.View):
         self.settings = settings
         self.delete = delete
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system = "message leaderboard roles"))
 
     @discord.ui.button(
         label="overwrite entry ",
