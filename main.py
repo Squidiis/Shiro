@@ -176,8 +176,6 @@ class Main(commands.Cog):
         view.add_item(SendXpBonusModal())
         view.add_item(ShowLevelSettings())
 
-        self.bot.add_view(HelpMenuSelect())
-
         # Mod tools
         self.bot.add_view(GhostPingButtons())
 
@@ -186,13 +184,18 @@ class Main(commands.Cog):
         self.bot.add_view(SetMessageleaderboard())
         self.bot.add_view(OverwriteMessageChannel(channel_id=None))
         self.bot.add_view(ContinueMessageSetting())
+        self.bot.add_view(OverwriteMessageInterval())
+        self.bot.add_view(OverwriteRole())
+        self.bot.add_view(ShowLeaderboardRolesButton())
+        self.bot.add_view(ShowLeaderboardRolesSelect())
         view.add_item(LeaderboardOnOffSwitchMessage())
+        view.add_item(DefaultSettingsMessageLeaderboard())
 
 
         # Other Systems
-        self.bot.add_view(GhostPingButtons())
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
 
+        self.bot.add_view(HelpMenuSelect())
         view.add_item(CancelButton())
 
         self.bot.add_view(view)

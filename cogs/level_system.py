@@ -347,7 +347,7 @@ class LevelSystem(commands.Cog):
                 try:   
                             
                     # Database check for all values 
-                    check_if_exists = DatabaseCheck.check_level_system_stats(guild_id=message.guild.id, user=message.author.id)
+                    check_if_exists = DatabaseCheck.check_level_system_stats(guild_id=message.guild.id, user_id=message.author.id)
 
                     if check_if_exists:
                                      
@@ -457,7 +457,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
+            check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
             if check_stats:
                 
@@ -510,7 +510,7 @@ class LevelSystem(commands.Cog):
     async def remove_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user from which you want to remove xp"),
         xp:Option(int, description="Specify a quantity of Xp to be removed!")):
             
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -550,7 +550,7 @@ class LevelSystem(commands.Cog):
     async def give_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user you want to give the levels to"), 
         level:Option(int, description="Specify a set of levels that you want to assign")):
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -590,7 +590,7 @@ class LevelSystem(commands.Cog):
     async def remove_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user from whom you want to remove the level"), 
         level:Option(int, description="Specify how many levels should be removed")):
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
         
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -651,7 +651,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_user_stats(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user whose stats you want to reset")):
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
+        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
         if check_stats:
 
@@ -684,7 +684,7 @@ class LevelSystem(commands.Cog):
             {Emojis.dot_emoji} The user was not found, it is possible that no entry has been created yet 
             {Emojis.dot_emoji} Entries for the level system are only created when the user writes in a message and receives XP for it""", color=bot_colour)
 
-        check_user = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user=user.id)
+        check_user = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
         
         if check_user:
 
@@ -1819,54 +1819,60 @@ class LevelSystemDefault(discord.ui.View):
 
     async def level_system_default_select(self, select, interaction:discord.Interaction):
 
-        settings_dict = {
-            "xp_rate":1,
-            "level_up_channel":2,
-            "level_up_message":3,
-            "bonus_xp_percentage":4
-        }
+        if interaction.user.guild_permissions.administrator:
 
-        settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
-        default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
+            settings_dict = {
+                "xp_rate":1,
+                "level_up_channel":2,
+                "level_up_message":3,
+                "bonus_xp_percentage":4
+            }
 
-        settings_list = {"reset":{
-            "xp_rate":'' if settings[1] == 20 else f'{Emojis.dot_emoji} XP rate',
-            "level_up_channel":'' if settings[3] == None else f'{Emojis.dot_emoji} Level up channel',
-            "level_up_message":'' if settings[4] == default_message else f'{Emojis.dot_emoji} Level up message',
-            "bonus_xp_percentage":'' if settings[5] == 10 else f'{Emojis.dot_emoji} Bonus XP percentage'
-        },
-        "default":{
-            "xp_rate":f'{Emojis.dot_emoji} XP rate' if settings[1] == 20 else '',
-            "level_up_channel":f'{Emojis.dot_emoji} Level up channel' if settings[3] == None else '',
-            "level_up_message":f'{Emojis.dot_emoji} Level up message' if settings[4] == default_message else '',
-            "bonus_xp_percentage":f'{Emojis.dot_emoji} Bonus XP percentage' if settings[5] == 10 else ''
-        }}
+            settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+            default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
 
-        reset_list, default_list = [], []
-        for i in select.values:
-            reset_list.append(settings_list['reset'][i])
+            settings_list = {"reset":{
+                "xp_rate":'' if settings[1] == 20 else f'{Emojis.dot_emoji} XP rate',
+                "level_up_channel":'' if settings[3] == None else f'{Emojis.dot_emoji} Level up channel',
+                "level_up_message":'' if settings[4] == default_message else f'{Emojis.dot_emoji} Level up message',
+                "bonus_xp_percentage":'' if settings[5] == 10 else f'{Emojis.dot_emoji} Bonus XP percentage'
+            },
+            "default":{
+                "xp_rate":f'{Emojis.dot_emoji} XP rate' if settings[1] == 20 else '',
+                "level_up_channel":f'{Emojis.dot_emoji} Level up channel' if settings[3] == None else '',
+                "level_up_message":f'{Emojis.dot_emoji} Level up message' if settings[4] == default_message else '',
+                "bonus_xp_percentage":f'{Emojis.dot_emoji} Bonus XP percentage' if settings[5] == 10 else ''
+            }}
 
-        for i in select.values:
-            default_list.append(settings_list['default'][i])
+            reset_list, default_list = [], []
+            for i in select.values:
+                reset_list.append(settings_list['reset'][i])
+
+            for i in select.values:
+                default_list.append(settings_list['default'][i])
+        
+            reset_list = list(filter(None, reset_list))
+            default_list = list(filter(None, default_list))
+            reset_new_list = "\n".join(reset_list)
+            default_new_list = "\n".join(default_list)
     
-        reset_list = list(filter(None, reset_list))
-        default_list = list(filter(None, default_list))
-        reset_new_list = "\n".join(reset_list)
-        default_new_list = "\n".join(default_list)
-  
-        for i in select.values:
-            DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = settings_dict[i])
+            for i in select.values:
+                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = settings_dict[i])
 
-        emb = discord.Embed(description=f"""## Reset settings                
-            **{Emojis.arrow_emoji} The following level system settings have been reset:**
+            emb = discord.Embed(description=f"""## Reset settings                
+                **{Emojis.arrow_emoji} The following level system settings have been reset:**
 
-            {reset_new_list if any(x for x in reset_list if x != '') else f'{Emojis.dot_emoji} No settings can be reset as they are already all set to default settings'}
-            
-            **{Emojis.arrow_emoji} The following settings were already set to default:**
-            
-            {default_new_list if any(x for x in default_list if x != '') else f'{Emojis.dot_emoji} No settings were set to default settings'}
-            """, color=bot_colour)
-        await interaction.response.edit_message(embed=emb, view=None)
+                {reset_new_list if any(x for x in reset_list if x != '') else f'{Emojis.dot_emoji} No settings can be reset as they are already all set to default settings'}
+                
+                **{Emojis.arrow_emoji} The following settings were already set to default:**
+                
+                {default_new_list if any(x for x in default_list if x != '') else f'{Emojis.dot_emoji} No settings were set to default settings'}
+                """, color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+        
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
     @discord.ui.button(
@@ -1908,35 +1914,41 @@ class ShowLevelSettings(discord.ui.Button):
     
     async def callback(self, interaction: discord.Interaction):
 
-        emb = discord.Embed(description=f"""## Select which settings you want to see
-            {Emojis.help_emoji} Here you have a small overview of what the individual systems can do and what they are currently set to:
-                            
-            **{Emojis.dot_emoji} Level up Channel**
-            > All level up notifications as well as the notifications for receiving a level role are sent to a channel specified by you
+        if interaction.user.guild_permissions.administrator:
 
-            **{Emojis.dot_emoji} Level up Message**
-            > A custom message that is sent after a level up
+            emb = discord.Embed(description=f"""## Select which settings you want to see
+                {Emojis.help_emoji} Here you have a small overview of what the individual systems can do and what they are currently set to:
+                                
+                **{Emojis.dot_emoji} Level up Channel**
+                > All level up notifications as well as the notifications for receiving a level role are sent to a channel specified by you
 
-            **{Emojis.dot_emoji} Level system Blacklist**
-            > Channels, categories, roles or users that are excluded from the level system
+                **{Emojis.dot_emoji} Level up Message**
+                > A custom message that is sent after a level up
 
-            **{Emojis.dot_emoji} Level Roles**
-            > Roles that are assigned when you reach a specified level
+                **{Emojis.dot_emoji} Level system Blacklist**
+                > Channels, categories, roles or users that are excluded from the level system
 
-            **{Emojis.dot_emoji} XP rate**
-            > Indicates how much XP you get per activity can be customized and can be influenced by items on the Bonus XP list
+                **{Emojis.dot_emoji} Level Roles**
+                > Roles that are assigned when you reach a specified level
 
-            **{Emojis.dot_emoji} Bonus XP perventage**
-            > A percentage value that is added to the individual items of the Bonus XP list if no own items are specified
+                **{Emojis.dot_emoji} XP rate**
+                > Indicates how much XP you get per activity can be customized and can be influenced by items on the Bonus XP list
 
-            **{Emojis.dot_emoji} Bonus XP list**
-            > Channel, category, role and user can be added to this list and rewarded either 
-            > with an individual percentage of bonus XP per activity or with
-            > the bonus XP percentage as a bonus.           
-            
-            **{Emojis.dot_emoji} Level System status**
-            > Shows whether the level system is switched on or off""", color=bot_colour)
-        await interaction.response.send_message(embed=emb, ephemeral=True, view=ShowLevelSettingsSelect())
+                **{Emojis.dot_emoji} Bonus XP perventage**
+                > A percentage value that is added to the individual items of the Bonus XP list if no own items are specified
+
+                **{Emojis.dot_emoji} Bonus XP list**
+                > Channel, category, role and user can be added to this list and rewarded either 
+                > with an individual percentage of bonus XP per activity or with
+                > the bonus XP percentage as a bonus.           
+                
+                **{Emojis.dot_emoji} Level System status**
+                > Shows whether the level system is switched on or off""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, ephemeral=True, view=ShowLevelSettingsSelect())
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 class ShowLevelSettingsSelect(discord.ui.View):
@@ -1960,47 +1972,53 @@ class ShowLevelSettingsSelect(discord.ui.View):
         
     async def show_level_settings(self, select, interaction: discord.Interaction):
 
-        if select.values[0] == "show_level_up_channel":
+        if interaction.user.guild_permissions.administrator:
 
-            level_up_channel = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
+            if select.values[0] == "show_level_up_channel":
 
-            emb = discord.Embed(description=f"""## Current level up channel
-                {Emojis.dot_emoji} {f'The current level up channel is {level_up_channel}' if level_up_channel != None else 'No level up channel has been set yet'}
-                {Emojis.dot_emoji} If a level up channel is set, all level up notifications are sent to this channel as well as all notifications for receiving a level role
-                {Emojis.dot_emoji} If no level up channel is set, all notifications are sent to the channel where the last activity took place""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+                level_up_channel = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
 
-        elif select.values[0] == "show_level_up_message":
+                emb = discord.Embed(description=f"""## Current level up channel
+                    {Emojis.dot_emoji} {f'The current level up channel is {level_up_channel}' if level_up_channel != None else 'No level up channel has been set yet'}
+                    {Emojis.dot_emoji} If a level up channel is set, all level up notifications are sent to this channel as well as all notifications for receiving a level role
+                    {Emojis.dot_emoji} If no level up channel is set, all notifications are sent to the channel where the last activity took place""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-            level_up_message = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[4]
+            elif select.values[0] == "show_level_up_message":
 
-            emb = discord.Embed(description=f"""## Current level up message
-                {Emojis.dot_emoji} Currently is:\n{f'`{level_up_message}`' if level_up_message != default_message else f'`{default_message}`'} the level up message.
-                {Emojis.dot_emoji} The level up message is always sent when someone gets a level up
-                {Emojis.help_emoji} You also have several parameters to customize them exactly in the curly brackets you can either use the parameter user or level""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+                level_up_message = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[4]
 
-        elif select.values[0] == "show_xp_rate":
+                emb = discord.Embed(description=f"""## Current level up message
+                    {Emojis.dot_emoji} Currently is:\n{f'`{level_up_message}`' if level_up_message != default_message else f'`{default_message}`'} the level up message.
+                    {Emojis.dot_emoji} The level up message is always sent when someone gets a level up
+                    {Emojis.help_emoji} You also have several parameters to customize them exactly in the curly brackets you can either use the parameter user or level""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-            emb = discord.Embed(description=f"""## Current XP rate
-                {Emojis.dot_emoji} The XP rate is the amount of XP you receive as a reward per activity
-                {Emojis.dot_emoji} The current XP rate is {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]} XP per activity
-                {Emojis.help_emoji} The XP rate can be influenced by the entries on the bonus XP list if activities take place in a channel, category, role or user that is on this list, extra XP will be awarded""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+            elif select.values[0] == "show_xp_rate":
 
-        elif select.values[0] == "show_bonus_xp_percentage":
+                emb = discord.Embed(description=f"""## Current XP rate
+                    {Emojis.dot_emoji} The XP rate is the amount of XP you receive as a reward per activity
+                    {Emojis.dot_emoji} The current XP rate is {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]} XP per activity
+                    {Emojis.help_emoji} The XP rate can be influenced by the entries on the bonus XP list if activities take place in a channel, category, role or user that is on this list, extra XP will be awarded""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-            emb = discord.Embed(description=f"""## Current bonus XP percentage 
-                {Emojis.dot_emoji} The bonus percentage is the default value of the bonus XP list and is always taken into account if no own is specified
-                {Emojis.dot_emoji} Currently the bonus XP percentage is {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]} % more XP per activity as long as the channel, category, role or user is on the bonus XP list""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+            elif select.values[0] == "show_bonus_xp_percentage":
 
-        elif select.values[0] == "show_level_status":
+                emb = discord.Embed(description=f"""## Current bonus XP percentage 
+                    {Emojis.dot_emoji} The bonus percentage is the default value of the bonus XP list and is always taken into account if no own is specified
+                    {Emojis.dot_emoji} Currently the bonus XP percentage is {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]} % more XP per activity as long as the channel, category, role or user is on the bonus XP list""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
-            emb = discord.Embed(description=f"""## Current status of the level system
-                {Emojis.dot_emoji} The level system is currently {'switched on' if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 'on' else 'switched off'}
-                {Emojis.dot_emoji} All activities are rewarded with XP unless the channel, category, role or user is on the blacklist""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+            elif select.values[0] == "show_level_status":
+
+                emb = discord.Embed(description=f"""## Current status of the level system
+                    {Emojis.dot_emoji} The level system is currently {'switched on' if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 'on' else 'switched off'}
+                    {Emojis.dot_emoji} All activities are rewarded with XP unless the channel, category, role or user is on the blacklist""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 

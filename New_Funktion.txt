@@ -37,8 +37,8 @@ design anpassen für show role command
 
 zu den anderne Show und Remove commands das konzept mit dem Dropdown adden
 
-back to default funktion adden für message leaderboard
-
 nochmal gesammt test machen für das message leaderboard
 
 das rollen system integieren in das leaderboard
+
+alle buttons im on_ready adden

@@ -89,6 +89,25 @@ class DatabaseCheck():
     
     '''
     Checks whether a channel, category, role or user is on the blacklist
+    if you specify individual IDs, the system only checks whether they are present, if they are not present, none is returned if they are present, the entire entry is returned 
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+        - channel_id
+            Id of the channel to be checked
+        - category_id
+            Id of the category to be checked
+        - role_id 
+            Id of the role to be checked
+        - user_id
+            Id of the user to be checked
+
+    Info:
+        - guild_id must be specified
+        - If only the `guild_id` is specified, all entries specified for the server are returned
+        - Always specify only one id otherwise errors may occur     
     '''
     def check_blacklist(
         guild_id:int, 
@@ -132,18 +151,27 @@ class DatabaseCheck():
     
     '''
     If you specify a user, the user's statistics are returned; if no user is specified, the statistics of all users on the server are returned
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+        - user_id
+            Id of the user
+
     Info:
         - The guild_id must be specified
+        - If only the `guild_id` is specified, all entries specified for the server are returned
     '''
-    def check_level_system_stats(guild_id:int, user:int = None):
+    def check_level_system_stats(guild_id:int, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        if user != None:
+        if user_id != None:
 
             levelsys_stats_check = "SELECT * FROM LevelSystemStats WHERE guildId = %s AND userId = %s"
-            levelsys_stats_check_values = [guild_id, user]
+            levelsys_stats_check_values = [guild_id, user_id]
 
         else:
 
@@ -152,7 +180,7 @@ class DatabaseCheck():
 
         cursor.execute(levelsys_stats_check, levelsys_stats_check_values)
 
-        if user != None:
+        if user_id != None:
             levelsys_stats = cursor.fetchone()
         else:
             levelsys_stats = cursor.fetchall()
@@ -163,6 +191,7 @@ class DatabaseCheck():
     
     '''
     Returns all level roles that are available on the server
+    if you specify individual IDs, the system only checks whether they are present, if they are not present, none is returned if they are present, the entire entry is returned 
 
     Parameters:
     ------------
@@ -299,6 +328,14 @@ class DatabaseCheck():
 
     '''
     Returns the settings of a server if you enter the guild_id
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+
+    Info:
+        - guild_id must be specified
     '''
     def check_level_settings(guild_id:int):
 
@@ -411,7 +448,7 @@ class DatabaseCheck():
         - user_id
             Id of the user to be checked
         - interval
-            the interval in which the leaderboard is updated
+            The interval in which the leaderboard is updated
             - 0 day
             - 1 week
             - 2  month
@@ -453,6 +490,33 @@ class DatabaseCheck():
     
 
     '''
+    Returns all leaderboard roles that are available on the server
+    if you specify individual IDs, the system only checks whether they are present, if they are not present, none is returned if they are present, the entire entry is returned 
+
+    Parameters:
+    ------------
+        - guild_id
+            Id of the server
+        - role_id
+            The id of the leaderboard role to be returned
+        - position
+            The potition from which the role is assigned
+        - interval
+            - daily
+                Daily updated leaderboard
+            - weekly
+                Weekly updated leaderboard
+            - monthly
+                Monthly updating leaderboard
+            - general
+                Leaderboard that is updated daily shows the total activity (only those who have written the most messages)
+
+    Info:
+        - guild_id must be specified
+        - If no role_id, position or interval is specified, all leadboard roles are returned
+        - If a position is specified but no interval or role, the entry for the position is returned
+        - If only one role is specified and no interval or position, the entry with the role is returned
+        - If no entry exists, None is returned
     '''
     def check_leaderboard_roles(
         guild_id:int, 
@@ -929,7 +993,7 @@ class DatabaseUpdates():
 
     Info:
         - guild_id must be specified
-        - all values must have the specified data type
+        - All values must have the specified data type
     '''
     def update_level_settings(
         guild_id:int, 
@@ -1052,7 +1116,7 @@ class DatabaseUpdates():
 
     Info:
         - guild_id must be specified
-        - status only needs to be specified if you want to overwrite an existing entry 
+        - Status only needs to be specified if you want to overwrite an existing entry 
     '''
     def update_level_roles(
         guild_id:int, 
@@ -1319,6 +1383,37 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     
+    '''
+    manage the leaderboard-roles
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+        - role_id
+            Id of the role to be changed
+        - position
+            position at which a role is to be redefined
+        - status
+            - 0: off 
+            - 1: on
+        - settings
+            This value determines what is to be overwritten
+            - position
+            - role
+            - status
+            - interval
+        - interval
+            Which intervals should be set for the message leaderboard
+            - daily
+            - weekly
+            - monthly
+            - general
+
+    Info:
+        - guild_id must be specified
+        - Status only needs to be specified if you want to overwrite an existing entry
+    '''
     def manage_leaderboard_roles(
         guild_id:int,
         role_id:int = None,
@@ -1453,7 +1548,15 @@ class DatabaseRemoveDatas():
 
 
     '''
-    
+    Resets the message leaderboard settings
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+
+    Info:
+        - guild_id must be specified
     '''
     def _remove_leaderboard_settings_message(guild_id:int):
 
@@ -1476,7 +1579,24 @@ class DatabaseRemoveDatas():
 
 
     '''
+    Removes individual roles or resets all of them
 
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+        - role_id
+            Id of the role to be removed
+        - poistion
+            From which position the role is to be removed
+        - interval
+            From which interval the role is to be removed
+
+    Info:
+        - guild_id must be specified
+        - An `interval` must always be specified
+        - Position can only be 0 - 15
+        - If only `guild_id` is specified, all roles are removed from the leaderboard
     '''
     def _remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None, interval:str = None):
         
@@ -1484,9 +1604,17 @@ class DatabaseRemoveDatas():
         cursor = db_connect.cursor()
 
         try:
+            
+            if any(x != None for x in [role_id, position, interval]):
 
-            delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'} AND roleInterval = %s"
-            delete_leaderboard_role_values = [guild_id, role_id if position == None else position, interval]
+                delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'} AND roleInterval = %s"
+                delete_leaderboard_role_values = [guild_id, role_id if position == None else position, interval]
+
+            else:
+
+                delete_leaderboard_role = "DELETE FROM LeaderboardRoles WHERE guildId = %s"
+                delete_leaderboard_role_values = [guild_id]
+
             cursor.execute(delete_leaderboard_role, delete_leaderboard_role_values)
             db_connect.commit()
 
