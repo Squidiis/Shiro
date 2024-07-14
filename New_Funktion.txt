@@ -18,8 +18,6 @@ Updaite 1.1
     - manager / endweder mit slash command oder mit manager
         drop down für die einzelnen einstellungen button mit modal für emoji oder spezific content
 
-das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird (testen)
-
 Es giebt noch einen error wenn der channel und die intervalle überschrieben wurden
 back button zum close button machen help
 
@@ -30,7 +28,6 @@ statistic section
 
 funktion die den message count zurück setzt (testen)
 
-verbindungs verlusts embed auch auf get_embed setzten
 design anpassen für show role command
 
 nochmal gesammt test machen für das message leaderboard

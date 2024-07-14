@@ -140,18 +140,14 @@ class LevelRolesButtons(discord.ui.View):
         super().__init__(timeout=None)
 
     # Button to override the level role 
-    @discord.ui.button(label="Yes", style=discord.ButtonStyle.blurple, custom_id="yes_button_level_role")
+    @discord.ui.button(label="overwrite entry", style=discord.ButtonStyle.blurple, custom_id="yes_button_level_role")
     async def yes_button_levelroles(self, button, interaction:discord.Interaction):
     
         if interaction.user.guild_permissions.administrator:
 
             if self.role_id == None and self.role_level == None and self.status == None:
 
-                emb = discord.Embed(description=f"""## The role or level could not be overwritten
-                    {Emojis.dot_emoji} The role or level could not be overwritten because the process has expired
-                    {Emojis.dot_emoji} This happens when you wait too long to react to the button
-                    {Emojis.dot_emoji} You can simply run the command again if you still want to overwrite the level or role {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="level role", settings2="to overwrite the level role", settings3="add-level-role"), view=None)
 
             else:
 
@@ -168,7 +164,7 @@ class LevelRolesButtons(discord.ui.View):
 
 
     # Button to cancel the overwriting of the level role 
-    @discord.ui.button(label="No", style=discord.ButtonStyle.blurple, custom_id="no_button_level_role")
+    @discord.ui.button(label="keep entry", style=discord.ButtonStyle.blurple, custom_id="no_button_level_role")
     async def no_button_levelroles(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -1124,7 +1120,7 @@ class LevelSystem(commands.Cog):
                         emb = discord.Embed(description=f"""## This role is already assigned
                             {Emojis.dot_emoji} Do you want to override the required level for this role? 
                             {Emojis.dot_emoji} The role <@&{level_roles[1]}> is currently assigned at level **{level_roles[2]}**
-                            {Emojis.dot_emoji} If you want to change the required level for the role {role.mention} to level {level} press the `yes` button if not press the `no` button""", color=bot_colour)
+                            {Emojis.dot_emoji} If you want to change the required level for the role {role.mention} to level {level} press the `overwrite entry` button if not press the `keep entry` button""", color=bot_colour)
                         await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status='role'))
 
                     elif level == level_roles[2]:
@@ -1132,7 +1128,7 @@ class LevelSystem(commands.Cog):
                         emb = discord.Embed(description=f"""## This level is already assigned
                             {Emojis.dot_emoji} Do you want to override the role for this level?
                             {Emojis.dot_emoji} For the level **{level}** the role <@&{level_roles[1]}> is currently assigned
-                            {Emojis.dot_emoji} If you want to change the role for level {level} to the role {role.mention} press the `yes` button if not press the `no` button""", color=bot_colour)
+                            {Emojis.dot_emoji} If you want to change the role for level {level} to the role {role.mention} press the `overwrite entry` button if not press the `keep entry` button""", color=bot_colour)
                         await ctx.respond(embed=emb, view=LevelRolesButtons(role_id=role.id, role_level=level, status='level'))
 
 

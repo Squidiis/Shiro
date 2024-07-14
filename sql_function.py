@@ -1233,7 +1233,7 @@ class DatabaseUpdates():
             "monthly":"bourdMessageIdMonth",
             "whole":"bourdMessageIdWhole",
             "channel":"leaderboardChannel",
-            "status":"status"
+            "status":"statusMessage"
         }
 
         coulmn_values = {

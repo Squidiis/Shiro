@@ -206,7 +206,14 @@ class GetEmbed():
                 {f"{Emojis.dot_emoji} That's why you got a timeout for {settings2[4]} minutes" if settings2[4] != 0 else ''}""", colour=bot_colour)
             emb.set_footer(text=f'{settings.author.name}', icon_url=settings.author.display_avatar.url if settings.author.display_avatar != None else settings.guild.icon.url)
 
+        elif embed_index == 10:
+
+            emb = discord.Embed(description=f"""## An error has occurred
+                {Emojis.dot_emoji} The {settings} could not be overwritten this happens if the option remains unanswered for too long or if I lose the connection
+                {Emojis.dot_emoji} If you want {settings2}, you just have to execute the command `/{settings3}` again""", color=bot_colour)
+
         return emb
+    
     
 
 #########################################  Cancel Button  ########################################

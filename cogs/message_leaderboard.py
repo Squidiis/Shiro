@@ -454,10 +454,10 @@ class SetleaderboardChannel(discord.ui.View):
 
                 DatabaseUpdates.create_leaderboard_settings_message(guild_id = interaction.guild.id, settings = "createSettings", channel_id = select.values[0].id)
 
-            DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+            #DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
 
-            emb = GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention)
-            await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
+            #emb = GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention)
+            #await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
         
         else:
 
@@ -656,10 +656,7 @@ class OverwriteMessageChannel(discord.ui.View):
 
             if self.channel_id == None:
 
-                emb = discord.Embed(description=f"""## An error has occurred {Emojis.fail_emoji}
-                    {Emojis.dot_emoji} The channel could not be overwritten this happens if the option remains unanswered for too long or if I lose the connection
-                    {Emojis.dot_emoji} If you want to set the leaderboard further, you just have to execute the command `/set-message-leaderboard` again""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="channel", settings2="to set leaderboard", settings3="set-message-leaderboard"), view=None)
 
             else:
                 
@@ -667,7 +664,7 @@ class OverwriteMessageChannel(discord.ui.View):
                 DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
 
                 for i, index in (get_messages[2], "daily"), (get_messages[3], "weekly"), (get_messages[4], "monthly"):
-                    
+                    print(i)
                     if i != None:
                     
                         leaderboard_channel = bot.get_channel(get_messages[6])
@@ -755,12 +752,8 @@ class OverwriteMessageInterval(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             if self.intervals == None:
-
-                emb = discord.Embed(description=f"""## An error has occurred {Emojis.fail_emoji}
-                    {Emojis.dot_emoji} The intervals cannot be overwritten
-                    {Emojis.dot_emoji} This happens if the interaction remains unanswered for too long or if I lose the connection
-                    {Emojis.help_emoji} If you want to override the intervals simply execute this command again""")
-                await interaction.response.edit_message(embed=emb, view=None)
+                
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="interval", settings2="to overwrite the interval", settings3="set-message-leaderboard"), view=None)
 
             else:
 
@@ -915,7 +908,7 @@ class OverwriteRole(discord.ui.View):
         self.add_item(CancelButton(system = "message leaderboard roles"))
 
     @discord.ui.button(
-        label="overwrite entry ",
+        label="overwrite entry",
         style=discord.ButtonStyle.blurple,
         custom_id="overwrite_role_entry"
     )
@@ -923,20 +916,26 @@ class OverwriteRole(discord.ui.View):
     async def overwrite_role_button(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
+            
+            if any(x != None for x in [self.role, self.interval, self.settings, self.position, self.delete]):
 
-            check_role = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1])
-            if check_role:
-                DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval)
-            check_positon = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position)
-            if check_positon:
-                DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval)
+                check_role = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1])
+                if check_role:
+                    DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval)
+                check_positon = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position)
+                if check_positon:
+                    DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval)
 
-            DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval)
+                DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval)
 
-            emb = discord.Embed(description=f"""## The entry has been overwritten
-                {Emojis.dot_emoji} From now on the role <@&{self.role.id}> is assigned to the {self.position} place, this applies to the {self.interval}{'ly' if self.interval != 'general' else ''} leaderboard
-                {Emojis.dot_emoji} If you want to change the settings of the message leaderboard system you can do this with the `set-messageleaderboard` command""", color=bot_colour)  
-            await interaction.response.edit_message(embed=emb, view=None)
+                emb = discord.Embed(description=f"""## The entry has been overwritten
+                    {Emojis.dot_emoji} From now on the role <@&{self.role.id}> is assigned to the {self.position} place, this applies to the {self.interval}{'ly' if self.interval != 'general' else ''} leaderboard
+                    {Emojis.dot_emoji} If you want to change the settings of the message leaderboard system you can do this with the `set-messageleaderboard` command""", color=bot_colour)  
+                await interaction.response.edit_message(embed=emb, view=None)
+
+            else:
+
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="leaderboard role", settings2="to overwrite the role", settings3="add-message-leaderboard-role"), view=None)
 
         else:
 

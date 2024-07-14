@@ -111,11 +111,11 @@ class Main(commands.Cog):
                 dailyCountMessage INT UNSIGNED DEFAULT 0,
                 weeklyCountMessage INT UNSIGNED DEFAULT 0,
                 monthlyCountMessage INT UNSIGNED DEFAULT 0,
-                wholeMessageCount INT UNSIGNED DEFAULT 0,
-                dailyInviteCount INT UNSIGNED DEFAULT 0,
-                weeklyInviteCount INT UNSIGNED DEFAULT 0,
-                monthlyInviteCount INT UNSIGNED DEFAULT 0,
-                wholeInviteCount INT UNSIGNED DEFAULT 0
+                wholeCountMessage INT UNSIGNED DEFAULT 0,
+                dailyCountInvite INT UNSIGNED DEFAULT 0,
+                weeklyCountInvite INT UNSIGNED DEFAULT 0,
+                monthlyCountInvite INT UNSIGNED DEFAULT 0,
+                wholeCountInvite INT UNSIGNED DEFAULT 0 
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             '''
@@ -172,7 +172,6 @@ class Main(commands.Cog):
         view.add_item(SetLevelUpChannelButton())
         view.add_item(LevelSystemOnOffSwitch())
         view.add_item(SetBonusXpPercentageButton())
-        view.add_item(CancelButton(system=None))
         view.add_item(SendXpBonusModal())
         view.add_item(ShowLevelSettings())
 
@@ -184,8 +183,8 @@ class Main(commands.Cog):
         self.bot.add_view(SetMessageleaderboard())
         self.bot.add_view(OverwriteMessageChannel(channel_id=None))
         self.bot.add_view(ContinueMessageSetting())
-        self.bot.add_view(OverwriteMessageInterval())
-        self.bot.add_view(OverwriteRole())
+        self.bot.add_view(OverwriteMessageInterval(intervals=None))
+        self.bot.add_view(OverwriteRole(role=None, interval=None, position=None, settings=None, delete=None))
         self.bot.add_view(ShowLeaderboardRolesButton())
         self.bot.add_view(ShowLeaderboardRolesSelect())
         view.add_item(LeaderboardOnOffSwitchMessage())
@@ -196,7 +195,7 @@ class Main(commands.Cog):
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
 
         self.bot.add_view(HelpMenuSelect())
-        view.add_item(CancelButton())
+        view.add_item(CancelButton(system=None))
 
         self.bot.add_view(view)
 

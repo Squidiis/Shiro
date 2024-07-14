@@ -81,7 +81,7 @@ DROP TABLE IF EXISTS `LeaderboardSettingsMessage`
 
 CREATE TABLE LeaderboardSettingsMessage (
     guildId BIGINT UNSIGNED NOT NULL,
-    status INT UNSIGNED NOT NULL DEFAULT 0,
+    statusMessage INT UNSIGNED NOT NULL DEFAULT 0,
     bourdMessageIdDay BIGINT UNSIGNED NULL,
     bourdMessageIdWeek BIGINT UNSIGNED NULL,
     bourdMessageIdMonth  BIGINT UNSIGNED NULL,
@@ -94,7 +94,7 @@ DROP TABLE IF EXISTS `LeaderboardSettingsInvite`
 
 CREATE TABLE LeaderboardSettingsInvite (
     guildId BIGINT UNSIGNED NOT NULL,
-    status INT UNSIGNED NOT NULL DEFAULT 0,
+    statusInvite INT UNSIGNED NOT NULL DEFAULT 0,
     invitebourdMessageIdDay BIGINT UNSIGNED NULL,
     invitebourdMessageIdWeek BIGINT UNSIGNED NULL,
     invitebourdMessageIdMonth BIGINT UNSIGNED NULL,
