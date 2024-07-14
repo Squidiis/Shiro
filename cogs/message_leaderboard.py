@@ -253,20 +253,34 @@ def setup(bot):
     bot.add_cog(Messageleaderboard(bot))
 
 
-async def sort_leaderboard(user_list, interval):
+async def sort_leaderboard(user_list, interval, guild_id):
+
+    guild = bot.get_guild(guild_id)
+
+    check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id)
+
+    general_role = None
+    if check_roles:
+
+        for i in check_roles:
+
+            if i[2] == 0:
+
+                general_role = guild.get_role(i[1])
 
     max_lengths = [
         max(len(str(t[i])) for t in user_list)
         for i in range(9)
     ]
     
-    user_names = []
+    user_names, users = [], []
     for t in user_list:
 
         user = await bot.get_or_fetch_user(t[1])
         user_names.append(user.name)
+        users.append(user)
         max_lengths[0] = max(max_lengths[0], len(user.name))
-    
+
     padded_tuples = [
         (
             user_names[i].ljust(max_lengths[0]), 
@@ -280,6 +294,20 @@ async def sort_leaderboard(user_list, interval):
 
     leaderboard = []
     for i in range(min(len(user_list), 15)):
+        
+        if check_roles:
+
+            role = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1)
+
+            if general_role != None:
+
+                await user[i].add_roles(general_role)
+
+            if role != None:
+
+                leaderboard_role = guild.get_role(role)
+                await users[i].add_roles(leaderboard_role)
+
         num_str = str(i + 1)
         if len(num_str) == 1:
             num_str = f" #{num_str}  "
@@ -327,7 +355,7 @@ async def edit_leaderboard(bot):
                                     if (current_date - message_age) > timedelta(days=1) and message_name == "1_day_old":
 
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 3)
-                                        users = await sort_leaderboard(user_list=user_list, interval=5)
+                                        users = await sort_leaderboard(user_list=user_list, interval=5, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Whole Messages Leaderboard
                                             {users}""", color=bot_colour)
 
@@ -338,7 +366,7 @@ async def edit_leaderboard(bot):
                                     if (current_date - message_age) > timedelta(days=1) and message_name == "1_day_old":
 
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 0)
-                                        users = await sort_leaderboard(user_list=user_list, interval=2)
+                                        users = await sort_leaderboard(user_list=user_list, interval=2, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Daily Messages Leaderboard
                                             {users}""", color=bot_colour)
 
@@ -351,7 +379,7 @@ async def edit_leaderboard(bot):
                                     if (current_date - message_age) > timedelta(weeks=1) and message_name == "1_week_old":
                                         
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 1)
-                                        users = await sort_leaderboard(user_list=user_list, interval=3)
+                                        users = await sort_leaderboard(user_list=user_list, interval=3, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Weekly Messages Leaderboard
                                             {users}""", color=bot_colour)
 
@@ -364,7 +392,7 @@ async def edit_leaderboard(bot):
                                     if (current_date - message_age) > timedelta(days=30) and message_name == "1_month_old":
                                         
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 2)
-                                        users = await sort_leaderboard(user_list=user_list, interval=4)
+                                        users = await sort_leaderboard(user_list=user_list, interval=4, guild_id=guild.id)
                                         emb = discord.Embed(description=f"""## Monthly Messages Leaderboard (30 days)
                                             {users}""", color=bot_colour)
 

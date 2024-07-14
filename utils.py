@@ -98,13 +98,23 @@ class GetEmbed():
     ------------
         - embed_index
             If an index is passed which then leads to the correct embed
-            0: Bonus XP procentage
-            1: User not found 
-            2: Help menu main text
-            3: Message leaderboard text
-            4: Same channel message leaderboard
+                0: Bonus XP procentage
+                1: User not found 
+                2: Help menu main text
+                3: Message leaderboard text
+                4: Channel for message leaderboard exits
+                5: Same channel message leaderboard
+                6: Interval has been set
+                7: General message leaderboard
+                8: Settings message leaderboard
+                9: Antilink violation
         - settings
             The correct information that must be inserted in the embed
+        - settings2 (same as settings)
+        - settings3 (same as settings)
+
+    Info:
+        - embed_idex must be specified
     '''
     def get_embed(
         embed_index, 
@@ -180,6 +190,21 @@ class GetEmbed():
                 {Emojis.dot_emoji} The message leaderboard is currently {'switched off' if settings[1] == 0 or settings[1] == None else 'switched on'}.
                 {Emojis.dot_emoji} Currently no channel or intervals have been defined for the message leaderboard
                 {Emojis.help_emoji} If you want to set the message leaderboard use the `set-message-leaderboard` command""", color=bot_colour)
+            
+        elif embed_index == 9:
+
+            anti_link_text = {
+                0:"discord invitation link",
+                1:"link or a discord invitations",
+                2:"link or an image / video",
+                3:""
+            }
+            
+            emb = discord.Embed(title=f'{Emojis.help_emoji} {settings.author.name} you have violated the anti-link system', 
+                description=f"""{Emojis.dot_emoji} You have violated the anti-link system on {settings.guild.name}
+                {Emojis.dot_emoji} `You have sent an {anti_link_text[settings2[3]]} to this chat`
+                {f"{Emojis.dot_emoji} That's why you got a timeout for {settings2[4]} minutes" if settings2[4] != 0 else ''}""", colour=bot_colour)
+            emb.set_footer(text=f'{settings.author.name}', icon_url=settings.author.display_avatar.url if settings.author.display_avatar != None else settings.guild.icon.url)
 
         return emb
     

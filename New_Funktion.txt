@@ -18,9 +18,9 @@ Updaite 1.1
     - manager / endweder mit slash command oder mit manager
         drop down für die einzelnen einstellungen button mit modal für emoji oder spezific content
 
-das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird 
+das antilink system auf eine funktion erweitern die checkt ob eine nachricht zu einen link editiert wird (testen)
 
-Es giebt noch einen error wenn der channel und die intervalle überschreiben wurden
+Es giebt noch einen error wenn der channel und die intervalle überschrieben wurden
 back button zum close button machen help
 
 statistic section 
@@ -28,17 +28,13 @@ statistic section
 - Message Leaderboard
 - Invite Leaderboard
 
-(system für 3 intervalle aufbewahren
-
-funktion die den message count zurück setzt) (testen)
+funktion die den message count zurück setzt (testen)
 
 verbindungs verlusts embed auch auf get_embed setzten
 design anpassen für show role command
 
-zu den anderne Show und Remove commands das konzept mit dem Dropdown adden
-
 nochmal gesammt test machen für das message leaderboard
 
-das rollen system integieren in das leaderboard
+das rollen system integieren in das leaderboard (testen)
 
-alle buttons im on_ready adden
+villeicht noch eine text bemerkung das wer eine rolle erhalten hat (message leaderboard)

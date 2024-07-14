@@ -6,6 +6,10 @@ from sql_function import *
 
 class ModeratorCommands(commands.Cog):
     
+    def __init__(self, bot):
+        self.bot = bot
+        self.formats = ['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp', 'mp4', 'avi', 'mkv', 'mov', 'wmv', '.mp3', 'wav', 'ogg', 'aac', 'flac']
+
     # Returns the antilink whitelist completely formatted 
     def show_antilink_system_whitelist(guild_id:int):
 
@@ -41,7 +45,8 @@ class ModeratorCommands(commands.Cog):
 
     
     # Checks whether the message contains a link
-    def contains_invite(self, content:str):
+    @staticmethod
+    def contains_invite(content:str):
 
         invites_re = re.compile(r'(?:discord\.gg|discord\.com\/invite|\.gg)\/(\S+)')
         matches = invites_re.findall(content)
@@ -50,7 +55,67 @@ class ModeratorCommands(commands.Cog):
             return False
     
         return True
+
     
+    # Checks the whitelist and checks whether there is a match in the channels, categories, roles or user entries
+    @staticmethod
+    def check_whitelist_antilink(message:discord.Message):
+        
+        check_whitelist = DatabaseCheck.check_antilink_whitelist(guild_id = message.guild.id)
+            
+        if check_whitelist:
+                
+            for _, channel, category, role, user in check_whitelist:
+                    
+                if isinstance(message.channel, discord.channel.DMChannel):
+                    return True
+                    
+                else:
+
+                    if user == message.author.id:
+                        return True
+
+                    if role != None:
+                                    
+                        blacklist_role = message.guild.get_role(role)
+                        if blacklist_role in message.author.roles:
+                            return True
+                        
+                    if message.channel.id == channel:
+                        return True
+
+                    if message.channel.category_id == category:
+                        return True
+                    
+        return False
+
+
+    # Checks whether there has been a violation of the antilink system
+    def check_rule_violation(self, check_settings, message:discord.Message):
+
+        check_link = self.contains_invite(message.content.replace(" ", ""))
+
+        # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
+        if check_settings[3] == 0:
+                
+            if "discord.gg/" in message.content or "discord.com" in message.content or check_link == True:
+
+                return True
+
+        # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
+        elif check_settings[3] == 1:
+                
+            if 'https://' in message.content and not any(word in message.content for word in self.formats) and not message.attachments or check_link == True: 
+
+                return True
+
+        # Is triggered when there is any link in the message (when triggered, the message is deleted)
+        elif check_settings[3] == 2:
+
+            if "https://" in message.content or message.attachments or check_link == True:
+
+                return True
+
 
     # Antilink system checks whether messages violate the antilink system, distinguishes between links that lead to images, invitation links or links in general
     @commands.Cog.listener()
@@ -58,94 +123,57 @@ class ModeratorCommands(commands.Cog):
         
         if message != None:
 
-            check_whitelist = DatabaseCheck.check_antilink_whitelist(guild_id = message.guild.id)
-            
-            if check_whitelist:
-                
-                for _, channel, category, role, user in check_whitelist:
-                    
-                    if isinstance(message.channel, discord.channel.DMChannel):
-                        return
-                    
-                    else:
-
-                        if user == message.author.id:
-                            return
-
-                        if role != None:
-                                    
-                            blacklist_role = message.guild.get_role(role)
-                            if blacklist_role in message.author.roles:
-                                return
-                        
-                        if message.channel.id == channel:
-                            return
-
-                        if message.channel.category_id == category:
-                            return
+            if self.check_whitelist_antilink(message=message) == True:
+                return
 
             if message.author.bot:
                 return
 
             else:
-
-                formats=['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp', 'mp4', 'avi', 'mkv', 'mov', 'wmv', '.mp3', 'wav', 'ogg', 'aac', 'flac']
         
                 if message.author.guild_permissions.administrator:
                     return
 
                 else:
 
-                    # Text additions for the embed
-                    anti_link_text = {
-                        0:"discord invitation link",
-                        1:"link or a discord invitations",
-                        2:"link or an image / video",
-                        3:""}
-
                     check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
-                    channel = message.channel
-                
-                    emb = discord.Embed(title=f'{Emojis.help_emoji} {message.author.name} you have violated the anti-link system', 
-                        description=f"""{Emojis.dot_emoji} You have violated the anti-link system on {message.guild.name} it is forbidden:
-                        {Emojis.dot_emoji} `You have sent an {anti_link_text[check_settings[3]]} to this chat`
-                        {f"{Emojis.dot_emoji} That's why you got a timeout for {check_settings[4]} minutes" if check_settings[4] != 0 else ''}""", colour=bot_colour)
-                    emb.set_footer(text=f'{message.author.name}', icon_url=message.author.display_avatar.url)
-                    
-                    rule_violation = False
-                    check_link = self.contains_invite(message.content.replace(" ", ""))
-                    # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
-                    if check_settings[3] == 0:
-                
-                        if "discord.gg/" in message.content or "discord.com" in message.content or check_link == True:
 
-                            await message.delete()
-                            rule_violation = True
-
-                    # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
-                    elif check_settings[3] == 1:
-                
-                        if 'https://' in message.content and not any(word in message.content for word in formats) and not message.attachments or check_link == True: 
-
-                            await message.delete()
-                            rule_violation = True
-
-                    # Is triggered when there is any link in the message (when triggered, the message is deleted)
-                    elif check_settings[3] == 2:
-
-                        if "https://" in message.content or message.attachments or check_link == True:
-
-                            await message.delete()
-                            rule_violation = True
-                    
                     # Antilink system is disabled 
-                    elif check_settings[3] == 3:
+                    if check_settings[3] == 3:
                         return
-                    
-                    if rule_violation == True:
 
-                        await channel.send(embed=emb, delete_after=5)
+                    if self.check_rule_violation(check_settings = check_settings, message = message) == True:
+
+                        await message.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=message, settings2=check_settings), delete_after=5)
+                        await message.delete()
                         await message.author.timeout_for(timedelta(minutes = check_settings[4]))
+
+    
+    @commands.Cog.listener()
+    async def on_message_edit(self, before:discord.Message, after:discord.Message):
+        
+        if self.check_whitelist_antilink(message=after) == True:
+            return
+        
+        if after.author.bot:
+            return
+        
+        else:
+
+            if after.author.guild_permissions.administrator:
+                return
+            
+            check_settings = DatabaseCheck.check_bot_settings(guild_id=after.guild.id)
+
+            # Antilink system is disabled 
+            if check_settings[3] == 3:
+                return           
+
+            if self.check_rule_violation(check_settings = check_settings, message = after) == True:
+
+                await after.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=after, settings2=check_settings), delete_after=5)
+                await after.delete()
+                await after.author.timeout_for(timedelta(minutes = check_settings[4]))
 
 
     @commands.slash_command(name = "set-antilink-system", description = "Set the anti-link system the way you want it!")

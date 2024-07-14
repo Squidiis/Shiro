@@ -276,10 +276,12 @@ class LevelSystem(commands.Cog):
         self.bot = bot
         self.cd = commands.CooldownMapping.from_cooldown(1, 10.0, commands.BucketType.member)
 
+    # Cooldown for the level system
     def get_ratelimit(self, message:discord.Message):
         bucket = self.cd.get_bucket(message)
         return bucket.update_rate_limit()
 
+    # Check how much XP must be awarded
     @staticmethod
     def xp_generator(guild_id:int, message:discord.Message = None):
 
@@ -294,6 +296,7 @@ class LevelSystem(commands.Cog):
         
         return xp
     
+    # Round off the corners of the rectangles (Rank card)
     @staticmethod
     def round_corner_mask(radius, rectangle, fill):
     
@@ -305,7 +308,54 @@ class LevelSystem(commands.Cog):
         rectangle.putalpha(mask)
         return (rectangle, mask)
     
-    
+    # Returns True if an element is on the blacklist.
+    @staticmethod
+    def blacklist_check_text(guild_id:int, message_check:discord.Message):
+
+        if isinstance(message_check.channel, discord.TextChannel):
+
+            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
+
+            if levelsystem_blacklist:
+
+                for _, channel_blacklist, category_blacklist, role_blacklist, user_blacklist in levelsystem_blacklist:
+                   
+                    if user_blacklist == message_check.author.id:
+                        return True
+
+                    if role_blacklist != None:
+                        
+                        blacklist_role = message_check.guild.get_role(role_blacklist)
+                        if blacklist_role in message_check.author.roles:
+                            return True
+                                
+                    if message_check.channel.category_id == category_blacklist:
+                        return True
+
+                    if message_check.channel.id == channel_blacklist:
+                        return True
+                        
+            else:
+                return None
+            
+    # Returns the value True if "on" in the database and False when not
+    @staticmethod
+    def check_level_system_status(guild_id:int):
+
+        levelsystem_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
+        # Anpassen das es auch überprüft ob voice und so an ist!
+        if levelsystem_status:
+
+            if levelsystem_status[2] == "on":
+                return True
+            
+            else:
+                return False
+            
+        else:
+            return None
+
+
     # Level system checks who gets XP and how much has a cooldown of 10 seconds
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -328,7 +378,7 @@ class LevelSystem(commands.Cog):
             return 
 
         # Checks the settings and returns false if the level system is disabled and none if no entry was found 
-        check_settings = DatabaseStatusCheck._level_system_status(guild_id=message.guild.id)
+        check_settings = self.check_level_system_status(guild_id=message.guild.id)
         
         if check_settings == None:
             DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
@@ -338,7 +388,7 @@ class LevelSystem(commands.Cog):
             return
                 
         # Checks the blacklist and returns true if the channel is on the blacklist
-        check_blacklist = DatabaseStatusCheck._blacklist_check_text(message_check=message, guild_id=message.guild.id)
+        check_blacklist = self.blacklist_check_text(message_check=message, guild_id=message.guild.id)
                         
         if isinstance(message.channel, discord.TextChannel):
                     
@@ -835,6 +885,7 @@ class LevelSystem(commands.Cog):
 #################################################  Level Blacklist settings  ###############################################
 
 
+    # To configure the level system blacklist (adding, removing and restoring)
     async def config_level_blacklist(
         self, 
         guild_id:int, 
@@ -1158,6 +1209,8 @@ class LevelSystem(commands.Cog):
 
 #########################################  Bonus xp system  #############################################
 
+
+    # Checks how high the bonus percentage should be
     @staticmethod
     def check_bonus_percentage(guild_id:int, bonus:int = None):
 
@@ -1173,6 +1226,7 @@ class LevelSystem(commands.Cog):
         return bonus_percentage
     
     
+    # To configure the level system bonus XP list (adding, removing and restoring)
     async def config_bonus_xp_list(
         self, 
         guild_id:int, 

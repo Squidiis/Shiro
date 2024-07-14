@@ -26,57 +26,6 @@ class DatabaseSetup():
         else:
             pass
 
-        
-
-# Contains all important check functions for the level system 
-class DatabaseStatusCheck():
-
-    # Returns True if an element is on the blacklist.
-    def _blacklist_check_text(guild_id:int, message_check:discord.Message):
-
-        if isinstance(message_check.channel, discord.TextChannel):
-
-            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
-
-            if levelsystem_blacklist:
-
-                for _, channel_blacklist, category_blacklist, role_blacklist, user_blacklist in levelsystem_blacklist:
-                   
-                    if user_blacklist == message_check.author.id:
-                        return True
-
-                    if role_blacklist != None:
-                        
-                        blacklist_role = message_check.guild.get_role(role_blacklist)
-                        if blacklist_role in message_check.author.roles:
-                            return True
-                                
-                    if message_check.channel.category_id == category_blacklist:
-                        return True
-
-                    if message_check.channel.id == channel_blacklist:
-                        return True
-                        
-            else:
-                return None
-            
-    
-    # Returns the value True if "on" in the database and False when not
-    def _level_system_status(guild_id:int):
-
-        levelsystem_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
-        # Anpassen das es auch überprüft ob voice und so an ist!
-        if levelsystem_status:
-
-            if levelsystem_status[2] == "on":
-                return True
-            
-            else:
-                return False
-            
-        else:
-            return None
-
 
 
 ##################################################  Database Statemants  #####################################
