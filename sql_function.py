@@ -1228,10 +1228,10 @@ class DatabaseUpdates():
         ):
 
         column_name_settings = {
-            "daily":"bourdMessageIdDay", 
-            "weekly":"bourdMessageIdWeek", 
-            "monthly":"bourdMessageIdMonth",
-            "whole":"bourdMessageIdWhole",
+            "daily":"bourdMessageIdDay" if settings != "tracking" else "dailyCountMessage", 
+            "weekly":"bourdMessageIdWeek" if settings != "tracking" else "weeklyCountMessage", 
+            "monthly":"bourdMessageIdMonth" if settings != "tracking" else "monthlyCountMessage",
+            "whole":"bourdMessageIdWhole" if settings != "tracking" else "wholeCountMessage",
             "channel":"leaderboardChannel",
             "status":"statusMessage"
         }
@@ -1249,7 +1249,7 @@ class DatabaseUpdates():
         cursor = db_connect.cursor()
         try:
 
-            if settings:
+            if settings != None and settings != "tracking":
 
                 value = coulmn_values[settings]
                 settings = f"UPDATE LeaderboardSettingsMessage SET {column_name_settings[settings]} = %s WHERE guildId = %s"
@@ -1279,7 +1279,7 @@ class DatabaseUpdates():
 
             elif back_to_none != None:
 
-                set_back_to_none = f"UPDATE LeaderboardSettingsMessage SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+                set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == "tracking" else 'LeaderboardSettingsMessage'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
                 set_back_to_none_values = [guild_id]
                 cursor.execute(set_back_to_none, set_back_to_none_values)
             

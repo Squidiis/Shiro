@@ -32,6 +32,6 @@ design anpassen für show role command
 
 nochmal gesammt test machen für das message leaderboard
 
-das rollen system integieren in das leaderboard (testen)
+eine funktion die die Rolle wieder entfernt wenn ein neuer user die rolle erhält (Entweder die user in einer db packen oder mit hinweis versehen und allen die rolle wegnehmen)
 
 villeicht noch eine text bemerkung das wer eine rolle erhalten hat (message leaderboard)

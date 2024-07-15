@@ -254,7 +254,7 @@ def setup(bot):
 
 
 async def sort_leaderboard(user_list, interval, guild_id):
-
+    
     guild = bot.get_guild(guild_id)
 
     check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id)
@@ -276,7 +276,7 @@ async def sort_leaderboard(user_list, interval, guild_id):
     user_names, users = [], []
     for t in user_list:
 
-        user = await bot.get_or_fetch_user(t[1])
+        user = await guild.fetch_member(t[1])
         user_names.append(user.name)
         users.append(user)
         max_lengths[0] = max(max_lengths[0], len(user.name))
@@ -291,7 +291,7 @@ async def sort_leaderboard(user_list, interval, guild_id):
         )
         for i, t in enumerate(user_list)
     ]
-
+    
     leaderboard = []
     for i in range(min(len(user_list), 15)):
         
@@ -300,22 +300,22 @@ async def sort_leaderboard(user_list, interval, guild_id):
             role = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1)
 
             if general_role != None:
-
+                
                 await user[i].add_roles(general_role)
 
             if role != None:
-
-                leaderboard_role = guild.get_role(role)
+                
+                leaderboard_role = guild.get_role(role[1])
                 await users[i].add_roles(leaderboard_role)
-
+            
         num_str = str(i + 1)
         if len(num_str) == 1:
             num_str = f" #{num_str}  "
         elif len(num_str) == 2:
             num_str = f" #{num_str} "
-
+        
         leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `messages {padded_tuples[i][interval]}`\n")
-
+        
     return "".join(leaderboard)
 
 
@@ -332,7 +332,8 @@ async def edit_leaderboard(bot):
                 message_ids = [
                     ("1_day_old", leaderboard_settings[2]),
                     ("1_week_old", leaderboard_settings[3]),
-                    ("1_month_old", leaderboard_settings[4])
+                    ("1_month_old", leaderboard_settings[4]),
+                    ("whole", leaderboard_settings[5])
                 ]
                 
                 if leaderboard_settings[1] == 1 and leaderboard_settings[6] != None:
@@ -346,16 +347,16 @@ async def edit_leaderboard(bot):
                             if message_id != None:
                                 
                                 channel = bot.get_channel(leaderboard_settings[6])
-                                message = await channel.fetch_message(message_id)
-
-                                message_age = message.edited_at if message.edited_at != None else message.created_at
 
                                 if leaderboard_settings[5] != None:
+                                    
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
 
-                                    if (current_date - message_age) > timedelta(days=1) and message_name == "1_day_old":
+                                    if (current_date - message_age) > timedelta(days=1) and message_name == "whole":
 
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 3)
-                                        users = await sort_leaderboard(user_list=user_list, interval=5, guild_id = guild.id)
+                                        users = await sort_leaderboard(user_list=user_list, interval=4, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Whole Messages Leaderboard
                                             {users}""", color=bot_colour)
 
@@ -363,42 +364,51 @@ async def edit_leaderboard(bot):
 
                                 if leaderboard_settings[2] != None:
 
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+
                                     if (current_date - message_age) > timedelta(days=1) and message_name == "1_day_old":
 
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 0)
-                                        users = await sort_leaderboard(user_list=user_list, interval=2, guild_id = guild.id)
+                                        users = await sort_leaderboard(user_list=user_list, interval=1, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Daily Messages Leaderboard
                                             {users}""", color=bot_colour)
 
                                         await message.edit(embed = emb)
 
-                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily")
+                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily", settings = "tracking")
 
                                 if leaderboard_settings[3] != None:
+                                    
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
 
                                     if (current_date - message_age) > timedelta(weeks=1) and message_name == "1_week_old":
                                         
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 1)
-                                        users = await sort_leaderboard(user_list=user_list, interval=3, guild_id = guild.id)
+                                        users = await sort_leaderboard(user_list=user_list, interval=2, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Weekly Messages Leaderboard
                                             {users}""", color=bot_colour)
 
                                         await message.edit(embed = emb)
 
-                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly")
+                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly", settings = "tracking")
 
                                 if leaderboard_settings[4] != None:
+                                    
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
 
                                     if (current_date - message_age) > timedelta(days=30) and message_name == "1_month_old":
                                         
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 2)
-                                        users = await sort_leaderboard(user_list=user_list, interval=4, guild_id=guild.id)
+                                        users = await sort_leaderboard(user_list=user_list, interval=3, guild_id=guild.id)
                                         emb = discord.Embed(description=f"""## Monthly Messages Leaderboard (30 days)
                                             {users}""", color=bot_colour)
 
                                         await message.edit(embed = emb)
 
-                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly")
+                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly", settings = "tracking")
 
 
                     except Exception as error:
@@ -453,11 +463,6 @@ class SetleaderboardChannel(discord.ui.View):
             else:
 
                 DatabaseUpdates.create_leaderboard_settings_message(guild_id = interaction.guild.id, settings = "createSettings", channel_id = select.values[0].id)
-
-            #DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
-
-            #emb = GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention)
-            #await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
         
         else:
 
@@ -558,6 +563,9 @@ class SetMessageleaderboard(discord.ui.View):
                         if value_check[i]:
 
                             check_list.append(f"> {Emojis.dot_emoji} {i} update\n")
+                    
+                    if check_list == []:
+                        check_list = [f"> {Emojis.dot_emoji} None of the intervals you mentioned are currently active"]
 
                     emb = discord.Embed(description=f"""## Intervals have already been defined
                         {Emojis.dot_emoji} The following intervals are currently active:\n
