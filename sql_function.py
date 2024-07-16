@@ -513,7 +513,21 @@ class DatabaseCheck():
         DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
         return leaderboard_roles
     
+    
+    def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
 
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        check_users = "SELECT * FROM LeaderboardGivenRoles WHERE guildId = %s AND roleInterval = %s, status = %s"
+        check_users_values = [guild_id, interval, status]
+
+        cursor.execute(check_users, check_users_values)
+        leaderbaord_user_roles = cursor.fetchall()
+
+        return leaderbaord_user_roles
+
+    
 
 
 
@@ -1226,7 +1240,7 @@ class DatabaseUpdates():
         channel_id:int = None,
         back_to_none = None
         ):
-
+    
         column_name_settings = {
             "daily":"bourdMessageIdDay" if settings != "tracking" else "dailyCountMessage", 
             "weekly":"bourdMessageIdWeek" if settings != "tracking" else "weeklyCountMessage", 
@@ -1248,7 +1262,7 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         try:
-
+            
             if settings != None and settings != "tracking":
 
                 value = coulmn_values[settings]
@@ -1266,7 +1280,7 @@ class DatabaseUpdates():
                     update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, check_user[5] + 1, guild_id, user_id]
 
                 elif check_user != None and interval == "countInvite":
-
+                    
                     update_stats = f"UPDATE LeaderboardTacking SET dailyCountInvite = %s, weeklyCountInvite = %s, monthlyCountInvite = %s, wholeCountInvite = %s WHERE guildId = %s AND userId = %s"
                     update_stats_values = [check_user[6] + 1, check_user[7] + 1, check_user[8] + 1, check_user[9] + 1, guild_id, user_id]
 
@@ -1333,7 +1347,7 @@ class DatabaseUpdates():
 
     
     '''
-    manage the leaderboard-roles
+    Manage the leaderboard-roles
 
     Parameters:
     -----------
@@ -1375,37 +1389,79 @@ class DatabaseUpdates():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         
-        if settings:
+        try:
 
-            if settings == "position":
+            if settings:
 
-                update_roles = "UPDATE LeaderboardRoles SET rankingPosition = %s WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
-                update_roles_values = [position, guild_id, role_id, interval]
-                
-            elif settings == "role":
-                
-                update_roles = "UPDATE LeaderboardRoles SET roleId = %s WHERE guildId = %s AND rankingPosition = %s AND roleInterval = %s"
-                update_roles_values = [role_id, guild_id, position, interval]
+                if settings == "position":
 
-            elif settings == "status":
-                
-                update_roles = "UPDATE LeaderboardRoles SET status = %s WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
-                update_roles_values = [status, guild_id, role_id, interval]
+                    update_roles = "UPDATE LeaderboardRoles SET rankingPosition = %s WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
+                    update_roles_values = [position, guild_id, role_id, interval]
+                    
+                elif settings == "role":
+                    
+                    update_roles = "UPDATE LeaderboardRoles SET roleId = %s WHERE guildId = %s AND rankingPosition = %s AND roleInterval = %s"
+                    update_roles_values = [role_id, guild_id, position, interval]
 
-            elif settings == "interval":
-                
-                update_roles = "UPDATE LeaderboardRoles SET roleInterval = %s WHERE guildId = %s AND roleId = %s"
-                update_roles_values = [interval, guild_id, role_id]
+                elif settings == "status":
+                    
+                    update_roles = "UPDATE LeaderboardRoles SET status = %s WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
+                    update_roles_values = [status, guild_id, role_id, interval]
 
-        else:
+                elif settings == "interval":
+                    
+                    update_roles = "UPDATE LeaderboardRoles SET roleInterval = %s WHERE guildId = %s AND roleId = %s"
+                    update_roles_values = [interval, guild_id, role_id]
 
-            update_roles = f"INSERT INTO LeaderboardRoles (guildId, roleId, rankingPosition, status, roleInterval) VALUES (%s, %s, %s, %s, %s)"
-            update_roles_values = [guild_id, role_id, position, status, interval]
+            else:
 
-        cursor.execute(update_roles, update_roles_values)
-        db_connect.commit()
+                update_roles = f"INSERT INTO LeaderboardRoles (guildId, roleId, rankingPosition, status, roleInterval) VALUES (%s, %s, %s, %s, %s)"
+                update_roles_values = [guild_id, role_id, position, status, interval]
 
-        DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            cursor.execute(update_roles, update_roles_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+
+    
+    def manage_leaderboard_roles_users(
+        guild_id:int, 
+        status:str, 
+        operation:str, 
+        role_id:int, 
+        user_id:int,
+        interval:str
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        try:
+
+            if operation == "add":
+
+                manage_role = "INSERT INTO LeaderboardGivenRoles (guildId, roleId, userId, roleInterval, status) VALUES (%s, %s, %s, %s)"
+                manage_role_values = [guild_id, role_id, user_id, interval, status]
+
+            else:
+
+                manage_role = "DELETE FROM LeaderboardGivenRoles WHERE guildId = %s AND userId = %s AND roleInterval = %s AND status = %s"
+                manage_role_values = [guild_id, user_id, interval, status]
+
+            cursor.execute(manage_role, manage_role_values)
+            db_connect.commit()
+        
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
 

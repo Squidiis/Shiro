@@ -130,6 +130,17 @@ CREATE TABLE LeaderboardRoles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+DROP TABLE IF EXISTS `LeaderboardGivenRoles`;
+
+CREATE TABLE LeaderboardGivenRoles (
+    guildId BIGINT UNSIGNED NOT NULL,
+    roleId BIGINT UNSIGNED NOT NULL,
+    userId BIGINT UNSIGNED NOT NULL,
+    roleInterval VARCHAR(10) NOT NULL,
+    status VARCHAR(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 ------------- Table for the Bot settigs -----------------
 
 DROP TABLE IF EXISTS `BotSettings`;

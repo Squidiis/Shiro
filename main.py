@@ -126,6 +126,15 @@ class Main(commands.Cog):
                 status VARCHAR(20) NOT NULL,
                 roleInterval VARCHAR(10) NOT NUll
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LeaderboardGivenRoles (
+                guildId BIGINT UNSIGNED NOT NULL,
+                roleId BIGINT UNSIGNED NOT NULL,
+                userId BIGINT UNSIGNED NOT NULL,
+                roleInterval VARCHAR(10) NOT NULL,
+                status VARCHAR(20) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
             ]
 

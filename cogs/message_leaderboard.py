@@ -462,7 +462,7 @@ class SetleaderboardChannel(discord.ui.View):
 
             else:
 
-                DatabaseUpdates.create_leaderboard_settings_message(guild_id = interaction.guild.id, settings = "createSettings", channel_id = select.values[0].id)
+                DatabaseUpdates.create_leaderboard_settings_message(guild_id = interaction.guild.id, channel_id = select.values[0].id)
         
         else:
 
