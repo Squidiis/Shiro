@@ -500,7 +500,7 @@ class DatabaseCheck():
             check_roles_values = [guild_id, role_id, interval]
 
         else:
-
+            
             check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
             check_roles_values = [guild_id] if interval == None else [guild_id, interval]
 
@@ -513,13 +513,13 @@ class DatabaseCheck():
         DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
         return leaderboard_roles
     
-    
+
     def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        check_users = "SELECT * FROM LeaderboardGivenRoles WHERE guildId = %s AND roleInterval = %s, status = %s"
+        check_users = "SELECT * FROM LeaderboardGivenRoles WHERE guildId = %s AND roleInterval = %s AND status = %s"
         check_users_values = [guild_id, interval, status]
 
         cursor.execute(check_users, check_users_values)
@@ -1433,25 +1433,24 @@ class DatabaseUpdates():
         guild_id:int, 
         status:str, 
         operation:str, 
-        role_id:int, 
-        user_id:int,
-        interval:str
+        interval:str,
+        role_id:int = None, 
+        user_id:int = None,
         ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
-
+        
         try:
 
             if operation == "add":
-
-                manage_role = "INSERT INTO LeaderboardGivenRoles (guildId, roleId, userId, roleInterval, status) VALUES (%s, %s, %s, %s)"
+                manage_role = "INSERT INTO LeaderboardGivenRoles (guildId, roleId, userId, roleInterval, status) VALUES (%s, %s, %s, %s, %s)"
                 manage_role_values = [guild_id, role_id, user_id, interval, status]
 
             else:
 
-                manage_role = "DELETE FROM LeaderboardGivenRoles WHERE guildId = %s AND userId = %s AND roleInterval = %s AND status = %s"
-                manage_role_values = [guild_id, user_id, interval, status]
+                manage_role = "DELETE FROM LeaderboardGivenRoles WHERE guildId = %s AND roleInterval = %s AND status = %s"
+                manage_role_values = [guild_id, interval, status]
 
             cursor.execute(manage_role, manage_role_values)
             db_connect.commit()

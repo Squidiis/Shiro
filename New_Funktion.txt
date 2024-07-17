@@ -36,4 +36,8 @@ villeicht noch eine text bemerkung das wer eine rolle erhalten hat (message lead
 level roles testen (Wegen änderungen an der db)
 
 
-check und remove funktion für das rollen entfern system fertig machen
+check und remove funktion für das rollen entfern system fertig machen (testen) (Info: Es wird nichts in die db eingetragen)
+
+Den Timestamp zurück zu day stellen
+
+SQL funktionen zu async funktionen machen

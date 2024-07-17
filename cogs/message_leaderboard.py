@@ -253,11 +253,23 @@ def setup(bot):
     bot.add_cog(Messageleaderboard(bot))
 
 
+async def remove_leaderboard_roles(guild:int, interval:str):
+    
+    check_role = DatabaseCheck.check_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = "message")
+    DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = "message", operation = "remove")
+    
+    for _, role, user, _, _ in check_role:
+
+        user = await guild.fetch_member(user)
+        leaderboard_role = guild.get_role(role)
+        await user.remove_roles(leaderboard_role)
+
+
 async def sort_leaderboard(user_list, interval, guild_id):
     
     guild = bot.get_guild(guild_id)
-
-    check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id)
+    interval_list = ["", "day", "week", "month", "whole"]
+    check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval])
 
     general_role = None
     if check_roles:
@@ -292,22 +304,26 @@ async def sort_leaderboard(user_list, interval, guild_id):
         for i, t in enumerate(user_list)
     ]
     
+    await remove_leaderboard_roles(guild=guild, interval=interval_list[interval])
+    
     leaderboard = []
     for i in range(min(len(user_list), 15)):
         
         if check_roles:
-
+            
             role = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1)
 
             if general_role != None:
                 
-                await user[i].add_roles(general_role)
+                await users[i].add_roles(general_role)
+                DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = "message", interval = interval_list[interval])
 
             if role != None:
-                
+
                 leaderboard_role = guild.get_role(role[1])
                 await users[i].add_roles(leaderboard_role)
-            
+                DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = "message", interval = interval_list[interval])
+        
         num_str = str(i + 1)
         if len(num_str) == 1:
             num_str = f" #{num_str}  "
@@ -353,7 +369,7 @@ async def edit_leaderboard(bot):
                                     message = await channel.fetch_message(message_id)
                                     message_age = message.edited_at if message.edited_at != None else message.created_at
 
-                                    if (current_date - message_age) > timedelta(days=1) and message_name == "whole":
+                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "whole":
 
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 3)
                                         users = await sort_leaderboard(user_list=user_list, interval=4, guild_id = guild.id)
@@ -367,7 +383,7 @@ async def edit_leaderboard(bot):
                                     message = await channel.fetch_message(message_id)
                                     message_age = message.edited_at if message.edited_at != None else message.created_at
 
-                                    if (current_date - message_age) > timedelta(days=1) and message_name == "1_day_old":
+                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "1_day_old":
 
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 0)
                                         users = await sort_leaderboard(user_list=user_list, interval=1, guild_id = guild.id)
