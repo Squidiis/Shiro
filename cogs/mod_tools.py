@@ -123,10 +123,10 @@ class ModeratorCommands(commands.Cog):
         
         if message != None:
 
-            if self.check_whitelist_antilink(message=message) == True:
+            if message.author.bot:
                 return
 
-            if message.author.bot:
+            if self.check_whitelist_antilink(message=message) == True:
                 return
 
             else:

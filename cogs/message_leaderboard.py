@@ -207,12 +207,12 @@ class Messageleaderboard(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-        
-        check = DatabaseCheck.check_leaderboard_settings_message(guild_id = message.guild.id)
 
         if message.author.bot:
             return
         
+        check = DatabaseCheck.check_leaderboard_settings_message(guild_id = message.guild.id)
+
         if check[1] == 1:
             
             DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
@@ -376,7 +376,7 @@ async def edit_leaderboard(bot):
                                         emb = discord.Embed(description=f"""## Whole Messages Leaderboard
                                             {users}""", color=bot_colour)
 
-                                        await message.edit(embed = emb)
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
 
                                 if leaderboard_settings[2] != None:
 
@@ -390,7 +390,7 @@ async def edit_leaderboard(bot):
                                         emb = discord.Embed(description=f"""## Daily Messages Leaderboard
                                             {users}""", color=bot_colour)
 
-                                        await message.edit(embed = emb)
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
 
                                         DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily", settings = "tracking")
 
@@ -406,7 +406,7 @@ async def edit_leaderboard(bot):
                                         emb = discord.Embed(description=f"""## Weekly Messages Leaderboard
                                             {users}""", color=bot_colour)
 
-                                        await message.edit(embed = emb)
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
 
                                         DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly", settings = "tracking")
 
@@ -422,7 +422,7 @@ async def edit_leaderboard(bot):
                                         emb = discord.Embed(description=f"""## Monthly Messages Leaderboard (30 days)
                                             {users}""", color=bot_colour)
 
-                                        await message.edit(embed = emb)
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
 
                                         DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly", settings = "tracking")
 
@@ -1071,3 +1071,44 @@ class ShowLeaderboardRolesSelect(discord.ui.View):
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+class ShowLeaderboardGivenRoles(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+    
+
+    @discord.ui.button(
+        label="Schau dir an wer welche rolle erhalten hat",
+        style=discord.ButtonStyle.blurple,
+        custom_id="show_leaderboar_given_roles"
+    )
+    
+    async def show_leaderboard_given_roles(self, button, interaction:discord.Interaction):
+
+        interval_text = {
+            "Whole":"whole",
+            "Daily":"day",
+            "Weekly":"week",
+            "Monthly":"month"
+        }
+
+        for key, interval in interval_text.items():
+
+            if key in interaction.message.embeds[0].description:
+            
+                check_roles = DatabaseCheck.check_leaderboard_roles_users(guild_id = interaction.guild.id, status = "message", interval = interval)
+                user_list = []
+                for role in check_roles:
+                    
+                    check_position = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = role[1])
+                    user_list.append(f"{Emojis.dot_emoji} Der user <@{role[2]}> hat die rolle <@&{role[1]}> erhalten für das erreichen von platz {check_position[2]}\n")
+                    
+
+                emb = discord.Embed(description=f"""## Die folgenden Rollen wurden vergeben
+                    {Emojis.dot_emoji} Hier siehst du welche rollen für das {key.lower()} leaderboard vergeben wurden
+                        
+                    {"".join(user_list)}
+                    """, color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
