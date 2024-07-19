@@ -48,8 +48,7 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS LevelSystemRoles (
                 guildId BIGINT UNSIGNED NOT NULL,
                 roleId BIGINT UNSIGNED NOT NULL,
-                roleLevel INT UNSIGNED NOT NULL,
-                guildName VARCHAR(255) NOT NULL
+                roleLevel INT UNSIGNED NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             '''
@@ -72,6 +71,7 @@ class Main(commands.Cog):
                 PercentBonusXp INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
+            # Antilink system table
             '''
             CREATE TABLE If NOT EXISTS AntiLinkWhiteList (
                 guildId BIGINT UNSIGNED NOT NULL,
@@ -198,6 +198,7 @@ class Main(commands.Cog):
         self.bot.add_view(ShowLeaderboardRolesSelect())
         view.add_item(LeaderboardOnOffSwitchMessage())
         view.add_item(DefaultSettingsMessageLeaderboard())
+        self.bot.add_view(ShowLeaderboardGivenRoles())
 
 
         # Other Systems

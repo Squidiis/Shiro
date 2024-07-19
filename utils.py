@@ -182,7 +182,7 @@ class GetEmbed():
 
             emb = discord.Embed(description=f"""## This is the general leaderboard
                 {Emojis.dot_emoji} Here you can see which users have written the most messages in total
-                {Emojis.help_emoji} It is updated daily and will be edited into the correct leaderboard tomorrow""", color=bot_colour)
+                {Emojis.help_emoji} It is updated daily and will be edited into the correct leaderboard on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>""", color=bot_colour)
         
         elif embed_index == 8:
 
