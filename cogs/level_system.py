@@ -151,7 +151,7 @@ class LevelRolesButtons(discord.ui.View):
 
             else:
 
-                DatabaseUpdates.update_level_roles(guild_id=interaction.guild.id , role_id=self.role_id, role_level=self.role_level, status=self.status)
+                await DatabaseUpdates.update_level_roles(guild_id=interaction.guild.id , role_id=self.role_id, role_level=self.role_level, status=self.status)
                             
                 emb = discord.Embed(description=f"""## Successful override of the level role
                     {Emojis.dot_emoji} The level role was successfully overwritten
@@ -193,7 +193,7 @@ class ResetLevelStatsButton(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             guild_id = interaction.guild.id
-            DatabaseRemoveDatas._remove_level_system_stats(guild_id=guild_id)
+            await DatabaseRemoveDatas.remove_level_system_stats(guild_id=guild_id)
 
             emb = discord.Embed(description=f"""## You have reset all the stats of the level system
                 {Emojis.dot_emoji} All user files have been deleted every user is now level 0 again and has 0 XP
@@ -235,7 +235,7 @@ class ResetBlacklistLevelButton(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
             guild_id = interaction.guild.id
 
-            DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="reset")
+            await DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="reset")
 
             emb = discord.Embed(description=f"""## The blacklist has been reset
                 {Emojis.dot_emoji} All channels, users, roles and categories have been removed from the blacklist
@@ -377,7 +377,7 @@ class LevelSystem(commands.Cog):
         check_settings = self.check_level_system_status(guild_id=message.guild.id)
         
         if check_settings == None:
-            DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
+            await DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
             return
         
         elif check_settings == False:
@@ -414,7 +414,7 @@ class LevelSystem(commands.Cog):
                             try:
                                 
                                 # Updates the XP
-                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, level=new_level, whole_xp=whole_xp)
+                                await DatabaseUpdates.update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, level=new_level, whole_xp=whole_xp)
 
                             except mysql.connector.Error as error:
                                 print("parameterized query failed {}".format(error))
@@ -451,14 +451,14 @@ class LevelSystem(commands.Cog):
 
                             try:
 
-                                DatabaseUpdates._update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp, whole_xp=whole_xp)                       
+                                await DatabaseUpdates.update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp, whole_xp=whole_xp)                       
 
                             except mysql.connector.Error as error:
                                 print("parameterized query failed {}".format(error))
 
                     else:
                             
-                        DatabaseUpdates._insert_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name)
+                        await DatabaseUpdates.insert_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name)
 
                 except mysql.connector.Error as error:
                     print("parameterized query failed {}".format(error))
@@ -515,7 +515,7 @@ class LevelSystem(commands.Cog):
                     new_xp = user_xp + xp
                     new_whole_xp = xp + check_stats[6]
 
-                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp, whole_xp=new_whole_xp)
+                    await DatabaseUpdates.update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp, whole_xp=new_whole_xp)
                         
                     emb = discord.Embed(description=f"""## You have successfully given {user.mention} {xp} XP
                     {Emojis.dot_emoji} You have given **{user.mention}** {xp} XP, **{user.mention}** has from now on **{new_xp}** XP
@@ -526,7 +526,7 @@ class LevelSystem(commands.Cog):
 
                         new_level = user_level + 1
                                             
-                        DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level, whole_xp=new_whole_xp)
+                        await DatabaseUpdates.update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level, whole_xp=new_whole_xp)
                         levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
                         if levelup_channel_check[3] == None:
@@ -546,7 +546,7 @@ class LevelSystem(commands.Cog):
 
             else:
 
-                DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
+                await DatabaseUpdates.insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                 
                 await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name)) 
 
@@ -577,7 +577,7 @@ class LevelSystem(commands.Cog):
 
                 else:
 
-                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp)
+                    await DatabaseUpdates.update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, xp=new_xp)
 
                     emb = discord.Embed(description=f"""## You have successfully removed the XP
                         {Emojis.dot_emoji} You have removed **{user.mention}** {xp} XP **{user.mention}** has **{new_xp}** XP from now on
@@ -586,7 +586,7 @@ class LevelSystem(commands.Cog):
 
             else:
                     
-                DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
+                await DatabaseUpdates.insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                     
                 await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name))  
 
@@ -617,7 +617,7 @@ class LevelSystem(commands.Cog):
 
                 else:
 
-                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level, whole_xp = check_stats[6])
+                    await DatabaseUpdates.update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level, whole_xp = check_stats[6])
 
                     emb = discord.Embed(description=f"""## You have successfully added the levels
                         {Emojis.dot_emoji} You gave **{user.mention}** {level} levels, from now on **{user.mention}** has **{new_level}** level
@@ -626,7 +626,7 @@ class LevelSystem(commands.Cog):
 
             else:
 
-                DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
+                await DatabaseUpdates.insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
 
                 await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name)) 
                 
@@ -657,7 +657,7 @@ class LevelSystem(commands.Cog):
                 
                 else:
 
-                    DatabaseUpdates._update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id,  level=new_level)
+                    await DatabaseUpdates.update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id,  level=new_level)
 
                     emb = discord.Embed(description=f"""## You have successfully removed the levels
                         {Emojis.dot_emoji} You have removed **{user.mention}** {level} levels, **{user.mention}** is now level **{new_level}**
@@ -666,7 +666,7 @@ class LevelSystem(commands.Cog):
 
             else:
 
-                DatabaseUpdates._insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
+                await DatabaseUpdates.insert_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, user_name=user.name)
                 
                 await ctx.respond(embed=GetEmbed.get_embed(embed_index=1, settings=user.name))  
     
@@ -701,7 +701,7 @@ class LevelSystem(commands.Cog):
 
         if check_stats:
 
-            DatabaseRemoveDatas._remove_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+            await DatabaseRemoveDatas.remove_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
             emb = discord.Embed(description=f"""## The user data has been reset
                 {Emojis.dot_emoji} The user stats of {user.mention} have been reset
@@ -922,7 +922,7 @@ class LevelSystem(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "\n> None of the items you specified were on the blacklist"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be blacklisted because they are already on the blacklist"
                     
-                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
+                    await DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
                         
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the blacklist or were already there", 
                         description=f"""### {Emojis.dot_emoji} The following were already on the blacklist:
@@ -935,7 +935,7 @@ class LevelSystem(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "> All the items you specified were on the blacklist"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be removed from the blacklist because they are not on the blacklist"
 
-                    DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
+                    await DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
 
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been removed from the blacklist or were not listed", 
                         description=f"""### {Emojis.dot_emoji} The following items were not on the blacklist:
@@ -979,7 +979,7 @@ class LevelSystem(commands.Cog):
                     
                     if bot.get_channel(channels).category.id == category.id:
 
-                        DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channels)
+                        await DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="remove", channel_id=channels)
                         filtered_list.append(f"> {Emojis.dot_emoji} <#{channels}>")
         
         if channel != None and any(channel.category.id == x[2] for x in check_blacklist):
@@ -991,7 +991,7 @@ class LevelSystem(commands.Cog):
         elif category != None and filtered_list != []:
  
             channel_list = "\n".join(filtered_list)
-            DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id)
+            await DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="add", category_id=category.id)
                     
             emb = discord.Embed(description=f"""## {Emojis.help_emoji} {'One channel' if len(filtered_list) == 1 else 'Several channels'} in this category {'is' if len(filtered_list) == 1 else 'are'} already blacklisted
                     {Emojis.dot_emoji} The following {'channel is' if len(filtered_list) == 1 else 'channels are'} already blacklisted \n\n{channel_list}
@@ -1091,7 +1091,7 @@ class LevelSystem(commands.Cog):
                 
                 if level <= 999:
                             
-                    DatabaseUpdates._insert_level_roles(guild_id=ctx.guild.id, role_id=role.id, level=level)
+                    await DatabaseUpdates.insert_level_roles(guild_id=ctx.guild.id, role_id=role.id, level=level)
 
                     emb = discord.Embed(description=f"""## The role was assigned successfully as a level role
                         {Emojis.dot_emoji} The role {role.mention} was successfully assigned to the level {level}
@@ -1141,7 +1141,7 @@ class LevelSystem(commands.Cog):
 
         if level_roles:
             
-            DatabaseRemoveDatas._remove_level_system_level_roles(guild_id=ctx.guild.id, role_id=role.id)
+            await DatabaseRemoveDatas.remove_level_system_level_roles(guild_id=ctx.guild.id, role_id=role.id)
 
             emb = discord.Embed(description=f"""## This role has been removed as a level role
                 {Emojis.dot_emoji} The role <@&{role.id}> was successfully removed as a level role
@@ -1166,7 +1166,7 @@ class LevelSystem(commands.Cog):
 
         if check_level_roles:
             
-            DatabaseRemoveDatas._remove_level_system_level_roles(guild_id = ctx.guild.id)
+            await DatabaseRemoveDatas.remove_level_system_level_roles(guild_id = ctx.guild.id)
 
             emb = discord.Embed(description=f"""## All level roles have been successfully reset
                 {Emojis.dot_emoji} All level roles have been removed so no more level roles will be assigned
@@ -1263,7 +1263,7 @@ class LevelSystem(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "\n> None of these items are on the Bonus XP list"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of these items can be removed from the Bonus XP list as they are not listed there"
                     
-                    DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3], bonus = bonus)    
+                    await DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3], bonus = bonus)    
                     server_bonus = DatabaseCheck.check_level_settings(guild_id=guild_id)[5]
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the bonus XP list or were already there", 
                         description=f"""### {Emojis.dot_emoji} The following were already on the XP bonus list:
@@ -1277,7 +1277,7 @@ class LevelSystem(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "> All the items you specified were on the XP bonus list"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be removed from the XP bonus list because they are not on the blacklist"
 
-                    DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
+                    await DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
 
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been removed from the XP bonus list or were not listed", 
                         description=f"""### {Emojis.dot_emoji} The following items were not on the XP bonus list:
@@ -1367,7 +1367,7 @@ class LevelSystem(commands.Cog):
 
         if check_list:
 
-            DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove")
+            await DatabaseUpdates.manage_xp_bonus(guild_id=ctx.guild.id, operation="remove")
 
             emb = discord.Embed(description=f"""## The bonus xp list was reset
                 {Emojis.dot_emoji} All channels, users, roles and categories have been deleted from the xp bonus list
@@ -1518,7 +1518,7 @@ class LevelSystemOnOffSwitch(discord.ui.Button):
             
             settings = DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
 
-            DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status='on' if settings == 'off' else 'on')
+            await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status='on' if settings == 'off' else 'on')
                         
             emb = discord.Embed(description=f"""## The level system was switched {' off' if settings == 'on' else 'on'}
                 {Emojis.dot_emoji} {'From now on, XP will no longer be given as a reward.' if settings == 'on' else 'From now on all activities will be rewarded with XP, you can adjust the amount manually using the **/set-level-system** command'}
@@ -1566,7 +1566,7 @@ class LevelUpMessageModal(discord.ui.Modal):
         level = 1
         level_up_message = eval("f'{}'".format(self.children[0].value))
 
-        DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
+        await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
 
         embed = discord.Embed(description=f"""## The level-up message was successfully set
             {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}`
@@ -1627,7 +1627,7 @@ class SetLevelUpChannelSelect(discord.ui.View):
 
             if settings[3] != select.values[0].id:
 
-                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, level_up_channel = select.values[0].id)
+                await DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, level_up_channel = select.values[0].id)
                     
                 emb = discord.Embed(
                     description=f"""## Level up channel has been {f"set " if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "overwritten"}
@@ -1713,7 +1713,7 @@ class BonusXpPercentage(discord.ui.View):
 
             else:
             
-                DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=int(select.values[0]))
+                await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=int(select.values[0]))
 
                 emb = discord.Embed(description=f"""## A new bonus XP percentage rate has been set
                     {Emojis.dot_emoji} The newly set bonus percentage rate is now **{select.values[0]}**
@@ -1768,7 +1768,7 @@ class BonusXpPercentageModal(discord.ui.Modal):
                     
                     if int(self.children[0].value) <= 100:
 
-                        DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
+                        await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
 
                         embed = discord.Embed(description=f"""## Your bonus XP percentage has been set
                             {Emojis.dot_emoji} The bonus XP percentage was set to **{self.children[0].value}** %
@@ -1832,7 +1832,7 @@ class SetXpRate(discord.ui.View):
 
             else:
 
-                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, xp_rate = int(select.values[0]))
+                await DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, xp_rate = int(select.values[0]))
 
                 emb = discord.Embed(description=f"""## The XP bonus value has been set
                     {Emojis.dot_emoji} You have set the new XP bonus value to **{select.values[0]}** XP
@@ -1907,7 +1907,7 @@ class LevelSystemDefault(discord.ui.View):
             default_new_list = "\n".join(default_list)
     
             for i in select.values:
-                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = settings_dict[i])
+                await DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = settings_dict[i])
 
             emb = discord.Embed(description=f"""## Reset settings                
                 **{Emojis.arrow_emoji} The following level system settings have been reset:**
@@ -1936,7 +1936,7 @@ class LevelSystemDefault(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             for i in [0, 2, 3, 4]:
-                DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = i)
+                await DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, back_to_none = i)
 
             emb = discord.Embed(description=f"""## All data has been reset to default
                 {Emojis.dot_emoji} You have successfully set all level system settings back to default

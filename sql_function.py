@@ -583,7 +583,7 @@ class DatabaseUpdates():
             levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
             bonusXpPercentage INT UNSIGNED DEFAULT 10
     '''
-    def _create_bot_settings(guild_id:int):
+    async def _create_bot_settings(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -639,7 +639,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - all values must have the specified data type
     '''
-    def update_bot_settings(
+    async def update_bot_settings(
         guild_id:int, 
         bot_colour:str = None, 
         ghost_ping:int = None, 
@@ -707,7 +707,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified either add, remove or reset
     '''
-    def manage_antilink_whitelist(
+    async def manage_antilink_whitelist(
         guild_id:int, 
         operation:str, 
         channel_id:int = None, 
@@ -785,7 +785,7 @@ class DatabaseUpdates():
         - guild_id, user_id, user_level must be specified
         - All other values have a default value and do not need to be changed
     '''
-    def _insert_user_stats_level(
+    async def insert_user_stats_level(
         guild_id:int, 
         user_id:int, 
         user_name:str, 
@@ -827,7 +827,7 @@ class DatabaseUpdates():
     Info:
         - All values must be specified
     '''
-    def _insert_level_roles(
+    async def insert_level_roles(
         guild_id:int, 
         role_id:int, 
         level:int
@@ -876,7 +876,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified either add, remove or reset
     '''
-    def manage_blacklist(
+    async def manage_blacklist(
         guild_id:int, 
         operation:str, 
         channel_id:int = None, 
@@ -958,7 +958,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - All values must have the specified data type
     '''
-    def update_level_settings(
+    async def update_level_settings(
         guild_id:int, 
         xp_rate:int = None, 
         level_status:str = None, 
@@ -1022,7 +1022,7 @@ class DatabaseUpdates():
         - guild_id and user_id must be specified as well as either XP and whole_xp or level
         - If you give a user XP without having earned it through activities, it will not be counted towards the whole_xp
     ''' 
-    def _update_user_stats_level(
+    async def update_user_stats_level(
         guild_id:int, 
         user_id:int, 
         level:int = None, 
@@ -1081,7 +1081,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - Status only needs to be specified if you want to overwrite an existing entry 
     '''
-    def update_level_roles(
+    async def update_level_roles(
         guild_id:int, 
         role_id:int = None, 
         role_level:int = None, 
@@ -1139,7 +1139,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified either add, remove or reset
     '''
-    def manage_xp_bonus(
+    async def manage_xp_bonus(
         guild_id:int, 
         operation:str, 
         channel_id:int = None, 
@@ -1231,7 +1231,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified
     '''
-    def manage_leaderboard_message(
+    async def manage_leaderboard_message(
         guild_id:int, 
         user_id:int = None,
         interval:str = None,
@@ -1321,7 +1321,7 @@ class DatabaseUpdates():
         - settings
             If not None, new entries are created
     '''
-    def create_leaderboard_settings_message(
+    async def create_leaderboard_settings_message(
         guild_id:int, 
         channel_id:int = None,
         ):
@@ -1377,7 +1377,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - Status only needs to be specified if you want to overwrite an existing entry
     '''
-    def manage_leaderboard_roles(
+    async def manage_leaderboard_roles(
         guild_id:int,
         role_id:int = None,
         position:int = None,
@@ -1429,7 +1429,7 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
     
-    def manage_leaderboard_roles_users(
+    async def manage_leaderboard_roles_users(
         guild_id:int, 
         status:str, 
         operation:str, 
@@ -1478,7 +1478,7 @@ class DatabaseRemoveDatas():
         - guild_id must be specified
         - If no user_id is specified, all entries belonging to the server are deleted
     '''
-    def _remove_level_system_stats(guild_id:int, user_id:int = None):
+    async def remove_level_system_stats(guild_id:int, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -1515,7 +1515,7 @@ class DatabaseRemoveDatas():
         - guild_id must be specified
         - If no role_id or role_level is specified, all roles are removed as level roles
     '''
-    def _remove_level_system_level_roles(guild_id:int, role_id:int = None, role_level:int = None):
+    async def remove_level_system_level_roles(guild_id:int, role_id:int = None, role_level:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -1562,7 +1562,7 @@ class DatabaseRemoveDatas():
     Info:
         - guild_id must be specified
     '''
-    def _remove_leaderboard_settings_message(guild_id:int):
+    async def remove_leaderboard_settings_message(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -1602,7 +1602,7 @@ class DatabaseRemoveDatas():
         - Position can only be 0 - 15
         - If only `guild_id` is specified, all roles are removed from the leaderboard
     '''
-    def _remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None, interval:str = None):
+    async def remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None, interval:str = None):
         
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()

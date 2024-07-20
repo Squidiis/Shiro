@@ -32,14 +32,15 @@ class Messageleaderboard(commands.Cog):
         
         if settings == None:
 
-            DatabaseUpdates.create_leaderboard_settings_message(guild_id = ctx.guild.id)
+            await DatabaseUpdates.create_leaderboard_settings_message(guild_id = ctx.guild.id)
             settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = ctx.guild_id)
 
         emb = discord.Embed(description=f"""## Set the message leaderboard
             {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderboard should be sent
             {Emojis.dot_emoji} Then you can also set an interval at which time intervals the leaderboard should be updated
             {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[1] else 'switched on'}. (as soon as it is switched off, no more messages are counted and when it is switched on, the leaderboard is reset)
-            {Emojis.help_emoji} The leaderboard is edited when you update it, so you should make sure that no one else can write in the channel you specified""", color=bot_colour)        
+            {Emojis.dot_emoji} The leaderboard is edited when you update it, so you should make sure that no one else can write in the channel you specified
+            {Emojis.help_emoji} **The leaderboard always shows the data of the past interval, for example it shows the best users who wrote the most messages yesterday**""", color=bot_colour)        
         await ctx.respond(embed=emb, view=SetleaderboardChannel())
 
 
@@ -50,7 +51,7 @@ class Messageleaderboard(commands.Cog):
         
         if settings == None:
 
-            DatabaseUpdates.create_leaderboard_settings_message(guild_id = ctx.guild.id)
+            await DatabaseUpdates.create_leaderboard_settings_message(guild_id = ctx.guild.id)
 
             await ctx.respond(embed = GetEmbed.get_embed(embed_index=8))
 
@@ -140,7 +141,7 @@ class Messageleaderboard(commands.Cog):
 
         else:
                 
-            DatabaseUpdates.manage_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position_db, status = "message", interval = interval_db)
+            await DatabaseUpdates.manage_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position_db, status = "message", interval = interval_db)
 
             emb = discord.Embed(description=f"""## The new leaderboard role has been successfully established
                 {Emojis.dot_emoji} The role {role.mention} was successfully {f'set for the {position} place' if position_db != 0 else f'set as general role'}
@@ -158,7 +159,7 @@ class Messageleaderboard(commands.Cog):
 
         if check:
 
-            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval_list[interval])
+            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval_list[interval])
             
             emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
                 {Emojis.dot_emoji} The role {role.mention} was deleted from {interval}
@@ -201,7 +202,7 @@ class Messageleaderboard(commands.Cog):
 
         if check:
 
-            DatabaseRemoveDatas._remove_leaderboard_role(guild_id = ctx.guild.id)
+            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id)
 
             emb = discord.Embed(description=f"""## Leaderboard roles have been reset
                 {Emojis.dot_emoji} All leaderbaord roles of the {interval} have been successfully reset
@@ -226,7 +227,7 @@ class Messageleaderboard(commands.Cog):
 
         if check[1] == 1:
             
-            DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
+            await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
 
 
     @commands.Cog.listener()
@@ -238,16 +239,16 @@ class Messageleaderboard(commands.Cog):
 
             if message.id == check[2]:
 
-                DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily")
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily")
 
             elif message.id == check[3]:
 
-                DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly")
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly")
 
 
             elif message.id == check[4]:
 
-                DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly")
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly")
 
 
     @commands.Cog.listener()
@@ -257,7 +258,7 @@ class Messageleaderboard(commands.Cog):
 
         if check[5] == channel.id:
 
-            DatabaseRemoveDatas._remove_leaderboard_settings_message(guild_id = channel.guild.id)
+            await DatabaseRemoveDatas.remove_leaderboard_settings_message(guild_id = channel.guild.id)
 
     
 def setup(bot):
@@ -267,7 +268,7 @@ def setup(bot):
 async def remove_leaderboard_roles(guild:int, interval:str):
     
     check_role = DatabaseCheck.check_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = "message")
-    DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = "message", operation = "remove")
+    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = "message", operation = "remove")
     
     for _, role, user, _, _ in check_role:
 
@@ -327,14 +328,14 @@ async def sort_leaderboard(user_list, interval, guild_id):
             if general_role != None and count < 1:
                 
                 await users[i].add_roles(general_role)
-                DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = "message", interval = interval_list[interval])
+                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = "message", interval = interval_list[interval])
                 count =+ 1
 
             if role != None:
 
                 leaderboard_role = guild.get_role(role[1])
                 await users[i].add_roles(leaderboard_role)
-                DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = "message", interval = interval_list[interval])
+                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = "message", interval = interval_list[interval])
             
         num_str = str(i + 1)
         if len(num_str) == 1:
@@ -401,12 +402,14 @@ async def edit_leaderboard(bot):
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 0)
                                         users = await sort_leaderboard(user_list=user_list, interval=1, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Daily Messages Leaderboard
-                                            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
-                                            {users}""", color=bot_colour)
+                                            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+                                            {users}
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
 
                                         await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
 
-                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily", settings = "tracking")
+                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily", settings = "tracking")
 
                                 if leaderboard_settings[3] != None:
                                     
@@ -418,12 +421,15 @@ async def edit_leaderboard(bot):
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 1)
                                         users = await sort_leaderboard(user_list=user_list, interval=2, guild_id = guild.id)
                                         emb = discord.Embed(description=f"""## Weekly Messages Leaderboard
-                                            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(weeks=1)).timestamp())}>
-                                            {users}""", color=bot_colour)
+                                            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(weeks=1)).timestamp())}>
 
+                                            {users}
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+                                            
                                         await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
 
-                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly", settings = "tracking")
+                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly", settings = "tracking")
 
                                 if leaderboard_settings[4] != None:
                                     
@@ -435,12 +441,14 @@ async def edit_leaderboard(bot):
                                         user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 2)
                                         users = await sort_leaderboard(user_list=user_list, interval=3, guild_id=guild.id)
                                         emb = discord.Embed(description=f"""## Monthly Messages Leaderboard (30 days)
-                                            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>
-                                            {users}""", color=bot_colour)
+                                            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+            
+                                            {users}
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
 
                                         await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
 
-                                        DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly", settings = "tracking")
+                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly", settings = "tracking")
 
 
                     except Exception as error:
@@ -477,7 +485,7 @@ class SetleaderboardChannel(discord.ui.View):
                 
                 if settings[6] == None:
                     
-                    DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+                    await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
 
                     await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention), view=SetMessageleaderboard())
 
@@ -494,7 +502,7 @@ class SetleaderboardChannel(discord.ui.View):
 
             else:
 
-                DatabaseUpdates.create_leaderboard_settings_message(guild_id = interaction.guild.id, channel_id = select.values[0].id)
+                await DatabaseUpdates.create_leaderboard_settings_message(guild_id = interaction.guild.id, channel_id = select.values[0].id)
         
         else:
 
@@ -605,7 +613,7 @@ class SetMessageleaderboard(discord.ui.View):
                 channel = bot.get_channel(settings[6])
 
                 message = await channel.send(embed=GetEmbed.get_embed(embed_index=7))
-                DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
 
                 order = sorted(select.values, key=lambda item: ["daily", "weekly", "monthly"].index(item))
                 for i in order:
@@ -619,11 +627,11 @@ class SetMessageleaderboard(discord.ui.View):
                             {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
                         message = await channel.send(embed=emb)
                         
-                        DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = i, message_id = message.id)
+                        await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = i, message_id = message.id)
 
                 for i in [value for value in ["daily", "weekly", "monthly"] if value not in check_list]:
 
-                    DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
+                    await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
 
                 await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=6, settings=select.values, settings2=option_list, settings3=channel.mention), view=None)
 
@@ -694,7 +702,7 @@ class OverwriteMessageChannel(discord.ui.View):
             else:
                 
                 get_messages = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
-                DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
 
                 for i, index in (get_messages[2], "daily"), (get_messages[3], "weekly"), (get_messages[4], "monthly"):
                     
@@ -705,7 +713,7 @@ class OverwriteMessageChannel(discord.ui.View):
                         msg = await leaderboard_channel.fetch_message(i)
                         await msg.delete()
 
-                        DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = index)
+                        await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = index)
 
                 emb = discord.Embed(description=f"""## Leaderboard channel has been overwritten
                     {Emojis.dot_emoji} As of now, <#{self.channel_id}> is the new leaderboard channel
@@ -798,7 +806,7 @@ class OverwriteMessageInterval(discord.ui.View):
                 channel = bot.get_channel(settings[6])
 
                 message = await channel.send(embed=GetEmbed.get_embed(embed_index=7))
-                DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
 
                 for i in order:
                     option_list.append(f"> {Emojis.dot_emoji} {i} update\n")
@@ -810,11 +818,11 @@ class OverwriteMessageInterval(discord.ui.View):
                             description=f"""## The number of messages is saved for {interval_text[i][0]}.
                                 {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
                         message = await channel.send(embed=emb)
-                        DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = i, message_id = message.id)
+                        await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = i, message_id = message.id)
 
                 for i in [value for value in ["daily", "weekly", "monthly"] if value not in check_list]:
 
-                    DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
+                    await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
 
                 await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=6, settings=self.intervals, settings2=option_list, settings3=channel.mention), view=None)
 
@@ -871,7 +879,7 @@ class LeaderboardOnOffSwitchMessage(discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
 
             settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
-            DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "status")
+            await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "status")
 
             emb = discord.Embed(description=f"""## The message leaderboard system is now {'activated' if settings[1] == 0 else 'deactivated'}.
                 {Emojis.dot_emoji} {f'''From now on all messages will be added to the message leaderboard and a ranking will be created showing who has written the most messages
@@ -898,7 +906,7 @@ class DefaultSettingsMessageLeaderboard(discord.ui.Button):
         
         if interaction.user.guild_permissions.administrator:
 
-            DatabaseRemoveDatas._remove_leaderboard_settings_message(guild_id = interaction.guild.id)
+            await DatabaseRemoveDatas.remove_leaderboard_settings_message(guild_id = interaction.guild.id)
 
             emb = discord.Embed(description=f"""## The settings have been reset
                 {Emojis.dot_emoji} The settings of the message leaderboard system have been reset to default
@@ -947,12 +955,12 @@ class OverwriteRole(discord.ui.View):
 
                 check_role = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1])
                 if check_role:
-                    DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval)
+                    await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval)
                 check_positon = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position)
                 if check_positon:
-                    DatabaseRemoveDatas._remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval)
+                    await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval)
 
-                DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval)
+                await DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval)
 
                 emb = discord.Embed(description=f"""## The entry has been overwritten
                     {Emojis.dot_emoji} From now on the role <@&{self.role.id}> is assigned to the {self.position} place, this applies to the {self.interval}{'ly' if self.interval != 'general' else ''} leaderboard

@@ -200,7 +200,7 @@ class ModeratorCommands(commands.Cog):
 
         else:
 
-            DatabaseUpdates.update_bot_settings(guild_id=ctx.guild.id, antilink=int(settings), antilink_timeout=timeout)
+            await DatabaseUpdates.update_bot_settings(guild_id=ctx.guild.id, antilink=int(settings), antilink_timeout=timeout)
 
             # Text passages for the embed
             settings_text = {
@@ -274,7 +274,7 @@ class ModeratorCommands(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "\n> None of these items are on the antilink whitelist"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of these items can be removed from the antilink whitelist as they are not listed there"
                     
-                    DatabaseUpdates.manage_antilink_whitelist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
+                    await DatabaseUpdates.manage_antilink_whitelist(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])    
                    
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the antilink whitelist or were already there", 
                         description=f"""### {Emojis.dot_emoji} The following were already on the whitelist:
@@ -289,7 +289,7 @@ class ModeratorCommands(commands.Cog):
                     formatted_items = "\n".join(item) if item != [] else "> All the items you specified were on the antilink whitelist"
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of the items you specified could be removed from the antilink whitelist because they are not on the blacklist"
 
-                    DatabaseUpdates.manage_antilink_whitelist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
+                    await DatabaseUpdates.manage_antilink_whitelist(guild_id=guild_id, operation="remove", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3])
 
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been removed from the antilink whitelist or were not listed", 
                         description=f"""### {Emojis.dot_emoji} The following items were not on the whitelist:
@@ -360,7 +360,7 @@ class ModeratorCommands(commands.Cog):
 
         if check_whitelist:
             
-            DatabaseUpdates.manage_antilink_whitelist(guild_id = ctx.guild.id, operation = "reset")
+            await DatabaseUpdates.manage_antilink_whitelist(guild_id = ctx.guild.id, operation = "reset")
 
             emb = discord.Embed(description=f"""## The antilink whitelist has been successfully reset
                 {Emojis.dot_emoji} All channels, categories, roles and users that were on the whitelist have been removed from it
@@ -715,7 +715,7 @@ class GhostPingButtons(discord.ui.View):
     async def on_off_ghost_ping(self, button, interaction:discord.Interaction):
 
         check_settings = DatabaseCheck.check_bot_settings(guild_id=interaction.guild.id)
-        DatabaseUpdates.update_bot_settings(guild_id=interaction.guild.id, ghost_ping=1 if check_settings[2] == 0 else 0)
+        await DatabaseUpdates.update_bot_settings(guild_id=interaction.guild.id, ghost_ping=1 if check_settings[2] == 0 else 0)
 
         emb = discord.Embed(title=f"{Emojis.help_emoji} You have successfully switched the ghost ping system {'**off**' if check_settings[2] != 0 else '**on**'}", 
             description=f"""{Emojis.dot_emoji} The anti ghost ping system is now {'**disabled**.' if check_settings[2] != 0 else f'''**enabled**.
