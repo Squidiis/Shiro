@@ -135,6 +135,17 @@ class Main(commands.Cog):
                 roleInterval VARCHAR(10) NOT NULL,
                 status VARCHAR(20) NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LeaderboardSettingsInvite (
+                guildId BIGINT UNSIGNED NOT NULL,
+                statusInvite INT UNSIGNED NOT NULL DEFAULT 0,
+                invitebourdMessageIdDay BIGINT UNSIGNED NULL,
+                invitebourdMessageIdWeek BIGINT UNSIGNED NULL,
+                invitebourdMessageIdMonth BIGINT UNSIGNED NULL,
+                invitebourdMessageIdWhole BIGINT UNSIGNED NULL,
+                leaderboardChannel BIGINT UNSIGNED NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;  
             '''
             ]
 

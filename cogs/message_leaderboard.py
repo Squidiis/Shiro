@@ -28,12 +28,12 @@ class Messageleaderboard(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def set_message_leaderboard(self, ctx:discord.ApplicationContext):
 
-        settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = ctx.guild_id)
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = "message")
         
         if settings == None:
 
-            await DatabaseUpdates.create_leaderboard_settings_message(guild_id = ctx.guild.id)
-            settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = ctx.guild_id)
+            await DatabaseUpdates.create_leaderboard_settings(guild_id = ctx.guild.id, system = "message")
+            settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = "message")
 
         emb = discord.Embed(description=f"""## Set the message leaderboard
             {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderboard should be sent
@@ -47,11 +47,11 @@ class Messageleaderboard(commands.Cog):
     @commands.slash_command(name = "show-message-leaderboard-setting", description = "Shows all settings of the message leaderboard!")
     async def show_message_leaderboard_settings(self, ctx:discord.ApplicationContext):
         
-        settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = ctx.guild.id)
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild.id, system = "message")
         
         if settings == None:
 
-            await DatabaseUpdates.create_leaderboard_settings_message(guild_id = ctx.guild.id)
+            await DatabaseUpdates.create_leaderboard_settings(guild_id = ctx.guild.id, system = "message")
 
             await ctx.respond(embed = GetEmbed.get_embed(embed_index=8))
 
@@ -107,7 +107,7 @@ class Messageleaderboard(commands.Cog):
 
         check_role = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position_db)
 
-        if check_role is not None and check_role[4] == interval_db: # Reagiert nicht weil kein eintrag vorhanden ist
+        if check_role is not None and check_role[4] == interval_db:
             
             if check_role[2] == position_db and check_role[1] == role.id and interval_db == check_role[4]:
                 
@@ -223,7 +223,7 @@ class Messageleaderboard(commands.Cog):
         if message.author.bot:
             return
         
-        check = DatabaseCheck.check_leaderboard_settings_message(guild_id = message.guild.id)
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
 
         if check[1] == 1:
             
@@ -233,7 +233,7 @@ class Messageleaderboard(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message:discord.Message):
 
-        check = DatabaseCheck.check_leaderboard_settings_message(guild_id = message.guild.id)
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
 
         if check[1] == 1:
 
@@ -254,7 +254,7 @@ class Messageleaderboard(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
 
-        check = DatabaseCheck.check_leaderboard_settings_message(guild_id = channel.guild.id)
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = channel.guild.id, system = "message")
 
         if check[5] == channel.id:
 
@@ -353,7 +353,7 @@ async def edit_leaderboard(bot):
 
     for guild in bot.guilds:
 
-        leaderboard_settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = guild.id)
+        leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id = guild.id, system = "message")
 
         if leaderboard_settings:
 
@@ -479,7 +479,7 @@ class SetleaderboardChannel(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
+            settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
             
             if settings:
                 
@@ -502,7 +502,7 @@ class SetleaderboardChannel(discord.ui.View):
 
             else:
 
-                await DatabaseUpdates.create_leaderboard_settings_message(guild_id = interaction.guild.id, channel_id = select.values[0].id)
+                await DatabaseUpdates.create_leaderboard_settings(guild_id = interaction.guild.id, channel_id = select.values[0].id, system = "message")
         
         else:
 
@@ -519,7 +519,7 @@ class SetleaderboardChannel(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            if DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)[6]:
+            if DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")[6]:
 
                 emb = discord.Embed(description=f"""## Setting the channel was skipped
                     {GetEmbed.get_embed(embed_index=3)}""", color=bot_colour)
@@ -571,7 +571,7 @@ class SetMessageleaderboard(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
+            settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
 
             value_check = {
                 "daily":settings[2],
@@ -650,7 +650,7 @@ class SetMessageleaderboard(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            interval = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
+            interval = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
 
             intervals = {
                 interval[2]:"daily",
@@ -701,7 +701,7 @@ class OverwriteMessageChannel(discord.ui.View):
 
             else:
                 
-                get_messages = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
+                get_messages = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
                 await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
 
                 for i, index in (get_messages[2], "daily"), (get_messages[3], "weekly"), (get_messages[4], "monthly"):
@@ -738,7 +738,7 @@ class OverwriteMessageChannel(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             emb = discord.Embed(description=f"""## Channel is retained
-                {Emojis.dot_emoji} The channel <#{DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)[6]}> will be retained as a leaderboard channel
+                {Emojis.dot_emoji} The channel <#{DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")[6]}> will be retained as a leaderboard channel
                 {Emojis.dot_emoji} You can continue with the setting using the selection menu below
                 {Emojis.help_emoji} You can select several intervals and each interval is a single leaderboard""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
@@ -763,7 +763,7 @@ class ContinueMessageSetting(discord.ui.View):
     async def continue_setting_button(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
-
+            print(interaction.message.embeds[0].description)
             emb = discord.Embed(description=f"""## Set intervals
                 {Emojis.dot_emoji} With the lower select menu you can define an interval in which periods the message leaderboard should be updated
                 {Emojis.dot_emoji} You can also select several intervals, but you only need to select at least one
@@ -798,7 +798,7 @@ class OverwriteMessageInterval(discord.ui.View):
 
             else:
 
-                settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
+                settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
 
                 option_list, check_list = [], []
                 order = sorted(self.intervals, key=lambda item: ["daily", "weekly", "monthly"].index(item))
@@ -841,7 +841,7 @@ class OverwriteMessageInterval(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            check_settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
+            check_settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
 
             list_intervals = []
             for _, _, day, week, month, _, _ in check_settings:
@@ -878,7 +878,7 @@ class LeaderboardOnOffSwitchMessage(discord.ui.Button):
         
         if interaction.user.guild_permissions.administrator:
 
-            settings = DatabaseCheck.check_leaderboard_settings_message(guild_id = interaction.guild.id)
+            settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
             await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "status")
 
             emb = discord.Embed(description=f"""## The message leaderboard system is now {'activated' if settings[1] == 0 else 'deactivated'}.
