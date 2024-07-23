@@ -1,12 +1,13 @@
 from utils import *
 from sql_function import *
 from discord.ext import tasks
+from message_leaderboard import SetMessageleaderboardMessage
 
 # Dictionary for the check functions (does not have to be in each command individually)
 interval_list = {
-    "day":"daily leaderboard",
     "week":"weekly leaderboard",
     "month":"monthly leaderboard",
+    "quarter":"quarterly leaderboard",
     "general":"general leaderboard"
     }
 
@@ -45,6 +46,7 @@ def setup(bot):
     bot.add_cog(InviteTrackerSystem(bot))
 
 
+# angepasst
 class SetleaderboardChannel(discord.ui.View):
 
     def __init__(self):
@@ -69,15 +71,23 @@ class SetleaderboardChannel(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "invite")
+            system = 'message' if 'Set the message leaderboard' in interaction.message.embeds[0].description else 'invite'
+            settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)
             
             if settings:
                 
                 if settings[6] == None:
                     
-                    await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+                    if system == "invite":
 
-                    await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention), view=SetInviteleaderboard())
+                        await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+                    
+                    else:
+
+                        await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
+
+
+                    await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention), view=SetInviteleaderboardInvite() if system == "invite" else SetMessageleaderboardMessage())
 
                 elif settings[6] == select.values[0].id:
 
@@ -92,7 +102,7 @@ class SetleaderboardChannel(discord.ui.View):
 
             else:
 
-                await DatabaseUpdates.create_leaderboard_settings(guild_id = interaction.guild.id, channel_id = select.values[0].id, system = "invite")
+                await DatabaseUpdates.create_leaderboard_settings(guild_id = interaction.guild.id, channel_id = select.values[0].id, system = system)
         
         else:
 
@@ -109,16 +119,18 @@ class SetleaderboardChannel(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            if DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")[6]:
+            system = 'message' if 'Set the message leaderboard' in interaction.message.embeds[0].description else 'invite'
+
+            if DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)[6]:
 
                 emb = discord.Embed(description=f"""## Setting the channel was skipped
                     {GetEmbed.get_embed(embed_index=3)}""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=SetInviteleaderboard())
+                await interaction.response.edit_message(embed=emb, view=SetInviteleaderboardInvite())
 
             else:
 
                 emb = discord.Embed(description=f"""## Setting cannot be skipped
-                    {Emojis.dot_emoji} The setting can only be skipped if a channel has been assigned to the message leaderboard
+                    {Emojis.dot_emoji} The setting can only be skipped if a channel has been assigned to the {system} leaderboard
                     {Emojis.dot_emoji} You must first set a channel before you can continue""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
@@ -142,8 +154,8 @@ class LeaderboardOnOffSwitchInvite(discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
 
             system = 'message' if 'Set the message leaderboard' in interaction.message.embeds[0].description else 'invite'
-            settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
-            await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "status")
+            settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)
+            await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = "status")
 
             emb = discord.Embed(description=f"""## The {system} leaderboard system is now {'activated' if settings[1] == 0 else 'deactivated'}.
                 {Emojis.dot_emoji} {f'''From now on all {'message' if system == 'message' else 'invitation'}s will be added to the {system} leaderboard and a ranking will be created showing who has {'written the most messages' if system == 'message' else 'invited the most users'}
@@ -157,8 +169,8 @@ class LeaderboardOnOffSwitchInvite(discord.ui.Button):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-
-class SetInviteleaderboard(discord.ui.View):
+# angepasst
+class SetInviteleaderboardInvite(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
@@ -179,6 +191,11 @@ class SetInviteleaderboard(discord.ui.View):
                 label="Update monthly", 
                 description="The leaderboard is updated every month", 
                 value="monthly"
+            ),
+            discord.SelectOption(
+                label="Update quarterly", 
+                description="The leaderboard is updated every three month", 
+                value="quarterly"
             )
         ]
     )
@@ -190,9 +207,9 @@ class SetInviteleaderboard(discord.ui.View):
             settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "invite")
 
             value_check = {
-                "daily":settings[2],
-                "weekly":settings[3],
-                "monthly":settings[4]
+                "weekly":settings[2],
+                "monthly":settings[3],
+                "quarterly":settings[4]
             }
 
             check_list = []
@@ -229,9 +246,9 @@ class SetInviteleaderboard(discord.ui.View):
                 channel = bot.get_channel(settings[6])
 
                 message = await channel.send(embed=GetEmbed.get_embed(embed_index=7))
-                await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
+                await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
 
-                order = sorted(select.values, key=lambda item: ["daily", "weekly", "monthly"].index(item))
+                order = sorted(select.values, key=lambda item: ["weekly", "monthly", "quarterly"].index(item))
                 for i in order:
                     option_list.append(f"{Emojis.dot_emoji} {i} update\n")
                     check_list.append(i)
@@ -243,11 +260,11 @@ class SetInviteleaderboard(discord.ui.View):
                             {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
                         message = await channel.send(embed=emb)
                         
-                        await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = i, message_id = message.id)
+                        await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = i, message_id = message.id)
 
-                for i in [value for value in ["daily", "weekly", "monthly"] if value not in check_list]:
+                for i in [value for value in ["weekly", "monthly", "quarterly"] if value not in check_list]:
 
-                    await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
+                    await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, back_to_none = i)
 
                 await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=6, settings=select.values, settings2=option_list, settings3=channel.mention), view=None)
 
@@ -266,12 +283,12 @@ class SetInviteleaderboard(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            interval = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
+            interval = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "invite")
 
             intervals = {
-                interval[2]:"daily",
-                interval[3]:"weekly",
-                interval[4]:"monthly"
+                interval[2]:"weekly",
+                interval[3]:"monthly",
+                interval[4]:"quarterly"
             }
 
             if interval[2] or interval[3] or interval[4]:
@@ -293,13 +310,13 @@ class SetInviteleaderboard(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-
+# Angepasst
 class OverwriteMessageInterval(discord.ui.View):
 
     def __init__(self, intervals):
         self.intervals = intervals
         super().__init__(timeout=None)
-        self.add_item(CancelButton(system = "message leaderboard system"))
+        self.add_item(CancelButton(system = "invite leaderboard system"))
 
     @discord.ui.button(
         label="overwrite the intervals",
@@ -313,19 +330,19 @@ class OverwriteMessageInterval(discord.ui.View):
 
             if self.intervals == None:
                 
-                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="interval", settings2="to overwrite the interval", settings3="set-message-leaderboard"), view=None)
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="invite", settings2="to overwrite the interval", settings3=f"set-invite-leaderboard"), view=None)
 
             else:
 
-                settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
+                settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "invite")
 
                 option_list, check_list = [], []
-                order = sorted(self.intervals, key=lambda item: ["daily", "weekly", "monthly"].index(item))
+                order = sorted(self.intervals, key=lambda item: ["weekly", "monthly", "quarterly"].index(item))
 
                 channel = bot.get_channel(settings[6])
 
                 message = await channel.send(embed=GetEmbed.get_embed(embed_index=7))
-                await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
+                await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = "whole", message_id = message.id)
 
                 for i in order:
                     option_list.append(f"> {Emojis.dot_emoji} {i} update\n")
@@ -337,11 +354,11 @@ class OverwriteMessageInterval(discord.ui.View):
                             description=f"""## The number of messages is saved for {interval_text[i][0]}.
                                 {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
                         message = await channel.send(embed=emb)
-                        await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = i, message_id = message.id)
+                        await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = i, message_id = message.id)
 
-                for i in [value for value in ["daily", "weekly", "monthly"] if value not in check_list]:
+                for i in [value for value in ["weekly", "monthly", "quarterly"] if value not in check_list]:
 
-                    await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = i)
+                    await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, back_to_none = i)
 
                 await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=6, settings=self.intervals, settings2=option_list, settings3=channel.mention), view=None)
 
@@ -360,19 +377,19 @@ class OverwriteMessageInterval(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            check_settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")
+            check_settings = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "invite")
 
             list_intervals = []
-            for _, _, day, week, month, _, _ in check_settings:
-
-                if day != None:
-                    list_intervals.append(f"{Emojis.dot_emoji} Daily updated leaderboard")
+            for _, _, week, month, quarter, _, _ in check_settings:
 
                 if week != None:
                     list_intervals.append(f"{Emojis.dot_emoji} Weekly updated leaderboard")
 
                 if month != None:
                     list_intervals.append(f"{Emojis.dot_emoji} Monthly updated leaderboard")
+
+                if quarter != None:
+                    list_intervals.append(f"{Emojis.dot_emoji} quarterly updated leaderboard")
 
             emb = discord.Embed(description=f"""## The current intervals are retained
                 {Emojis.dot_emoji} Here you can see an overview of the currently defined intervals
@@ -436,14 +453,14 @@ class ContinueSettingLeaderboard(discord.ui.View):
                 {Emojis.dot_emoji} With the lower select menu you can define an interval in which periods the {system} leaderboard should be updated
                 {Emojis.dot_emoji} You can also select several intervals, but you only need to select at least one
                 {Emojis.help_emoji} As soon as you have selected the intervals, the leaderboards are sent to the channel you have previously set up and then always updated in the corresponding time periods""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=SetInviteleaderboard())
+            await interaction.response.edit_message(embed=emb, view=SetInviteleaderboardInvite())
 
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-
+# Angepasst für beide systeme
 class OverwriteMessageChannel(discord.ui.View):
 
     def __init__(
@@ -471,9 +488,14 @@ class OverwriteMessageChannel(discord.ui.View):
             else:
                 
                 get_messages = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)
-                await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
+                await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = "channel", channel_id = self.channel_id)
 
-                for i, index in (get_messages[2], "daily"), (get_messages[3], "weekly"), (get_messages[4], "monthly"):
+                system_intervals = {
+                    "invite":[(get_messages[2], "weekly"), (get_messages[3], "monthly"), (get_messages[4], "quarterly")],
+                    "message":[(get_messages[2], "daily"), (get_messages[3], "weekly"), (get_messages[4], "monthly")]
+                }
+                
+                for i, index in system_intervals[system]:
                     
                     if i != None:
                     
@@ -482,14 +504,14 @@ class OverwriteMessageChannel(discord.ui.View):
                         msg = await leaderboard_channel.fetch_message(i)
                         await msg.delete()
 
-                        await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, back_to_none = index)
+                        await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, back_to_none = index)
 
                 emb = discord.Embed(description=f"""## Leaderboard channel has been overwritten
                     {Emojis.dot_emoji} As of now, <#{self.channel_id}> is the new leaderboard channel
                     {Emojis.dot_emoji} The leaderboard is deleted from the old leaderboard channel
                     {Emojis.dot_emoji} You can continue with the setting using the selection menu below
                     {Emojis.help_emoji} You can select several intervals and each interval is a single leaderboard""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=SetInviteleaderboard())
+                await interaction.response.edit_message(embed=emb, view=SetInviteleaderboardInvite())
 
         else:
 
@@ -505,12 +527,14 @@ class OverwriteMessageChannel(discord.ui.View):
     async def keep_channel(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
+            
+            system = 'message' if 'Set the message leaderboard' in interaction.message.embeds[0].description else 'invite'
 
             emb = discord.Embed(description=f"""## Channel is retained
-                {Emojis.dot_emoji} The channel <#{DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")[6]}> will be retained as a leaderboard channel
+                {Emojis.dot_emoji} The channel <#{DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)[6]}> will be retained as a leaderboard channel
                 {Emojis.dot_emoji} You can continue with the setting using the selection menu below
                 {Emojis.help_emoji} You can select several intervals and each interval is a single leaderboard""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=SetInviteleaderboard())
+            await interaction.response.edit_message(embed=emb, view=SetInviteleaderboardInvite())
 
         else:
 

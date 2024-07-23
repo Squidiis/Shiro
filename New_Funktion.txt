@@ -25,7 +25,7 @@ statistic section
 - Message Leaderboard (Fertig)
 - Invite Leaderboard
 
-Invite system intervalle (weekly, mounthly, 4 Monate und gesammt)
+Invite system intervalle (weekly, mounthly, 3 Monate und gesammt)
 
 die leaderboard functionen so umarbeiten das sie auch für das invite leaderbaord funktionieren
 

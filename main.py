@@ -112,10 +112,10 @@ class Main(commands.Cog):
                 weeklyCountMessage INT UNSIGNED DEFAULT 0,
                 monthlyCountMessage INT UNSIGNED DEFAULT 0,
                 wholeCountMessage INT UNSIGNED DEFAULT 0,
-                dailyCountInvite INT UNSIGNED DEFAULT 0,
                 weeklyCountInvite INT UNSIGNED DEFAULT 0,
                 monthlyCountInvite INT UNSIGNED DEFAULT 0,
-                wholeCountInvite INT UNSIGNED DEFAULT 0 
+                quarterlyCountInvite INT UNSIGNED DEFAULT 0,
+                wholeCountInvite INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             '''
@@ -140,9 +140,9 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS LeaderboardSettingsInvite (
                 guildId BIGINT UNSIGNED NOT NULL,
                 statusInvite INT UNSIGNED NOT NULL DEFAULT 0,
-                invitebourdMessageIdDay BIGINT UNSIGNED NULL,
                 invitebourdMessageIdWeek BIGINT UNSIGNED NULL,
                 invitebourdMessageIdMonth BIGINT UNSIGNED NULL,
+                invitebourdMessageIdQuarter BIGINT UNSIGNED NULL,
                 invitebourdMessageIdWhole BIGINT UNSIGNED NULL,
                 leaderboardChannel BIGINT UNSIGNED NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;  

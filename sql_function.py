@@ -1269,9 +1269,8 @@ class DatabaseUpdates():
             
             if settings != None and settings != "tracking":
 
-                value = coulmn_values[settings]
                 settings = f"UPDATE LeaderboardSettingsMessage SET {column_name_settings[settings]} = %s WHERE guildId = %s"
-                settings_values = [value, guild_id]
+                settings_values = [coulmn_values[settings], guild_id]
                 cursor.execute(settings, settings_values)
 
             elif interval:
@@ -1282,11 +1281,6 @@ class DatabaseUpdates():
                     
                     update_stats = f"UPDATE LeaderboardTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s, wholeCountMessage = %s WHERE guildId = %s AND userId = %s"
                     update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, check_user[5] + 1, guild_id, user_id]
-
-                elif check_user != None and interval == "countInvite":
-                    
-                    update_stats = f"UPDATE LeaderboardTacking SET dailyCountInvite = %s, weeklyCountInvite = %s, monthlyCountInvite = %s, wholeCountInvite = %s WHERE guildId = %s AND userId = %s"
-                    update_stats_values = [check_user[6] + 1, check_user[7] + 1, check_user[8] + 1, check_user[9] + 1, guild_id, user_id]
 
                 else:   
                     
@@ -1311,6 +1305,9 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     
+    '''
+    
+    '''
     async def manage_leaderboard_invite(
         guild_id:int, 
         user_id:int = None,
@@ -1322,21 +1319,21 @@ class DatabaseUpdates():
         ):
     
         column_name_settings = {
-            "daily":"bourdMessageIdDay" if settings != "tracking" else "dailyCountMessage", 
-            "weekly":"bourdMessageIdWeek" if settings != "tracking" else "weeklyCountMessage", 
-            "monthly":"bourdMessageIdMonth" if settings != "tracking" else "monthlyCountMessage",
-            "whole":"bourdMessageIdWhole" if settings != "tracking" else "wholeCountMessage",
+            "daily":"invitebourdMessageIdWeek" if settings != "tracking" else "weeklyCountInvite", 
+            "weekly":"invitebourdMessageIdMonth" if settings != "tracking" else "monthlyCountInvite", 
+            "monthly":"invitebourdMessageIdQuarter" if settings != "tracking" else "quarterlyCountInvite",
+            "whole":"invitebourdMessageIdWhole" if settings != "tracking" else "wholeCountInvite",
             "channel":"leaderboardChannel",
-            "status":"statusMessage"
+            "status":"statusInvite"
         }
 
         coulmn_values = {
-            "daily":message_id,
             "weekly":message_id,
             "monthly":message_id,
+            "quarterly":message_id,
             "whole":message_id,
             "channel":channel_id,
-            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message") == 1 else 1
+            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite") == 1 else 1
         }
 
         db_connect = DatabaseSetup.db_connector()
@@ -1345,23 +1342,17 @@ class DatabaseUpdates():
             
             if settings != None and settings != "tracking":
 
-                value = coulmn_values[settings]
-                settings = f"UPDATE LeaderboardSettingsMessage SET {column_name_settings[settings]} = %s WHERE guildId = %s"
-                settings_values = [value, guild_id]
+                settings = f"UPDATE LeaderboardSettingsInvite SET {column_name_settings[settings]} = %s WHERE guildId = %s"
+                settings_values = [coulmn_values[settings], guild_id]
                 cursor.execute(settings, settings_values)
 
             elif interval:
                 
                 check_user = DatabaseCheck.check_leaderboard_message(guild_id = guild_id, user_id = user_id)
 
-                if check_user and interval == "countMessage":
+                if check_user != None and interval == "countInvite":
                     
-                    update_stats = f"UPDATE LeaderboardTacking SET dailyCountMessage = %s, weeklyCountMessage = %s, monthlyCountMessage = %s, wholeCountMessage = %s WHERE guildId = %s AND userId = %s"
-                    update_stats_values = [check_user[2] + 1, check_user[3] + 1, check_user[4] + 1, check_user[5] + 1, guild_id, user_id]
-
-                elif check_user != None and interval == "countInvite":
-                    
-                    update_stats = f"UPDATE LeaderboardTacking SET dailyCountInvite = %s, weeklyCountInvite = %s, monthlyCountInvite = %s, wholeCountInvite = %s WHERE guildId = %s AND userId = %s"
+                    update_stats = f"UPDATE LeaderboardTacking SET weeklyCountInvite = %s, monthlyCountInvite = %s, quarterlyCountInvite = %s, wholeCountInvite = %s WHERE guildId = %s AND userId = %s"
                     update_stats_values = [check_user[6] + 1, check_user[7] + 1, check_user[8] + 1, check_user[9] + 1, guild_id, user_id]
 
                 else:   
@@ -1373,7 +1364,7 @@ class DatabaseUpdates():
 
             elif back_to_none != None:
 
-                set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == "tracking" else 'LeaderboardSettingsMessage'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+                set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == "tracking" else 'LeaderboardSettingsInvite'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
                 set_back_to_none_values = [guild_id]
                 cursor.execute(set_back_to_none, set_back_to_none_values)
             

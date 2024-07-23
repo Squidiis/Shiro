@@ -487,7 +487,7 @@ class SetleaderboardChannel(discord.ui.View):
                     
                     await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = "channel", channel_id = select.values[0].id)
 
-                    await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention), view=SetMessageleaderboard())
+                    await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=4, settings=select.values[0].mention), view=SetMessageleaderboardMessage())
 
                 elif settings[6] == select.values[0].id:
 
@@ -523,7 +523,7 @@ class SetleaderboardChannel(discord.ui.View):
 
                 emb = discord.Embed(description=f"""## Setting the channel was skipped
                     {GetEmbed.get_embed(embed_index=3)}""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
+                await interaction.response.edit_message(embed=emb, view=SetMessageleaderboardMessage())
 
             else:
 
@@ -537,7 +537,7 @@ class SetleaderboardChannel(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-class SetMessageleaderboard(discord.ui.View):
+class SetMessageleaderboardMessage(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
@@ -720,7 +720,7 @@ class OverwriteMessageChannel(discord.ui.View):
                     {Emojis.dot_emoji} The leaderboard is deleted from the old leaderboard channel
                     {Emojis.dot_emoji} You can continue with the setting using the selection menu below
                     {Emojis.help_emoji} You can select several intervals and each interval is a single leaderboard""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
+                await interaction.response.edit_message(embed=emb, view=SetMessageleaderboardMessage())
 
         else:
 
@@ -741,7 +741,7 @@ class OverwriteMessageChannel(discord.ui.View):
                 {Emojis.dot_emoji} The channel <#{DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = "message")[6]}> will be retained as a leaderboard channel
                 {Emojis.dot_emoji} You can continue with the setting using the selection menu below
                 {Emojis.help_emoji} You can select several intervals and each interval is a single leaderboard""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
+            await interaction.response.edit_message(embed=emb, view=SetMessageleaderboardMessage())
 
         else:
 
@@ -768,7 +768,7 @@ class ContinueMessageSetting(discord.ui.View):
                 {Emojis.dot_emoji} With the lower select menu you can define an interval in which periods the message leaderboard should be updated
                 {Emojis.dot_emoji} You can also select several intervals, but you only need to select at least one
                 {Emojis.help_emoji} As soon as you have selected the intervals, the leaderboards are sent to the channel you have previously set up and then always updated in the corresponding time periods""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=SetMessageleaderboard())
+            await interaction.response.edit_message(embed=emb, view=SetMessageleaderboardMessage())
 
         else:
 
