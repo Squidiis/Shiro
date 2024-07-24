@@ -25,11 +25,6 @@ statistic section
 - Message Leaderboard (Fertig)
 - Invite Leaderboard
 
-Invite system intervalle (weekly, mounthly, 3 Monate und gesammt)
-
-die leaderboard functionen so umarbeiten das sie auch für das invite leaderbaord funktionieren
-
+die leaderboard functionen so umarbeiten das sie auch für das invite leaderbaord funktionieren (das invite leaderbaord fertig stellen und testen)
 
 die doppelten texte in die get_embed funktion verlegen
-
-manage message leaderboard system function auch für das invite system machen (neue funktion der aufwand wäre sonst zu groß)

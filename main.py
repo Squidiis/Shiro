@@ -4,7 +4,7 @@ from cogs.mod_tools import *
 from dotenv import load_dotenv
 from cogs.fun_commands import *
 from utils import *
-from cogs.message_leaderboard import *
+from cogs.leaderboard_system import *
 
 @bot.slash_command(description="Shows you the ping.")
 async def ping(ctx):
