@@ -4,19 +4,31 @@ from sql_function import *
 from discord.ext import tasks
 
 # Dictionary for the check functions (does not have to be in each command individually)
-interval_list = {
+interval_list_message = {
     "day":"daily leaderboard",
     "week":"weekly leaderboard",
     "month":"monthly leaderboard",
     "general":"general leaderboard"
     }
 
+interval_list_message = {
+    "week":"weekly leaderboard",
+    "month":"monthly leaderboard",
+    "quarter":"quarterly leaderboard",
+    "general":"general leaderboard"
+    }
 
-interval_text = {
+interval_text_message = {
     "daily":("one day", 1),
     "weekly":("one week", 7),
     "monthly":("one month", 30)
     }
+
+interval_text_invite = {
+    "weekly":("one week", 7),
+    "monthly":("one month", 30),
+    "quarterly":("a quarter of a year", 90)
+}
 
 
 class Messageleaderboard(commands.Cog):
@@ -102,7 +114,7 @@ class Messageleaderboard(commands.Cog):
         position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
         interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
     
-        interval_db = next((key for key, value in interval_list.items() if value == interval), None)
+        interval_db = next((key for key, value in interval_list_message.items() if value == interval), None)
         position_db = 0 if "general role" == position else int(position)
 
         check_role = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position_db)
@@ -112,7 +124,7 @@ class Messageleaderboard(commands.Cog):
             if check_role[2] == position_db and check_role[1] == role.id and interval_db == check_role[4]:
                 
                 emb = discord.Embed(description=f"""## This role has already been assigned to this position
-                    {Emojis.dot_emoji} The role {role.mention} {f'is already assigned to the {position} space' if position_db != 0 else f'is defined as a general role for the {interval_list[check_role[4]]}'}
+                    {Emojis.dot_emoji} The role {role.mention} {f'is already assigned to the {position} space' if position_db != 0 else f'is defined as a general role for the {interval_list_message[check_role[4]]}'}
                     {Emojis.dot_emoji} If you want to overwrite the role, position or the associated interval, you can simply execute this command again""", color=bot_colour)
                 await ctx.respond(embed=emb)
 
@@ -126,7 +138,7 @@ class Messageleaderboard(commands.Cog):
             elif check_role[2] == 0 or self.check_interval_role(guild_id=ctx.guild.id, interval=interval_db):
                 
                 emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] != role.id else 'This interval already has a general role'}
-                    {Emojis.dot_emoji} The role <@&{check_role[1]}> is currently defined as the general role for the interval {interval_list[check_role[4]]}
+                    {Emojis.dot_emoji} The role <@&{check_role[1]}> is currently defined as the general role for the interval {interval_list_message[check_role[4]]}
                     {Emojis.dot_emoji} {f'Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and set this as a new general role?\n{Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role' 
                     if check_role[1] != role.id else 
                     f'Do you want to assign the role <@&{check_role[1]}> as a normal role for the {position} space?'}""", color=bot_colour)
@@ -135,8 +147,8 @@ class Messageleaderboard(commands.Cog):
             else:
                 
                 emb = discord.Embed(description=f"""## {'This role' if check_role[1] != role.id else 'This position'} has already been assigned
-                    {Emojis.dot_emoji} Currently, the role <@&{check_role[1]}> is assigned for the {check_role[2]} place, for the {interval_list[check_role[4]]}
-                    {Emojis.dot_emoji} Do you want to {f'replace the role <@&{check_role[1]}> with the role {role.mention} for the position {position} for the {interval_list[check_role[4]]}' if check_role[1] != role.id else f'change the place for which the role {role.mention} is assigned to {position}? this role is then always assigned when someone reaches the {position} place on the {interval}'}""", color=bot_colour)
+                    {Emojis.dot_emoji} Currently, the role <@&{check_role[1]}> is assigned for the {check_role[2]} place, for the {interval_list_message[check_role[4]]}
+                    {Emojis.dot_emoji} Do you want to {f'replace the role <@&{check_role[1]}> with the role {role.mention} for the position {position} for the {interval_list_message[check_role[4]]}' if check_role[1] != role.id else f'change the place for which the role {role.mention} is assigned to {position}? this role is then always assigned when someone reaches the {position} place on the {interval}'}""", color=bot_colour)
                 await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "position", delete=check_role))
 
         else:
@@ -159,7 +171,7 @@ class Messageleaderboard(commands.Cog):
 
         if check:
 
-            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval_list[interval])
+            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval_list_message[interval])
             
             emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
                 {Emojis.dot_emoji} The role {role.mention} was deleted from {interval}
@@ -173,7 +185,7 @@ class Messageleaderboard(commands.Cog):
                 {Emojis.dot_emoji} Here you have an overview of all roles that are listed on the respective intervals with the lower select menu you can display the other intervals
                 {Emojis.dot_emoji} All leaderboard roles for the {interval}
                 
-                {show_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list[interval])}""", color=bot_colour)
+                {show_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list_message[interval])}""", color=bot_colour)
             await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
 
     
@@ -198,7 +210,7 @@ class Messageleaderboard(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_leaderboard_roles_message(self, ctx:discord.ApplicationContext, interval:Option(str, description="Wähle welche Leaderboard rollen zurück gesetzt werden sollen", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
 
-        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, interval = interval_list[interval])
+        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, interval = interval_list_message[interval])
 
         if check:
 
@@ -675,8 +687,8 @@ class SetMessageleaderboard(discord.ui.View):
                     if i != None:
 
                         emb = discord.Embed(
-                            description=f"""## The number of messages is saved for {interval_text[i][0]}.
-                            {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
+                            description=f"""## The number of messages is saved for {interval_text_message[i][0]}.
+                            {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text_message[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
                         message = await channel.send(embed=emb)
                         
                         await DatabaseUpdates.manage_leaderboard_message(guild_id = interaction.guild.id, settings = i, message_id = message.id)
@@ -824,8 +836,8 @@ class SetInviteleaderboard(discord.ui.View):
                     if i != None:
 
                         emb = discord.Embed(
-                            description=f"""## The number of messages is saved for {interval_text[i][0]}.
-                            {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
+                            description=f"""## The number of messages is saved for {interval_text_invite[i][0]}.
+                            {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text_invite[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
                         message = await channel.send(embed=emb)
                         
                         await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = i, message_id = message.id)

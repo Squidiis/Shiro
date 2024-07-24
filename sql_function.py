@@ -1320,9 +1320,9 @@ class DatabaseUpdates():
         ):
     
         column_name_settings = {
-            "daily":"invitebourdMessageIdWeek" if settings != "tracking" else "weeklyCountInvite", 
-            "weekly":"invitebourdMessageIdMonth" if settings != "tracking" else "monthlyCountInvite", 
-            "monthly":"invitebourdMessageIdQuarter" if settings != "tracking" else "quarterlyCountInvite",
+            "weekly":"invitebourdMessageIdWeek" if settings != "tracking" else "weeklyCountInvite", 
+            "monthly":"invitebourdMessageIdMonth" if settings != "tracking" else "monthlyCountInvite", 
+            "quarterly":"invitebourdMessageIdQuarter" if settings != "tracking" else "quarterlyCountInvite",
             "whole":"invitebourdMessageIdWhole" if settings != "tracking" else "wholeCountInvite",
             "channel":"leaderboardChannel",
             "status":"statusInvite"
@@ -1342,7 +1342,7 @@ class DatabaseUpdates():
         try:
             
             if settings != None and settings != "tracking":
-
+                
                 value = coulmn_values[settings]
                 settings = f"UPDATE LeaderboardSettingsInvite SET {column_name_settings[settings]} = %s WHERE guildId = %s"
                 settings_values = [value, guild_id]
