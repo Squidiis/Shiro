@@ -1260,17 +1260,18 @@ class DatabaseUpdates():
             "monthly":message_id,
             "whole":message_id,
             "channel":channel_id,
-            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message") == 1 else 1
+            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message")[1] == 1 else 1
         }
-
+        
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         try:
             
             if settings != None and settings != "tracking":
-
+                
+                value = coulmn_values[settings]
                 settings = f"UPDATE LeaderboardSettingsMessage SET {column_name_settings[settings]} = %s WHERE guildId = %s"
-                settings_values = [coulmn_values[settings], guild_id]
+                settings_values = [value, guild_id]
                 cursor.execute(settings, settings_values)
 
             elif interval:
@@ -1333,7 +1334,7 @@ class DatabaseUpdates():
             "quarterly":message_id,
             "whole":message_id,
             "channel":channel_id,
-            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite") == 1 else 1
+            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite")[1] == 1 else 1
         }
 
         db_connect = DatabaseSetup.db_connector()
@@ -1342,8 +1343,9 @@ class DatabaseUpdates():
             
             if settings != None and settings != "tracking":
 
+                value = coulmn_values[settings]
                 settings = f"UPDATE LeaderboardSettingsInvite SET {column_name_settings[settings]} = %s WHERE guildId = %s"
-                settings_values = [coulmn_values[settings], guild_id]
+                settings_values = [value, guild_id]
                 cursor.execute(settings, settings_values)
 
             elif interval:

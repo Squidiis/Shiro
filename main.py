@@ -202,14 +202,15 @@ class Main(commands.Cog):
         self.bot.add_view(SetleaderboardChannel())
         self.bot.add_view(SetMessageleaderboard())
         self.bot.add_view(OverwriteMessageChannel(channel_id=None))
-        self.bot.add_view(ContinueMessageSetting())
+        self.bot.add_view(ContinueSettingLeaderboard())
         self.bot.add_view(OverwriteMessageInterval(intervals=None))
         self.bot.add_view(OverwriteRole(role=None, interval=None, position=None, settings=None, delete=None))
         self.bot.add_view(ShowLeaderboardRolesButton())
         self.bot.add_view(ShowLeaderboardRolesSelect())
-        view.add_item(LeaderboardOnOffSwitchMessage())
-        view.add_item(DefaultSettingsMessageLeaderboard())
+        view.add_item(LeaderboardOnOffSwitch())
+        view.add_item(DefaultSettingsLeaderboard())
         self.bot.add_view(ShowLeaderboardGivenRoles())
+        self.bot.add_view(SetInviteleaderboard())
 
 
         # Other Systems
