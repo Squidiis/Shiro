@@ -92,7 +92,7 @@ python bot.py
 If you encounter problems use the discord server linked above or press [here](https://discord.gg/UKZkmeJYsA) to be redirected directly to in.
 
 ## License
-This project is licensed under the [Custom License](LICENSE.txt). For commercial use, please contact [Squidi](https://github.com/Squidiis) at [papersquidi@outlook.de].
+This project is licensed under the [Custom License](LICENSE.txt). For commercial use, please contact [Squidi](https://github.com/Squidiis) at papersquidi@outlook.de.
 
 ## All commands
 
