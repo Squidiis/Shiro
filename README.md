@@ -38,8 +38,8 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 * Moderation System
     - ban, kick, mute, unmute, clear commands
     - server-info, user-info commands
-    - anti link system (with whitelist function)
-    - anti ghost ping system
+    - anti-link system (with whitelist function)
+    - anti-ghost ping system
     - invite tracker
 
 * Fun commands
@@ -49,6 +49,11 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - Anime gif commands (kiss, hug and much more) uses all the [tenor API](https://tenor.com/gifapi/documentation)
     - Anime meme command with the [reddit API](https://www.reddit.com/dev/api/)
 
+* Statistics system
+    - Message Leaderboard system (The top 15 users who have written the most messages in an interval determined by the server owner are presented on a leaderboard)
+    - Invite Leaderboard system (The top 15 users who invite the most users in an interval determined by the server owner are presented on a leaderboard)
+    - Leaderboard roles to reward users who have reached a certain place (Message and Invite Leaderboard have their own roles, each place can also be filled with an individual role)
+
 ## 📝 Requirements
 
 - [mysql-connector-python 8.1.0](https://pypi.org/project/mysql-connector-python/)
@@ -57,8 +62,10 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 - [python-dotenv 1.0.0](https://pypi.org/project/python-dotenv/)
 - [requests 2.31.0](https://pypi.org/project/requests/)
 - [ui 0.1.4](https://pypi.org/project/ui/)
+- [PyYAML 6.0.1](https://pypi.org/project/PyYAML/)
+- [DateTime 5.5](https://pypi.org/project/DateTime/)
 
-# How to set up
+## How to set up
 
 Setting up the bot has been made as simple as possible.
 
@@ -77,7 +84,7 @@ To run the code on your bot customize the [`.env`](.env) file simply fill in all
 
 In the [`ultils.py`](ultils.py) file add the emojis to the variables [emojis](emojis)
 
-# How to start?
+## How to start?
 
 Once you have configured everything and adjusted the required variables in [`config.yaml`](config.yaml) and [`.env`](.env), all you have to do is install the required packages
 ```

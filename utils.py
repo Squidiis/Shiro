@@ -186,10 +186,10 @@ class GetEmbed():
         
         elif embed_index == 8:
 
-            emb = discord.Embed(description=f"""## Here you can see the settings of the message leaderboard
-                {Emojis.dot_emoji} The message leaderboard is currently {'switched off' if settings[1] == 0 or settings[1] == None else 'switched on'}.
+            emb = discord.Embed(description=f"""## Here you can see the settings of the {settings} leaderboard
+                {Emojis.dot_emoji} The message leaderboard is currently {'switched off' if settings2[1] == 0 or settings2[1] == None else 'switched on'}.
                 {Emojis.dot_emoji} Currently no channel or intervals have been defined for the message leaderboard
-                {Emojis.help_emoji} If you want to set the message leaderboard use the `set-message-leaderboard` command""", color=bot_colour)
+                {Emojis.help_emoji} If you want to set the message leaderboard use the `set-{settings}-leaderboard` command""", color=bot_colour)
             
         elif embed_index == 9:
 

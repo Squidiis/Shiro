@@ -446,6 +446,10 @@ class DatabaseCheck():
     ------------
         - guild_id
             Id of the server
+        - system
+            Welches system betroffen ist
+                - message
+                - invite
         - role_id
             The id of the leaderboard role to be returned
         - position
@@ -468,7 +472,8 @@ class DatabaseCheck():
         - If no entry exists, None is returned
     '''
     def check_leaderboard_roles(
-        guild_id:int, 
+        guild_id:int,
+        system:str,
         role_id:int = None, 
         position:int = None,
         interval:str = None
@@ -480,29 +485,29 @@ class DatabaseCheck():
         check = False
         if role_id != None and position != None:
 
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s OR rankingPosition = %s"
-            check_roles_values = [guild_id, role_id, position]
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND status = %s AND roleId = %s OR rankingPosition = %s"
+            check_roles_values = [guild_id, system, role_id, position]
 
         elif role_id:
 
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s"
-            check_roles_values = [guild_id, role_id]
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s AND status = %s"
+            check_roles_values = [guild_id, role_id, system]
 
         elif position:
 
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND rankingPosition = %s"
-            check_roles_values = [guild_id, position]
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND rankingPosition = %s AND status = %s"
+            check_roles_values = [guild_id, position, system]
 
         elif interval and role_id:
 
             check = True
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s AND roleInterval = %s"
-            check_roles_values = [guild_id, role_id, interval]
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s AND roleInterval = %s AND status = %s"
+            check_roles_values = [guild_id, role_id, interval, system]
 
         else:
             
-            check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
-            check_roles_values = [guild_id] if interval == None else [guild_id, interval]
+            check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s AND status = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
+            check_roles_values = [guild_id, system] if interval == None else [guild_id, system, interval]
 
         cursor.execute(check_roles, check_roles_values)
         if role_id == None and position == None or check == True:
@@ -514,6 +519,9 @@ class DatabaseCheck():
         return leaderboard_roles
     
 
+    '''
+    
+    '''
     def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
 
         db_connect = DatabaseSetup.db_connector()
@@ -1502,6 +1510,9 @@ class DatabaseUpdates():
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
     
+    '''
+    
+    '''
     async def manage_leaderboard_roles_users(
         guild_id:int, 
         status:str, 
@@ -1666,6 +1677,10 @@ class DatabaseRemoveDatas():
     -----------
         - guild_id
             Id of the server
+        - system
+            Welches system betroffen ist
+                - message
+                - invite
         - role_id
             Id of the role to be removed
         - poistion
@@ -1679,7 +1694,13 @@ class DatabaseRemoveDatas():
         - Position can only be 0 - 15
         - If only `guild_id` is specified, all roles are removed from the leaderboard
     '''
-    async def remove_leaderboard_role(guild_id:int, role_id:int = None, position:int = None, interval:str = None):
+    async def remove_leaderboard_role(
+        guild_id:int, 
+        system:str,
+        role_id:int = None, 
+        position:int = None, 
+        interval:str = None
+        ):
         
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -1688,13 +1709,13 @@ class DatabaseRemoveDatas():
             
             if any(x != None for x in [role_id, position, interval]):
 
-                delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'} AND roleInterval = %s"
-                delete_leaderboard_role_values = [guild_id, role_id if position == None else position, interval]
+                delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND status = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'} AND roleInterval = %s"
+                delete_leaderboard_role_values = [guild_id, system, role_id if position == None else position, interval]
 
             else:
 
-                delete_leaderboard_role = "DELETE FROM LeaderboardRoles WHERE guildId = %s"
-                delete_leaderboard_role_values = [guild_id]
+                delete_leaderboard_role = "DELETE FROM LeaderboardRoles WHERE guildId = %s AND status = %s"
+                delete_leaderboard_role_values = [guild_id, system]
 
             cursor.execute(delete_leaderboard_role, delete_leaderboard_role_values)
             db_connect.commit()

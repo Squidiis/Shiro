@@ -11,7 +11,7 @@ interval_list_message = {
     "general":"general leaderboard"
     }
 
-interval_list_message = {
+interval_list_invite = {
     "week":"weekly leaderboard",
     "month":"monthly leaderboard",
     "quarter":"quarterly leaderboard",
@@ -35,6 +35,108 @@ class Messageleaderboard(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    async def process_show_leaderboard_settings(self, ctx:discord.ApplicationContext, system:str, settings, intervals):
+
+        if settings is None:
+
+            await DatabaseUpdates.create_leaderboard_settings(guild_id=ctx.guild.id, system=system)
+            await ctx.respond(embed=GetEmbed.get_embed(embed_index=8))
+
+        elif settings[6] is None or all(x is None for x in [settings[2], settings[3], settings[4]]):
+
+            await ctx.respond(embed=GetEmbed.get_embed(embed_index=8))
+
+        else:
+
+            intervals_text = []
+            for i in [settings[2], settings[3], settings[4]]:
+                if i is not None:
+                    intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating {system} leaderboard\n")
+            
+            emb = discord.Embed(f"""## Here you can see all the settings of the {system} leaderboard
+            {Emojis.dot_emoji} The {system} leaderboard is currently {'switched on' if settings[1] == 0 else 'switched off'}
+            {Emojis.dot_emoji} {f'Currently <#{settings[6]}> is set as' if settings[5] is not None else 'No'} {system} leaderboard channel has been set
+            {Emojis.dot_emoji} **The following intervals are currently defined for which a leaderboard exists:**
+            {"".join(intervals_text) if intervals_text else f'{Emojis.dot_emoji} No intervals have been defined yet'}""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+
+    async def process_add_leaderboard_role(self, ctx:discord.ApplicationContext, role:discord.Role, position:str, interval:str, system:str):
+
+        interval_list = interval_list_message if system == "message" else interval_list_invite
+
+        interval_db = next((key for key, value in interval_list.items() if value == interval), None)
+        position_db = 0 if "general role" == position else int(position)
+
+        check_role = DatabaseCheck.check_leaderboard_roles(guild_id=ctx.guild.id, role_id=role.id, position=position_db, system=system)
+
+        if check_role is not None and check_role[4] == interval_db:
+            
+            if check_role[2] == position_db and check_role[1] == role.id and interval_db == check_role[4]:
+
+                emb = discord.Embed(description=f"""## This role has already been assigned to this position
+                    {Emojis.dot_emoji} The role {role.mention} {f'is already assigned to the {position} space' if position_db != 0 else f'is defined as a general role for the {interval_list[check_role[4]]}'}
+                    {Emojis.dot_emoji} If you want to overwrite the role, position or the associated interval, you can simply execute this command again""", color=bot_colour)
+                await ctx.respond(embed=emb)
+
+            elif check_role[2] == 0 and position_db != 0:
+
+                emb = discord.Embed(description=f"""## This role is currently set as a generic role
+                    {Emojis.dot_emoji} Currently <@&{check_role[1]}> is set as a general role do you want to set this role for the {position} place?
+                    {Emojis.dot_emoji} You can confirm your decision with the button below""", color=bot_colour)
+                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="position", delete=check_role[1]))
+
+            elif check_role[2] == 0 or self.check_interval_role(guild_id=ctx.guild.id, interval=interval_db, system=system):
+
+                emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] != role.id else 'This interval already has a general role'}
+                    {Emojis.dot_emoji} The role <@&{check_role[1]}> is currently defined as the general role for the interval {interval_list[check_role[4]]}
+                    {Emojis.dot_emoji} {f'Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and set this as a new general role?\n{Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role' 
+                    if check_role[1] != role.id else 
+                    f'Do you want to assign the role <@&{check_role[1]}> as a normal role for the {position} space?'}""", color=bot_colour)
+                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "interval", delete=check_role))
+            
+            else:
+
+                emb = discord.Embed(description=f"""## {'This role' if check_role[1] != role.id else 'This position'} has already been assigned
+                    {Emojis.dot_emoji} Currently, the role <@&{check_role[1]}> is assigned for the {check_role[2]} place, for the {interval_list[check_role[4]]}
+                    {Emojis.dot_emoji} Do you want to {f'replace the role <@&{check_role[1]}> with the role {role.mention} for the position {position} for the {interval_list[check_role[4]]}' if check_role[1] != role.id else f'change the place for which the role {role.mention} is assigned to {position}? this role is then always assigned when someone reaches the {position} place on the {interval}'}""", color=bot_colour)
+                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "position", delete=check_role))
+        
+        else:
+            
+            await DatabaseUpdates.manage_leaderboard_roles(guild_id=ctx.guild.id, role_id=role.id, position=position_db, status=system, interval=interval_db)
+
+            emb = discord.Embed(description=f"""## The new leaderboard role has been successfully established
+                {Emojis.dot_emoji} The role {role.mention} was successfully {f'set for the {position} place' if position_db != 0 else f'set as general role'}
+                {Emojis.dot_emoji} {f'If a user now reaches the {position} place on the {interval} he gets the role {role.mention}' if position_db != 0 else f'If a user is now listed on the {interval} he gets the role {role.mention} until the leaderboard is updated again and a new user gets this role'}""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+    
+    async def process_remove_leaderboard_role(self, ctx:discord.ApplicationContext, role:discord.Role, interval:str, system:str):
+
+        check = DatabaseCheck.check_leaderboard_roles(guild_id=ctx.guild.id, role_id=role.id, interval=interval, system=system)
+
+        interval_list = interval_list_message if system == "message" else interval_list_invite
+
+        if check:
+            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id=ctx.guild.id, role_id=role.id, interval=interval_list[interval], system=system)
+            
+            emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
+                {Emojis.dot_emoji} The role {role.mention} was deleted from {interval}
+                {Emojis.dot_emoji} With the button below you can see which other roles are defined as leaderboard roles""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesButton())
+
+        else:
+            emb = discord.Embed(description=f"""## This role has not been set for this interval
+                {Emojis.dot_emoji} The role you specified is not listed for this interval
+                {Emojis.dot_emoji} Here you have an overview of all roles that are listed on the respective intervals with the lower select menu you can display the other intervals
+                {Emojis.dot_emoji} All leaderboard roles for the {interval}
+                
+                {show_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list[interval], system=system)}""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+
+
 
     @commands.slash_command(name = "set-message-leaderboard", description = "Set the message leaderboard system!")
     @commands.has_permissions(administrator = True)
@@ -61,42 +163,18 @@ class Messageleaderboard(commands.Cog):
         
         settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild.id, system = "message")
         
-        if settings == None:
+        intervals = {
+            settings[2]:"Daily",
+            settings[3]:"Weekly",
+            settings[4]:"Monthly"
+        }
 
-            await DatabaseUpdates.create_leaderboard_settings(guild_id = ctx.guild.id, system = "message")
-
-            await ctx.respond(embed = GetEmbed.get_embed(embed_index=8))
-
-        elif settings[6] == None or all(x for x in [settings[2], settings[3], settings[4]]) == None:
-
-            await ctx.respond(embed = GetEmbed.get_embed(embed_index=8))
-
-        else:
-
-            intervals = {
-                settings[2]:"Daily",
-                settings[3]:"Weekly",
-                settings[4]:"Monthly"
-            }
-            intervals_text = []
-            for i in settings[2], settings[3], settings[4]:
-
-                if i != None:
-
-                    intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating Message leaderboard\n")
-
-            emb = discord.Embed(description=f"""## Here you can see all the settings of the message leaderboard
-                {Emojis.dot_emoji} Das message leaderboard ist aktuell {'angeschalten' if settings[1] == 0 else 'ausgeschalten'}
-                {Emojis.dot_emoji} {f'Currently <#{settings[6]}> is set as' if settings[5] != None else 'No'} message leaderboard channel has been set
-                {Emojis.dot_emoji} **The following intervals are currently defined for which a leaderboard exists:**
-
-                {"".join(intervals_text) if intervals_text != [] else f'{Emojis.dot_emoji} No intervals have been defined yet'}""", color=bot_colour)
-            await ctx.respond(embed=emb)
+        await self.process_show_leaderboard_settings(ctx=ctx, system="message", settings=settings, intervals=intervals)
 
     
-    def check_interval_role(self, guild_id, interval):
+    def check_interval_role(self, guild_id, interval, system):
 
-        roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id)
+        roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, system = system)
 
         for role in roles:
 
@@ -114,51 +192,7 @@ class Messageleaderboard(commands.Cog):
         position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
         interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
     
-        interval_db = next((key for key, value in interval_list_message.items() if value == interval), None)
-        position_db = 0 if "general role" == position else int(position)
-
-        check_role = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position_db)
-
-        if check_role is not None and check_role[4] == interval_db:
-            
-            if check_role[2] == position_db and check_role[1] == role.id and interval_db == check_role[4]:
-                
-                emb = discord.Embed(description=f"""## This role has already been assigned to this position
-                    {Emojis.dot_emoji} The role {role.mention} {f'is already assigned to the {position} space' if position_db != 0 else f'is defined as a general role for the {interval_list_message[check_role[4]]}'}
-                    {Emojis.dot_emoji} If you want to overwrite the role, position or the associated interval, you can simply execute this command again""", color=bot_colour)
-                await ctx.respond(embed=emb)
-
-            elif check_role[2] == 0 and position_db != 0:
-            
-                emb = discord.Embed(description=f"""## Diese rolle ist aktuell als geneal role festgelegt
-                    {Emojis.dot_emoji} Aktuell ist <@&{check_role[1]}> als generelle rolle festgelegt möchtest du diese rolle für den {position} platz festlegen?
-                    {Emojis.dot_emoji} Mit den unteren Button kannst du deine entscheidung bestätigen""", color=bot_colour)
-                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="position", delete=check_role[1]))
-
-            elif check_role[2] == 0 or self.check_interval_role(guild_id=ctx.guild.id, interval=interval_db):
-                
-                emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] != role.id else 'This interval already has a general role'}
-                    {Emojis.dot_emoji} The role <@&{check_role[1]}> is currently defined as the general role for the interval {interval_list_message[check_role[4]]}
-                    {Emojis.dot_emoji} {f'Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and set this as a new general role?\n{Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role' 
-                    if check_role[1] != role.id else 
-                    f'Do you want to assign the role <@&{check_role[1]}> as a normal role for the {position} space?'}""", color=bot_colour)
-                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "interval", delete=check_role))
-
-            else:
-                
-                emb = discord.Embed(description=f"""## {'This role' if check_role[1] != role.id else 'This position'} has already been assigned
-                    {Emojis.dot_emoji} Currently, the role <@&{check_role[1]}> is assigned for the {check_role[2]} place, for the {interval_list_message[check_role[4]]}
-                    {Emojis.dot_emoji} Do you want to {f'replace the role <@&{check_role[1]}> with the role {role.mention} for the position {position} for the {interval_list_message[check_role[4]]}' if check_role[1] != role.id else f'change the place for which the role {role.mention} is assigned to {position}? this role is then always assigned when someone reaches the {position} place on the {interval}'}""", color=bot_colour)
-                await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "position", delete=check_role))
-
-        else:
-                
-            await DatabaseUpdates.manage_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, position = position_db, status = "message", interval = interval_db)
-
-            emb = discord.Embed(description=f"""## The new leaderboard role has been successfully established
-                {Emojis.dot_emoji} The role {role.mention} was successfully {f'set for the {position} place' if position_db != 0 else f'set as general role'}
-                {Emojis.dot_emoji} {f'If a user now reaches the {position} place on the {interval} he gets the role {role.mention}' if position_db != 0 else f'If a user is now listed on the {interval} he gets the role {role.mention} until the leaderboard is updated again and a new user gets this role'}""", color=bot_colour)
-            await ctx.respond(embed=emb)
+        await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="message")
 
     
     @commands.slash_command(name = "remove-message-leaderboard-role")
@@ -167,26 +201,7 @@ class Messageleaderboard(commands.Cog):
         role:Option(discord.Role, description="Remove a role from the leaderboard roles!"), 
         interval:Option(str, description="Choose from which leaderboard the roll should be removed!", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
 
-        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, role_id = role.id, interval = interval)
-
-        if check:
-
-            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id, role_id = role.id, interval = interval_list_message[interval])
-            
-            emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
-                {Emojis.dot_emoji} The role {role.mention} was deleted from {interval}
-                {Emojis.dot_emoji} With the button below you can see which other roles are defined as leaderbaord roles""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ShowLeaderboardRolesButton())
-
-        else:
-
-            emb = discord.Embed(description=f"""## This role has not been set for this interval
-                {Emojis.dot_emoji} The role you specified is not listed for this interval
-                {Emojis.dot_emoji} Here you have an overview of all roles that are listed on the respective intervals with the lower select menu you can display the other intervals
-                {Emojis.dot_emoji} All leaderboard roles for the {interval}
-                
-                {show_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list_message[interval])}""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+        await self.process_remove_leaderboard_role(ctx=ctx, role=role, interval=interval, system="message")
 
     
     @commands.slash_command(name = "show-message-leaderboard-roles")
@@ -210,11 +225,11 @@ class Messageleaderboard(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_leaderboard_roles_message(self, ctx:discord.ApplicationContext, interval:Option(str, description="Wähle welche Leaderboard rollen zurück gesetzt werden sollen", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
 
-        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, interval = interval_list_message[interval])
+        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, interval = interval_list_message[interval], system = "message")
 
         if check:
 
-            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id)
+            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id, system = "message")
 
             emb = discord.Embed(description=f"""## Leaderboard roles have been reset
                 {Emojis.dot_emoji} All leaderbaord roles of the {interval} have been successfully reset
@@ -242,6 +257,7 @@ class Messageleaderboard(commands.Cog):
             await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
 
 
+
 ##########################################  Invite Leaderboard  ##########################################
             
 
@@ -263,8 +279,44 @@ class Messageleaderboard(commands.Cog):
             {Emojis.help_emoji} **The leaderboard always shows the data from the previous interval, e.g. the best users who have invited the most users in the last week**""", color=bot_colour)        
         await ctx.respond(embed=emb, view = SetleaderboardChannel())
 
+    
+    @commands.slash_command(name = "show-invite-leaderboard-setting", description = "Shows all settings of the invite leaderboard!")
+    async def show_message_leaderboard_settings(self, ctx:discord.ApplicationContext):
+        
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild.id, system = "invite")
+
+        intervals = {
+            settings[2]:"Weekly",
+            settings[3]:"Monthly",
+            settings[4]:"Quarterly"
+        }
+
+        await self.process_show_leaderboard_settings(ctx=ctx, system="invite", settings=settings, intervals=intervals)
+
+
+    @commands.slash_command(name = "add-invite-leaderboard-role", description = "Define roles for the invite leaderboard that are assigned when you reach a certain position!")
+    @commands.has_permissions(administrator = True)
+    async def add_leaderboard_role_invite(self, ctx:discord.ApplicationContext, 
+        role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
+        position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
+        interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
+    
+        await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="invite")
+
+    
+    @commands.slash_command(name = "remove-invite-leaderboard-role")
+    @commands.has_permissions(administrator = True)
+    async def remove_leaderboard_role_invite(self, ctx:discord.ApplicationContext, 
+        role:Option(discord.Role, description="Remove a role from the leaderboard roles!"), 
+        interval:Option(str, description="Choose from which leaderboard the roll should be removed!", choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
+
+        await self.process_remove_leaderboard_role(ctx=ctx, role=role, interval=interval, system="invite")
+
+
 
 ##########################################  System events  ###########################################
+        
+
     @commands.Cog.listener()
     async def on_message_delete(self, message:discord.Message):
 
@@ -1223,9 +1275,10 @@ class OverwriteRole(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-def show_leaderboard_roles(guild_id, interval):
+# Returns all leaderboard roles that have been set for a specific system
+def show_leaderboard_roles(guild_id, interval, system):
 
-    check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval)
+    check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval, system = system)
     leaderboard = []
 
     if check:

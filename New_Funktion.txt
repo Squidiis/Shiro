@@ -28,3 +28,9 @@ statistic section
 die leaderboard functionen so umarbeiten das sie auch für das invite leaderbaord funktionieren (das invite leaderbaord fertig stellen und testen)
 
 die doppelten texte in die get_embed funktion verlegen
+
+
+leaderboard system übersetzten
+antilink zu anti-link edetieren
+
+rollen buttons umarbeiten das sie auch für invite system gelten (anderes select menü)
