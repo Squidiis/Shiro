@@ -36,6 +36,30 @@ class Messageleaderboard(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    '''
+    
+    '''
+    async def process_set_leaderboard(self, ctx:discord.ApplicationContext, system:str):
+
+        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = system)
+        
+        if settings == None:
+
+            await DatabaseUpdates.create_leaderboard_settings(guild_id = ctx.guild.id, system = system)
+            settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = system)
+
+        emb = discord.Embed(description=f"""## Set the {system} leaderboard
+            {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderboard should be sent
+            {Emojis.dot_emoji} Then you can also set an interval at which time intervals the leaderboard should be updated
+            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[0] else 'switched on'}. (as soon as it is switched off, no more {'invitations' if system == 'invite' else 'message'} are counted and when it is switched on, the leaderboard is reset)
+            {Emojis.help_emoji} The leaderboard is edited when you update it, so you should make sure that no one else can write in the channel you specified
+            {Emojis.help_emoji} **The leaderboard always shows the data from the previous interval, e.g. the best users who have {'invited' if system == "invite" else "wrote"} the most {'users' if system == "invite" else 'messages'} in the last week**""", color=bot_colour)        
+        await ctx.respond(embed=emb, view = SetleaderboardChannel())
+
+
+    '''
+    
+    '''
     async def process_show_leaderboard_settings(self, ctx:discord.ApplicationContext, system:str, settings, intervals):
 
         if settings is None:
@@ -62,6 +86,9 @@ class Messageleaderboard(commands.Cog):
             await ctx.respond(embed=emb)
 
 
+    '''
+    
+    '''
     async def process_add_leaderboard_role(self, ctx:discord.ApplicationContext, role:discord.Role, position:str, interval:str, system:str):
 
         interval_list = interval_list_message if system == "message" else interval_list_invite
@@ -113,6 +140,9 @@ class Messageleaderboard(commands.Cog):
             await ctx.respond(embed=emb)
 
     
+    '''
+    
+    '''
     async def process_remove_leaderboard_role(self, ctx:discord.ApplicationContext, role:discord.Role, interval:str, system:str):
 
         check = DatabaseCheck.check_leaderboard_roles(guild_id=ctx.guild.id, role_id=role.id, interval=interval, system=system)
@@ -120,6 +150,7 @@ class Messageleaderboard(commands.Cog):
         interval_list = interval_list_message if system == "message" else interval_list_invite
 
         if check:
+
             await DatabaseRemoveDatas.remove_leaderboard_role(guild_id=ctx.guild.id, role_id=role.id, interval=interval_list[interval], system=system)
             
             emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
@@ -128,34 +159,65 @@ class Messageleaderboard(commands.Cog):
             await ctx.respond(embed=emb, view=ShowLeaderboardRolesButton())
 
         else:
+
             emb = discord.Embed(description=f"""## This role has not been set for this interval
                 {Emojis.dot_emoji} The role you specified is not listed for this interval
                 {Emojis.dot_emoji} Here you have an overview of all roles that are listed on the respective intervals with the lower select menu you can display the other intervals
                 {Emojis.dot_emoji} All leaderboard roles for the {interval}
                 
                 {show_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list[interval], system=system)}""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectMessage() if system == "message" else ShowLeaderboardRolesSelectInvite())
+
+    
+    '''
+    
+    '''
+    async def process_reset_leaderboard_roles(self, ctx:discord.ApplicationContext, interval:str, system:str):
+        
+        interval_list = interval_list_message if system == "message" else interval_list_invite
+
+        check = DatabaseCheck.check_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list[interval], system=system)
+
+        if check:
+            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id=ctx.guild.id, system=system)
+
+            emb = discord.Embed(description=f"""## Leaderboard roles have been reset
+                {Emojis.dot_emoji} All leaderboard roles of the {interval} have been successfully reset
+                {Emojis.dot_emoji} If you want to see which roles are listed on the other intervals, use the select menu below""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectMessage() if system == "message" else ShowLeaderboardRolesSelectInvite())
+
+        else:
+            emb = discord.Embed(description=f"""## No roles have been added to this leaderboard
+                {Emojis.dot_emoji} No roles have been added to the {interval}
+                {Emojis.dot_emoji} With the lower select menu you can check the other intervals and view the defined roles""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectMessage() if system == "message" else ShowLeaderboardRolesSelectInvite())
+
+    
+    '''
+    
+    '''
+    def check_interval_role(self, guild_id, interval, system):
+
+        roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, system = system)
+
+        for role in roles:
+
+            if role[2] == 0 and role[4] == interval:
+
+                return True
+
+        return False 
 
 
+
+#############################################  Message leaderboard commands  #####################################
+            
 
     @commands.slash_command(name = "set-message-leaderboard", description = "Set the message leaderboard system!")
     @commands.has_permissions(administrator = True)
     async def set_message_leaderboard(self, ctx:discord.ApplicationContext):
 
-        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = "message")
-        
-        if settings == None:
-
-            await DatabaseUpdates.create_leaderboard_settings(guild_id = ctx.guild.id, system = "message")
-            settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = "message")
-
-        emb = discord.Embed(description=f"""## Set the message leaderboard
-            {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderboard should be sent
-            {Emojis.dot_emoji} Then you can also set an interval at which time intervals the leaderboard should be updated
-            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[1] else 'switched on'}. (as soon as it is switched off, no more messages are counted and when it is switched on, the leaderboard is reset)
-            {Emojis.dot_emoji} The leaderboard is edited when you update it, so you should make sure that no one else can write in the channel you specified
-            {Emojis.help_emoji} **The leaderboard always shows the data of the past interval, for example it shows the best users who wrote the most messages yesterday**""", color=bot_colour)        
-        await ctx.respond(embed=emb, view=SetleaderboardChannel())
+        await self.process_set_leaderboard(ctx=ctx, system="message")
 
 
     @commands.slash_command(name = "show-message-leaderboard-setting", description = "Shows all settings of the message leaderboard!")
@@ -171,26 +233,15 @@ class Messageleaderboard(commands.Cog):
 
         await self.process_show_leaderboard_settings(ctx=ctx, system="message", settings=settings, intervals=intervals)
 
-    
-    def check_interval_role(self, guild_id, interval, system):
-
-        roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, system = system)
-
-        for role in roles:
-
-            if role[2] == 0 and role[4] == interval:
-
-                return True
-
-        return False 
-
 
     @commands.slash_command(name = "add-message-leaderboard-role", description = "Define roles for the message leaderboard that are assigned when you reach a certain position!")
     @commands.has_permissions(administrator = True)
     async def add_leaderboard_role_message(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
-        position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
-        interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+        position:Option(required = True, description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)", 
+            choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]),
+        interval:Option(str, description="Select the leaderboard for which this role is to be assigned", 
+            choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
     
         await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="message")
 
@@ -218,43 +269,16 @@ class Messageleaderboard(commands.Cog):
             > {Emojis.dot_emoji} **Monthly leaderboard:** Every month, the system checks which users have posted the most messages. The previously counted messages are deleted
 
             > {Emojis.dot_emoji} **General leaderboard:** This checks which users have written the most messages (updated daily). The previously counted messages are not deleted""", color=bot_colour)
-        await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
+        await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectMessage())
 
 
     @commands.slash_command(name = "reset-message-leaderboard-roles")
     @commands.has_permissions(administrator = True)
-    async def reset_leaderboard_roles_message(self, ctx:discord.ApplicationContext, interval:Option(str, description="Wähle welche Leaderboard rollen zurück gesetzt werden sollen", choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+    async def reset_leaderboard_roles_message(self, ctx:discord.ApplicationContext, 
+        interval:Option(str, description="Select which leaderboard roles should be reset", 
+            choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
 
-        check = DatabaseCheck.check_leaderboard_roles(guild_id = ctx.guild.id, interval = interval_list_message[interval], system = "message")
-
-        if check:
-
-            await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = ctx.guild.id, system = "message")
-
-            emb = discord.Embed(description=f"""## Leaderboard roles have been reset
-                {Emojis.dot_emoji} All leaderbaord roles of the {interval} have been successfully reset
-                {Emojis.dot_emoji} If you want to see which roles are listed on the other intervals use the select menu below""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
-
-        else:
-
-            emb = discord.Embed(description=f"""## No roles have been added to this leaderboard
-                {Emojis.dot_emoji} No roles have been added to the {interval}
-                {Emojis.dot_emoji} With the lower select menu you can check the other intervals and view the defined roles""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelect())
-
-
-    @commands.Cog.listener()
-    async def on_message(self, message:discord.Message):
-
-        if message.author.bot:
-            return
-        
-        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
-
-        if check[1] == 1:
-            
-            await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
+        await self.process_reset_leaderboard_roles(ctx=ctx, interval=interval, system="message")
 
 
 
@@ -264,20 +288,7 @@ class Messageleaderboard(commands.Cog):
     @commands.slash_command(name = "set-invite-leaderboard", description = "Set up the invite leaderboard system!")
     async def set_invite_leaderboard(self, ctx:discord.ApplicationContext):
 
-        settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = "invite")
-        
-        if settings == None:
-
-            await DatabaseUpdates.create_leaderboard_settings(guild_id = ctx.guild.id, system = "invite")
-            settings = DatabaseCheck.check_leaderboard_settings(guild_id = ctx.guild_id, system = "invite")
-
-        emb = discord.Embed(description=f"""## Set the invite leaderboard
-            {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderboard should be sent
-            {Emojis.dot_emoji} Then you can also set an interval at which time intervals the leaderboard should be updated
-            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[0] else 'switched on'}. (as soon as it is switched off, no more invites are counted and when it is switched on, the leaderboard is reset)
-            {Emojis.help_emoji} The leaderboard is edited when you update it, so you should make sure that no one else can write in the channel you specified
-            {Emojis.help_emoji} **The leaderboard always shows the data from the previous interval, e.g. the best users who have invited the most users in the last week**""", color=bot_colour)        
-        await ctx.respond(embed=emb, view = SetleaderboardChannel())
+        await self.process_set_leaderboard(ctx=ctx, system="invite")
 
     
     @commands.slash_command(name = "show-invite-leaderboard-setting", description = "Shows all settings of the invite leaderboard!")
@@ -298,8 +309,10 @@ class Messageleaderboard(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def add_leaderboard_role_invite(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
-        position:Option(required = True, choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)"),
-        interval:Option(str, description="Select the leaderboard for which this role is to be assigned", choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
+        position:Option(required = True, description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)",
+            choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]),
+        interval:Option(str, description="Select the leaderboard for which this role is to be assigned", 
+            choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
     
         await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="invite")
 
@@ -308,15 +321,61 @@ class Messageleaderboard(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_leaderboard_role_invite(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, description="Remove a role from the leaderboard roles!"), 
-        interval:Option(str, description="Choose from which leaderboard the roll should be removed!", choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
+        interval:Option(str, description="Choose from which leaderboard the roll should be removed!", 
+            choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
 
         await self.process_remove_leaderboard_role(ctx=ctx, role=role, interval=interval, system="invite")
+
+    
+    @commands.slash_command(name = "show-invite-leaderboard-roles")
+    async def show_leaderboard_roles_invite(self, ctx:discord.ApplicationContext):
+
+        emb = discord.Embed(description=f"""## Choose from which leaderboard you want to see the roles
+            {Emojis.dot_emoji} With the lower select menu you can choose from which interval you want to see the corresponding roles:
+            
+            
+            > {Emojis.dot_emoji} **Weekly ranking:** Every week, the system checks which users have invited the most users. The previously counted invitations are deleted
+            
+            > {Emojis.dot_emoji} **Monthly leaderboard:** Every month, the system checks which users have invited the most users. The previously counted invitations  are deleted
+
+            > {Emojis.dot_emoji} **Quarterly leaderboard:** Every quarter, the system checks which users have invited the most users. The previously counted invitations are deleted
+
+            > {Emojis.dot_emoji} **General leaderboard:** This checks which users have written the most users (updated daily). The previously counted invitations are not deleted""", color=bot_colour)
+        await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectInvite())
+
+    
+    @commands.slash_command(name = "reset-invite-leaderboard-roles")
+    @commands.has_permissions(administrator = True)
+    async def reset_leaderboard_roles_invite(self, ctx:discord.ApplicationContext, 
+        interval:Option(str, description="Select which leaderboard roles should be reset!", 
+            choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
+
+        await self.process_reset_leaderboard_roles(ctx=ctx, interval=interval, system="message")
 
 
 
 ##########################################  System events  ###########################################
         
 
+    '''
+    
+    '''
+    @commands.Cog.listener()
+    async def on_message(self, message:discord.Message):
+
+        if message.author.bot:
+            return
+        
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
+
+        if check[1] == 1:
+            
+            await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
+ 
+
+    '''
+    
+    '''
     @commands.Cog.listener()
     async def on_message_delete(self, message:discord.Message):
 
@@ -354,6 +413,9 @@ class Messageleaderboard(commands.Cog):
                 await DatabaseUpdates.manage_leaderboard_invite(guild_id = message.guild.id, back_to_none = "quarterly")
 
 
+    '''
+    
+    '''
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
 
@@ -1323,14 +1385,14 @@ class ShowLeaderboardRolesButton(discord.ui.View):
                 {Emojis.dot_emoji} Weekly leaderboard: Every week, the system checks which users have posted the most messages. The previously counted messages are deleted
                 {Emojis.dot_emoji} Monthly leaderboard: Every month, the system checks which users have posted the most messages. The previously counted messages are deleted
                 {Emojis.dot_emoji} General leaderboard: This checks which users have written the most messages (updated daily). The previously counted messages are not deleted""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=ShowLeaderboardRolesSelect())
+            await interaction.response.edit_message(embed=emb, view=ShowLeaderboardRolesSelectMessage())
         
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-class ShowLeaderboardRolesSelect(discord.ui.View):
+class ShowLeaderboardRolesSelectMessage(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
@@ -1352,10 +1414,10 @@ class ShowLeaderboardRolesSelect(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(description=f"""## Leaderboard roles
+            emb = discord.Embed(description=f"""## Leaderboard roles for the message leaderboard
                 {Emojis.dot_emoji} Here you can see an overview of all roles that are listed on the {select.values[0]} leaderboard
 
-                {show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0])}""", color=bot_colour)
+                {show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0], system="message")}""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
         else:
@@ -1410,3 +1472,37 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
                     {"".join(user_list)}
                     """, color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+
+
+
+class ShowLeaderboardRolesSelectInvite(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.select(
+        placeholder = "Choose from which leaderboard you want to see all roles!",
+        min_values = 1,
+        max_values = 1,
+        custom_id = "show_leaderboard_roles",
+        options = [
+            discord.SelectOption(label="Weekly leaderboard", description="Take a look at which roles are defined for the weekly leaderboard", value="weekly"),
+            discord.SelectOption(label="Monthly leaderboard", description="Take a look at which roles are defined for the Monthly leaderboard", value="monthly"),
+            discord.SelectOption(label="Quarterly leaderboard", description="Take a look at which roles are defined for the quarterly leaderboard", value="quarterly"),
+            discord.SelectOption(label="General leaderboard", description="Take a look at which roles are defined for the Gernal leaderboard", value="general")
+        ]
+    )
+
+    async def show_leaderboard_roles_select(self, select, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""## Leaderboard roles for the invite leaderboard
+                {Emojis.dot_emoji} Here you can see an overview of all roles that are listed on the {select.values[0]} leaderboard
+
+                {show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0], system="invite")}""", color=bot_colour)
+            await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)

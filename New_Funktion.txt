@@ -34,3 +34,8 @@ leaderboard system übersetzten
 antilink zu anti-link edetieren
 
 rollen buttons umarbeiten das sie auch für invite system gelten (anderes select menü)
+
+
+Description adden for the functions (level system, leaderbaord system, mod tools)
+
+Edit Button Names (level system, mod tools)

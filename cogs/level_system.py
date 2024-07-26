@@ -21,7 +21,9 @@ def level_message(guild_id:int, user_id:int, level:int):
 # Check the different parts of the level system and the database
 class CheckLevelSystem():
     
-    # Function that checks how high the bonus xp percentage rate is
+    '''
+    
+    '''
     def check_bonus_xp(guild_id:int, message:discord.Message):
 
         check_settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
@@ -50,7 +52,9 @@ class CheckLevelSystem():
             return None
     
 
-    # Returns all entries of the database with the sorted level roles (ascending with level)
+    '''
+    
+    '''
     def show_level_roles(guild_id:int):
 
         level_roles = DatabaseCheck.check_level_system_levelroles(guild_id = guild_id, status = "level_role")
@@ -68,8 +72,10 @@ class CheckLevelSystem():
 
             return f"{Emojis.dot_emoji} No level roles have been set"
     
+
+    '''
     
-    # Returns the blacklist completely formatted 
+    '''    
     def show_blacklist(guild_id:int):
 
         blacklist = DatabaseCheck.check_blacklist(guild_id = guild_id)
@@ -103,7 +109,9 @@ class CheckLevelSystem():
             return "".join(final_blacklist)
         
 
-    # Returns the bonus Xp list completely formatted 
+    '''
+    
+    '''
     def show_bonus_xp_list(guild_id:int):
 
         bonus_list = DatabaseCheck.check_xp_bonus_list(guild_id = guild_id)
@@ -132,15 +140,26 @@ class CheckLevelSystem():
 
 ######################################################  Level System level roles button  ##################################################
 
+
 class LevelRolesButtons(discord.ui.View):
-    def __init__(self, role_id:int, role_level:int, status:str):
+
+    def __init__(
+            self, 
+            role_id:int, 
+            role_level:int, 
+            status:str
+        ):
         self.role_id = role_id
         self.role_level = role_level
         self.status = status
         super().__init__(timeout=None)
 
-    # Button to override the level role 
-    @discord.ui.button(label="overwrite entry", style=discord.ButtonStyle.blurple, custom_id="yes_button_level_role")
+    @discord.ui.button(
+        label="overwrite entry", 
+        style=discord.ButtonStyle.blurple, 
+        custom_id="yes_button_level_role"
+    )
+
     async def yes_button_levelroles(self, button, interaction:discord.Interaction):
     
         if interaction.user.guild_permissions.administrator:
@@ -163,8 +182,12 @@ class LevelRolesButtons(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
 
 
-    # Button to cancel the overwriting of the level role 
-    @discord.ui.button(label="keep entry", style=discord.ButtonStyle.blurple, custom_id="no_button_level_role")
+    @discord.ui.button(
+        label="keep entry", 
+        style=discord.ButtonStyle.blurple, 
+        custom_id="no_button_level_role"
+    )
+    
     async def no_button_levelroles(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -184,10 +207,16 @@ class LevelRolesButtons(discord.ui.View):
 
 
 class ResetLevelStatsButton(discord.ui.View):
+
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Yes", style=discord.ButtonStyle.gray, custom_id="yes_button_reset")
+    @discord.ui.button(
+        label="Yes", 
+        style=discord.ButtonStyle.gray, 
+        custom_id="yes_button_reset"
+    )
+
     async def reset_stats_button_level_yes(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -206,7 +235,12 @@ class ResetLevelStatsButton(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True)
 
     
-    @discord.ui.button(label="No", style=discord.ButtonStyle.gray, custom_id="no_button_reset")
+    @discord.ui.button(
+        label="No", 
+        style=discord.ButtonStyle.gray, 
+        custom_id="no_button_reset"
+    )
+
     async def reset_stats_button_level_no(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -226,10 +260,17 @@ class ResetLevelStatsButton(discord.ui.View):
 
 
 class ResetBlacklistLevelButton(discord.ui.View):
+
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Yes", style=discord.ButtonStyle.blurple, row=1, custom_id="yes_button_level")
+    @discord.ui.button(
+        label="Yes", 
+        style=discord.ButtonStyle.blurple, 
+        row=1, 
+        custom_id="yes_button_level"
+    )
+
     async def reset_blacklist_button_level_yes(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -247,7 +288,13 @@ class ResetBlacklistLevelButton(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb)
 
 
-    @discord.ui.button(label="No", style=discord.ButtonStyle.blurple, row=1, custom_id="no_button_level")
+    @discord.ui.button(
+        label="No", 
+        style=discord.ButtonStyle.blurple, 
+        row=1, 
+        custom_id="no_button_level"
+    )
+
     async def reset_blacklist_button_level_no(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -277,6 +324,7 @@ class LevelSystem(commands.Cog):
         bucket = self.cd.get_bucket(message)
         return bucket.update_rate_limit()
 
+
     # Check how much XP must be awarded
     @staticmethod
     def xp_generator(guild_id:int, message:discord.Message = None):
@@ -292,6 +340,7 @@ class LevelSystem(commands.Cog):
         
         return xp
     
+
     # Round off the corners of the rectangles (Rank card)
     @staticmethod
     def round_corner_mask(radius, rectangle, fill):
@@ -304,6 +353,7 @@ class LevelSystem(commands.Cog):
         rectangle.putalpha(mask)
         return (rectangle, mask)
     
+
     # Returns True if an element is on the blacklist.
     @staticmethod
     def blacklist_check_text(guild_id:int, message_check:discord.Message):
@@ -334,6 +384,7 @@ class LevelSystem(commands.Cog):
             else:
                 return None
             
+
     # Returns the value True if "on" in the database and False when not
     @staticmethod
     def check_level_system_status(guild_id:int):
@@ -463,7 +514,6 @@ class LevelSystem(commands.Cog):
                 except mysql.connector.Error as error:
                     print("parameterized query failed {}".format(error))
    
-
 
     @commands.slash_command(name = "set-level-system", description = "Set the level system the way you want it!")
     @commands.has_permissions(administrator = True)
