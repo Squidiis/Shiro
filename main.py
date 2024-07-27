@@ -6,10 +6,11 @@ from cogs.fun_commands import *
 from utils import *
 from cogs.leaderboard_system import *
 
+
+
 @bot.slash_command(description="Shows you the ping.")
 async def ping(ctx):
     await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
-
 
 
 class Main(commands.Cog):
@@ -206,7 +207,8 @@ class Main(commands.Cog):
         self.bot.add_view(OverwriteMessageInterval(intervals=None))
         self.bot.add_view(OverwriteRole(role=None, interval=None, position=None, settings=None, delete=None))
         self.bot.add_view(ShowLeaderboardRolesButton())
-        self.bot.add_view(ShowLeaderboardRolesSelect())
+        self.bot.add_view(ShowLeaderboardRolesSelectMessage())
+        self.bot.add_view(ShowLeaderboardRolesSelectInvite())
         view.add_item(LeaderboardOnOffSwitch())
         view.add_item(DefaultSettingsLeaderboard())
         self.bot.add_view(ShowLeaderboardGivenRoles())
@@ -223,10 +225,12 @@ class Main(commands.Cog):
 
         await Main.create_db_table()
 
-        if not edit_leaderboard.is_running():
-            edit_leaderboard.start(self.bot)
+        for guild in bot.guilds:
+            await LeaderboardSystem.update_invites(guild)
 
 
+        if not edit_leaderboard_message.is_running():
+            edit_leaderboard_message.start(self.bot)
 
 
 # Status task while the bot is active, the status is permanently updated

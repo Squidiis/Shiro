@@ -31,10 +31,11 @@ interval_text_invite = {
 }
 
 
-class Messageleaderboard(commands.Cog):
+class LeaderboardSystem(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.invite_counts = {}
 
     '''
     
@@ -109,14 +110,14 @@ class Messageleaderboard(commands.Cog):
 
             elif check_role[2] == 0 and position_db != 0:
 
-                emb = discord.Embed(description=f"""## This role is currently set as a generic role
+                emb = discord.Embed(description=f"""## This role is currently set as a generic role for {system} leaderboard
                     {Emojis.dot_emoji} Currently <@&{check_role[1]}> is set as a general role do you want to set this role for the {position} place?
                     {Emojis.dot_emoji} You can confirm your decision with the button below""", color=bot_colour)
                 await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="position", delete=check_role[1]))
 
             elif check_role[2] == 0 or self.check_interval_role(guild_id=ctx.guild.id, interval=interval_db, system=system):
 
-                emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] != role.id else 'This interval already has a general role'}
+                emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] != role.id else 'This interval already has a general role'} for the {system} leaderboard
                     {Emojis.dot_emoji} The role <@&{check_role[1]}> is currently defined as the general role for the interval {interval_list[check_role[4]]}
                     {Emojis.dot_emoji} {f'Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and set this as a new general role?\n{Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role' 
                     if check_role[1] != role.id else 
@@ -125,7 +126,7 @@ class Messageleaderboard(commands.Cog):
             
             else:
 
-                emb = discord.Embed(description=f"""## {'This role' if check_role[1] != role.id else 'This position'} has already been assigned
+                emb = discord.Embed(description=f"""## {'This role' if check_role[1] != role.id else 'This position'} has already been assigned for the {system} leaderboard
                     {Emojis.dot_emoji} Currently, the role <@&{check_role[1]}> is assigned for the {check_role[2]} place, for the {interval_list[check_role[4]]}
                     {Emojis.dot_emoji} Do you want to {f'replace the role <@&{check_role[1]}> with the role {role.mention} for the position {position} for the {interval_list[check_role[4]]}' if check_role[1] != role.id else f'change the place for which the role {role.mention} is assigned to {position}? this role is then always assigned when someone reaches the {position} place on the {interval}'}""", color=bot_colour)
                 await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "position", delete=check_role))
@@ -153,7 +154,7 @@ class Messageleaderboard(commands.Cog):
 
             await DatabaseRemoveDatas.remove_leaderboard_role(guild_id=ctx.guild.id, role_id=role.id, interval=interval_list[interval], system=system)
             
-            emb = discord.Embed(description=f"""## The role was successfully removed from the leaderboard
+            emb = discord.Embed(description=f"""## The role was successfully removed from the {system} leaderboard
                 {Emojis.dot_emoji} The role {role.mention} was deleted from {interval}
                 {Emojis.dot_emoji} With the button below you can see which other roles are defined as leaderboard roles""", color=bot_colour)
             await ctx.respond(embed=emb, view=ShowLeaderboardRolesButton())
@@ -206,9 +207,19 @@ class Messageleaderboard(commands.Cog):
 
                 return True
 
-        return False 
+        return False
 
 
+    '''
+
+    '''
+    async def update_invites(self, guild):
+
+        invites = await guild.invites()
+        for invite in invites:
+            self.invite_counts[invite.inviter.id] = invite.uses
+
+    
 
 #############################################  Message leaderboard commands  #####################################
             
@@ -246,7 +257,7 @@ class Messageleaderboard(commands.Cog):
         await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="message")
 
     
-    @commands.slash_command(name = "remove-message-leaderboard-role")
+    @commands.slash_command(name = "remove-message-leaderboard-role", description = "Removes a specific role from a specific interval of the message leaderboard!")
     @commands.has_permissions(administrator = True)
     async def remove_leaderboard_role_message(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, description="Remove a role from the leaderboard roles!"), 
@@ -255,7 +266,7 @@ class Messageleaderboard(commands.Cog):
         await self.process_remove_leaderboard_role(ctx=ctx, role=role, interval=interval, system="message")
 
     
-    @commands.slash_command(name = "show-message-leaderboard-roles")
+    @commands.slash_command(name = "show-message-leaderboard-roles", description = "Shows all roles that have been defined for the message leaderboard!")
     async def show_leaderboard_roles_message(self, ctx:discord.ApplicationContext):
 
         emb = discord.Embed(description=f"""## Choose from which leaderboard you want to see the roles
@@ -272,7 +283,7 @@ class Messageleaderboard(commands.Cog):
         await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectMessage())
 
 
-    @commands.slash_command(name = "reset-message-leaderboard-roles")
+    @commands.slash_command(name = "reset-message-leaderboard-roles", description = "Resets all roles that have been set for the message leaderboard!")
     @commands.has_permissions(administrator = True)
     async def reset_leaderboard_roles_message(self, ctx:discord.ApplicationContext, 
         interval:Option(str, description="Select which leaderboard roles should be reset", 
@@ -317,7 +328,7 @@ class Messageleaderboard(commands.Cog):
         await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="invite")
 
     
-    @commands.slash_command(name = "remove-invite-leaderboard-role")
+    @commands.slash_command(name = "remove-invite-leaderboard-role", description = "Removes a specific role from a specific interval of the invite leaderboard!")
     @commands.has_permissions(administrator = True)
     async def remove_leaderboard_role_invite(self, ctx:discord.ApplicationContext, 
         role:Option(discord.Role, description="Remove a role from the leaderboard roles!"), 
@@ -327,7 +338,7 @@ class Messageleaderboard(commands.Cog):
         await self.process_remove_leaderboard_role(ctx=ctx, role=role, interval=interval, system="invite")
 
     
-    @commands.slash_command(name = "show-invite-leaderboard-roles")
+    @commands.slash_command(name = "show-invite-leaderboard-roles", description = "Shows all roles that have been defined for the invite leaderboard!")
     async def show_leaderboard_roles_invite(self, ctx:discord.ApplicationContext):
 
         emb = discord.Embed(description=f"""## Choose from which leaderboard you want to see the roles
@@ -344,13 +355,13 @@ class Messageleaderboard(commands.Cog):
         await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectInvite())
 
     
-    @commands.slash_command(name = "reset-invite-leaderboard-roles")
+    @commands.slash_command(name = "reset-invite-leaderboard-roles", description = "Resets all roles that have been set for the invite leaderboard!")
     @commands.has_permissions(administrator = True)
     async def reset_leaderboard_roles_invite(self, ctx:discord.ApplicationContext, 
         interval:Option(str, description="Select which leaderboard roles should be reset!", 
             choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
 
-        await self.process_reset_leaderboard_roles(ctx=ctx, interval=interval, system="message")
+        await self.process_reset_leaderboard_roles(ctx=ctx, interval=interval, system="invite")
 
 
 
@@ -371,6 +382,30 @@ class Messageleaderboard(commands.Cog):
         if check[1] == 1:
             
             await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
+
+    
+    '''
+    
+    '''
+    @commands.Cog.listener()
+    async def on_member_join(self, member:discord.Member):
+
+        if member.bot:
+            return
+
+        invites_before = {invite.inviter.id: invite.uses for invite in await member.guild.invites()}
+        
+        await asyncio.sleep(2)
+
+        invites_after = {invite.inviter.id: invite.uses for invite in await member.guild.invites()}
+        
+        for inviter_id in invites_after:
+
+            if invites_after[inviter_id] > invites_before.get(inviter_id, 0):
+                DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = inviter_id, settings = "tracking", interval = "countInvite")
+
+        await self.update_invites(guild=member.guild)
+
  
 
     '''
@@ -429,13 +464,13 @@ class Messageleaderboard(commands.Cog):
 
     
 def setup(bot):
-    bot.add_cog(Messageleaderboard(bot))
+    bot.add_cog(LeaderboardSystem(bot))
 
 
-async def remove_leaderboard_roles(guild:int, interval:str):
+async def remove_leaderboard_roles(guild:int, interval:str, system):
     
-    check_role = DatabaseCheck.check_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = "message")
-    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = "message", operation = "remove")
+    check_role = DatabaseCheck.check_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system)
+    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system, operation = "remove")
     
     for _, role, user, _, _ in check_role:
 
@@ -444,11 +479,11 @@ async def remove_leaderboard_roles(guild:int, interval:str):
         await user.remove_roles(leaderboard_role)
 
 
-async def sort_leaderboard(user_list, interval, guild_id):
+async def sort_leaderboard(user_list, interval, guild_id, system):
     
     guild = bot.get_guild(guild_id)
-    interval_list = ["", "day", "week", "month", "whole"]
-    check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval])
+    interval_list = ["", "day", "week", "month", "whole"] if system == "message" else ["", "week", "month", "quarter", "whole"]
+    check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval], system = system)
     
     general_role = None
     if check_roles:
@@ -490,19 +525,19 @@ async def sort_leaderboard(user_list, interval, guild_id):
         
         if check_roles and i != None:
             
-            role = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1)
+            role = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1, system = system)
 
             if general_role != None and count < 1:
                 
                 await users[i].add_roles(general_role)
-                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = "message", interval = interval_list[interval])
+                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = system, interval = interval_list[interval])
                 count =+ 1
 
             if role != None:
 
                 leaderboard_role = guild.get_role(role[1])
                 await users[i].add_roles(leaderboard_role)
-                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = "message", interval = interval_list[interval])
+                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = system, interval = interval_list[interval])
             
         num_str = str(i + 1)
         if len(num_str) == 1:
@@ -510,13 +545,121 @@ async def sort_leaderboard(user_list, interval, guild_id):
         elif len(num_str) == 2:
             num_str = f" #{num_str} "
         
-        leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `messages {padded_tuples[i][interval]}`\n")
+        leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
         
     return "".join(leaderboard)
 
 
 @tasks.loop(hours=1)
-async def edit_leaderboard(bot):
+async def edit_leaderboard_message(bot):
+
+    for guild in bot.guilds:
+
+        leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id = guild.id, system = "invite")
+
+        if leaderboard_settings:
+
+            if leaderboard_settings[1] == 1:
+                message_ids = [
+                    ("1_week_old", leaderboard_settings[2]),
+                    ("1_month_old", leaderboard_settings[3]),
+                    ("1_quarter_old", leaderboard_settings[4]),
+                    ("whole", leaderboard_settings[5])
+                ]
+                
+                if leaderboard_settings[1] == 1 and leaderboard_settings[6] != None:
+
+                    try:
+                        
+                        current_date = datetime.now(UTC)
+
+                        for message_name, message_id in message_ids:
+
+                            if message_id != None:
+                                
+                                channel = bot.get_channel(leaderboard_settings[6])
+
+                                if leaderboard_settings[5] != None:
+                                    
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+
+                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "whole":
+
+                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 3)
+                                        users = await sort_leaderboard(user_list=user_list, interval=4, guild_id = guild.id)
+                                        emb = discord.Embed(description=f"""## Whole Invite Leaderboard
+                                            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
+                                            {users}""", color=bot_colour)
+
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
+
+                                if leaderboard_settings[2] != None:
+
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+
+                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "1_week_old":
+
+                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 0)
+                                        users = await sort_leaderboard(user_list=user_list, interval=1, guild_id = guild.id)
+                                        emb = discord.Embed(description=f"""## Weekly Invite Leaderboard
+                                            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+                                            {users}
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
+
+                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly", settings = "tracking")
+
+                                if leaderboard_settings[3] != None:
+                                    
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+
+                                    if (current_date - message_age) > timedelta(weeks=1) and message_name == "1_month_old":
+                                        
+                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 1)
+                                        users = await sort_leaderboard(user_list=user_list, interval=2, guild_id = guild.id)
+                                        emb = discord.Embed(description=f"""## Monthly Invite Leaderboard
+                                            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(weeks=1)).timestamp())}>
+
+                                            {users}
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+                                            
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
+
+                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly", settings = "tracking")
+
+                                if leaderboard_settings[4] != None:
+                                    
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+
+                                    if (current_date - message_age) > timedelta(days=30) and message_name == "1_quarter_old":
+                                        
+                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 2)
+                                        users = await sort_leaderboard(user_list=user_list, interval=3, guild_id=guild.id)
+                                        emb = discord.Embed(description=f"""## Quarterly Invite Leaderboard (30 days)
+                                            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+            
+                                            {users}
+                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+
+                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
+
+                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "quarterly", settings = "tracking")
+
+
+                    except Exception as error:
+                        print("parameterized query failed {}".format(error))
+
+
+
+@tasks.loop(hours=1)
+async def edit_leaderboard_invite(bot):
 
     for guild in bot.guilds:
 
@@ -818,51 +961,6 @@ class SetMessageleaderboard(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-class SkipIntervalSetting(discord.ui.Button):
-
-    def __init__(self):
-        super().__init__(
-            label="skip interval setting",
-            style=discord.ButtonStyle.blurple,
-            custom_id="skip_interval_setting"
-        )
-
-    async def callback(self, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            system = 'message' if 'message leaderboard' in interaction.message.embeds[0].description else 'invite'
-            
-            interval = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)
-
-            intervals = {
-                interval[2]:"weekly" if system == "invite" else "daily",
-                interval[3]:"monthly" if system == "invite" else "weekly", 
-                interval[4]:"quarterly" if system == "invite" else "monthly"
-            }
-            
-            if interval[2] or interval[3] or interval[4]:
-                
-                check_interval = "".join([f"{intervals[i]}, " for i in [interval[2], interval[3], interval[4]] if i is not None])
-
-                emb = discord.Embed(description=f"""## Setting the intervals was skipped
-                    {Emojis.dot_emoji} {f'The intervals {check_interval} will be kept as intervals' if len(check_interval) != 1 else f'The interval {check_interval} will be kept'}""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
-
-            else:
-
-                emb = discord.Embed(description=f"""## Setting cannot be skipped
-                    {Emojis.dot_emoji} The setting can only be skipped if at least one interval has been assigned to the message leaderboard
-                    {Emojis.dot_emoji} You must first set an interval before you can continue""", color=bot_colour)
-                await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-    
-
-
-
 class SetInviteleaderboard(discord.ui.View):
 
     def __init__(self):
@@ -967,6 +1065,49 @@ class SetInviteleaderboard(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
+class SkipIntervalSetting(discord.ui.Button):
+
+    def __init__(self):
+        super().__init__(
+            label="skip interval setting",
+            style=discord.ButtonStyle.blurple,
+            custom_id="skip_interval_setting"
+        )
+
+    async def callback(self, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            system = 'message' if 'message leaderboard' in interaction.message.embeds[0].description else 'invite'
+            
+            interval = DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)
+
+            intervals = {
+                interval[2]:"weekly" if system == "invite" else "daily",
+                interval[3]:"monthly" if system == "invite" else "weekly", 
+                interval[4]:"quarterly" if system == "invite" else "monthly"
+            }
+            
+            if interval[2] or interval[3] or interval[4]:
+                
+                check_interval = "".join([f"{intervals[i]}, " for i in [interval[2], interval[3], interval[4]] if i is not None])
+
+                emb = discord.Embed(description=f"""## Setting the intervals was skipped
+                    {Emojis.dot_emoji} {f'The intervals {check_interval} will be kept as intervals' if len(check_interval) != 1 else f'The interval {check_interval} will be kept'}""", color=bot_colour)
+                await interaction.response.edit_message(embed=emb, view=None)
+
+            else:
+
+                emb = discord.Embed(description=f"""## Setting cannot be skipped
+                    {Emojis.dot_emoji} The setting can only be skipped if at least one interval has been assigned to the message leaderboard
+                    {Emojis.dot_emoji} You must first set an interval before you can continue""", color=bot_colour)
+                await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
 class OverwriteMessageChannel(discord.ui.View):
 
     def __init__(
@@ -1048,7 +1189,6 @@ class OverwriteMessageChannel(discord.ui.View):
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
         
-
 
 class ContinueSettingLeaderboard(discord.ui.View):
 
@@ -1230,7 +1370,6 @@ class LeaderboardOnOffSwitch(discord.ui.Button):
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
-
     
 class DefaultSettingsLeaderboard(discord.ui.Button):
     
@@ -1261,8 +1400,35 @@ class DefaultSettingsLeaderboard(discord.ui.Button):
 
 
 
-################################  Message leaderboard roles  ####################################
+#########################################  Message leaderboard roles  ####################################################
         
+
+'''
+
+'''
+def show_leaderboard_roles(guild_id, interval, system):
+
+    check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval, system = system)
+    leaderboard = []
+
+    if check:
+
+        for _, role, poistion, _, _ in check:
+
+            if poistion != 0:
+
+                leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is used for place {poistion}")
+
+            else:
+
+                leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is defined as a general role and is assigned to every user who is on the leaderboard")
+    
+    else:
+
+        leaderboard.append(f"**{Emojis.dot_emoji} No roles have been defined for this leaderboard**")
+
+    return "\n".join(leaderboard)
+
 
 class OverwriteRole(discord.ui.View):
 
@@ -1292,25 +1458,27 @@ class OverwriteRole(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
             
+            system = "message" if "message leaderboard" in interaction.message.embeds[0].description else "invite"
+
             if any(x != None for x in [self.role, self.interval, self.settings, self.position, self.delete]):
 
-                check_role = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1])
+                check_role = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1], system = system)
                 if check_role:
-                    await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval)
-                check_positon = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position)
+                    await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval, system = system)
+                check_positon = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position, system = system)
                 if check_positon:
-                    await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval)
+                    await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval, system = system)
 
-                await DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = "message", interval = self.interval)
+                await DatabaseUpdates.manage_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.role.id, position = self.position, status = system, interval = self.interval)
 
                 emb = discord.Embed(description=f"""## The entry has been overwritten
                     {Emojis.dot_emoji} From now on the role <@&{self.role.id}> is assigned to the {self.position} place, this applies to the {self.interval}{'ly' if self.interval != 'general' else ''} leaderboard
-                    {Emojis.dot_emoji} If you want to change the settings of the message leaderboard system you can do this with the `set-messageleaderboard` command""", color=bot_colour)  
+                    {Emojis.dot_emoji} If you want to change the settings of the {system} leaderboard system you can do this with the `set-{system}-leaderboard` command""", color=bot_colour)  
                 await interaction.response.edit_message(embed=emb, view=None)
 
             else:
 
-                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="leaderboard role", settings2="to overwrite the role", settings3="add-message-leaderboard-role"), view=None)
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="leaderboard role", settings2="to overwrite the role", settings3=f"add-{system}-leaderboard-role"), view=None)
 
         else:
 
@@ -1337,54 +1505,38 @@ class OverwriteRole(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-# Returns all leaderboard roles that have been set for a specific system
-def show_leaderboard_roles(guild_id, interval, system):
-
-    check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval, system = system)
-    leaderboard = []
-
-    if check:
-
-        for _, role, poistion, _, _ in check:
-
-            if poistion != 0:
-
-                leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is used for place {poistion}")
-
-            else:
-
-                leaderboard.append(f"{Emojis.dot_emoji} <@&{role}> is defined as a general role and is assigned to every user who is on the leaderboard")
-    
-    else:
-
-        leaderboard.append(f"**{Emojis.dot_emoji} No roles have been defined for this leaderboard**")
-
-    return "\n".join(leaderboard)
-
-
 class ShowLeaderboardRolesButton(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
 
     @discord.ui.button(
-            label = "show all Leaderboard Roles",
-            style = discord.ButtonStyle.blurple,
-            custom_id = "show_leaderboard_roles_button"
-        )
+        label = "show all leaderboard roles",
+        style = discord.ButtonStyle.blurple,
+        custom_id = "show_leaderboard_roles_button"
+    )
     
     async def callback(self, button, interaction:discord.Interaction):
         
         if interaction.user.guild_permissions.administrator:
 
+            interval_text = {
+                "message":f"""{Emojis.dot_emoji} Daily leaderboard: Every day, the system checks which users have posted the most messages. The previously counted messages are deleted
+                {Emojis.dot_emoji} Weekly leaderboard: Every week, the system checks which users have posted the most messages. The previously counted messages are deleted
+                {Emojis.dot_emoji} Monthly leaderboard: Every month, the system checks which users have posted the most messages. The previously counted messages are deleted
+                {Emojis.dot_emoji} General leaderboard: This checks which users have written the most messages (updated daily). The previously counted messages are not deleted""",
+                
+                "invite":f"""{Emojis.dot_emoji} Weekly leaderboard: Every week, the system checks which users have invited the most users. The previously counted invitations are deleted
+                {Emojis.dot_emoji} Monthly leaderboard: Every month, the system checks which users have invited the most users. The previously counted invitations are deleted
+                {Emojis.dot_emoji} Quarterly leaderboard: Every quarter of a year, the system checks which users have invited the most users. The previously counted invitations are deleted
+                {Emojis.dot_emoji} General leaderboard: This checks which users have invited the most users (updated daily). The previously counted invitations are not deleted"""
+            }
+
             emb = discord.Embed(description=f"""## Leaderboard roles
                 {Emojis.dot_emoji} With the lower select menu you can see which roles are set for which leaderboard
                 {Emojis.dot_emoji} The following leaderboards are available
                 
-                {Emojis.dot_emoji} Daily leaderboard: Every day, the system checks which users have posted the most messages. The previously counted messages are deleted
-                {Emojis.dot_emoji} Weekly leaderboard: Every week, the system checks which users have posted the most messages. The previously counted messages are deleted
-                {Emojis.dot_emoji} Monthly leaderboard: Every month, the system checks which users have posted the most messages. The previously counted messages are deleted
-                {Emojis.dot_emoji} General leaderboard: This checks which users have written the most messages (updated daily). The previously counted messages are not deleted""", color=bot_colour)
+                {interval_text['message' if 'message leaderboard' in interaction.message.embeds[0].description else 'invite']}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=ShowLeaderboardRolesSelectMessage())
         
         else:
@@ -1438,22 +1590,25 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
     
     async def show_leaderboard_given_roles(self, button, interaction:discord.Interaction):
 
-        interval_text = {
-            "Whole":"whole",
-            "Daily":"day",
-            "Weekly":"week",
-            "Monthly":"month"
-        }
+        system = "message" if "Messages Leaderboard" in interaction.message.embeds[0].description else "invite"
+
+        intervals = [
+            "Whole",
+            "Daily" if system == "message" else "Weekly",
+            "Weekly" if system == "message" else "Monthly",
+            "Monthly" if system == "message" else "Quarterly"
+        ]
         
-        for key, interval in interval_text.items():
+        for key in intervals:
 
             if key in interaction.message.embeds[0].description:
             
-                check_roles = DatabaseCheck.check_leaderboard_roles_users(guild_id = interaction.guild.id, status = "message", interval = interval)
+                check_roles = DatabaseCheck.check_leaderboard_roles_users(guild_id = interaction.guild.id, status = system, interval = key.lower())
+
                 user_list, general_role = [], None
                 for role in check_roles:
                     
-                    check_position = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = role[1])
+                    check_position = DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = role[1], system = system)
 
                     if check_position[2] != 0:
 
@@ -1472,7 +1627,6 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
                     {"".join(user_list)}
                     """, color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
-
 
 
 class ShowLeaderboardRolesSelectInvite(discord.ui.View):
