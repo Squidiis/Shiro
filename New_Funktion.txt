@@ -34,3 +34,9 @@ antilink zu anti-link edetieren
 Description adden for the functions (level system, leaderbaord system, mod tools)
 
 Edit Button Names (level system, mod tools)
+
+invite tracker testen
+
+neue Table und funktionen zu delete user data hinfügen
+
+db machen für die invite codes (invite code, anzahl der joins, guildid)

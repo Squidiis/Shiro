@@ -35,7 +35,11 @@ class LeaderboardSystem(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.edit_leaderboard_invite.start()
+        self.edit_leaderboard_message.start()
         self.invite_counts = {}
+        for guild in self.bot.guilds:
+            self.update_invites(guild=guild)
 
     '''
     
@@ -208,18 +212,18 @@ class LeaderboardSystem(commands.Cog):
                 return True
 
         return False
-
-
-    '''
+    
 
     '''
-    async def update_invites(self, guild):
 
+    '''
+    async def update_invites(self, guild:int):
+        
         invites = await guild.invites()
         for invite in invites:
             self.invite_counts[invite.inviter.id] = invite.uses
 
-    
+
 
 #############################################  Message leaderboard commands  #####################################
             
@@ -380,7 +384,7 @@ class LeaderboardSystem(commands.Cog):
         check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
 
         if check[1] == 1:
-            
+    
             await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
 
     
@@ -389,23 +393,31 @@ class LeaderboardSystem(commands.Cog):
     '''
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
-
+        
         if member.bot:
             return
 
-        invites_before = {invite.inviter.id: invite.uses for invite in await member.guild.invites()}
-        
-        await asyncio.sleep(2)
+        invites_before = await member.guild.invites()
+        invite_counts_before = {invite.code: invite.uses for invite in invites_before}
 
-        invites_after = {invite.inviter.id: invite.uses for invite in await member.guild.invites()}
-        
-        for inviter_id in invites_after:
+        await asyncio.sleep(10)
 
-            if invites_after[inviter_id] > invites_before.get(inviter_id, 0):
-                DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = inviter_id, settings = "tracking", interval = "countInvite")
+        invites_after = await member.guild.invites()
+        invite_counts_after = {invite.code: invite.uses for invite in invites_after}
+
+        print("Einladungen vor dem Beitritt:", invite_counts_before)
+        print("Einladungen nach dem Beitritt:", invite_counts_after)
+
+        for invite in invites_after:
+            before_uses = invite_counts_before.get(invite.code, 0)
+            after_uses = invite.uses
+            print(f"Überprüfung: Invite Code: {invite.code}, Before Uses: {before_uses}, After Uses: {after_uses}")
+            if after_uses > before_uses:
+                DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = invite.inviter.id, settings = "tracking", interval = "countInvite")
+                print(f"Einladung von {invite.inviter} verwendet, neue Anzahl: {self.invite_counts[invite.inviter.id]}")
+                break
 
         await self.update_invites(guild=member.guild)
-
  
 
     '''
@@ -462,104 +474,108 @@ class LeaderboardSystem(commands.Cog):
 
                 await DatabaseRemoveDatas.remove_leaderboard_settings(guild_id = channel.guild.id, system = system)
 
+
+
+############################################  Leaderboard system  ###################################
+
+
+    '''
     
-def setup(bot):
-    bot.add_cog(LeaderboardSystem(bot))
-
-
-async def remove_leaderboard_roles(guild:int, interval:str, system):
+    '''
+    async def remove_leaderboard_roles(self, guild:int, interval:str, system:str):
     
-    check_role = DatabaseCheck.check_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system)
-    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system, operation = "remove")
-    
-    for _, role, user, _, _ in check_role:
-
-        user = await guild.fetch_member(user)
-        leaderboard_role = guild.get_role(role)
-        await user.remove_roles(leaderboard_role)
-
-
-async def sort_leaderboard(user_list, interval, guild_id, system):
-    
-    guild = bot.get_guild(guild_id)
-    interval_list = ["", "day", "week", "month", "whole"] if system == "message" else ["", "week", "month", "quarter", "whole"]
-    check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval], system = system)
-    
-    general_role = None
-    if check_roles:
-
-        for i in check_roles:
-
-            if i[2] == 0:
-
-                general_role = guild.get_role(i[1])
-
-    max_lengths = [
-        max(len(str(t[i])) for t in user_list)
-        for i in range(9)
-    ]
-    
-    user_names, users = [], []
-    for t in user_list:
-
-        user = await guild.fetch_member(t[1])
-        user_names.append(user.name)
-        users.append(user)
-        max_lengths[0] = max(max_lengths[0], len(user.name))
-
-    padded_tuples = [
-        (
-            user_names[i].ljust(max_lengths[0]), 
-            str(t[2]).ljust(max_lengths[2]),
-            str(t[3]).ljust(max_lengths[3]),
-            str(t[4]).ljust(max_lengths[4]),
-            str(t[5]).ljust(max_lengths[5])
-        )
-        for i, t in enumerate(user_list)
-    ]
-    
-    await remove_leaderboard_roles(guild=guild, interval=interval_list[interval])
-    
-    leaderboard, count = [], 0
-    for i in range(min(len(user_list), 15)):
+        check_role = DatabaseCheck.check_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system)
+        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system, operation = "remove")
         
-        if check_roles and i != None:
-            
-            role = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1, system = system)
+        for _, role, user, _, _ in check_role:
 
-            if general_role != None and count < 1:
+            user = await guild.fetch_member(user)
+            leaderboard_role = guild.get_role(role)
+            await user.remove_roles(leaderboard_role)
+
+
+    '''
+
+    '''
+    async def sort_leaderboard(self, user_list, interval, guild_id, system):
+    
+        guild = bot.get_guild(guild_id)
+        interval_list = ["", "day", "week", "month", "whole"] if system == "message" else ["", "week", "month", "quarter", "whole"]
+        check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval], system = system)
+        
+        general_role = None
+        if check_roles:
+
+            for i in check_roles:
+
+                if i[2] == 0:
+
+                    general_role = guild.get_role(i[1])
+
+        max_lengths = [
+            max(len(str(t[i])) for t in user_list)
+            for i in range(9)
+        ]
+        
+        user_names, users = [], []
+        for t in user_list:
+
+            user = await guild.fetch_member(t[1])
+            user_names.append(user.name)
+            users.append(user)
+            max_lengths[0] = max(max_lengths[0], len(user.name))
+
+        padded_tuples = [
+            (
+                user_names[i].ljust(max_lengths[0]), 
+                str(t[2]).ljust(max_lengths[2]),
+                str(t[3]).ljust(max_lengths[3]),
+                str(t[4]).ljust(max_lengths[4]),
+                str(t[5]).ljust(max_lengths[5])
+            )
+            for i, t in enumerate(user_list)
+        ]
+        
+        await self.remove_leaderboard_roles(guild=guild, interval=interval_list[interval])
+        
+        leaderboard, count = [], 0
+        for i in range(min(len(user_list), 15)):
+            
+            if check_roles and i != None:
                 
-                await users[i].add_roles(general_role)
-                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = system, interval = interval_list[interval])
-                count =+ 1
+                role = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1, system = system)
 
-            if role != None:
+                if general_role != None and count < 1:
+                    
+                    await users[i].add_roles(general_role)
+                    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = system, interval = interval_list[interval])
+                    count =+ 1
 
-                leaderboard_role = guild.get_role(role[1])
-                await users[i].add_roles(leaderboard_role)
-                await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = system, interval = interval_list[interval])
+                if role != None:
+
+                    leaderboard_role = guild.get_role(role[1])
+                    await users[i].add_roles(leaderboard_role)
+                    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = system, interval = interval_list[interval])
+                
+            num_str = str(i + 1)
+            if len(num_str) == 1:
+                num_str = f" #{num_str}  "
+            elif len(num_str) == 2:
+                num_str = f" #{num_str} "
             
-        num_str = str(i + 1)
-        if len(num_str) == 1:
-            num_str = f" #{num_str}  "
-        elif len(num_str) == 2:
-            num_str = f" #{num_str} "
-        
-        leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
-        
-    return "".join(leaderboard)
+            leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
+            
+        return "".join(leaderboard)
 
 
-@tasks.loop(hours=1)
-async def edit_leaderboard_message(bot):
+    @tasks.loop(hours=1)
+    async def edit_leaderboard_invite(self):
+        print("invite")
+        for guild in self.bot.guilds:
+            leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="invite")
 
-    for guild in bot.guilds:
+            if leaderboard_settings and leaderboard_settings[1] == 1:
 
-        leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id = guild.id, system = "invite")
-
-        if leaderboard_settings:
-
-            if leaderboard_settings[1] == 1:
                 message_ids = [
                     ("1_week_old", leaderboard_settings[2]),
                     ("1_month_old", leaderboard_settings[3]),
@@ -567,107 +583,102 @@ async def edit_leaderboard_message(bot):
                     ("whole", leaderboard_settings[5])
                 ]
                 
-                if leaderboard_settings[1] == 1 and leaderboard_settings[6] != None:
+                if leaderboard_settings[6] is not None:
 
                     try:
-                        
+
                         current_date = datetime.now(UTC)
+                        channel = self.bot.get_channel(leaderboard_settings[6])
 
                         for message_name, message_id in message_ids:
 
-                            if message_id != None:
-                                
-                                channel = bot.get_channel(leaderboard_settings[6])
+                            if message_id is not None:
 
-                                if leaderboard_settings[5] != None:
-                                    
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+                                message = await channel.fetch_message(message_id)
+                                message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "whole":
+                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
 
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 3)
-                                        users = await sort_leaderboard(user_list=user_list, interval=4, guild_id = guild.id)
-                                        emb = discord.Embed(description=f"""## Whole Invite Leaderboard
-                                            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
-                                            {users}""", color=bot_colour)
+                                    await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
 
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
+                                if message_name == "1_week_old" and (current_date - message_age) > timedelta(minutes=1):
 
-                                if leaderboard_settings[2] != None:
+                                    await self.update_weekly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+                                if message_name == "1_month_old" and (current_date - message_age) > timedelta(weeks=1):
 
-                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "1_week_old":
+                                    await self.update_monthly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 0)
-                                        users = await sort_leaderboard(user_list=user_list, interval=1, guild_id = guild.id)
-                                        emb = discord.Embed(description=f"""## Weekly Invite Leaderboard
-                                            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+                                if message_name == "1_quarter_old" and (current_date - message_age) > timedelta(days=30):
 
-                                            {users}
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
-
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
-
-                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly", settings = "tracking")
-
-                                if leaderboard_settings[3] != None:
-                                    
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
-
-                                    if (current_date - message_age) > timedelta(weeks=1) and message_name == "1_month_old":
-                                        
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 1)
-                                        users = await sort_leaderboard(user_list=user_list, interval=2, guild_id = guild.id)
-                                        emb = discord.Embed(description=f"""## Monthly Invite Leaderboard
-                                            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(weeks=1)).timestamp())}>
-
-                                            {users}
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
-                                            
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
-
-                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly", settings = "tracking")
-
-                                if leaderboard_settings[4] != None:
-                                    
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
-
-                                    if (current_date - message_age) > timedelta(days=30) and message_name == "1_quarter_old":
-                                        
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 2)
-                                        users = await sort_leaderboard(user_list=user_list, interval=3, guild_id=guild.id)
-                                        emb = discord.Embed(description=f"""## Quarterly Invite Leaderboard (30 days)
-                                            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
-            
-                                            {users}
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
-
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
-
-                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "quarterly", settings = "tracking")
-
+                                    await self.update_quarterly_leaderboard_invite(guild_id=guild.id, message=message)
 
                     except Exception as error:
-                        print("parameterized query failed {}".format(error))
+                        print(f"parameterized query failed {error}")
 
 
+    async def update_whole_leaderboard_invite(self, guild_id:int, message:discord.Message):
 
-@tasks.loop(hours=1)
-async def edit_leaderboard_invite(bot):
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=3, system = "invite")
+        users = await self.sort_leaderboard(user_list=user_list, interval=4, guild_id=guild_id, system="invite")
 
-    for guild in bot.guilds:
+        emb = discord.Embed(description=f"""## Whole Invite Leaderboard
+            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
 
-        leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id = guild.id, system = "message")
+            {users}""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
 
-        if leaderboard_settings:
 
-            if leaderboard_settings[1] == 1:
+    async def update_weekly_leaderboard_invite(self, guild_id:int, message:discord.Message):
+
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=0, system = "invite")
+        users = await self.sort_leaderboard(user_list=user_list, interval=1, guild_id=guild_id, system="invite")
+
+        emb = discord.Embed(description=f"""## Weekly Invite Leaderboard
+            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+            {users}
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(weeks=1)).timestamp())}>""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
+        await DatabaseUpdates.manage_leaderboard_invite(guild_id=guild_id, back_to_none="weekly", settings="tracking")
+
+
+    async def update_monthly_leaderboard_invite(self, guild_id:int, message:discord.Message):
+
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=1, system = "invite")
+        users = await self.sort_leaderboard(user_list=user_list, interval=2, guild_id=guild_id, system="invite")
+
+        emb = discord.Embed(description=f"""## Monthly Invite Leaderboard
+            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+            {users}
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
+        await DatabaseUpdates.manage_leaderboard_invite(guild_id=guild_id, back_to_none="monthly", settings="tracking")
+
+
+    async def update_quarterly_leaderboard_invite(self, guild_id:int, message:discord.Message):
+
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=2, system = "invite")
+        users = await self.sort_leaderboard(user_list=user_list, interval=3, guild_id=guild_id, system="invite")
+
+        emb = discord.Embed(description=f"""## Quarterly Invite Leaderboard (90 days)
+            {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=80)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+            {users}
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=90)).timestamp())}>""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
+        await DatabaseUpdates.manage_leaderboard_invite(guild_id=guild_id, back_to_none="quarterly", settings="tracking")
+
+
+    @tasks.loop(hours=1)
+    async def edit_leaderboard_message(self):
+
+        for guild in self.bot.guilds:
+            leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="message")
+
+            if leaderboard_settings and leaderboard_settings[1] == 1:
+
                 message_ids = [
                     ("1_day_old", leaderboard_settings[2]),
                     ("1_week_old", leaderboard_settings[3]),
@@ -675,94 +686,100 @@ async def edit_leaderboard_invite(bot):
                     ("whole", leaderboard_settings[5])
                 ]
                 
-                if leaderboard_settings[1] == 1 and leaderboard_settings[6] != None:
+                if leaderboard_settings[6] is not None:
 
                     try:
-                        
+
                         current_date = datetime.now(UTC)
+                        channel = self.bot.get_channel(leaderboard_settings[6])
 
                         for message_name, message_id in message_ids:
 
-                            if message_id != None:
-                                
-                                channel = bot.get_channel(leaderboard_settings[6])
+                            if message_id is not None:
 
-                                if leaderboard_settings[5] != None:
-                                    
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+                                message = await channel.fetch_message(message_id)
+                                message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "whole":
+                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
 
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 3)
-                                        users = await sort_leaderboard(user_list=user_list, interval=4, guild_id = guild.id)
-                                        emb = discord.Embed(description=f"""## Whole Messages Leaderboard
-                                            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
-                                            {users}""", color=bot_colour)
+                                    await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
 
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
+                                if message_name == "1_day_old" and (current_date - message_age) > timedelta(minutes=1):
 
-                                if leaderboard_settings[2] != None:
+                                    await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
 
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
+                                if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
 
-                                    if (current_date - message_age) > timedelta(minutes=1) and message_name == "1_day_old":
+                                    await self.update_weekly_leaderboard_message(guild_id=guild.id, message=message)
 
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 0)
-                                        users = await sort_leaderboard(user_list=user_list, interval=1, guild_id = guild.id)
-                                        emb = discord.Embed(description=f"""## Daily Messages Leaderboard
-                                            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+                                if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
 
-                                            {users}
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
-
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
-
-                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily", settings = "tracking")
-
-                                if leaderboard_settings[3] != None:
-                                    
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
-
-                                    if (current_date - message_age) > timedelta(weeks=1) and message_name == "1_week_old":
-                                        
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 1)
-                                        users = await sort_leaderboard(user_list=user_list, interval=2, guild_id = guild.id)
-                                        emb = discord.Embed(description=f"""## Weekly Messages Leaderboard
-                                            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(weeks=1)).timestamp())}>
-
-                                            {users}
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
-                                            
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
-
-                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly", settings = "tracking")
-
-                                if leaderboard_settings[4] != None:
-                                    
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at != None else message.created_at
-
-                                    if (current_date - message_age) > timedelta(days=30) and message_name == "1_month_old":
-                                        
-                                        user_list = DatabaseCheck.check_leaderboard_message(guild_id = guild.id, interval = 2)
-                                        users = await sort_leaderboard(user_list=user_list, interval=3, guild_id=guild.id)
-                                        emb = discord.Embed(description=f"""## Monthly Messages Leaderboard (30 days)
-                                            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
-            
-                                            {users}
-                                            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
-
-                                        await message.edit(embed = emb, view=ShowLeaderboardGivenRoles())
-
-                                        await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly", settings = "tracking")
-
+                                    await self.update_monthly_leaderboard_message(guild_id=guild.id, message=message)
 
                     except Exception as error:
-                        print("parameterized query failed {}".format(error))
+                        print(f"parameterized query failed {error}")
+
+
+    async def update_whole_leaderboard_message(self, guild_id:int, message:discord.Message):
+
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=3, system = "message")
+        users = await self.sort_leaderboard(user_list=user_list, interval=4, guild_id=guild_id, system="message")
+
+        emb = discord.Embed(description=f"""## Whole Message Leaderboard
+            The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
+
+            {users}""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
+
+
+    async def update_daily_leaderboard_message(self, guild_id:int, message:discord.Message):
+
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=0, system = "message")
+        users = await self.sort_leaderboard(user_list=user_list, interval=1, guild_id=guild_id, system="message")
+
+        emb = discord.Embed(description=f"""## Daily Message Leaderboard
+            {Emojis.dot_emoji} These are the users who have written the most message in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+            {users}
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
+        await DatabaseUpdates.manage_leaderboard_message(guild_id=guild_id, back_to_none="daily", settings="tracking")
+
+
+    async def update_weekly_leaderboard_message(self, guild_id:int, message:discord.Message):
+
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=1, system = "message")
+        users = await self.sort_leaderboard(user_list=user_list, interval=2, guild_id=guild_id, system="message")
+
+        emb = discord.Embed(description=f"""## Weekly Message Leaderboard
+            {Emojis.dot_emoji} These are the users who have written the most message in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+            {users}
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
+        await DatabaseUpdates.manage_leaderboard_message(guild_id=guild_id, back_to_none="weekly", settings="tracking")
+
+
+    async def update_monthly_leaderboard_message(self, guild_id:int, message:discord.Message):
+
+        user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=2, system = "message")
+        users = await self.sort_leaderboard(user_list=user_list, interval=3, guild_id=guild_id, system="message")
+
+        emb = discord.Embed(description=f"""## Monthly Message Leaderboard (30 days)
+            {Emojis.dot_emoji} These are the users who have written the most message in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+
+            {users}
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+        await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
+        await DatabaseUpdates.manage_leaderboard_message(guild_id=guild_id, back_to_none="monthly", settings="tracking")
+
+    
+def setup(bot):
+    bot.add_cog(LeaderboardSystem(bot))
+
+
+
+#######################################  Leaderboard system interactions  ###################################
 
 
 class SetleaderboardChannel(discord.ui.View):
@@ -1048,8 +1065,8 @@ class SetInviteleaderboard(discord.ui.View):
                     if i != None:
 
                         emb = discord.Embed(
-                            description=f"""## The number of messages is saved for {interval_text_invite[i][0]}.
-                            {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text_invite[i][1])).timestamp())}> and will then act as a leaderboard and show who has written the most messages on the server""", color=bot_colour)
+                            description=f"""## The number of invitations is saved for {interval_text_invite[i][0]}.
+                            {Emojis.dot_emoji} This message will be edited on <t:{int((datetime.now() + timedelta(days=interval_text_invite[i][1])).timestamp())}> and will then act as a leaderboard and show who has invited the most users on the server""", color=bot_colour)
                         message = await channel.send(embed=emb)
                         
                         await DatabaseUpdates.manage_leaderboard_invite(guild_id = interaction.guild.id, settings = i, message_id = message.id)

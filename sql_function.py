@@ -397,17 +397,19 @@ class DatabaseCheck():
         - user_id
             Id of the user to be checked
         - interval
-            The interval in which the leaderboard is updated
-            - 0 day
-            - 1 week
-            - 2  month
+            The interval in which the leaderboard is updated (distinguishes between message and invite leaderboard)
+            - 0 day or week
+            - 1 week or month
+            - 2  month or quarter
+            - 3 whole
     Info:
         - guild_id must be specified
         - Depending on which item you specify, you will receive the respective entries from the database
         - If you do not specify a channel, category, role or user id, the entire whitelist will be returned
     '''
-    def check_leaderboard_message(
+    def check_leaderboard(
         guild_id:int,
+        system:str, 
         user_id:int = None,
         interval:int = None
         ):
@@ -415,7 +417,10 @@ class DatabaseCheck():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        column_name = ["dailyCountMessage", "weeklyCountMessage", "monthlyCountMessage", "wholeCountMessage"]
+        column_name = [
+            "dailyCountMessage", "weeklyCountMessage", "monthlyCountMessage", "wholeCountMessage"
+            ] if system == "message" else [
+            "weeklyCountInvite", "monthlyCountInvite", "quarterlyCountInvite", "wholeCountInvite"]
 
         if interval != None:
 
@@ -1284,7 +1289,7 @@ class DatabaseUpdates():
 
             elif interval:
                 
-                check_user = DatabaseCheck.check_leaderboard_message(guild_id = guild_id, user_id = user_id)
+                check_user = DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id, system = "message")
 
                 if check_user and interval == "countMessage":
                     
@@ -1326,7 +1331,7 @@ class DatabaseUpdates():
         channel_id:int = None,
         back_to_none = None
         ):
-    
+        print("check")
         column_name_settings = {
             "weekly":"invitebourdMessageIdWeek" if settings != "tracking" else "weeklyCountInvite", 
             "monthly":"invitebourdMessageIdMonth" if settings != "tracking" else "monthlyCountInvite", 
@@ -1357,11 +1362,12 @@ class DatabaseUpdates():
                 cursor.execute(settings, settings_values)
 
             elif interval:
-                
-                check_user = DatabaseCheck.check_leaderboard_message(guild_id = guild_id, user_id = user_id)
-
+                print("one step")
+                check_user = DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id, system = "invite")
+                print(check_user)
+                print(interval, settings, user_id, guild_id)
                 if check_user != None and interval == "countInvite":
-                    
+                    print(6)
                     update_stats = f"UPDATE LeaderboardTacking SET weeklyCountInvite = %s, monthlyCountInvite = %s, quarterlyCountInvite = %s, wholeCountInvite = %s WHERE guildId = %s AND userId = %s"
                     update_stats_values = [check_user[6] + 1, check_user[7] + 1, check_user[8] + 1, check_user[9] + 1, guild_id, user_id]
 

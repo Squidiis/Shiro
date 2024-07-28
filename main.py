@@ -225,13 +225,6 @@ class Main(commands.Cog):
 
         await Main.create_db_table()
 
-        for guild in bot.guilds:
-            await LeaderboardSystem.update_invites(guild)
-
-
-        if not edit_leaderboard_message.is_running():
-            edit_leaderboard_message.start(self.bot)
-
 
 # Status task while the bot is active, the status is permanently updated
 async def status_task():

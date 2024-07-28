@@ -16,6 +16,9 @@ class DeleteData(commands.Cog):
 #########################################  Deletes data when a user or the bot itself leaves the server   ############################################
 
 
+    '''
+    
+    '''
     def delete_data(table:str, column:str, item):
 
         db_connect = DatabaseSetup.db_connector()
