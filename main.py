@@ -17,53 +17,6 @@ class Main(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.check_expired_invite_liks.start()
-
-    '''
-    
-    '''
-    @classmethod
-    async def collects_invitation_links(cls):
-
-        for guild in bot.guilds:
-
-            for invite in await guild.invites():
-
-                if invite.inviter.bot:
-
-                    pass
-                
-                else:
-
-                    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = guild.id, user_id = invite.inviter.id, invite_code = invite.code, uses = invite.uses)
-    
-
-    '''
-    
-    '''
-    @classmethod
-    async def check_expired_invites(cls):
-        
-        for guild in bot.guilds:
-
-            invite_codes = DatabaseCheck.check_invite_codes(guild_id = guild.id)
-
-            for (invite_code,) in invite_codes:
-
-                invite = await bot.fetch_invite(invite_code)
-                if invite.revoked or invite.max_uses and invite.uses >= invite.max_uses:
-                        
-                    await DatabaseRemoveDatas.remove_invite_links(guild_id = guild.id, invite_code = invite_code)
-            
-
-    '''
-    
-    '''
-    @tasks.loop(hours=24)
-    async def check_expired_invite_liks(self):
-
-        await self.check_expired_invites()
-        await self.collects_invitation_links()
 
 
     '''
@@ -284,8 +237,8 @@ class Main(commands.Cog):
         self.bot.add_view(view)
 
         await Main.create_db_table()
-        await self.collects_invitation_links()
-        await self.check_expired_invites()
+        await LeaderboardSystem.collects_invitation_links()
+        await LeaderboardSystem.check_expired_invites()
 
 
 # Status task while the bot is active, the status is permanently updated

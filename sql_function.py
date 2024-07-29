@@ -544,7 +544,8 @@ class DatabaseCheck():
     def check_invite_codes(
         guild_id:int,
         invite_code:str = None,  
-        user_id:int = None
+        user_id:int = None,
+        remove_value:str = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
@@ -557,7 +558,7 @@ class DatabaseCheck():
 
         else:
 
-            check_invite = "SELECT inviteCode FROM LeaderboardInviteTracking WHERE guildId = %s"
+            check_invite = f"SELECT inviteCode{', usesCount' if remove_value == None else ''} FROM LeaderboardInviteTracking WHERE guildId = %s"
             check_invite_values = [guild_id]
         
         cursor.execute(check_invite, check_invite_values)
@@ -1484,8 +1485,8 @@ class DatabaseUpdates():
                 update_invites = "INSERT INTO LeaderboardInviteTracking (guildId, userId, inviteCode, usesCount) VALUES (%s, %s, %s, %s)"
                 update_invites_values = [guild_id, user_id, invite_code, uses]
 
-            cursor.execute(update_invites, update_invites_values)
-            db_connect.commit()
+                cursor.execute(update_invites, update_invites_values)
+                db_connect.commit()
 
         except mysql.connector.Error as error:
             print("parameterized query failed {}".format(error))

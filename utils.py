@@ -78,7 +78,6 @@ default_message = 'Oh nice {user} you have a new level, your newlevel is {level}
 
 def is_admin():
     async def predicate(ctx):
-        # Überprüfe, ob der Benutzer Administrator ist
         if ctx.guild is None:
             return False
         member = ctx.guild.get_member(ctx.author.id)
@@ -108,6 +107,7 @@ class GetEmbed():
                 7: General message leaderboard
                 8: Settings message leaderboard
                 9: Antilink violation
+                10: Error embed for overrides
         - settings
             The correct information that must be inserted in the embed
         - settings2 (same as settings)

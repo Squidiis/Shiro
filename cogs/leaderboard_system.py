@@ -3,6 +3,7 @@ from utils import *
 from sql_function import *
 from discord.ext import tasks
 
+
 # Dictionary for the check functions (does not have to be in each command individually)
 interval_list_message = {
     "day":"daily leaderboard",
@@ -38,8 +39,59 @@ class LeaderboardSystem(commands.Cog):
         self.edit_leaderboard_invite.start()
         self.edit_leaderboard_message.start()
         self.invite_counts = {}
-        for guild in self.bot.guilds:
-            self.update_invites(guild=guild)
+        self.check_expired_invite_liks.start()
+
+    '''
+    
+    '''
+    @classmethod
+    async def collects_invitation_links(cls):
+
+        for guild in bot.guilds:
+
+            for invite in await guild.invites():
+
+                if invite.inviter.bot:
+
+                    pass
+                
+                else:
+
+                    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = guild.id, user_id = invite.inviter.id, invite_code = invite.code, uses = invite.uses)
+    
+
+    '''
+    
+    '''
+    @classmethod
+    async def check_expired_invites(cls):
+        
+        for guild in bot.guilds:
+
+            invite_codes = DatabaseCheck.check_invite_codes(guild_id = guild.id, remove_value = "remove")
+            
+            for (invite_code,) in invite_codes:
+                
+                try:
+
+                    invite = await bot.fetch_invite(invite_code)
+                    if invite.revoked or invite.max_uses and invite.uses >= invite.max_uses:
+                 
+                        await DatabaseRemoveDatas.remove_invite_links(guild_id = guild.id, invite_code = invite_code)
+
+                except discord.NotFound:
+
+                    await DatabaseRemoveDatas.remove_invite_links(guild_id = guild.id, invite_code = invite_code)
+
+    '''
+    
+    '''
+    @tasks.loop(hours=24)
+    async def check_expired_invite_liks(self):
+
+        await self.check_expired_invites()
+        await self.collects_invitation_links()
+
 
     '''
     
@@ -212,16 +264,6 @@ class LeaderboardSystem(commands.Cog):
                 return True
 
         return False
-    
-
-    '''
-
-    '''
-    async def update_invites(self, guild:int):
-        
-        invites = await guild.invites()
-        for invite in invites:
-            self.invite_counts[invite.inviter.id] = invite.uses
 
 
 
@@ -397,28 +439,42 @@ class LeaderboardSystem(commands.Cog):
         if member.bot:
             return
 
-        invites_before = await member.guild.invites()
-        invite_counts_before = {invite.code: invite.uses for invite in invites_before}
-
-        await asyncio.sleep(10)
+        invites_before = DatabaseCheck.check_invite_codes(guild_id = member.guild.id)
 
         invites_after = await member.guild.invites()
-        invite_counts_after = {invite.code: invite.uses for invite in invites_after}
 
-        print("Einladungen vor dem Beitritt:", invite_counts_before)
-        print("Einladungen nach dem Beitritt:", invite_counts_after)
+        code_sum1 = {}
+        code_sum2 = {}
 
+        for code, count in invites_before:
+            if code in code_sum1:
+                code_sum1[code] += count
+            else:
+                code_sum1[code] = count
+    
+        invite_before_sum = [(code, count) for code, count in code_sum1.items()]
+        # TODO: Hinzufügen das auch der Name mit eingereichnet
         for invite in invites_after:
-            before_uses = invite_counts_before.get(invite.code, 0)
-            after_uses = invite.uses
-            print(f"Überprüfung: Invite Code: {invite.code}, Before Uses: {before_uses}, After Uses: {after_uses}")
-            if after_uses > before_uses:
-                DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = invite.inviter.id, settings = "tracking", interval = "countInvite")
-                print(f"Einladung von {invite.inviter} verwendet, neue Anzahl: {self.invite_counts[invite.inviter.id]}")
-                break
+            if invite.code in code_sum2:
+                code_sum2[invite.code] += invite.uses
+            else:
+                code_sum2[invite.code] = invite.uses
+    
+        invite_after_sum = [(code, count) for code, count in code_sum2.items()]   
 
-        await self.update_invites(guild=member.guild)
- 
+        for invite in invite_after_sum:
+            
+            for invite_before in invite_before_sum:
+
+                if invite_before[0] == invite[0] and invite_before[1] < invite[1]:
+                    print(invite_before[0], invite[0], invite_before[1], invite[1])
+                    await DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = invites_after.inviter.id, settings = "tracking", interval = "countInvite")
+                    print(invite.inviter.id)
+                    break
+
+        await self.check_expired_invites()
+        await self.collects_invitation_links()                
+
 
     '''
     
