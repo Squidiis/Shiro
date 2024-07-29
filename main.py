@@ -14,10 +14,61 @@ async def ping(ctx):
 
 
 class Main(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
+        self.check_expired_invite_liks.start()
 
-    # Creates all the necessary tables that the bot needs right at the beginning
+    '''
+    
+    '''
+    @classmethod
+    async def collects_invitation_links(cls):
+
+        for guild in bot.guilds:
+
+            for invite in await guild.invites():
+
+                if invite.inviter.bot:
+
+                    pass
+                
+                else:
+
+                    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = guild.id, user_id = invite.inviter.id, invite_code = invite.code, uses = invite.uses)
+    
+
+    '''
+    
+    '''
+    @classmethod
+    async def check_expired_invites(cls):
+        
+        for guild in bot.guilds:
+
+            invite_codes = DatabaseCheck.check_invite_codes(guild_id = guild.id)
+
+            for (invite_code,) in invite_codes:
+
+                invite = await bot.fetch_invite(invite_code)
+                if invite.revoked or invite.max_uses and invite.uses >= invite.max_uses:
+                        
+                    await DatabaseRemoveDatas.remove_invite_links(guild_id = guild.id, invite_code = invite_code)
+            
+
+    '''
+    
+    '''
+    @tasks.loop(hours=24)
+    async def check_expired_invite_liks(self):
+
+        await self.check_expired_invites()
+        await self.collects_invitation_links()
+
+
+    '''
+    
+    '''
     async def create_db_table():
 
         db_connect = DatabaseSetup.db_connector()
@@ -147,6 +198,15 @@ class Main(commands.Cog):
                 invitebourdMessageIdWhole BIGINT UNSIGNED NULL,
                 leaderboardChannel BIGINT UNSIGNED NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;  
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS LeaderboardInviteTracking (
+                guildId BIGINT UNSIGNED NOT NULL,
+                userId BIGINT UNSIGNED NOT NULL,
+                inviteCode VARCHAR(20) NOT NULL,
+                usesCount INT NOT NULL,
+                UNIQUE KEY unique_invite (guildId, inviteCode)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
             ]
 
@@ -224,6 +284,8 @@ class Main(commands.Cog):
         self.bot.add_view(view)
 
         await Main.create_db_table()
+        await self.collects_invitation_links()
+        await self.check_expired_invites()
 
 
 # Status task while the bot is active, the status is permanently updated

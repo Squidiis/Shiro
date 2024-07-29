@@ -539,8 +539,35 @@ class DatabaseCheck():
         leaderbaord_user_roles = cursor.fetchall()
 
         return leaderbaord_user_roles
-
     
+
+    def check_invite_codes(
+        guild_id:int,
+        invite_code:str = None,  
+        user_id:int = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+        
+        if invite_code:
+
+            check_invite = f"SELECT * FROM LeaderboardInviteTracking WHERE guildId = %s AND inviteCode = %s {'AND user_id = %s' if user_id != None else ''}"
+            check_invite_values = [guild_id, user_id, invite_code] if user_id != None else [guild_id, invite_code]
+
+        else:
+
+            check_invite = "SELECT inviteCode FROM LeaderboardInviteTracking WHERE guildId = %s"
+            check_invite_values = [guild_id]
+        
+        cursor.execute(check_invite, check_invite_values)
+
+        if invite_code:
+            invite_code_check = cursor.fetchone()
+        else:
+            invite_code_check = cursor.fetchall()
+
+        return invite_code_check
 
 
 
@@ -1331,7 +1358,7 @@ class DatabaseUpdates():
         channel_id:int = None,
         back_to_none = None
         ):
-        print("check")
+
         column_name_settings = {
             "weekly":"invitebourdMessageIdWeek" if settings != "tracking" else "weeklyCountInvite", 
             "monthly":"invitebourdMessageIdMonth" if settings != "tracking" else "monthlyCountInvite", 
@@ -1362,12 +1389,11 @@ class DatabaseUpdates():
                 cursor.execute(settings, settings_values)
 
             elif interval:
-                print("one step")
+                
                 check_user = DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id, system = "invite")
-                print(check_user)
-                print(interval, settings, user_id, guild_id)
+
                 if check_user != None and interval == "countInvite":
-                    print(6)
+                
                     update_stats = f"UPDATE LeaderboardTacking SET weeklyCountInvite = %s, monthlyCountInvite = %s, quarterlyCountInvite = %s, wholeCountInvite = %s WHERE guildId = %s AND userId = %s"
                     update_stats_values = [check_user[6] + 1, check_user[7] + 1, check_user[8] + 1, check_user[9] + 1, guild_id, user_id]
 
@@ -1423,6 +1449,42 @@ class DatabaseUpdates():
             create_settings_values = [guild_id, channel_id]
 
             cursor.execute(create_settings, create_settings_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
+    '''
+    
+    '''
+    async def manage_leaderboard_invite_list(
+        guild_id:int, 
+        user_id:int, 
+        invite_code:str, 
+        uses:int
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        try:
+
+            invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+
+            if invite_code_check:
+                pass
+
+            else:
+
+                update_invites = "INSERT INTO LeaderboardInviteTracking (guildId, userId, inviteCode, usesCount) VALUES (%s, %s, %s, %s)"
+                update_invites_values = [guild_id, user_id, invite_code, uses]
+
+            cursor.execute(update_invites, update_invites_values)
             db_connect.commit()
 
         except mysql.connector.Error as error:
@@ -1724,6 +1786,38 @@ class DatabaseRemoveDatas():
                 delete_leaderboard_role_values = [guild_id, system]
 
             cursor.execute(delete_leaderboard_role, delete_leaderboard_role_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+        
+        finally:
+
+            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+
+
+    async def remove_invite_links(
+        guild_id:int,
+        invite_code:str,
+        user_id:int = None
+        ):
+        
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        try:
+
+            if user_id:
+
+                delete_invite_link = "DELETE FROM LeaderboardInviteTracking WHERE guildId = %s AND inviteCode = %s AND userId = %s"
+                delete_invite_link_values = [guild_id, invite_code, user_id]
+
+            else:
+
+                delete_invite_link = "DELETE FROM LeaderboardInviteTracking WHERE guildId = %s AND inviteCode = %s"
+                delete_invite_link_values = [guild_id, invite_code]
+
+            cursor.execute(delete_invite_link, delete_invite_link_values)
             db_connect.commit()
 
         except mysql.connector.Error as error:

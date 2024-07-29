@@ -39,4 +39,4 @@ invite tracker testen
 
 neue Table und funktionen zu delete user data hinfügen
 
-db machen für die invite codes (invite code, anzahl der joins, guildid)
+funktion zum zusammen rechnen aller invites eines users

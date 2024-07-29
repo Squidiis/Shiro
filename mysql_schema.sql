@@ -141,6 +141,17 @@ CREATE TABLE LeaderboardGivenRoles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+DROP TABLE IF EXISTS `LeaderboardInviteTracking`;
+
+CREATE TABLE LeaderboardInviteTracking (
+    guildId BIGINT UNSIGNED NOT NULL,
+    userId BIGINT UNSIGNED NOT NULL,
+    inviteCode VARCHAR(20) NOT NULL,
+    usesCount INT NOT NULL,
+    UNIQUE KEY unique_invite (guildId, inviteCode)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 ------------- Table for the Bot settigs -----------------
 
 DROP TABLE IF EXISTS `BotSettings`;
