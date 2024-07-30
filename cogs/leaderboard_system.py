@@ -68,7 +68,7 @@ class LeaderboardSystem(commands.Cog):
         
         for guild in bot.guilds:
 
-            invite_codes = DatabaseCheck.check_invite_codes(guild_id = guild.id, remove_value = "remove")
+            invite_codes = DatabaseCheck.check_invite_codes(guild_id = guild.id, remove_value = "")
             
             for (invite_code,) in invite_codes:
                 
@@ -438,42 +438,64 @@ class LeaderboardSystem(commands.Cog):
         
         if member.bot:
             return
-
+    
         invites_before = DatabaseCheck.check_invite_codes(guild_id = member.guild.id)
-
         invites_after = await member.guild.invites()
 
-        code_sum1 = {}
-        code_sum2 = {}
+        summary = {}
+        for _, user_id, code , uses in invites_before:
 
-        for code, count in invites_before:
-            if code in code_sum1:
-                code_sum1[code] += count
+            if user_id in summary:
+
+                summary[user_id]['codes'].add(code)
+                summary[user_id]['uses'][code] = summary[user_id]['uses'].get(code, 0) + uses
+
             else:
-                code_sum1[code] = count
-    
-        invite_before_sum = [(code, count) for code, count in code_sum1.items()]
-        # TODO: Hinzufügen das auch der Name mit eingereichnet
+
+                summary[user_id] = {'codes': {code}, 'uses': {code: uses}}
+        
+        result_before = []
+        for user_id in summary:
+
+            total_uses = sum(summary[user_id]['uses'].values())
+            for code in summary[user_id]['codes']:
+
+                result_before.append((code, user_id, total_uses))
+        
+        summary2 = {}
         for invite in invites_after:
-            if invite.code in code_sum2:
-                code_sum2[invite.code] += invite.uses
-            else:
-                code_sum2[invite.code] = invite.uses
-    
-        invite_after_sum = [(code, count) for code, count in code_sum2.items()]   
-
-        for invite in invite_after_sum:
+            code = invite.code
+            name = invite.inviter.id
+            uses = invite.uses
             
-            for invite_before in invite_before_sum:
+            if name in summary2:
 
-                if invite_before[0] == invite[0] and invite_before[1] < invite[1]:
-                    print(invite_before[0], invite[0], invite_before[1], invite[1])
-                    await DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = invites_after.inviter.id, settings = "tracking", interval = "countInvite")
-                    print(invite.inviter.id)
-                    break
+                summary2[name]['codes'].add(code)
+                summary2[name]['uses'][code] = summary2[name]['uses'].get(code, 0) + uses
 
-        await self.check_expired_invites()
-        await self.collects_invitation_links()                
+            else:
+
+                summary2[name] = {'codes': {code}, 'uses': {code: uses}}
+
+        result_after = []
+        for name in summary2:
+
+            total_uses = sum(summary2[name]['uses'].values())
+
+            for code in summary2[name]['codes']:
+
+                result_after.append((code, name, total_uses))
+
+        for entry_after in result_after:
+            
+            for entry_before in result_before:
+                
+                if entry_after[1] == entry_before[1] and entry_before[2] < entry_after[2]:
+
+                    await DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = entry_before[1], settings = "tracking", interval = "countInvite")
+                    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_before[1], invite_code = entry_before[0], uses = entry_after[2])
+                    await self.check_expired_invites()
+                    return            
 
 
     '''
