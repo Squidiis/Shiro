@@ -29,7 +29,7 @@ interval_text_invite = {
     "weekly":("one week", 7),
     "monthly":("one month", 30),
     "quarterly":("a quarter of a year", 90)
-}
+    }
 
 
 class LeaderboardSystem(commands.Cog):
@@ -38,11 +38,14 @@ class LeaderboardSystem(commands.Cog):
         self.bot = bot
         self.edit_leaderboard_invite.start()
         self.edit_leaderboard_message.start()
-        self.invite_counts = {}
         self.check_expired_invite_liks.start()
 
+
     '''
-    
+    Adds all existing Invite links to a database
+
+    Info:
+    - Required for the Invite Leaderboard
     '''
     @classmethod
     async def collects_invitation_links(cls):
@@ -61,7 +64,10 @@ class LeaderboardSystem(commands.Cog):
     
 
     '''
+    Searches all invites and compares them with the database, all expired invites are deleted
     
+    Info:
+    - Required for the Invite Leaderboard
     '''
     @classmethod
     async def check_expired_invites(cls):
@@ -577,7 +583,7 @@ class LeaderboardSystem(commands.Cog):
     '''
     async def sort_leaderboard(self, user_list, interval, guild_id, system):
     
-        guild = bot.get_guild(guild_id)
+        guild = self.bot.get_guild(guild_id)
         interval_list = ["", "day", "week", "month", "whole"] if system == "message" else ["", "week", "month", "quarter", "whole"]
         check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval], system = system)
         
@@ -648,7 +654,9 @@ class LeaderboardSystem(commands.Cog):
 
     @tasks.loop(hours=1)
     async def edit_leaderboard_invite(self):
-        print("invite")
+        
+        await self.bot.wait_until_ready()
+
         for guild in self.bot.guilds:
             leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="invite")
 
@@ -752,50 +760,59 @@ class LeaderboardSystem(commands.Cog):
     @tasks.loop(hours=1)
     async def edit_leaderboard_message(self):
 
+        await self.bot.wait_until_ready()
+        
         for guild in self.bot.guilds:
+            
             leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="message")
 
-            if leaderboard_settings and leaderboard_settings[1] == 1:
+            if leaderboard_settings:
 
-                message_ids = [
-                    ("1_day_old", leaderboard_settings[2]),
-                    ("1_week_old", leaderboard_settings[3]),
-                    ("1_month_old", leaderboard_settings[4]),
-                    ("whole", leaderboard_settings[5])
-                ]
-                
-                if leaderboard_settings[6] is not None:
+                if leaderboard_settings and leaderboard_settings[1] == 1:
 
-                    try:
+                    message_ids = [
+                        ("1_day_old", leaderboard_settings[2]),
+                        ("1_week_old", leaderboard_settings[3]),
+                        ("1_month_old", leaderboard_settings[4]),
+                        ("whole", leaderboard_settings[5])
+                    ]
+                    
+                    if leaderboard_settings[6] is not None:
+                        
+                        try:
 
-                        current_date = datetime.now(UTC)
-                        channel = self.bot.get_channel(leaderboard_settings[6])
+                            current_date = datetime.now(UTC)
+                            channel = self.bot.get_channel(leaderboard_settings[6])
 
-                        for message_name, message_id in message_ids:
+                            for message_name, message_id in message_ids:
 
-                            if message_id is not None:
+                                if message_id is not None:
 
-                                message = await channel.fetch_message(message_id)
-                                message_age = message.edited_at if message.edited_at is not None else message.created_at
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
+                                    if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
 
-                                    await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
+                                        await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
 
-                                if message_name == "1_day_old" and (current_date - message_age) > timedelta(minutes=1):
+                                    if message_name == "1_day_old" and (current_date - message_age) > timedelta(minutes=1):
 
-                                    await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
+                                        await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
 
-                                if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
+                                    if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
 
-                                    await self.update_weekly_leaderboard_message(guild_id=guild.id, message=message)
+                                        await self.update_weekly_leaderboard_message(guild_id=guild.id, message=message)
 
-                                if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
+                                    if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
 
-                                    await self.update_monthly_leaderboard_message(guild_id=guild.id, message=message)
+                                        await self.update_monthly_leaderboard_message(guild_id=guild.id, message=message)
 
-                    except Exception as error:
-                        print(f"parameterized query failed {error}")
+                        except Exception as error:
+                            print(f"parameterized query failed {error}")
+
+            else:
+    
+                return
 
 
     async def update_whole_leaderboard_message(self, guild_id:int, message:discord.Message):

@@ -143,7 +143,7 @@ class ModeratorCommands(commands.Cog):
                         return
 
                     if self.check_rule_violation(check_settings = check_settings, message = message) == True:
-                        print(1)
+            
                         await message.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=message, settings2=check_settings), delete_after=5)
                         await message.delete()
                         await message.author.timeout_for(timedelta(minutes = check_settings[4]))
@@ -170,7 +170,7 @@ class ModeratorCommands(commands.Cog):
                 return           
 
             if self.check_rule_violation(check_settings = check_settings, message = after):
-                print(2)
+                
                 await after.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=after, settings2=check_settings), delete_after=5)
                 await after.delete()
                 await after.author.timeout_for(timedelta(minutes = check_settings[4]))

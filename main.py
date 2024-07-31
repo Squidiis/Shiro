@@ -235,7 +235,6 @@ class Main(commands.Cog):
         view.add_item(CancelButton(system=None))
 
         self.bot.add_view(view)
-
         await Main.create_db_table()
         await LeaderboardSystem.collects_invitation_links()
         await LeaderboardSystem.check_expired_invites()

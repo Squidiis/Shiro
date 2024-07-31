@@ -75,7 +75,13 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
 default_message = 'Oh nice {user} you have a new level, your newlevel is {level}' 
 
 
+'''
+Check if the user has admin rights
 
+Parameters:
+-----------
+- ctx: Command context
+'''
 def is_admin():
     async def predicate(ctx):
         if ctx.guild is None:
@@ -92,6 +98,7 @@ def is_admin():
 
 # Embeds that are used multiple times within the bot
 class GetEmbed():
+
     '''
     Parameters:
     ------------

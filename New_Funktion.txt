@@ -30,13 +30,11 @@ die leaderboard functionen so umarbeiten das sie auch für das invite leaderbaor
 
 leaderboard system übersetzten
 antilink zu anti-link edetieren
-
+anti-link testen
 Description adden for the functions (level system, leaderbaord system, mod tools)
 
 Edit Button Names (level system, mod tools)
 
-invite tracker testen
-
 neue Table und funktionen zu delete user data hinfügen
 
-funktion zum zusammen rechnen aller invites eines users
+testen das edetieren des leaderbaords und die invite tracker
