@@ -43,8 +43,6 @@ with open("config.yaml", 'r') as f:
 
 
 #Intents
-intent = discord.Intents.default()
-intent.members = True
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)

@@ -17,7 +17,19 @@ class DeleteData(commands.Cog):
 
 
     '''
-    
+    Deletes the database entries when a role or channel is deleted or a user leaves the server
+
+    Parameters:
+    ------------
+        - table
+            From which table the data should be deleted
+        - column
+            Which column to start from
+        - itme
+            What is to be deleted (id)
+
+    Info:
+        - If the bot itself is kicked from the server, all entries are deleted
     '''
     def delete_data(table:str, column:str, item):
 
@@ -41,9 +53,13 @@ class DeleteData(commands.Cog):
             "LevelSystemSettings",
             "BonusXpList",
             "AntiLinkWhiteList",
-            "LeaderboardSettings",
             "LeaderboardTacking",
-            "BotSettings"
+            "BotSettings",
+            "LeaderboardSettingsMessage",
+            "LeaderboardSettingsInvite",
+            "LeaderboardRoles",
+            "LeaderboardGivenRoles",
+            "LeaderboardInviteTracking"
             ]
 
         for table in tables:
@@ -62,6 +78,9 @@ class DeleteData(commands.Cog):
                 "LevelSystemStats",
                 "BonusXpList",
                 "AntiLinkWhiteList",
+                "LeaderboardTacking",
+                "LeaderboardInviteTracking",
+                "LeaderboardGivenRoles",
                 "LeaderboardTacking"
                 ]
             
@@ -92,10 +111,14 @@ class DeleteData(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role):
 
-        tables = ['LevelSystemBlacklist',
-                  'BonusXpList',
-                  "AntiLinkWhiteList",
-                  'LevelSystemRoles']
+        tables = [
+                "LevelSystemBlacklist",
+                "BonusXpList",
+                "AntiLinkWhiteList",
+                "LevelSystemRoles",
+                "LeaderboardRoles",
+                "LeaderboardGivenRoles"
+                ]
         
         for table in tables:
 

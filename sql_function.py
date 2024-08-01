@@ -452,7 +452,7 @@ class DatabaseCheck():
         - guild_id
             Id of the server
         - system
-            Welches system betroffen ist
+            Which system is affected
                 - message
                 - invite
         - role_id
@@ -460,12 +460,12 @@ class DatabaseCheck():
         - position
             The potition from which the role is assigned
         - interval
-            - daily
-                Daily updated leaderboard
-            - weekly
-                Weekly updated leaderboard
-            - monthly
-                Monthly updating leaderboard
+            - daily or weekly
+                Daily updated leaderboard / weekly
+            - weekly or monthly
+                Weekly updated leaderboard / monthly
+            - monthly or quarterly
+                Monthly updating leaderboard / quarterly
             - general
                 Leaderboard that is updated daily shows the total activity (only those who have written the most messages)
 
@@ -525,7 +525,22 @@ class DatabaseCheck():
     
 
     '''
-    
+    Returns all assigned leaderboard roles
+
+    Parameters:
+    ------------
+        - guild_id
+            Id of the server
+        - interval
+            From which interval the assigned roles should be returned
+            - daily or weekly
+            - weekly or monthly
+            - monthly or quarterly
+            - general
+        - status
+            for which system it was given
+            - message
+            - invite
     '''
     def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
 
@@ -541,6 +556,20 @@ class DatabaseCheck():
         return leaderbaord_user_roles
     
 
+    '''
+    Returns all invite codes or only specific ones
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+        - invite_code
+            Which invite code should be returned
+        - user_id
+            User id
+        - remove_value
+            If this is None, everything is returned
+    '''
     def check_invite_codes(
         guild_id:int,
         invite_code:str = None,  
@@ -1799,6 +1828,9 @@ class DatabaseRemoveDatas():
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
+    '''
+    
+    '''
     async def remove_invite_links(
         guild_id:int,
         invite_code:str,

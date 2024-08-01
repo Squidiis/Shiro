@@ -180,8 +180,6 @@ class Main(commands.Cog):
         print(f'Logged in as: {bot.user.name}')
         print(f'With ID: {bot.user.id}')
         self.bot.loop.create_task(status_task())
-        await bot.wait_until_ready() 
-
         
         print("┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓")
         print("┃┏━┓┃ ┃┏━┓┃ ┃┃ ┃┃ ┗┫┣┛ ┗┓┏┓┃ ┗┫┣┛")
@@ -233,7 +231,7 @@ class Main(commands.Cog):
 
         self.bot.add_view(HelpMenuSelect())
         view.add_item(CancelButton(system=None))
-
+        
         self.bot.add_view(view)
         await Main.create_db_table()
         await LeaderboardSystem.collects_invitation_links()

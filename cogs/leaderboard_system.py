@@ -89,8 +89,9 @@ class LeaderboardSystem(commands.Cog):
 
                     await DatabaseRemoveDatas.remove_invite_links(guild_id = guild.id, invite_code = invite_code)
 
+
     '''
-    
+    Check all servers every 24 hours for expired links and then deletes them from the database, adds newly created links at the same time
     '''
     @tasks.loop(hours=24)
     async def check_expired_invite_liks(self):
@@ -100,7 +101,14 @@ class LeaderboardSystem(commands.Cog):
 
 
     '''
-    
+    Exported logic of the set-leaderboard commands
+
+    Parameters:
+    ------------
+        - system
+            Which system is to be set
+                - message: Sets the message leaderboard
+                - invite: Sets the invite leaderboard
     '''
     async def process_set_leaderboard(self, ctx:discord.ApplicationContext, system:str):
 
@@ -121,8 +129,19 @@ class LeaderboardSystem(commands.Cog):
 
 
     '''
-    
-    '''
+    Exported logic of the show-leaderboard commands
+
+    Parameters:
+    ------------
+        - system
+            Which system should be shown
+                - message: Shows the message leaderboard
+                - invite: Shows the invite leaderboard
+        - settings
+            What should be displayed?
+        - invtervals
+            Which interval should be displayed
+   '''
     async def process_show_leaderboard_settings(self, ctx:discord.ApplicationContext, system:str, settings, intervals):
 
         if settings is None:
@@ -150,7 +169,21 @@ class LeaderboardSystem(commands.Cog):
 
 
     '''
-    
+    Exported logic of the add-leaderboard-role commands
+
+    Parameters:
+    ------------
+        - system
+            To which system the role should be added
+                - message: Add role to the message leaderboard
+                - invite: Add role to the invite leaderboard
+        - role
+            Role id
+        - position
+            To which position the role should be assigned
+
+    Info:
+        - If possition is 0, the role is assigned to every user listed on the leaderboard
     '''
     async def process_add_leaderboard_role(self, ctx:discord.ApplicationContext, role:discord.Role, position:str, interval:str, system:str):
 
@@ -204,7 +237,18 @@ class LeaderboardSystem(commands.Cog):
 
     
     '''
-    
+    Exported logic of the remove-leaderboard-role commands
+
+    Parameters:
+    ------------
+        - System
+        From which leaderboard the role should be removed
+            - Message: Removes the role from the message leaderboard
+            - Invite: Removes the role from the invite leaderboard
+        - Role ID
+            Role ID
+        - Interval
+            From which interval the role should be removed
     '''
     async def process_remove_leaderboard_role(self, ctx:discord.ApplicationContext, role:discord.Role, interval:str, system:str):
 
@@ -233,7 +277,17 @@ class LeaderboardSystem(commands.Cog):
 
     
     '''
-    
+    Exported logic of the reset-leaderboard-roles commands
+
+    Parameters:
+    ------------
+
+        - system
+        From which system the roles are to be reset
+            - message: Resets all roles of the message leaderboard
+            - invite: Resets all roles of the invite leaderboard
+        - interval
+        For which interval the roles should be reset
     '''
     async def process_reset_leaderboard_roles(self, ctx:discord.ApplicationContext, interval:str, system:str):
         
@@ -257,7 +311,16 @@ class LeaderboardSystem(commands.Cog):
 
     
     '''
-    
+    Returns all roles of an interval, also check whether it is a general role
+
+    Parameters:
+    ------------
+        - guild_id
+            Server id
+        - intervals
+            The interval at which the role is set
+        - system
+            Which system is to be checked 
     '''
     def check_interval_role(self, guild_id, interval, system):
 
@@ -420,9 +483,6 @@ class LeaderboardSystem(commands.Cog):
 ##########################################  System events  ###########################################
         
 
-    '''
-    
-    '''
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
 
@@ -436,9 +496,6 @@ class LeaderboardSystem(commands.Cog):
             await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
 
     
-    '''
-    
-    '''
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
         
@@ -494,6 +551,10 @@ class LeaderboardSystem(commands.Cog):
 
         for entry_after in result_after:
             
+            if entry_after[0] not in result_before:
+
+                await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+
             for entry_before in result_before:
                 
                 if entry_after[1] == entry_before[1] and entry_before[2] < entry_after[2]:
@@ -504,9 +565,6 @@ class LeaderboardSystem(commands.Cog):
                     return            
 
 
-    '''
-    
-    '''
     @commands.Cog.listener()
     async def on_message_delete(self, message:discord.Message):
 
@@ -544,9 +602,6 @@ class LeaderboardSystem(commands.Cog):
                 await DatabaseUpdates.manage_leaderboard_invite(guild_id = message.guild.id, back_to_none = "quarterly")
 
 
-    '''
-    
-    '''
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
 
@@ -564,7 +619,16 @@ class LeaderboardSystem(commands.Cog):
 
 
     '''
-    
+    Removes the roles from the users after the leaderboard has been updated
+
+    Parameters:
+    ------------
+        - guild_id 
+            The id of the server
+        - interval
+            Which interval was updated
+        - system 
+            Which leaderboard has been updated
     '''
     async def remove_leaderboard_roles(self, guild:int, interval:str, system:str):
     
@@ -579,7 +643,18 @@ class LeaderboardSystem(commands.Cog):
 
 
     '''
+    Creates the leaderboard
 
+    Parameters:
+    ------------
+        - guild_id
+            Id of the server
+        - user_list
+            Which users should be on the leaderboard
+        - interval
+            Which leaderboard interval is involved
+        - system
+            Which leaderboard should be created
     '''
     async def sort_leaderboard(self, user_list, interval, guild_id, system):
     
@@ -603,7 +678,7 @@ class LeaderboardSystem(commands.Cog):
         
         user_names, users = [], []
         for t in user_list:
-
+        
             user = await guild.fetch_member(t[1])
             user_names.append(user.name)
             users.append(user)
@@ -612,15 +687,15 @@ class LeaderboardSystem(commands.Cog):
         padded_tuples = [
             (
                 user_names[i].ljust(max_lengths[0]), 
-                str(t[2]).ljust(max_lengths[2]),
-                str(t[3]).ljust(max_lengths[3]),
-                str(t[4]).ljust(max_lengths[4]),
-                str(t[5]).ljust(max_lengths[5])
+                str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
+                str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[6]).ljust(max_lengths[7]),
+                str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[6]).ljust(max_lengths[8]),
+                str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[6]).ljust(max_lengths[9])
             )
             for i, t in enumerate(user_list)
         ]
         
-        await self.remove_leaderboard_roles(guild=guild, interval=interval_list[interval])
+        await self.remove_leaderboard_roles(guild=guild, interval=interval_list[interval], system=system)
         
         leaderboard, count = [], 0
         for i in range(min(len(user_list), 15)):
@@ -654,7 +729,7 @@ class LeaderboardSystem(commands.Cog):
 
     @tasks.loop(hours=1)
     async def edit_leaderboard_invite(self):
-        
+
         await self.bot.wait_until_ready()
 
         for guild in self.bot.guilds:
@@ -671,37 +746,36 @@ class LeaderboardSystem(commands.Cog):
                 
                 if leaderboard_settings[6] is not None:
 
-                    try:
+                    current_date = datetime.now(UTC)
+                    channel = self.bot.get_channel(leaderboard_settings[6])
 
-                        current_date = datetime.now(UTC)
-                        channel = self.bot.get_channel(leaderboard_settings[6])
+                    for message_name, message_id in message_ids:
 
-                        for message_name, message_id in message_ids:
+                        if message_id is not None:
 
-                            if message_id is not None:
+                            message = await channel.fetch_message(message_id)
+                            message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                message = await channel.fetch_message(message_id)
-                                message_age = message.edited_at if message.edited_at is not None else message.created_at
+                            if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
 
-                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
+                                await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
 
-                                    await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
+                            if message_name == "1_week_old" and (current_date - message_age) > timedelta(minutes=1):
 
-                                if message_name == "1_week_old" and (current_date - message_age) > timedelta(minutes=1):
+                                await self.update_weekly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                                    await self.update_weekly_leaderboard_invite(guild_id=guild.id, message=message)
+                            if message_name == "1_month_old" and (current_date - message_age) > timedelta(weeks=1):
 
-                                if message_name == "1_month_old" and (current_date - message_age) > timedelta(weeks=1):
+                                await self.update_monthly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                                    await self.update_monthly_leaderboard_invite(guild_id=guild.id, message=message)
+                            if message_name == "1_quarter_old" and (current_date - message_age) > timedelta(days=30):
 
-                                if message_name == "1_quarter_old" and (current_date - message_age) > timedelta(days=30):
+                                await self.update_quarterly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                                    await self.update_quarterly_leaderboard_invite(guild_id=guild.id, message=message)
+        else:
 
-                    except Exception as error:
-                        print(f"parameterized query failed {error}")
-
+            return
+        
 
     async def update_whole_leaderboard_invite(self, guild_id:int, message:discord.Message):
 
@@ -778,37 +852,32 @@ class LeaderboardSystem(commands.Cog):
                     ]
                     
                     if leaderboard_settings[6] is not None:
-                        
-                        try:
 
-                            current_date = datetime.now(UTC)
-                            channel = self.bot.get_channel(leaderboard_settings[6])
+                        current_date = datetime.now(UTC)
+                        channel = self.bot.get_channel(leaderboard_settings[6])
 
-                            for message_name, message_id in message_ids:
+                        for message_name, message_id in message_ids:
 
-                                if message_id is not None:
+                            if message_id is not None:
 
-                                    message = await channel.fetch_message(message_id)
-                                    message_age = message.edited_at if message.edited_at is not None else message.created_at
+                                message = await channel.fetch_message(message_id)
+                                message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                    if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
+                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
 
-                                        await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
+                                    await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
 
-                                    if message_name == "1_day_old" and (current_date - message_age) > timedelta(minutes=1):
+                                if message_name == "1_day_old" and (current_date - message_age) > timedelta(minutes=1):
 
-                                        await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
+                                    await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
 
-                                    if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
+                                if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
 
-                                        await self.update_weekly_leaderboard_message(guild_id=guild.id, message=message)
+                                    await self.update_weekly_leaderboard_message(guild_id=guild.id, message=message)
 
-                                    if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
+                                if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
 
-                                        await self.update_monthly_leaderboard_message(guild_id=guild.id, message=message)
-
-                        except Exception as error:
-                            print(f"parameterized query failed {error}")
+                                    await self.update_monthly_leaderboard_message(guild_id=guild.id, message=message)
 
             else:
     
@@ -1516,7 +1585,16 @@ class DefaultSettingsLeaderboard(discord.ui.Button):
         
 
 '''
+Shows which roles have been defined for which leaderboard
 
+Parameters:
+------------
+    - guid_id
+        Id of the server
+    - interval
+        Which leaderboard interval is involved
+    - system
+        Which leaderboard is involved
 '''
 def show_leaderboard_roles(guild_id, interval, system):
 

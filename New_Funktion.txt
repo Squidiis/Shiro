@@ -25,8 +25,6 @@ statistic section
 - Message Leaderboard (Fertig)
 - Invite Leaderboard
 
-die leaderboard functionen so umarbeiten das sie auch für das invite leaderbaord funktionieren (das invite leaderbaord fertig stellen und testen)
-
 
 leaderboard system übersetzten
 antilink zu anti-link edetieren
@@ -38,3 +36,5 @@ Edit Button Names (level system, mod tools)
 neue Table und funktionen zu delete user data hinfügen
 
 testen das edetieren des leaderbaords und die invite tracker
+
+Testen der funktion die neue inv links added
