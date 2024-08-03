@@ -20,21 +20,11 @@ Updaite 1.1
 
 back button zum close button machen help
 
-statistic section 
-
-- Message Leaderboard (Fertig)
-- Invite Leaderboard
-
-
-leaderboard system übersetzten
 antilink zu anti-link edetieren
 anti-link testen
-Description adden for the functions (level system, leaderbaord system, mod tools)
 
 Edit Button Names (level system, mod tools)
 
-neue Table und funktionen zu delete user data hinfügen
-
 testen das edetieren des leaderbaords und die invite tracker
 
-Testen der funktion die neue inv links added
+Testen der funktion die neue inv links added (Wenn der bot läuft und dann ein neuer inv link erstellt wird und über diesen jemand joint)

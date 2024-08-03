@@ -45,7 +45,7 @@ class LeaderboardSystem(commands.Cog):
     Adds all existing Invite links to a database
 
     Info:
-    - Required for the Invite Leaderboard
+        - Required for the Invite Leaderboard
     '''
     @classmethod
     async def collects_invitation_links(cls):
@@ -67,7 +67,7 @@ class LeaderboardSystem(commands.Cog):
     Searches all invites and compares them with the database, all expired invites are deleted
     
     Info:
-    - Required for the Invite Leaderboard
+        - Required for the Invite Leaderboard
     '''
     @classmethod
     async def check_expired_invites(cls):
@@ -287,7 +287,7 @@ class LeaderboardSystem(commands.Cog):
             - message: Resets all roles of the message leaderboard
             - invite: Resets all roles of the invite leaderboard
         - interval
-        For which interval the roles should be reset
+            For which interval the roles should be reset
     '''
     async def process_reset_leaderboard_roles(self, ctx:discord.ApplicationContext, interval:str, system:str):
         

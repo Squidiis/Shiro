@@ -22,7 +22,18 @@ def level_message(guild_id:int, user_id:int, level:int):
 class CheckLevelSystem():
     
     '''
+    Returns whether a bonus is granted
+
+    Parameters:
+    ------------
+        - guild_id
+            Server Id
+        - message
+            For checking the entries
     
+    Info:
+        - guild_id and message must be specified
+        - message must be specified as discord.message object
     '''
     def check_bonus_xp(guild_id:int, message:discord.Message):
 
@@ -53,7 +64,15 @@ class CheckLevelSystem():
     
 
     '''
-    
+    Displays all level roles
+
+    Parameters:
+    ------------
+        - guild_id
+            Server id
+
+    Info: 
+        - guild_id must be specified 
     '''
     def show_level_roles(guild_id:int):
 
@@ -74,7 +93,15 @@ class CheckLevelSystem():
     
 
     '''
-    
+    Shows what is listed on the blacklist
+
+    Parameters:
+    ------------
+        - guild_id
+            Server id
+
+    Info:
+        - guild_id must be specified
     '''    
     def show_blacklist(guild_id:int):
 
@@ -110,7 +137,15 @@ class CheckLevelSystem():
         
 
     '''
-    
+    Shows which channels, roles, users or categories are rewarded with extra XP
+
+    Parameters:
+    ------------
+        - guild_id
+            Server id
+
+    Info:
+        - guild_id must be specified
     '''
     def show_bonus_xp_list(guild_id:int):
 
@@ -931,7 +966,31 @@ class LevelSystem(commands.Cog):
 #################################################  Level Blacklist settings  ###############################################
 
 
-    # To configure the level system blacklist (adding, removing and restoring)
+    '''
+    Creates the blacklist for the level system
+
+    Parameters:
+    ------------
+        - guild_id
+            Server id 
+        - operation
+            Which operation is to be performed on the blacklist
+                - add: Adds an entry to the blacklist
+                - remove: Removes an entry from the blacklist
+        - channel
+            Channel Id
+        - category
+            Category Id
+        - role
+            Role Id
+        - user
+            User Id
+
+    Info:
+        - guild_id must be specified
+        - operation an operation must be specified
+        - One of the following items must be specified channel, category, role or user
+    '''
     async def config_level_blacklist(
         self, 
         guild_id:int, 
@@ -1271,8 +1330,33 @@ class LevelSystem(commands.Cog):
         
         return bonus_percentage
     
-    
-    # To configure the level system bonus XP list (adding, removing and restoring)
+
+    '''
+    Creates the bonus XP list for the level system
+
+    Parameters:
+    ------------
+        - guild_id
+            Server id 
+        - operation
+            Which operation is to be performed on the bonus XP list
+                - add: Adds an entry to the blacklist
+                - remove: Removes an entry from the blacklist
+        - channel
+            Channel Id
+        - category
+            Category Id
+        - role
+            Role Id
+        - user
+            User Id
+        - bonus
+            How high the bonus should be
+    Info:
+        - guild_id must be specified
+        - operation an operation must be specified
+        - One of the following items must be specified channel, category, role or user
+    '''
     async def config_bonus_xp_list(
         self, 
         guild_id:int, 
@@ -1281,7 +1365,8 @@ class LevelSystem(commands.Cog):
         category = None, 
         role = None, 
         user = None, 
-        bonus = None):
+        bonus = None
+        ):
 
         if [x for x in [channel, category, role, user] if x]:
             
@@ -1433,6 +1518,8 @@ class LevelSystem(commands.Cog):
 
 
 
+########################################################  Interactions level system  ###########################################
+            
 
 class LevelSystemSetting(discord.ui.View):
 

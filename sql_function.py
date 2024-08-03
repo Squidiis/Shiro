@@ -402,6 +402,7 @@ class DatabaseCheck():
             - 1 week or month
             - 2  month or quarter
             - 3 whole
+            
     Info:
         - guild_id must be specified
         - Depending on which item you specify, you will receive the respective entries from the database
@@ -541,6 +542,9 @@ class DatabaseCheck():
             for which system it was given
             - message
             - invite
+    
+    Info:
+        - All variables must always be specified
     '''
     def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
 
@@ -569,6 +573,9 @@ class DatabaseCheck():
             User id
         - remove_value
             If this is None, everything is returned
+    
+    Info:
+        - guild_id must be specified
     '''
     def check_invite_codes(
         guild_id:int,
@@ -1282,14 +1289,13 @@ class DatabaseUpdates():
                 - monthly: Monthly update
                 - channel: The channel in which the leaderboards should be sent
                 - countMessage: Message value is increased 
-                - countInvite: Invite value is increased 
         - settings
             Which column should be customized
-            - status: Switching the system on/off
-            - channel: Channel for the leaderboard
-            - daily
-            - weekly
-            - monthly 
+                - status: Switching the system on/off
+                - channel: Channel for the leaderboard
+                - daily
+                - weekly
+                - monthly 
         - message_id 
             The message id of the leaderboard
         - channel_id
@@ -1377,7 +1383,42 @@ class DatabaseUpdates():
 
     
     '''
-    
+    Manages the invite leaderboard system
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+        - user_id
+            Id of the user who has invited the user
+        - interval 
+            Interval at which the leaderboard should be updated
+                - weekly: Weekly update
+                - monthly: Monthly update
+                - quarterly: Quartlerly update
+                - channel: The channel in which the leaderboards should be sent
+                - countInvite: Invite value is increased 
+        - settings
+            Which column should be customized
+                - status: Switching the system on/off
+                - channel: Channel for the leaderboard
+                - weekly
+                - monthly
+                - quarterly 
+        - message_id 
+            The message id of the leaderboard
+        - channel_id
+            The id of the channel to which the leaderboards are to be sent
+        - back_to_none
+            What should be set back to the default settings
+                - weekly
+                - monthly
+                - quarterly
+                - channel
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
     '''
     async def manage_leaderboard_invite(
         guild_id:int, 
@@ -1463,11 +1504,15 @@ class DatabaseUpdates():
             Which system is affected
                 - message
                 - invite
+    
+    Info:
+        - guild_id must be specified
+        - system must be specified
     '''
     async def create_leaderboard_settings(
-        guild_id:int, 
-        channel_id:int = None,
-        system:str = None
+        guild_id:int,
+        system:str,
+        channel_id:int = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
@@ -1490,7 +1535,21 @@ class DatabaseUpdates():
 
 
     '''
-    
+    Edits the list with all invite links that exist on the respective server
+
+    Parameters:
+    ----------
+        - guild_id
+            Id of the server
+        - user_id
+            Id of the user who created the invitation
+        - invite_code
+            The code of the invitation
+        - uses
+            How often the invitation was used
+
+    Info:
+        - All variables must always be specified
     '''
     async def manage_leaderboard_invite_list(
         guild_id:int, 
@@ -1611,7 +1670,34 @@ class DatabaseUpdates():
 
     
     '''
-    
+    Manages all roles that are defined for a leaderboard
+
+    Parameters:
+    ----------
+        - guild_id
+            Server id
+        - status
+            For which leaderboard the setting should apply
+                - message: Message Leaderboard
+                - invite: Invite Leaderboard
+        - operation
+            what should be done
+                - add: Something is added to the database
+                - remove: Something is removed from the database
+        - interval
+            Which invterval leaderboard is affected (depends on status)
+                - daily or weekly
+                - weekly or monthly
+                - monthly or quarterly
+                - general
+        - role_id
+            role id
+        - user_id
+            Id of the user who is to receive the role
+            
+    Info:
+    - guild_id and user_id must be specified to add a role
+    - The intervals depend on which leaderboard was specified in status
     '''
     async def manage_leaderboard_roles_users(
         guild_id:int, 
@@ -1829,7 +1915,20 @@ class DatabaseRemoveDatas():
 
 
     '''
-    
+    Removes specific invitation codes from the database
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - invite_code
+            Code of the invitation to be removed
+        - user_id
+            Id of the user who created the invitation
+
+    Info:
+        - guild_id must be specified
+        - An invitation code must always be specified
     '''
     async def remove_invite_links(
         guild_id:int,

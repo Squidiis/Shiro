@@ -233,7 +233,40 @@ class ModeratorCommands(commands.Cog):
         await ctx.respond(embed=emb)
 
     
-    async def config_antilink_whitelist(self, guild_id:int, operation:str, channel = None, category = None, role = None, user = None):
+    '''
+    Creates the anti-link list for the anti-link system
+
+    Parameters:
+    ------------
+        - guild_id
+            Server id 
+        - operation
+            Which operation is to be performed on the anti-link
+                - add: Adds an entry to the anti-link
+                - remove: Removes an entry from the anti-link
+        - channel
+            Channel Id
+        - category
+            Category Id
+        - role
+            Role Id
+        - user
+            User Id
+
+    Info:
+        - guild_id must be specified
+        - operation an operation must be specified
+        - One of the following items must be specified channel, category, role or user
+    '''
+    async def config_antilink_whitelist(
+        self, 
+        guild_id:int, 
+        operation:str, 
+        channel = None, 
+        category = None, 
+        role = None, 
+        user = None
+        ):
 
         if [x for x in [channel, category, role, user] if x]:
             
@@ -705,6 +738,9 @@ class ModeratorCommands(commands.Cog):
 def setup(bot):
     bot.add_cog(ModeratorCommands(bot))
 
+
+
+#################################################  Interactions form mod tools  ##########################################
 
 
 class GhostPingButtons(discord.ui.View):
