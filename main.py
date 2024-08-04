@@ -191,7 +191,6 @@ class Main(commands.Cog):
         # level system
         self.bot.add_view(LevelRolesButtons(role_id=None, role_level=None, status=None))
         self.bot.add_view(ResetLevelStatsButton())
-        self.bot.add_view(ResetBlacklistLevelButton())
 
         # Level system settings
         self.bot.add_view(LevelSystemSetting())

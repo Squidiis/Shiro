@@ -22,6 +22,4 @@ back button zum close button machen help
 
 anti-link testen
 
-testen das edetieren des leaderbaords und die invite tracker
-
 Testen der funktion die neue inv links added (Wenn der bot läuft und dann ein neuer inv link erstellt wird und über diesen jemand joint)

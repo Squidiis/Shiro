@@ -673,12 +673,12 @@ class LeaderboardSystem(commands.Cog):
 
         max_lengths = [
             max(len(str(t[i])) for t in user_list)
-            for i in range(9)
+            for i in range(10)
         ]
         
         user_names, users = [], []
         for t in user_list:
-        
+            
             user = await guild.fetch_member(t[1])
             user_names.append(user.name)
             users.append(user)
@@ -688,9 +688,9 @@ class LeaderboardSystem(commands.Cog):
             (
                 user_names[i].ljust(max_lengths[0]), 
                 str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
-                str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[6]).ljust(max_lengths[7]),
-                str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[6]).ljust(max_lengths[8]),
-                str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[6]).ljust(max_lengths[9])
+                str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
+                str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[8]).ljust(max_lengths[8]),
+                str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[9]).ljust(max_lengths[9])
             )
             for i, t in enumerate(user_list)
         ]
