@@ -192,10 +192,10 @@ class LevelRolesButtons(discord.ui.View):
     @discord.ui.button(
         label="overwrite entry", 
         style=discord.ButtonStyle.blurple, 
-        custom_id="yes_button_level_role"
+        custom_id="overwrite_button_level_role"
     )
 
-    async def yes_button_levelroles(self, button, interaction:discord.Interaction):
+    async def overwrite_button_levelroles(self, button, interaction:discord.Interaction):
     
         if interaction.user.guild_permissions.administrator:
 
@@ -220,10 +220,10 @@ class LevelRolesButtons(discord.ui.View):
     @discord.ui.button(
         label="keep entry", 
         style=discord.ButtonStyle.blurple, 
-        custom_id="no_button_level_role"
+        custom_id="keep_button_level_role"
     )
     
-    async def no_button_levelroles(self, button, interaction:discord.Interaction):
+    async def keep_button_levelroles(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -247,12 +247,12 @@ class ResetLevelStatsButton(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(
-        label="Yes", 
+        label="reset stats", 
         style=discord.ButtonStyle.gray, 
-        custom_id="yes_button_reset"
+        custom_id="stats_button_reset"
     )
 
-    async def reset_stats_button_level_yes(self, button, interaction:discord.Interaction):
+    async def reset_stats_button_level(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -271,12 +271,12 @@ class ResetLevelStatsButton(discord.ui.View):
 
     
     @discord.ui.button(
-        label="No", 
+        label="keep stats", 
         style=discord.ButtonStyle.gray, 
         custom_id="no_button_reset"
     )
 
-    async def reset_stats_button_level_no(self, button, interaction:discord.Interaction):
+    async def reset_stats_button_level_keep(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
         
@@ -288,61 +288,6 @@ class ResetLevelStatsButton(discord.ui.View):
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-
-
-#######################################  Level system Blacklist buttons  ###########################################
-
-
-class ResetBlacklistLevelButton(discord.ui.View):
-
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.button(
-        label="Yes", 
-        style=discord.ButtonStyle.blurple, 
-        row=1, 
-        custom_id="yes_button_level"
-    )
-
-    async def reset_blacklist_button_level_yes(self, button, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-            guild_id = interaction.guild.id
-
-            await DatabaseUpdates.manage_blacklist(guild_id=guild_id, operation="reset")
-
-            emb = discord.Embed(description=f"""## The blacklist has been reset
-                {Emojis.dot_emoji} All channels, users, roles and categories have been removed from the blacklist
-                {Emojis.help_emoji} If you want to blacklist things again you can use the commands as before""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb)
-
-
-    @discord.ui.button(
-        label="No", 
-        style=discord.ButtonStyle.blurple, 
-        row=1, 
-        custom_id="no_button_level"
-    )
-
-    async def reset_blacklist_button_level_no(self, button, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            emb = discord.Embed(description=f"""Resetting the level system blacklist has been canceled 
-                {Emojis.dot_emoji} Resetting the blacklist was successfully aborted
-                {Emojis.dot_emoji} All channels, roles, categories and users are still listed on the blacklist
-                {Emojis.help_emoji} If you want to remove single elements from the blacklist you can remove them with the `/remove-level-blacklist` command""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb)
 
 
 
@@ -766,8 +711,8 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(description=f"""## Are you sure you want to reset the level system?
                 {Emojis.dot_emoji} With the buttons you can confirm your decision
-                {Emojis.dot_emoji} If you press the **Yes button** all user stats will be deleted
-                {Emojis.dot_emoji} If you press the **No button** the process will be aborted""", color=bot_colour)
+                {Emojis.dot_emoji} If you press the `reset stats` button, all user stats will be deleted
+                {Emojis.dot_emoji} If you press the `keep stats` button, the process will be aborted""", color=bot_colour)
             await ctx.respond(embed=emb, view=ResetLevelStatsButton())
 
         else:
@@ -1152,13 +1097,12 @@ class LevelSystem(commands.Cog):
 
         if blacklist:
 
-            view = ResetBlacklistLevelButton()
+            await DatabaseUpdates.manage_blacklist(guild_id=ctx.guild.id, operation="reset")
 
-            emb = discord.Embed(description=f"""## Are you sure you want to remove everything from the blacklist?
-                {Emojis.help_emoji} With the buttons you can confirm your decisions!
-                {Emojis.dot_emoji} If you press the **Yes button** all channels, categories, users and roles will be removed from the blacklist
-                {Emojis.dot_emoji} If you press the **No button** the process will be aborted""", color=bot_colour)
-            await ctx.respond(embed=emb, view=view)
+            emb = discord.Embed(description=f"""## The blacklist has been reset
+                {Emojis.dot_emoji} All channels, users, roles and categories have been removed from the blacklist
+                {Emojis.help_emoji} If you want to blacklist things again you can use the commands as before""", color=bot_colour)
+            await ctx.response.edit_message(embed=emb, view=None)
         
         else:
 

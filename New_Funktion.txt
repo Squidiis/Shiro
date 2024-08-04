@@ -20,10 +20,7 @@ Updaite 1.1
 
 back button zum close button machen help
 
-antilink zu anti-link edetieren
 anti-link testen
-
-Edit Button Names (level system, mod tools)
 
 testen das edetieren des leaderbaords und die invite tracker
 
