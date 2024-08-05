@@ -605,6 +605,40 @@ class DatabaseCheck():
             invite_code_check = cursor.fetchall()
 
         return invite_code_check
+    
+
+    '''
+    
+    '''
+    def check_auto_reaction(
+        guid_id:int,
+        channel_id:int = None,
+        category_id:int = None,
+        parameter = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        column_name = ["channelId", "categoryId", "parameter"]
+        column_value = [channel_id, category_id, parameter]
+
+        for count in range(len(column_value)):
+            
+            if column_value[count] != None:
+                
+                check_autoreact = f"SELECT * FROM AutoReactionSettings WHERE guildId = %s AND {column_name[count]}"
+                check_autoreact_values = [guid_id, column_value[count]]
+
+            elif all(x for x in column_value if x == None):
+
+                check_autoreact = f"SELECT * FROM AutoReactionSettings WHERE guildId = %s"
+                check_autoreact_values = [guid_id]
+
+        cursor.execute(check_autoreact, check_autoreact_values)
+
+        auto_react_settings = cursor.fetchall()
+        return auto_react_settings
 
 
 
