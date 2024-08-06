@@ -614,7 +614,8 @@ class DatabaseCheck():
         guid_id:int,
         channel_id:int = None,
         category_id:int = None,
-        parameter = None
+        parameter = None,
+        emoji:str = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
@@ -623,21 +624,32 @@ class DatabaseCheck():
         column_name = ["channelId", "categoryId", "parameter"]
         column_value = [channel_id, category_id, parameter]
 
+        check = None
         for count in range(len(column_value)):
-            
-            if column_value[count] != None:
+
+            if channel_id != None or category_id != None and parameter != None and emoji != None:
+
+                check = True
+                check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s AND {'channelId' if channel_id != None else 'categoryId'} = %s AND parameter = %s AND emoji = %s"
+                check_autoreact_values = [guid_id, channel_id if channel_id != None else category_id, parameter, emoji]
+
+            elif column_value[count] != None:
                 
-                check_autoreact = f"SELECT * FROM AutoReactionSettings WHERE guildId = %s AND {column_name[count]}"
+                check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s AND {column_name[count]}"
                 check_autoreact_values = [guid_id, column_value[count]]
 
             elif all(x for x in column_value if x == None):
 
-                check_autoreact = f"SELECT * FROM AutoReactionSettings WHERE guildId = %s"
+                check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s"
                 check_autoreact_values = [guid_id]
 
         cursor.execute(check_autoreact, check_autoreact_values)
 
-        auto_react_settings = cursor.fetchall()
+        if check == True:
+            auto_react_settings = cursor.fetchone()
+        else:
+            auto_react_settings = cursor.fetchall()
+
         return auto_react_settings
 
 
@@ -1757,6 +1769,44 @@ class DatabaseUpdates():
                 manage_role_values = [guild_id, interval, status]
 
             cursor.execute(manage_role, manage_role_values)
+            db_connect.commit()
+        
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
+    '''
+
+    '''
+    async def manage_auto_reaction(
+        guid_id:int, 
+        emoji:str,
+        operation:str,
+        channel_id:int = None, 
+        category_id:int = None, 
+        parameter:str = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        try:
+
+            if operation == "add":
+
+                manage_reaction = f"INSERT INTO AutoReactions (guildId, {'channelId' if channel_id != None else 'categoryId'}, parameter, emoji) VALUES (%s, %s, %s, %s)"
+                manage_reaction_values = [guid_id, channel_id if channel_id != None else category_id, parameter, emoji]
+
+            else:
+
+                manage_reaction = "DELETE FROM AutoReactions WHERE guildId = %s AND emoji = %s AND {'channelId' if channel_id != None else 'categoryId'}"
+                manage_reaction_values = [guid_id, emoji, channel_id if channel_id != None else category_id]
+
+            cursor.execute(manage_reaction, manage_reaction_values)
             db_connect.commit()
         
         except mysql.connector.Error as error:

@@ -1,4 +1,5 @@
-from utils import *
+from utils import discord, Option, commands, Emojis, no_permissions_emb, bot_colour
+from typing import Union
 from sql_function import DatabaseCheck, DatabaseRemoveDatas, DatabaseUpdates
 
 class AutoReaction(commands.Cog):
@@ -28,13 +29,51 @@ class AutoReaction(commands.Cog):
         
     
     @commands.slash_command(name = "set-auto-reaction")
-    async def set_auto_reaction(self, ctx:discord.ApplicationContext, area:Option(), parameter:Option(), emoji:Option()):
+    async def set_auto_reaction(self, ctx:discord.ApplicationContext):
 
         emb = discord.Embed(description=f"""## Einstellungs menü für das Auto reaction system
             {Emojis.dot_emoji} Wähle aus den unteren Buttons und Select menüs aus was du einstellen willst
             
             {Emojis.dot_emoji} Folgende einstellungen stehen zur verfügung:""")
-        await ctx.respond(embed=emb)
+        await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
+
+
+    @commands.slash_command(name = "add-auto-reaction")
+    async def add_auto_reaction(self, ctx:discord.ApplicationContext, 
+        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Wähle aus in welchen channel oder Kategorie die auto-reaction erstellt werden soll!"), 
+        parameter:Option(str, required = True, description="Wähle aus auf was diese auto-reaction reagieren soll!",
+            choices = ["links, images and videos", "specific content only", "any message"]), 
+        emoji:Option(str, required = True, description="Gebe hier den emoji ein denn du für diese auto-reaction festlegen möchtest (Wähle dazu einen gewünschten eoji aus und setzte einne \ davor)")):
+
+        check_reaction = DatabaseCheck.check_auto_reaction(
+            guild_id=ctx.guild.id, 
+            channel_id=area.id if isinstance(area, discord.TextChannel) else None,
+            category_id=None if isinstance(area, discord.TextChannel) else area.id,
+            parameter=parameter,
+            emoji=emoji
+            )
+        
+        if check_reaction:
+
+            emb = discord.Embed()
+
+        else:
+
+            if parameter == "specific content only":
+
+                emb = discord.Embed(description=f"""""")
+
+            else:
+
+                await DatabaseUpdates.manage_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id, parameter = parameter, emoji = emoji, operation = "add")
+
+                emb = discord.Embed(description=f"""## Eine neue auto-reaction wurde festgelegt
+                    {Emojis.dot_emoji} Die neue auto-reaction reagiert in {'dem channel' if isinstance(area, discord.TextChannel) else 'der Kategorie'} {area.mention}
+                    {Emojis.dot_emoji} Als parameter wurde festgelegt das die auto reaction auf {parameter} reagieren soll
+                    {Emojis.dot_emoji} Als Emoji wurde {emoji} festgelgt""", color=bot_colour)
+                await ctx.respond(embed=emb)
+
+
 
 def setup(bot):
     bot.add_cog(AutoReaction(bot))
@@ -66,48 +105,27 @@ class AutoReactionOnOffSwitch(discord.ui.Button):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-class SetAutoReactionArea(discord.ui.View):
 
-    def __init__(self):
-        super().__init__(timeout=None)
+class ParameterModalAutoReaction(discord.ui.Modal):
 
-    
-    @discord.ui.select(
-        placeholder = "Lege fest in welchen Bereich das auto reaction system reagieren soll!",
-        min_values = 1,
-        max_values = 1,
-        custom_id = "set_auto_react_area",
-        options = [
-            discord.SelectOption(label="Channel", description="Wenn du einen channel festlegt werden alle nachrichten die in diesen channel gesendet werden mit einer reaction versehen", value="channel"),
-            discord.SelectOption(label="Category", description="Wenn du eine Kategorie festlegst werden alle nachrichten die in die channel der Kategorei gesendet werden mit einer reaction versehen", value="category")
-        ]
-    )
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(title="Lege die spezifischen reaction wörter fest")
+        self.add_item(discord.ui.InputText(label="Schreibe hier die Wörter rein auf der doe auto-raction reagieren soll (Sind es mehre Wörter trenne dise mit einen komma)", style=discord.InputTextStyle.long))
 
-    async def set_auto_reaction_area(self, select, interaction:discord.Interaction):
+    async def callback(self, interaction:discord.Interaction):
 
-        emb = discord.Embed()
+        check = DatabaseCheck.check_auto_reaction(guild_id = interaction.guild.id, parameter = "placeholder")
 
+        if check:
 
+            emb = discord.Embed(description=f"""## Die auto-reaction parameter wurden festgelegt
+                {Emojis.dot_emoji} Ab jetzt reagiert die auto reaction auf die folgenden schlag wörter {self.children[0].value}
+                {Emojis.dot_emoji} Auf diese Wörter wird ab jetzt mit dem emoji {check[4]} reagiert""", color=bot_colour)
+            await interaction.response.send_message(embeds=[emb], view=None)
 
-class SetAutoReactionParameter(discord.ui.View):
+        else:
 
-    def __init__(self):
-        super().__init__(timeout=None)
-
-
-    @discord.ui.select(
-        placeholder = "Lege fest auf was das auto reaction system reagieren soll",
-        min_values = 1,
-        max_values = 1,
-        custom_id = "set_auto_react_parameter",
-        options = [
-            discord.SelectOption(label="Links, Bilder & Videos"),
-            discord.SelectOption(label="Text nachrichten"),
-            discord.SelectOption(label="Individuell"),
-            discord.SelectOption(label="Alle Inhalte")
-        ]
-    )
-
-    async def set_auto_reaction_parameter(self, select, interaction:discord.Interaction):
-
-        emb = discord.Embed()
+            emb = discord.Embed(description=f"""## Eintrag konnte nicht gefunden
+                {Emojis.dot_emoji} Ein fehler ist aufgetreten es konnte kein eintrag zu deiner jetzigen aktion zu geordnet werden
+                {Emojis.dot_emoji} Versuche sie es erneut falls dieser fehler bestehen bleibt konntaktieren sie den support https://discord.gg/3sZhp3q6bD""", color=bot_colour)
+            await interaction.response.send_message(embed=emb)

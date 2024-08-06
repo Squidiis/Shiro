@@ -1641,7 +1641,7 @@ class LevelUpMessageModal(discord.ui.Modal):
         super().__init__(title="Set a level-up message for your server!")
         self.add_item(discord.ui.InputText(label="Insert here the text for the level-up message", style=discord.InputTextStyle.long))
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction:discord.Interaction):
 
         user = interaction.user.mention
         level = 1
@@ -1649,10 +1649,10 @@ class LevelUpMessageModal(discord.ui.Modal):
 
         await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_up_message=self.children[0].value)
 
-        embed = discord.Embed(description=f"""## The level-up message was successfully set
+        emb = discord.Embed(description=f"""## The level-up message was successfully set
             {Emojis.dot_emoji} The level-up message was set to:\n{Emojis.arrow_emoji} `{level_up_message}`
             {Emojis.dot_emoji} When someone receives a level-up this message is sent""", color=bot_colour)
-        await interaction.response.edit_message(embeds=[embed], view=None)
+        await interaction.response.edit_message(embeds=[emb], view=None)
 
 
 

@@ -168,7 +168,7 @@ CREATE TABLE BotSettings (
 
 -------------- Table for the Autoreaction ---------------
 
-DROP TABLE IF EXISTS `AutoReactionSettings`;
+DROP TABLE IF EXISTS `AutoReactions`;
 
 CREATE TABLE AutoReactionSettings (
     guildId BIGINT UNSIGNED NOT NULL,
