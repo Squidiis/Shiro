@@ -1,3 +1,4 @@
+from discord.interactions import Interaction
 from utils import discord, Option, commands, Emojis, no_permissions_emb, bot_colour
 from typing import Union
 from sql_function import DatabaseCheck, DatabaseRemoveDatas, DatabaseUpdates
@@ -43,7 +44,7 @@ class AutoReaction(commands.Cog):
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Wähle aus in welchen channel oder Kategorie die auto-reaction erstellt werden soll!"), 
         parameter:Option(str, required = True, description="Wähle aus auf was diese auto-reaction reagieren soll!",
             choices = ["links, images and videos", "specific content only", "any message"]), 
-        emoji:Option(str, required = True, description="Gebe hier den emoji ein denn du für diese auto-reaction festlegen möchtest (Wähle dazu einen gewünschten eoji aus und setzte einne \ davor)")):
+        emoji:Option(str, required = True, description="Gebe hier den emoji ein denn du für diese auto-reaction festlegen möchtest (Entweder als vollständiger emoji oder als mention)")):
 
         check_reaction = DatabaseCheck.check_auto_reaction(
             guild_id=ctx.guild.id, 
@@ -61,7 +62,12 @@ class AutoReaction(commands.Cog):
 
             if parameter == "specific content only":
 
-                emb = discord.Embed(description=f"""""")
+                await DatabaseUpdates.manage_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id, parameter = "placeholder", emoji = emoji, operation = "add")
+
+                emb = discord.Embed(description=f"""## Lege jetzt die parameter für die auto reaction fest
+                    {Emojis.dot_emoji} Drücke den unteren Button um die parameter auf die die auto reaction reagieren soll festzulegen
+                    {Emojis.dot_emoji} Du kannst einzelne Wörter eintragen oder ganze setzte bedenke jedoch wenn du mehrere einzelne wörter angiebst diese in [...] schreibst und mit einen kommer trennst
+                    {Emojis.dot_emoji} Beispiel: [Wort1, Wort2, Wort3]""")
 
             else:
 
@@ -105,19 +111,43 @@ class AutoReactionOnOffSwitch(discord.ui.Button):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
+class ParameterButtonAutoReaction(discord.ui.Button):
+
+    def __init__(self):
+        super().__init__(
+            label="Set parameters now",
+            style=discord.ButtonStyle.blurple,
+            custom_id="set_parameter_auto_reaction"
+        )
+
+    async def callback(self, interaction:Interaction):
+        
+        if interaction.user.guild_permissions.administrator:
+
+            await interaction.response.send_modal(ParameterModalAutoReaction())
+        
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
 
 class ParameterModalAutoReaction(discord.ui.Modal):
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(title="Lege die spezifischen reaction wörter fest")
-        self.add_item(discord.ui.InputText(label="Schreibe hier die Wörter rein auf der doe auto-raction reagieren soll (Sind es mehre Wörter trenne dise mit einen komma)", style=discord.InputTextStyle.long))
+        super().__init__(title="Define the specific reaction parameters")
+        self.add_item(discord.ui.InputText(
+            label="Write here the words to which the auto-raction should react (if there are several words, separate them with a comma and put them in square brackets)", 
+            style=discord.InputTextStyle.long,
+            max_length=255,
+            min_length=1
+        ))
 
     async def callback(self, interaction:discord.Interaction):
 
         check = DatabaseCheck.check_auto_reaction(guild_id = interaction.guild.id, parameter = "placeholder")
 
         if check:
-
+            # Der zurück gegebene wert ist eine liste muss man noch in einzelne elemente unterteilen
             emb = discord.Embed(description=f"""## Die auto-reaction parameter wurden festgelegt
                 {Emojis.dot_emoji} Ab jetzt reagiert die auto reaction auf die folgenden schlag wörter {self.children[0].value}
                 {Emojis.dot_emoji} Auf diese Wörter wird ab jetzt mit dem emoji {check[4]} reagiert""", color=bot_colour)
