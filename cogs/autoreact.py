@@ -3,9 +3,31 @@ from utils import discord, Option, commands, Emojis, no_permissions_emb, bot_col
 from typing import Union
 from sql_function import DatabaseCheck, DatabaseRemoveDatas, DatabaseUpdates
 
+
+
 class AutoReaction(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
+
+
+    def show_auto_reactions_all(guild_id:int):
+
+        all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = guild_id)
+
+        if all_auto_reactions:
+
+            final_reactions = []
+            for _, channel, category, parameter, emoji in all_auto_reactions:
+
+                final_reactions.append(f"{Emojis.dot_emoji} In {f'dem channel <#{channel}>' if channel != None else f'der Kategorie <#{category}> wird aud {parameter} mit dem emoji {emoji} reagiert'}")
+
+            return "\n".join(final_reactions)
+
+        else:
+
+            return f"{Emojis.dot_emoji} No level roles have been set"
+
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -43,8 +65,8 @@ class AutoReaction(commands.Cog):
     async def add_auto_reaction(self, ctx:discord.ApplicationContext, 
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Wähle aus in welchen channel oder Kategorie die auto-reaction erstellt werden soll!"), 
         parameter:Option(str, required = True, description="Wähle aus auf was diese auto-reaction reagieren soll!",
-            choices = ["links, images and videos", "specific content only", "any message"]), 
-        emoji:Option(str, required = True, description="Gebe hier den emoji ein denn du für diese auto-reaction festlegen möchtest (Entweder als vollständiger emoji oder als mention)")):
+            choices = ["links, images and videos", "text messages", "any message"]), 
+        emoji:Option(str, required = True, description="Gebe hier den emoji ein denn du für diese auto-reaction festlegen möchtest (Einfach emoji einfügen dieser wird automatisch konventiert)")):
 
         check_reaction = DatabaseCheck.check_auto_reaction(
             guild_id=ctx.guild.id, 
@@ -56,29 +78,34 @@ class AutoReaction(commands.Cog):
         
         if check_reaction:
 
-            emb = discord.Embed()
+            emb = discord.Embed(description=f"""## Es wurde bereits eine auto-reaction role festgelegt die genau diese parameter besitzt
+                {Emojis.dot_emoji} Es giebt bereits eine auto-reaction die für {f'den channel {area.id}' if isinstance(area, discord.TextChannel) else f'die Kategorie {area.id}'} festgelegt ist
+                {Emojis.dot_emoji} Diese reagiert bereits auch auf {parameter} mit dem emoji {emoji}""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
         else:
 
-            if parameter == "specific content only":
+            await DatabaseUpdates.manage_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id, parameter = parameter, emoji = emoji, operation = "add")
 
-                await DatabaseUpdates.manage_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id, parameter = "placeholder", emoji = emoji, operation = "add")
+            emb = discord.Embed(description=f"""## Eine neue auto-reaction wurde festgelegt
+                {Emojis.dot_emoji} Die neue auto-reaction reagiert in {'dem channel' if isinstance(area, discord.TextChannel) else 'der Kategorie'} {area.mention}
+                {Emojis.dot_emoji} Als parameter wurde festgelegt das die auto reaction auf {parameter} reagieren soll
+                {Emojis.dot_emoji} Als Emoji wurde {emoji} festgelgt""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
-                emb = discord.Embed(description=f"""## Lege jetzt die parameter für die auto reaction fest
-                    {Emojis.dot_emoji} Drücke den unteren Button um die parameter auf die die auto reaction reagieren soll festzulegen
-                    {Emojis.dot_emoji} Du kannst einzelne Wörter eintragen oder ganze setzte bedenke jedoch wenn du mehrere einzelne wörter angiebst diese in [...] schreibst und mit einen kommer trennst
-                    {Emojis.dot_emoji} Beispiel: [Wort1, Wort2, Wort3]""")
 
-            else:
+    @commands.slash_command(name = "show-auto-reactions")
+    async def show_auto_reactions(self, ctx:discord.ApplicationContext):
+        
+        all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id)
 
-                await DatabaseUpdates.manage_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id, parameter = parameter, emoji = emoji, operation = "add")
+        if all_auto_reactions:
 
-                emb = discord.Embed(description=f"""## Eine neue auto-reaction wurde festgelegt
-                    {Emojis.dot_emoji} Die neue auto-reaction reagiert in {'dem channel' if isinstance(area, discord.TextChannel) else 'der Kategorie'} {area.mention}
-                    {Emojis.dot_emoji} Als parameter wurde festgelegt das die auto reaction auf {parameter} reagieren soll
-                    {Emojis.dot_emoji} Als Emoji wurde {emoji} festgelgt""", color=bot_colour)
-                await ctx.respond(embed=emb)
-
+            emb = discord.Embed(description=f"""## Aktuelle Auto-reactions
+                {Emojis.dot_emoji} Hier siehst du alle auto-reactions die für dem server {ctx.guild.name} festgelegt wurden
+                
+                {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 
 def setup(bot):
@@ -109,53 +136,3 @@ class AutoReactionOnOffSwitch(discord.ui.Button):
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-
-class ParameterButtonAutoReaction(discord.ui.Button):
-
-    def __init__(self):
-        super().__init__(
-            label="Set parameters now",
-            style=discord.ButtonStyle.blurple,
-            custom_id="set_parameter_auto_reaction"
-        )
-
-    async def callback(self, interaction:Interaction):
-        
-        if interaction.user.guild_permissions.administrator:
-
-            await interaction.response.send_modal(ParameterModalAutoReaction())
-        
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-
-class ParameterModalAutoReaction(discord.ui.Modal):
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(title="Define the specific reaction parameters")
-        self.add_item(discord.ui.InputText(
-            label="Write here the words to which the auto-raction should react (if there are several words, separate them with a comma and put them in square brackets)", 
-            style=discord.InputTextStyle.long,
-            max_length=255,
-            min_length=1
-        ))
-
-    async def callback(self, interaction:discord.Interaction):
-
-        check = DatabaseCheck.check_auto_reaction(guild_id = interaction.guild.id, parameter = "placeholder")
-
-        if check:
-            # Der zurück gegebene wert ist eine liste muss man noch in einzelne elemente unterteilen
-            emb = discord.Embed(description=f"""## Die auto-reaction parameter wurden festgelegt
-                {Emojis.dot_emoji} Ab jetzt reagiert die auto reaction auf die folgenden schlag wörter {self.children[0].value}
-                {Emojis.dot_emoji} Auf diese Wörter wird ab jetzt mit dem emoji {check[4]} reagiert""", color=bot_colour)
-            await interaction.response.send_message(embeds=[emb], view=None)
-
-        else:
-
-            emb = discord.Embed(description=f"""## Eintrag konnte nicht gefunden
-                {Emojis.dot_emoji} Ein fehler ist aufgetreten es konnte kein eintrag zu deiner jetzigen aktion zu geordnet werden
-                {Emojis.dot_emoji} Versuche sie es erneut falls dieser fehler bestehen bleibt konntaktieren sie den support https://discord.gg/3sZhp3q6bD""", color=bot_colour)
-            await interaction.response.send_message(embed=emb)
