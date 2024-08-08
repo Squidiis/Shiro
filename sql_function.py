@@ -2044,3 +2044,42 @@ class DatabaseRemoveDatas():
         finally:
 
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+
+
+
+###########################################  Remove values from the auto-reaction system  #########################################
+
+
+    '''
+    
+    '''
+    async def remove_auto_reactions(
+        guild_id:int,
+        channel_id:int = None,
+        category_id:int = None
+        ):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        try:
+
+            if channel_id or category_id:
+
+                delete_auto_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND {'channelId' if channel_id != None else 'categoryId'}"
+                delete_auto_reaction_values = [guild_id, channel_id if channel_id != None else category_id]
+            
+            else:
+
+                delete_auto_reaction = "DELETE FROM AutoReactions WHERE guildId = %s"
+                delete_auto_reaction_values = [guild_id]
+
+            cursor.execute(delete_auto_reaction, delete_auto_reaction_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+        
+        finally:
+
+            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)

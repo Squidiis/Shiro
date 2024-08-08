@@ -4,11 +4,15 @@ import calendar
 import re
 from sql_function import *
 
+
+
+formats = ['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp', 'mp4', 'avi', 'mkv', 'mov', 'wmv', '.mp3', 'wav', 'ogg', 'aac', 'flac']
+
+
 class ModeratorCommands(commands.Cog):
     
     def __init__(self, bot):
         self.bot = bot
-        self.formats = ['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp', 'mp4', 'avi', 'mkv', 'mov', 'wmv', '.mp3', 'wav', 'ogg', 'aac', 'flac']
 
     # Returns the antilink whitelist completely formatted 
     def show_antilink_system_whitelist(guild_id:int):
@@ -45,7 +49,6 @@ class ModeratorCommands(commands.Cog):
 
     
     # Checks whether the message contains a link
-    @staticmethod
     def contains_invite(content:str):
 
         invites_re = re.compile(r'(?:discord\.gg|discord\.com\/invite|\.gg)\/(\S+)')
@@ -105,7 +108,7 @@ class ModeratorCommands(commands.Cog):
         # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
         elif check_settings[3] == 1:
                 
-            if 'https://' in message.content and not any(word in message.content for word in self.formats) and not message.attachments or check_link == True: 
+            if 'https://' in message.content and any(word in message.content for word in formats) and message.attachments or check_link == True: 
 
                 return True
 

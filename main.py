@@ -93,7 +93,8 @@ class Main(commands.Cog):
                 botColour VARCHAR(20) NULL,
                 ghostPing BIT DEFAULT 0,
                 antiLink BIT(4) DEFAULT 3,
-                antiLinkTimeout INT DEFAULT 0
+                antiLinkTimeout INT DEFAULT 0,
+                autoReaction BIT DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             # Leaderboard tables
@@ -159,6 +160,15 @@ class Main(commands.Cog):
                 inviteCode VARCHAR(20) NOT NULL,
                 usesCount INT NOT NULL,
                 UNIQUE KEY unique_invite (guildId, inviteCode)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS AutoReactionSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                channelId BIGINT UNSIGNED NOT NULL,
+                categoryId BIGINT UNSIGNED NOT NULL,
+                parameter VARCHAR(255) NOT NULL,
+                emoji VARCHAR(255) NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
             ]
