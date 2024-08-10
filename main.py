@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from cogs.fun_commands import *
 from utils import *
 from cogs.leaderboard_system import *
-
+from cogs.auto_react import *
 
 
 @bot.slash_command(description="Shows you the ping.")
@@ -76,7 +76,7 @@ class Main(commands.Cog):
                 PercentBonusXp INT UNSIGNED DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
-            # Antilink system table
+            # Anti-link system table
             '''
             CREATE TABLE If NOT EXISTS AntiLinkWhiteList (
                 guildId BIGINT UNSIGNED NOT NULL,
@@ -162,6 +162,7 @@ class Main(commands.Cog):
                 UNIQUE KEY unique_invite (guildId, inviteCode)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
+            # Auto reaction table
             '''
             CREATE TABLE IF NOT EXISTS AutoReactionSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
@@ -233,6 +234,10 @@ class Main(commands.Cog):
         view.add_item(DefaultSettingsLeaderboard())
         self.bot.add_view(ShowLeaderboardGivenRoles())
         self.bot.add_view(SetInviteleaderboard())
+
+        # Auto-reaction
+        view.add_item(AutoReactionOnOffSwitch())
+        view.add_item(ShowAutoReactions())
 
 
         # Other Systems

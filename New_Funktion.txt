@@ -13,6 +13,3 @@ Testen der funktion die neue inv links added (Wenn der bot läuft und dann ein n
 
 
 Bot setting integation über arbeiten (der table hat einen neuen wert bekommen, autoReaction)
-
-
-remove auto reaction command

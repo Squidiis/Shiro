@@ -23,13 +23,13 @@ class AutoReaction(commands.Cog):
             final_reactions = []
             for _, channel, category, parameter, emoji in all_auto_reactions:
 
-                final_reactions.append(f"{Emojis.dot_emoji} In {f'dem channel <#{channel}>' if channel != None else f'der Kategorie <#{category}> wird aud {parameter} mit dem emoji {emoji} reagiert'}")
+                final_reactions.append(f"{Emojis.dot_emoji} In {f'the channel <#{channel}>' if channel != None else f'the category <#{category}> is responded to {parameter} with the emoji {emoji}'}")
 
             return "\n".join(final_reactions)
 
         else:
 
-            return f"{Emojis.dot_emoji} No level roles have been set"
+            return f"{Emojis.dot_emoji} No auto-reactions have been set"
         
 
     '''
@@ -39,10 +39,13 @@ class AutoReaction(commands.Cog):
 
         if parameter == "links, images and videos":
             return 'https://' in message.content and any(word in message.content for word in formats) and message.attachments or ModeratorCommands.contains_invite(content = message.content) == True
+        
         elif parameter == "text messages":
             return 'https://' not in message.content and not any(word in message.content for word in formats) and not message.attachments or ModeratorCommands.contains_invite(content = message.content) == True
+        
         elif parameter == "any message":
             return True
+        
         return False
 
 
@@ -75,20 +78,19 @@ class AutoReaction(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def set_auto_reaction(self, ctx:discord.ApplicationContext):
 
-        emb = discord.Embed(description=f"""## Einstellungs menü für das Auto reaction system
-            {Emojis.dot_emoji} Wähle aus den unteren Buttons und Select menüs aus was du einstellen willst
-            
-            {Emojis.dot_emoji} Folgende einstellungen stehen zur verfügung:""")
+        emb = discord.Embed(description=f"""## Settings menu for the auto reaction system
+            {Emojis.dot_emoji} With the button below you can either switch the auto-reactions menu on or off
+            {Emojis.help_emoji} With the command `add-auto-reaction` you can then set auto-reactions that automatically leave a reaction in the areas you specify""")
         await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
 
 
     @commands.slash_command(name = "add-auto-reaction")
     @commands.has_permissions(administrator = True)
     async def add_auto_reaction(self, ctx:discord.ApplicationContext, 
-        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Wähle aus in welchen channel oder Kategorie die auto-reaction erstellt werden soll!"), 
-        parameter:Option(str, required = True, description="Wähle aus auf was diese auto-reaction reagieren soll!",
+        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select in which channel or category the auto-reaction should be created!"), 
+        parameter:Option(str, required = True, description="Select what this auto-reaction should react to!",
             choices = ["links, images and videos", "text messages", "any message"]), 
-        emoji:Option(str, required = True, description="Gebe hier den emoji ein denn du für diese auto-reaction festlegen möchtest (Einfach emoji einfügen dieser wird automatisch konventiert)")):
+        emoji:Option(str, required = True, description="Enter the emoji you want to set for this auto-reaction here (simply insert emoji this will be automatically configured)")):
 
         check_reaction = DatabaseCheck.check_auto_reaction(
             guild_id=ctx.guild.id, 
@@ -100,42 +102,44 @@ class AutoReaction(commands.Cog):
         
         if check_reaction:
 
-            emb = discord.Embed(description=f"""## Es wurde bereits eine auto-reaction role festgelegt die genau diese parameter besitzt
-                {Emojis.dot_emoji} Es giebt bereits eine auto-reaction die für {f'den channel {area.id}' if isinstance(area, discord.TextChannel) else f'die Kategorie {area.id}'} festgelegt ist
-                {Emojis.dot_emoji} Diese reagiert bereits auch auf {parameter} mit dem emoji {emoji}""", color=bot_colour)
+            emb = discord.Embed(description=f"""## An auto-reaction role has already been defined that has exactly these parameters
+                {Emojis.dot_emoji} There is already an auto-reaction defined for the {f'channel {area.id}' if isinstance(area, discord.TextChannel) else f'category {area.id}'}.
+                {Emojis.dot_emoji} This already reacts to {parameter} with the emoji {emoji}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
             await DatabaseUpdates.manage_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id, parameter = parameter, emoji = emoji, operation = "add")
 
-            emb = discord.Embed(description=f"""## Eine neue auto-reaction wurde festgelegt
-                {Emojis.dot_emoji} Die neue auto-reaction reagiert in {'dem channel' if isinstance(area, discord.TextChannel) else 'der Kategorie'} {area.mention}
-                {Emojis.dot_emoji} Als parameter wurde festgelegt das die auto reaction auf {parameter} reagieren soll
-                {Emojis.dot_emoji} Als Emoji wurde {emoji} festgelgt""", color=bot_colour)
+            emb = discord.Embed(description=f"""## A new auto-reaction has been defined
+                {Emojis.dot_emoji} The new auto-reaction reacts in the {'channel' if isinstance(area, discord.TextChannel) else 'category'} {area.mention}
+                {Emojis.dot_emoji} The parameter was set so that the autoreaction should react to {parameter}
+                {Emojis.dot_emoji} {emoji} was set as the emoji""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         
     @commands.slash_command(name = "remove-auto-reaction")
     @commands.has_permissions(administrator = True)
     async def remove_auto_reactions(self, ctx:discord.ApplicationContext, 
-        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Wähle aus welchen channel oder Kategorie du vom auto-reaction system streichen willst!")):
+        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select which channel or category you want to remove from the auto-reaction system!")):
 
         check_auto_reaction = DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id if isinstance(area, discord.TextChannel) else None, category_id = None if isinstance(area, discord.TextChannel) else area.id)
 
         if check_auto_reaction:
 
-            emb = discord.Embed(description=f"""## Die auto-reaction wurde erfolgreiche entfernt
-                {Emojis.dot_emoji} Die auto-reaction die für {f'den channel {area.id}' if isinstance(area, discord.TextChannel) else f'die Kategorie {area.id}'} festgelegt wurde wurde entfernt
-                {Emojis.dot_emoji} Mit den unteren Button kannst du dir anzeigen lassen welchen auto-reactions noch festgelegt sind""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The auto-reaction has been successfully removed
+                {Emojis.dot_emoji} The auto-reaction that was set for the {f'channel {area.id}' if isinstance(area, discord.TextChannel) else f'category {area.id}'} has been removed
+                {Emojis.dot_emoji} With the button below you can see which auto-reactions are still set""", color=bot_colour)
             await ctx.respond(embed=emb, view=ShowAutoReactions())
 
         else:
-            # In die nachricht mit einbauen
-            emb = discord.Embed(description=f"""## Diese auto-reaction konnte nicht entfernt werden
-                {Emojis.dot_emoji} Diese auto-reaction konnte nicht entfernt werden da sie nicht als auto-reaction festgelegt ist
-                {Emojis.dot_emoji} Mit den unterem Button kannst du dir alle festgelegten auto-reactions ansehen""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ShowAutoReactions())
+            
+            emb = discord.Embed(description=f"""## This auto-reaction could not be removed
+                {Emojis.dot_emoji} This auto-reaction could not be removed because it is not set as an auto-reaction
+                {Emojis.dot_emoji} Here you can see all auto-reactions that are set for this server
+                
+                {Emojis.dot_emoji} {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
+            await ctx.respond(embed=emb)
 
 
     @commands.slash_command(name = "show-auto-reactions")
@@ -146,8 +150,8 @@ class AutoReaction(commands.Cog):
 
         if all_auto_reactions:
 
-            emb = discord.Embed(description=f"""## Aktuelle Auto-reactions
-                {Emojis.dot_emoji} Hier siehst du alle auto-reactions die für dem server {ctx.guild.name} festgelegt wurden
+            emb = discord.Embed(description=f"""## Current auto-reactions
+                {Emojis.dot_emoji} Here you can see all auto-reactions that have been set for the server {ctx.guild.name}
                 
                 {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
@@ -163,16 +167,16 @@ class AutoReaction(commands.Cog):
 
             DatabaseRemoveDatas.remove_auto_reactions(guild_id = ctx.guild.id)
 
-            emb = discord.Embed(description=f"""## Auto-reactions wurden zurück gesetzt
-                {Emojis.dot_emoji} Alle auto-reactions wurden gelöscht
-                {Emojis.dot_emoji} Wenn du neue auto-reactions festlegen möchtest kannst du den `add-auto-reaction` command dafür nutzen""", color=bot_colour)
+            emb = discord.Embed(description=f"""## Auto-reactions have been reset
+                {Emojis.dot_emoji} All auto-reactions have been deleted
+                {Emojis.dot_emoji} If you want to set new auto-reactions you can use the `add-auto-reaction` command to do so""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
 
-            emb = discord.Embed(description=f"""## Keine einträge gefunden
-                {Emojis.dot_emoji} Es konnten keine auto-reactions gelöscht werden da keine festgelegt worden sind
-                {Emojis.dot_emoji} Wenn du welche festlegen möchtest kannst du den `add-auto-reaction` command dafür verwenden""", color=bot_colour)
+            emb = discord.Embed(description=f"""## No entries found
+                {Emojis.dot_emoji} No auto-reactions could be deleted because none have been set
+                {Emojis.dot_emoji} If you want to set some you can use the `add-auto-reaction` command to do so""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -197,8 +201,8 @@ class AutoReactionOnOffSwitch(discord.ui.Button):
             settings = DatabaseCheck.check_bot_settings(guild_id = interaction.guild.id)
 
             emb = discord.Embed(description=f"""## The auto reaction system is now {'activated' if settings[5] == 0 else 'deactivated'}.
-                {Emojis.dot_emoji} {'Von jetzt an werden reactionen automatisch nach den vorher eingestellten parametern vergeben' if settings[5] == 0 else 'Ab jetzt werden keine neuen reactionen mehr automatisch hinzugefügt'}
-                {Emojis.dot_emoji} Wenn du das system weiter einstellen willst kannst du den `set-auto-reaction` einfach erneut ausführen""", color=bot_colour)
+                {Emojis.dot_emoji} {'From now on, reactions will be assigned automatically according to the previously set parameters' if settings[5] == 0 else 'From now on, no new reactions will be added automatically'}
+                {Emojis.dot_emoji} If you want to set the system further, you can simply run the `set-auto-reaction` again""", color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
         
         else:
@@ -217,6 +221,13 @@ class ShowAutoReactions(discord.ui.Button):
 
     async def callback(self, interaction: Interaction):
         
-        emb = discord.Embed(description=f"""## Hier siehst du alle auto-reactions
-            
-            {AutoReaction.show_auto_reactions_all(guild_id = interaction.guild.id)}""")
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""## Here you can see all auto-reactions
+                
+                {AutoReaction.show_auto_reactions_all(guild_id = interaction.guild.id)}""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
