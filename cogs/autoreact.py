@@ -125,11 +125,17 @@ class AutoReaction(commands.Cog):
 
         if check_auto_reaction:
 
-            emb = discord.Embed()
+            emb = discord.Embed(description=f"""## Die auto-reaction wurde erfolgreiche entfernt
+                {Emojis.dot_emoji} Die auto-reaction die für {f'den channel {area.id}' if isinstance(area, discord.TextChannel) else f'die Kategorie {area.id}'} festgelegt wurde wurde entfernt
+                {Emojis.dot_emoji} Mit den unteren Button kannst du dir anzeigen lassen welchen auto-reactions noch festgelegt sind""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowAutoReactions())
 
         else:
-
-            emb = discord.Embed()
+            # In die nachricht mit einbauen
+            emb = discord.Embed(description=f"""## Diese auto-reaction konnte nicht entfernt werden
+                {Emojis.dot_emoji} Diese auto-reaction konnte nicht entfernt werden da sie nicht als auto-reaction festgelegt ist
+                {Emojis.dot_emoji} Mit den unterem Button kannst du dir alle festgelegten auto-reactions ansehen""", color=bot_colour)
+            await ctx.respond(embed=emb, view=ShowAutoReactions())
 
 
     @commands.slash_command(name = "show-auto-reactions")
@@ -198,3 +204,19 @@ class AutoReactionOnOffSwitch(discord.ui.Button):
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+class ShowAutoReactions(discord.ui.Button):
+
+    def __init__(self):
+        super().__init__(
+            label="show auto-reactions",
+            style=discord.ButtonStyle,
+            custom_id="show_all_auto_reactions"
+        )
+
+    async def callback(self, interaction: Interaction):
+        
+        emb = discord.Embed(description=f"""## Hier siehst du alle auto-reactions
+            
+            {AutoReaction.show_auto_reactions_all(guild_id = interaction.guild.id)}""")
