@@ -10,6 +10,3 @@ back button zum close button machen help
 anti-link testen (hab bei der einen bestimmung das not entfernt (links videos))
 
 Testen der funktion die neue inv links added (Wenn der bot läuft und dann ein neuer inv link erstellt wird und über diesen jemand joint)
-
-
-Bot setting integation über arbeiten (der table hat einen neuen wert bekommen, autoReaction)
