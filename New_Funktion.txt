@@ -7,6 +7,8 @@ Updaite 1.1
 
 back button zum close button machen help
 
-anti-link testen (hab bei der einen bestimmung das not entfernt (links videos))
 
-Testen der funktion die neue inv links added (Wenn der bot läuft und dann ein neuer inv link erstellt wird und über diesen jemand joint)
+antilink fixen (Es werden mehrere bestätigungen gesendet )
+test of the auto reaction
+
+add auto reaction to the help menu and readme file

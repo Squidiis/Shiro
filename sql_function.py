@@ -608,10 +608,30 @@ class DatabaseCheck():
     
 
     '''
+    Returns all auto-reactions or only specific ones
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+        - channel_id
+            Id of the channel to be scanned
+        - category_id
+            Id of the category to be checked
+        - parameter
+            Which parameters to search for
+                - links, images and videos
+                - text messages
+                - any message
+        - emoji
+            Which emoji mention to search for
     
+    Info:
+        - guild_id must be specified
+        - If no channel or category is specified, all auto-reactions are returned
     '''
     def check_auto_reaction(
-        guid_id:int,
+        guild_id:int,
         channel_id:int = None,
         category_id:int = None,
         parameter = None,
@@ -626,22 +646,22 @@ class DatabaseCheck():
 
         check = None
         for count in range(len(column_value)):
-
+            
             if channel_id != None or category_id != None and parameter != None and emoji != None:
-
+                
                 check = True
                 check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s AND {'channelId' if channel_id != None else 'categoryId'} = %s AND parameter = %s AND emoji = %s"
-                check_autoreact_values = [guid_id, channel_id if channel_id != None else category_id, parameter, emoji]
+                check_autoreact_values = [guild_id, channel_id if channel_id != None else category_id, parameter, emoji]
 
             elif column_value[count] != None:
                 
                 check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s AND {column_name[count]}"
-                check_autoreact_values = [guid_id, column_value[count]]
+                check_autoreact_values = [guild_id, column_value[count]]
 
-            elif all(x for x in column_value if x == None):
-
+            elif all(x is None for x in column_value):
+                
                 check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s"
-                check_autoreact_values = [guid_id]
+                check_autoreact_values = [guild_id]
 
         cursor.execute(check_autoreact, check_autoreact_values)
 
@@ -1780,7 +1800,32 @@ class DatabaseUpdates():
 
 
     '''
+    Manages the auto-reaction system
 
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - emoji
+            Mention of the emoji
+        - operation
+            Which action should be performed
+                - add: Adds an auto-reaction
+                - remove: Removes an auto-reaction
+        - channel_id
+            Id of the channel in which the auto-reaction should react
+        - category_id
+            Id of the category in which the auto-reaction should react
+        - parameter
+            What the auto-reaction should react to
+                - links, images and videos: Only reacts to images, videos or links
+                - text messages: Only reacts to text messages
+                - any message: Reacts to all messages regardless of whether they are text or links
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
+        - At least one channel or category must be specified and an associated parameter
     '''
     async def manage_auto_reaction(
         guid_id:int, 
@@ -1803,7 +1848,7 @@ class DatabaseUpdates():
 
             else:
 
-                manage_reaction = "DELETE FROM AutoReactions WHERE guildId = %s AND emoji = %s AND {'channelId' if channel_id != None else 'categoryId'}"
+                manage_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND emoji = %s AND {'channelId' if channel_id != None else 'categoryId'}"
                 manage_reaction_values = [guid_id, emoji, channel_id if channel_id != None else category_id]
 
             cursor.execute(manage_reaction, manage_reaction_values)
@@ -2051,7 +2096,20 @@ class DatabaseRemoveDatas():
 
 
     '''
-    
+    Removes certain auto-reactions or resets them all equally
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - channel_id
+            Id of the channel to be removed
+        - category_id
+            Id of the category to be removed
+
+    Info:
+        - guild_id must be specified
+        - If no channel and no category are specified, all auto-reactions of a server are reset
     '''
     async def remove_auto_reactions(
         guild_id:int,

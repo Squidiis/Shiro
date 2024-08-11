@@ -16,6 +16,8 @@ import yaml
 from discord.ext.pages import Paginator, Page
 from datetime import timedelta
 from datetime import datetime, UTC
+import re
+
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
@@ -92,6 +94,19 @@ def is_admin():
     return commands.check(predicate)
 
 
+# File formats (required for antu-link system and auto-reaction)
+formats = ['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp', 'mp4', 'avi', 'mkv', 'mov', 'wmv', '.mp3', 'wav', 'ogg', 'aac', 'flac']
+
+# Checks whether the message contains a link
+def contains_invite(content:str):
+
+    invites_re = re.compile(r'(?:discord\.gg|discord\.com\/invite|\.gg)\/(\S+)')
+    matches = invites_re.findall(content)
+        
+    if not matches:
+        return False
+    
+    return True
 
 
 # Embeds that are used multiple times within the bot

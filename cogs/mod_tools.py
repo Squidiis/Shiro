@@ -1,12 +1,9 @@
 
 from utils import *
 import calendar
-import re
 from sql_function import *
 
 
-
-formats = ['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp', 'mp4', 'avi', 'mkv', 'mov', 'wmv', '.mp3', 'wav', 'ogg', 'aac', 'flac']
 
 
 class ModeratorCommands(commands.Cog):
@@ -48,18 +45,6 @@ class ModeratorCommands(commands.Cog):
 ##################################  Anti-link system  #########################################
 
     
-    # Checks whether the message contains a link
-    def contains_invite(content:str):
-
-        invites_re = re.compile(r'(?:discord\.gg|discord\.com\/invite|\.gg)\/(\S+)')
-        matches = invites_re.findall(content)
-        
-        if not matches:
-            return False
-    
-        return True
-
-    
     # Checks the whitelist and checks whether there is a match in the channels, categories, roles or user entries
     @staticmethod
     def check_whitelist_antilink(message:discord.Message):
@@ -96,7 +81,7 @@ class ModeratorCommands(commands.Cog):
     # Checks whether there has been a violation of the antilink system
     def check_rule_violation(self, check_settings, message:discord.Message):
 
-        check_link = self.contains_invite(message.content.replace(" ", ""))
+        check_link = contains_invite(message.content.replace(" ", ""))
 
         # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
         if check_settings[3] == 0:
@@ -108,7 +93,7 @@ class ModeratorCommands(commands.Cog):
         # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
         elif check_settings[3] == 1:
                 
-            if 'https://' in message.content and any(word in message.content for word in formats) and message.attachments or check_link == True: 
+            if 'https://' in message.content and not any(word in message.content for word in formats) and not message.attachments or check_link == True: 
 
                 return True
 

@@ -782,7 +782,7 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=3, system = "invite")
         users = await self.sort_leaderboard(user_list=user_list, interval=4, guild_id=guild_id, system="invite")
 
-        emb = discord.Embed(description=f"""## Whole Invite Leaderboard
+        emb = discord.Embed(description=f"""## Whole invite leaderboard
             The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
 
             {users}""", color=bot_colour)
@@ -794,7 +794,7 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=0, system = "invite")
         users = await self.sort_leaderboard(user_list=user_list, interval=1, guild_id=guild_id, system="invite")
 
-        emb = discord.Embed(description=f"""## Weekly Invite Leaderboard
+        emb = discord.Embed(description=f"""## Weekly invite leaderboard
             {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
@@ -808,7 +808,7 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=1, system = "invite")
         users = await self.sort_leaderboard(user_list=user_list, interval=2, guild_id=guild_id, system="invite")
 
-        emb = discord.Embed(description=f"""## Monthly Invite Leaderboard
+        emb = discord.Embed(description=f"""## Monthly invite leaderboard
             {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
@@ -822,7 +822,7 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=2, system = "invite")
         users = await self.sort_leaderboard(user_list=user_list, interval=3, guild_id=guild_id, system="invite")
 
-        emb = discord.Embed(description=f"""## Quarterly Invite Leaderboard (90 days)
+        emb = discord.Embed(description=f"""## Quarterly invite leaderboard (90 days)
             {Emojis.dot_emoji} These are the users who have invited the most users in the period from <t:{int((datetime.now() - timedelta(days=80)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
@@ -889,7 +889,7 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=3, system = "message")
         users = await self.sort_leaderboard(user_list=user_list, interval=4, guild_id=guild_id, system="message")
 
-        emb = discord.Embed(description=f"""## Whole Message Leaderboard
+        emb = discord.Embed(description=f"""## Whole message leaderboard
             The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>
 
             {users}""", color=bot_colour)
@@ -901,8 +901,8 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=0, system = "message")
         users = await self.sort_leaderboard(user_list=user_list, interval=1, guild_id=guild_id, system="message")
 
-        emb = discord.Embed(description=f"""## Daily Message Leaderboard
-            {Emojis.dot_emoji} These are the users who have written the most message in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+        emb = discord.Embed(description=f"""## Daily message leaderboard
+            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
             {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
@@ -915,8 +915,8 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=1, system = "message")
         users = await self.sort_leaderboard(user_list=user_list, interval=2, guild_id=guild_id, system="message")
 
-        emb = discord.Embed(description=f"""## Weekly Message Leaderboard
-            {Emojis.dot_emoji} These are the users who have written the most message in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+        emb = discord.Embed(description=f"""## Weekly message leaderboard
+            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
             {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
@@ -929,8 +929,8 @@ class LeaderboardSystem(commands.Cog):
         user_list = DatabaseCheck.check_leaderboard(guild_id=guild_id, interval=2, system = "message")
         users = await self.sort_leaderboard(user_list=user_list, interval=3, guild_id=guild_id, system="message")
 
-        emb = discord.Embed(description=f"""## Monthly Message Leaderboard (30 days)
-            {Emojis.dot_emoji} These are the users who have written the most message in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
+        emb = discord.Embed(description=f"""## Monthly message leaderboard (30 days)
+            {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(days=30)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
             {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)

@@ -1,8 +1,8 @@
 from discord.interactions import Interaction
-from utils import discord, Option, commands, Emojis, no_permissions_emb, bot_colour
+from utils import *
 from typing import Union
 from sql_function import DatabaseCheck, DatabaseRemoveDatas, DatabaseUpdates
-from mod_tools import ModeratorCommands, formats
+
 
 
 class AutoReaction(commands.Cog):
@@ -12,7 +12,16 @@ class AutoReaction(commands.Cog):
 
 
     '''
-    
+    Returns all auto-reactions
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+            
+    Info:
+        - guild_id must be specified
+        - If no auto-reactions are set, information about this is returned
     '''
     def show_auto_reactions_all(guild_id:int):
 
@@ -33,15 +42,25 @@ class AutoReaction(commands.Cog):
         
 
     '''
-    
+    Checks when the auto-reaction should react
+
+    Parameters:
+    -----------
+        - parameter
+            What to react to
+        - message
+            Message (specifies the required ids)
+            
+    Info:
+        - parameter and message must both be specified
     '''
     def should_react(parameter:str, message:discord.Message):
 
         if parameter == "links, images and videos":
-            return 'https://' in message.content and any(word in message.content for word in formats) and message.attachments or ModeratorCommands.contains_invite(content = message.content) == True
+            return 'https://' in message.content and any(word in message.content for word in formats) and message.attachments or contains_invite(content = message.content) == True
         
         elif parameter == "text messages":
-            return 'https://' not in message.content and not any(word in message.content for word in formats) and not message.attachments or ModeratorCommands.contains_invite(content = message.content) == True
+            return 'https://' not in message.content and not any(word in message.content for word in formats) and not message.attachments or contains_invite(content = message.content) == True
         
         elif parameter == "any message":
             return True
@@ -90,7 +109,7 @@ class AutoReaction(commands.Cog):
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select in which channel or category the auto-reaction should be created!"), 
         parameter:Option(str, required = True, description="Select what this auto-reaction should react to!",
             choices = ["links, images and videos", "text messages", "any message"]), 
-        emoji:Option(str, required = True, description="Enter the emoji you want to set for this auto-reaction here (simply insert emoji this will be automatically configured)")):
+        emoji:Option(str, required = True, description="Enter the emoji you want for this auto-reaction (just insert it and it'll be set)!")):
 
         check_reaction = DatabaseCheck.check_auto_reaction(
             guild_id=ctx.guild.id, 
@@ -126,6 +145,8 @@ class AutoReaction(commands.Cog):
         check_auto_reaction = DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id if isinstance(area, discord.TextChannel) else None, category_id = None if isinstance(area, discord.TextChannel) else area.id)
 
         if check_auto_reaction:
+
+            DatabaseRemoveDatas.remove_auto_reactions(guild_id = ctx.guild.id, channel_id = area.id if isinstance(area, discord.TextChannel) else None, category_id = None if isinstance(area, discord.TextChannel) else area.id)
 
             emb = discord.Embed(description=f"""## The auto-reaction has been successfully removed
                 {Emojis.dot_emoji} The auto-reaction that was set for the {f'channel {area.id}' if isinstance(area, discord.TextChannel) else f'category {area.id}'} has been removed

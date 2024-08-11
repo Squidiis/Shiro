@@ -164,7 +164,7 @@ class Main(commands.Cog):
             ''',
             # Auto reaction table
             '''
-            CREATE TABLE IF NOT EXISTS AutoReactionSettings (
+            CREATE TABLE IF NOT EXISTS AutoReactions (
                 guildId BIGINT UNSIGNED NOT NULL,
                 channelId BIGINT UNSIGNED NOT NULL,
                 categoryId BIGINT UNSIGNED NOT NULL,
