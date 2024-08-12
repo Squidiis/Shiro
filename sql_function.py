@@ -1828,7 +1828,7 @@ class DatabaseUpdates():
         - At least one channel or category must be specified and an associated parameter
     '''
     async def manage_auto_reaction(
-        guid_id:int, 
+        guild_id:int, 
         emoji:str,
         operation:str,
         channel_id:int = None, 
@@ -1844,12 +1844,12 @@ class DatabaseUpdates():
             if operation == "add":
 
                 manage_reaction = f"INSERT INTO AutoReactions (guildId, {'channelId' if channel_id != None else 'categoryId'}, parameter, emoji) VALUES (%s, %s, %s, %s)"
-                manage_reaction_values = [guid_id, channel_id if channel_id != None else category_id, parameter, emoji]
-
+                manage_reaction_values = [guild_id, channel_id, parameter, emoji] if channel_id != None else [guild_id, category_id, parameter, emoji]
+                
             else:
 
                 manage_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND emoji = %s AND {'channelId' if channel_id != None else 'categoryId'}"
-                manage_reaction_values = [guid_id, emoji, channel_id if channel_id != None else category_id]
+                manage_reaction_values = [guild_id, channel_id, parameter, emoji] if channel_id != None else [guild_id, category_id, parameter, emoji]
 
             cursor.execute(manage_reaction, manage_reaction_values)
             db_connect.commit()

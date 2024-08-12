@@ -172,8 +172,8 @@ DROP TABLE IF EXISTS `AutoReactions`;
 
 CREATE TABLE AutoReactionSettings (
     guildId BIGINT UNSIGNED NOT NULL,
-    channelId BIGINT UNSIGNED NOT NULL,
-    categoryId BIGINT UNSIGNED NOT NULL,
+    channelId BIGINT UNSIGNED NULL,
+    categoryId BIGINT UNSIGNED NULL,
     parameter VARCHAR(255) NOT NULL,
     emoji VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

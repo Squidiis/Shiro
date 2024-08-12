@@ -163,3 +163,8 @@ This project is licensed under the [Custom License](LICENSE.txt). For commercial
 |remove-message-leaderboard-role|Remove roles as leaderboard roles|
 |show-message-leaderboard-roles|Displays all roles that are set for the leaderboard system|
 |reset-message-leaderboard-roles|Resets all roles of the leaderboard system|
+|set-auto-reaction|Set the auto-reaction system|
+|add-auto-reaction|Add an auto-reaction|
+|remove-auto-reaction|Remove an auto-reaction|
+|show-auto-reaction|Display all auto-reactions set for a server|
+|reset-auto-reaction|resets all auto-reactions set for a server|

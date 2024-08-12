@@ -87,8 +87,9 @@ class AutoReaction(commands.Cog):
         for _, channel, category, parameter, emoji in recations:
 
             if (channel is not None and message.channel.id == channel) or (category is not None and message.channel.category_id == category):
-
-                if self.should_react(parameter=parameter, message=message):
+                print(parameter)
+                print(type(parameter))
+                if self.should_react(parameter=str(parameter), message=message):
 
                     await message.add_reaction(emoji=emoji)
             
@@ -128,7 +129,14 @@ class AutoReaction(commands.Cog):
 
         else:
 
-            await DatabaseUpdates.manage_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id, parameter = parameter, emoji = emoji, operation = "add")
+            await DatabaseUpdates.manage_auto_reaction(
+                guild_id = ctx.guild.id, 
+                channel_id = area.id if isinstance(area, discord.TextChannel) else None,
+                category_id = None if isinstance(area, discord.TextChannel) else area.id,
+                parameter = parameter,
+                emoji = emoji,
+                operation = "add"
+                )
 
             emb = discord.Embed(description=f"""## A new auto-reaction has been defined
                 {Emojis.dot_emoji} The new auto-reaction reacts in the {'channel' if isinstance(area, discord.TextChannel) else 'category'} {area.mention}
