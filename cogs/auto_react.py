@@ -23,7 +23,7 @@ class AutoReaction(commands.Cog):
         - guild_id must be specified
         - If no auto-reactions are set, information about this is returned
     '''
-    def show_auto_reactions_all(guild_id:int):
+    def show_auto_reactions_all(self, guild_id:int):
 
         all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = guild_id)
 
@@ -32,13 +32,13 @@ class AutoReaction(commands.Cog):
             final_reactions = []
             for _, channel, category, parameter, emoji in all_auto_reactions:
 
-                final_reactions.append(f"{Emojis.dot_emoji} In {f'the channel <#{channel}>' if channel != None else f'the category <#{category}> is responded to {parameter} with the emoji {emoji}'}")
+                final_reactions.append(f"> {Emojis.dot_emoji} In {f'the channel <#{channel}>' if channel != None else f'the category <#{category}>'}, is responded to {parameter} with the emoji: {emoji}")
 
             return "\n".join(final_reactions)
 
         else:
 
-            return f"{Emojis.dot_emoji} No auto-reactions have been set"
+            return f"> {Emojis.dot_emoji} No auto-reactions have been set"
         
 
     '''
@@ -54,13 +54,19 @@ class AutoReaction(commands.Cog):
     Info:
         - parameter and message must both be specified
     '''
-    def should_react(parameter:str, message:discord.Message):
-
+    async def should_react(self, parameter:str, message:discord.Message):
+    
         if parameter == "links, images and videos":
-            return 'https://' in message.content and any(word in message.content for word in formats) and message.attachments or contains_invite(content = message.content) == True
+            return 'https://' in message.content or len(message.attachments) >= 1
+        
+        elif parameter == "images and videos":
+            return 'hettps://' in message.content and any(word in message.content for word in formats) or len(message.attachments) >= 1
+        
+        elif parameter == "links":
+            return 'https://' in message.content
         
         elif parameter == "text messages":
-            return 'https://' not in message.content and not any(word in message.content for word in formats) and not message.attachments or contains_invite(content = message.content) == True
+            return 'https://' not in message.content and not any(word in message.content for word in formats) and not message.attachments
         
         elif parameter == "any message":
             return True
@@ -83,13 +89,12 @@ class AutoReaction(commands.Cog):
 
         if not recations:
             return
-
+        
         for _, channel, category, parameter, emoji in recations:
-
+            
             if (channel is not None and message.channel.id == channel) or (category is not None and message.channel.category_id == category):
-                print(parameter)
-                print(type(parameter))
-                if self.should_react(parameter=str(parameter), message=message):
+                
+                if await self.should_react(parameter=parameter, message=message) == True:
 
                     await message.add_reaction(emoji=emoji)
             
@@ -109,7 +114,7 @@ class AutoReaction(commands.Cog):
     async def add_auto_reaction(self, ctx:discord.ApplicationContext, 
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select in which channel or category the auto-reaction should be created!"), 
         parameter:Option(str, required = True, description="Select what this auto-reaction should react to!",
-            choices = ["links, images and videos", "text messages", "any message"]), 
+            choices = ["links, images and videos", "images and videos", "links", "text messages", "any message"]), 
         emoji:Option(str, required = True, description="Enter the emoji you want for this auto-reaction (just insert it and it'll be set)!")):
 
         check_reaction = DatabaseCheck.check_auto_reaction(
@@ -150,8 +155,12 @@ class AutoReaction(commands.Cog):
     async def remove_auto_reactions(self, ctx:discord.ApplicationContext, 
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select which channel or category you want to remove from the auto-reaction system!")):
 
-        check_auto_reaction = DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id, channel_id = area.id if isinstance(area, discord.TextChannel) else None, category_id = None if isinstance(area, discord.TextChannel) else area.id)
-
+        check_auto_reaction = DatabaseCheck.check_auto_reaction(
+            guild_id = ctx.guild.id, 
+            channel_id = area.id if isinstance(area, discord.TextChannel) else None,
+            category_id = None if isinstance(area, discord.TextChannel) else area.id
+            )
+        
         if check_auto_reaction:
 
             DatabaseRemoveDatas.remove_auto_reactions(guild_id = ctx.guild.id, channel_id = area.id if isinstance(area, discord.TextChannel) else None, category_id = None if isinstance(area, discord.TextChannel) else area.id)
@@ -167,7 +176,7 @@ class AutoReaction(commands.Cog):
                 {Emojis.dot_emoji} This auto-reaction could not be removed because it is not set as an auto-reaction
                 {Emojis.dot_emoji} Here you can see all auto-reactions that are set for this server
                 
-                {Emojis.dot_emoji} {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
+                {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 

@@ -12,3 +12,5 @@ antilink fixen (Es werden mehrere bestätigungen gesendet )
 test of the auto reaction
 
 add auto reaction to the help menu
+
+remove-auto-reaction fixen

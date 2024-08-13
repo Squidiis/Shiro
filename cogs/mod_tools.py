@@ -81,7 +81,7 @@ class ModeratorCommands(commands.Cog):
     # Checks whether there has been a violation of the antilink system
     def check_rule_violation(self, check_settings, message:discord.Message):
 
-        check_link = contains_invite(message.content.replace(" ", ""))
+        check_link = self.contains_invite(message.content.replace(" ", ""))
 
         # Is triggered when a discord invitation link is in the message (when triggered, the message is deleted)
         if check_settings[3] == 0:
@@ -103,6 +103,18 @@ class ModeratorCommands(commands.Cog):
             if "https://" in message.content or message.attachments or check_link == True:
 
                 return True
+            
+
+    # Checks whether the message contains a link
+    def contains_invite(self, content:str):
+
+        invites_re = re.compile(r'(?:discord\.gg|discord\.com\/invite|\.gg)\/(\S+)')
+        matches = invites_re.findall(content)
+            
+        if not matches:
+            return False
+        
+        return True
 
 
     # Antilink system checks whether messages violate the antilink system, distinguishes between links that lead to images, invitation links or links in general
