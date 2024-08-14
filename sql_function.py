@@ -634,34 +634,37 @@ class DatabaseCheck():
         guild_id:int,
         channel_id:int = None,
         category_id:int = None,
-        parameter = None,
+        parameter:str = None,
         emoji:str = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        column_name = ["channelId", "categoryId", "parameter"]
-        column_value = [channel_id, category_id, parameter]
-
+        column_name = ["channelId", "categoryId", "parameter", "emoji"]
+        column_value = [channel_id, category_id, parameter, emoji]
+        
         check = None
         for count in range(len(column_value)):
-            
-            if channel_id != None or category_id != None and parameter != None and emoji != None:
-                
+           
+            if (channel_id is not None or category_id is not None) and parameter is not None and emoji is not None:
                 check = True
                 check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s AND {'channelId' if channel_id != None else 'categoryId'} = %s AND parameter = %s AND emoji = %s"
                 check_autoreact_values = [guild_id, channel_id if channel_id != None else category_id, parameter, emoji]
 
-            elif column_value[count] != None:
+            elif any(value is not None for value in column_value):
                 
-                check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s AND {column_name[count]}"
-                check_autoreact_values = [guild_id, column_value[count]]
+                for count in range(len(column_value)):
 
-            elif all(x is None for x in column_value):
-                
+                    if column_value[count] is not None:
+                        check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s AND {column_name[count]} = %s"
+                        check_autoreact_values = [guild_id, column_value[count]]
+                        break
+            
+            else:
+
                 check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s"
-                check_autoreact_values = [guild_id]
+                check_autoreact_values = [guild_id] 
 
         cursor.execute(check_autoreact, check_autoreact_values)
 
@@ -2122,9 +2125,9 @@ class DatabaseRemoveDatas():
 
         try:
 
-            if channel_id or category_id:
+            if channel_id != None or category_id != None:
 
-                delete_auto_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND {'channelId' if channel_id != None else 'categoryId'}"
+                delete_auto_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND {'channelId' if channel_id != None else 'categoryId'} = %s"
                 delete_auto_reaction_values = [guild_id, channel_id if channel_id != None else category_id]
             
             else:

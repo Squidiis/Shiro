@@ -237,7 +237,7 @@ class Main(commands.Cog):
 
         # Auto-reaction
         view.add_item(AutoReactionOnOffSwitch())
-        view.add_item(ShowAutoReactions())
+        self.bot.add_view(ShowAutoReactions())
 
         # Other Systems
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))

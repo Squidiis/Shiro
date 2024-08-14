@@ -76,7 +76,7 @@ class AutoReaction(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-
+        
         if not message.guild:
             return
 
@@ -118,11 +118,11 @@ class AutoReaction(commands.Cog):
         emoji:Option(str, required = True, description="Enter the emoji you want for this auto-reaction (just insert it and it'll be set)!")):
 
         check_reaction = DatabaseCheck.check_auto_reaction(
-            guild_id=ctx.guild.id, 
-            channel_id=area.id if isinstance(area, discord.TextChannel) else None,
-            category_id=None if isinstance(area, discord.TextChannel) else area.id,
-            parameter=parameter,
-            emoji=emoji
+            guild_id = ctx.guild.id, 
+            channel_id = area.id if isinstance(area, discord.TextChannel) else None,
+            category_id = None if isinstance(area, discord.TextChannel) else area.id,
+            parameter = parameter,
+            emoji = emoji
             )
         
         if check_reaction:
@@ -152,23 +152,27 @@ class AutoReaction(commands.Cog):
         
     @commands.slash_command(name = "remove-auto-reaction")
     @commands.has_permissions(administrator = True)
-    async def remove_auto_reactions(self, ctx:discord.ApplicationContext, 
+    async def remove_auto_reaction(self, ctx:discord.ApplicationContext, 
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select which channel or category you want to remove from the auto-reaction system!")):
-
-        check_auto_reaction = DatabaseCheck.check_auto_reaction(
-            guild_id = ctx.guild.id, 
-            channel_id = area.id if isinstance(area, discord.TextChannel) else None,
-            category_id = None if isinstance(area, discord.TextChannel) else area.id
-            )
         
-        if check_auto_reaction:
+        auto_reactions = DatabaseCheck.check_auto_reaction(
+            guild_id = ctx.guild.id,
+            channel_id = area.id if isinstance(area, discord.TextChannel) else None,
+            category_id = area.id if isinstance(area, discord.CategoryChannel) else None
+        )
+    
+        if auto_reactions:
 
-            DatabaseRemoveDatas.remove_auto_reactions(guild_id = ctx.guild.id, channel_id = area.id if isinstance(area, discord.TextChannel) else None, category_id = None if isinstance(area, discord.TextChannel) else area.id)
+            await DatabaseRemoveDatas.remove_auto_reactions(
+                guild_id = ctx.guild.id, 
+                channel_id = area.id if isinstance(area, discord.TextChannel) else None, 
+                category_id = None if isinstance(area, discord.TextChannel) else area.id
+            )
 
             emb = discord.Embed(description=f"""## The auto-reaction has been successfully removed
-                {Emojis.dot_emoji} The auto-reaction that was set for the {f'channel {area.id}' if isinstance(area, discord.TextChannel) else f'category {area.id}'} has been removed
+                {Emojis.dot_emoji} The auto-reaction that was set for the {f'channel' if isinstance(area, discord.TextChannel) else f'category'} <#{area.id}> has been removed
                 {Emojis.dot_emoji} With the button below you can see which auto-reactions are still set""", color=bot_colour)
-            await ctx.respond(embed=emb, view=ShowAutoReactions())
+            await ctx.respond(embed=emb, view = ShowAutoReactions())
 
         else:
             
@@ -248,16 +252,18 @@ class AutoReactionOnOffSwitch(discord.ui.Button):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-class ShowAutoReactions(discord.ui.Button):
+class ShowAutoReactions(discord.ui.View):
 
     def __init__(self):
-        super().__init__(
-            label="show auto-reactions",
-            style=discord.ButtonStyle,
-            custom_id="show_all_auto_reactions"
+        super().__init__(timeout=None)
+
+    @discord.ui.button( 
+        label="show auto-reactions",
+        style=discord.ButtonStyle.blurple,
+        custom_id="show_all_auto_reactions"
         )
 
-    async def callback(self, interaction: Interaction):
+    async def show_auto_reactions_button(self, button, interaction: Interaction):
         
         if interaction.user.guild_permissions.administrator:
 
