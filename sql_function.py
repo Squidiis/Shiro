@@ -2117,7 +2117,8 @@ class DatabaseRemoveDatas():
     async def remove_auto_reactions(
         guild_id:int,
         channel_id:int = None,
-        category_id:int = None
+        category_id:int = None,
+        emoji:str = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
@@ -2129,7 +2130,12 @@ class DatabaseRemoveDatas():
 
                 delete_auto_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND {'channelId' if channel_id != None else 'categoryId'} = %s"
                 delete_auto_reaction_values = [guild_id, channel_id if channel_id != None else category_id]
-            
+
+            elif emoji != None:
+
+                delete_auto_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND emoji = %s"
+                delete_auto_reaction_values = [guild_id, emoji]
+
             else:
 
                 delete_auto_reaction = "DELETE FROM AutoReactions WHERE guildId = %s"

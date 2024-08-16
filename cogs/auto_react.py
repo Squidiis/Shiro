@@ -23,7 +23,7 @@ class AutoReaction(commands.Cog):
         - guild_id must be specified
         - If no auto-reactions are set, information about this is returned
     '''
-    def show_auto_reactions_all(self, guild_id:int):
+    def show_auto_reactions_all(guild_id:int):
 
         all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = guild_id)
 
@@ -85,7 +85,7 @@ class AutoReaction(commands.Cog):
         if check_settings[5] == 0:
             return
 
-        recations = DatabaseCheck.check_auto_reaction(guild_id=message.guild.id)
+        recations = DatabaseCheck.check_auto_reaction(guild_id = message.guild.id)
 
         if not recations:
             return
@@ -94,12 +94,31 @@ class AutoReaction(commands.Cog):
             
             if (channel is not None and message.channel.id == channel) or (category is not None and message.channel.category_id == category):
                 
-                if await self.should_react(parameter=parameter, message=message) == True:
+                if await self.should_react(parameter = parameter, message = message) == True:
 
-                    await message.add_reaction(emoji=emoji)
-            
+                    try:
+
+                        await message.add_reaction(emoji = emoji)
+
+                    except:
+                        pass
     
-    @commands.slash_command(name = "set-auto-reaction")
+    
+    @commands.Cog.listener()
+    async def on_guild_emojis_update(guild, before, after):
+
+        before_emojis = set(before)
+        after_emojis = set(after)
+
+        removed_emojis = before_emojis - after_emojis
+        
+        if removed_emojis:
+            for emoji in removed_emojis:
+                
+                await DatabaseRemoveDatas.remove_auto_reactions(guild_id = guild.id, emoji = emoji)
+                
+
+    @commands.slash_command(name = "set-auto-reaction", description = "Set the auto-reaction system!")
     @commands.has_permissions(administrator = True)
     async def set_auto_reaction(self, ctx:discord.ApplicationContext):
 
@@ -109,7 +128,7 @@ class AutoReaction(commands.Cog):
         await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
 
 
-    @commands.slash_command(name = "add-auto-reaction")
+    @commands.slash_command(name = "add-auto-reaction", description = "Adds an auto-reaction to the server!")
     @commands.has_permissions(administrator = True)
     async def add_auto_reaction(self, ctx:discord.ApplicationContext, 
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select in which channel or category the auto-reaction should be created!"), 
@@ -150,10 +169,11 @@ class AutoReaction(commands.Cog):
             await ctx.respond(embed=emb)
 
         
-    @commands.slash_command(name = "remove-auto-reaction")
+    @commands.slash_command(name = "remove-auto-reaction", description = "Removes an auto-reaction from the server!")
     @commands.has_permissions(administrator = True)
     async def remove_auto_reaction(self, ctx:discord.ApplicationContext, 
-        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select which channel or category you want to remove from the auto-reaction system!")):
+        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, 
+            description="Select which channel or category you want to remove from the auto-reaction system!")):
         
         auto_reactions = DatabaseCheck.check_auto_reaction(
             guild_id = ctx.guild.id,
@@ -184,7 +204,7 @@ class AutoReaction(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "show-auto-reactions")
+    @commands.slash_command(name = "show-auto-reactions", description = "Shows all auto-reactions that are available for the server!")
     @commands.has_permissions(administrator = True)
     async def show_auto_reactions(self, ctx:discord.ApplicationContext):
         
@@ -199,7 +219,7 @@ class AutoReaction(commands.Cog):
             await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "reset-auto-reactions")
+    @commands.slash_command(name = "reset-auto-reactions", description = "Resets all auto-reactions of the server!")
     @commands.has_permissions(administrator = True)
     async def reset_auto_reactions(self, ctx:discord.ApplicationContext):
 
@@ -207,7 +227,7 @@ class AutoReaction(commands.Cog):
 
         if all_auto_reactions:
 
-            DatabaseRemoveDatas.remove_auto_reactions(guild_id = ctx.guild.id)
+            await DatabaseRemoveDatas.remove_auto_reactions(guild_id = ctx.guild.id)
 
             emb = discord.Embed(description=f"""## Auto-reactions have been reset
                 {Emojis.dot_emoji} All auto-reactions have been deleted
@@ -233,7 +253,7 @@ class AutoReactionOnOffSwitch(discord.ui.Button):
         super().__init__(
             label="on / off switch",
             style=discord.ButtonStyle.blurple,
-            custom_id="on_off_switch_auto_react"
+            custom_id="on_off_switch_auto_reaction"
         )
 
     async def callback(self, interaction:discord.Interaction):
@@ -267,7 +287,8 @@ class ShowAutoReactions(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            emb = discord.Embed(description=f"""## Here you can see all auto-reactions
+            emb = discord.Embed(description=f"""## Auto reactions
+                {Emojis.dot_emoji} Here you can see a list of all auto-reactions that have been set for the server {interaction.guild.name} 
                 
                 {AutoReaction.show_auto_reactions_all(guild_id = interaction.guild.id)}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb)
