@@ -10,5 +10,3 @@ back button zum close button machen help
 
 antilink fixen (Es werden mehrere bestätigungen gesendet )
 
-add auto reaction to the help menu
-

@@ -280,7 +280,8 @@ class HelpMenuSelect(discord.ui.View):
             discord.SelectOption(label="Fun commands", description="Shows you all commands that belong to the Fun system", value="fun"),
             discord.SelectOption(label="Level commands part 1", description="Shows you all commands that belong to the level system part 1", value="level_one"),
             discord.SelectOption(label="Level commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two"),
-            discord.SelectOption(label="Statistics commands", description="Shows you all commands that belong to the statistics system", value="statistic")
+            discord.SelectOption(label="Statistics commands", description="Shows you all commands that belong to the statistics system", value="statistic"),
+            discord.SelectOption(label="Other system commands", description="Zeigt dir alle commands die zu den neben systeme gehören", value="other_systems")
         ],
         custom_id = "help_menu_select")
     async def help_menue_select(self, select, interaction:discord.Interaction):
@@ -288,20 +289,6 @@ class HelpMenuSelect(discord.ui.View):
         if select.values[0] == "mod":
 
             emb = discord.Embed(description="## Mod commands", color=bot_colour)
-            emb.add_field(name="set-anti-link", 
-                value="Set the anti-link system", inline=True)
-            emb.add_field(name="/show-antilink-settings", 
-                value="Shows how the antilin system is set", inline=True)
-            emb.add_field(name="/add-antilink-whitelist", 
-                value="Adds items to the whitelist", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
-            emb.add_field(name="/remove-antilink-whitelist", 
-                value="Removes items from the whitelist", inline=True)
-            emb.add_field(name="/show-antilink-whitelist", 
-                value="Shows what is on the white list", inline=True)
-            emb.add_field(name="/reset-antilink-whitelist", 
-                value="Resets the whitelist", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
             emb.add_field(name="/ban", 
                 value="Ban a user", inline=True)
             emb.add_field(name="/unban", 
@@ -315,9 +302,6 @@ class HelpMenuSelect(discord.ui.View):
                 value="Cancel the timeout of a user", inline=True)
             emb.add_field(name="/clear", 
                 value="Delete messages in a channel", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
-            emb.add_field(name="/ghost-ping-settings", 
-                value="Set the ghost ping system", inline=True)
             await interaction.response.edit_message(embed=emb, attachments=[])
             
 
@@ -396,6 +380,7 @@ class HelpMenuSelect(discord.ui.View):
                 value="Resets the bonus xp list", inline=True)
             await interaction.response.edit_message(embed=emb, attachments=[])
 
+
         if select.values[0] == "statistic":
 
             emb = discord.Embed(description="""## Statistics system commands """, color=bot_colour)
@@ -419,6 +404,39 @@ class HelpMenuSelect(discord.ui.View):
                 value="Display all information about a user", inline=True)
             emb.add_field(name="/serverinfo", 
                 value="Show all information about your server", inline=True)
+            await interaction.response.edit_message(embed=emb, attachments=[])
+
+
+        if select.values[0] == "other_systems":
+
+            emb = discord.Embed(description="""## Other system commands""", color=bot_colour)
+            emb.add_field(name="set-auto-reaction",
+                value="Sets the auto-reaction system", inline=True)
+            emb.add_field(name="add-auto-reaction",
+                value="Adds auto-reactions to the server", inline=True)
+            emb.add_field(name="remove-auto-reaction",
+                value="Removes auto-reactions from the server", inline=True)
+            emb.add_field(name="", value="", inline=False)
+            emb.add_field(name="show-auto-reactions",
+                value="Shows all auto-reactions that are set on the server", inline=True)
+            emb.add_field(name="reset-auto-reactions",
+                value="Resets all auto-reactions that are set for the server", inline=True)
+            emb.add_field(name="set-anti-link", 
+                value="Set the anti-link system", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/show-antilink-settings", 
+                value="Shows how the antilin system is set", inline=True)
+            emb.add_field(name="/add-antilink-whitelist", 
+                value="Adds items to the whitelist", inline=True)
+            emb.add_field(name="/remove-antilink-whitelist", 
+                value="Removes items from the whitelist", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/show-antilink-whitelist", 
+                value="Shows what is on the white list", inline=True)
+            emb.add_field(name="/reset-antilink-whitelist", 
+                value="Resets the whitelist", inline=True)
+            emb.add_field(name="/ghost-ping-settings", 
+                value="Set the ghost ping system", inline=True)
             await interaction.response.edit_message(embed=emb, attachments=[])
 
 
