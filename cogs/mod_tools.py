@@ -92,9 +92,9 @@ class ModeratorCommands(commands.Cog):
 
         # Is triggered when there is a link in the message, images and videos are ignored (when triggered, the message is deleted)
         elif check_settings[3] == 1:
-                
-            if 'https://' in message.content and not any(word in message.content for word in formats) and not message.attachments or check_link == True: 
 
+            if 'https://' in message.content and not any(word in message.content for word in formats) and not message.attachments or check_link == True: 
+                
                 return True
 
         # Is triggered when there is any link in the message (when triggered, the message is deleted)
@@ -625,7 +625,7 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command()
-    async def userinfo(ctx:discord.ApplicationContext, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
+    async def userinfo(self, ctx:discord.ApplicationContext, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
         member = ctx.author if not member else member
 
         unix_join_time = calendar.timegm(member.joined_at.utctimetuple())
@@ -633,23 +633,25 @@ class ModeratorCommands(commands.Cog):
 
         badge = ""
         if member.public_flags.bug_hunter:
-            badge += "<:bughunter:1045796473691979776> Bug Hunter\n"
+            badge += Emojis.bughunter
         if member.public_flags.bug_hunter_level_2:
-            badge += "<:bughunter2:1045796474744750090> Bug Hunter Level 2\n"
+            badge += Emojis.bughunter2
         if member.public_flags.early_supporter:
-            badge += "<:earlysupporter:1045796475864625283> Early Suppoter\n"
+            badge += Emojis.earlysupporter
         if member.public_flags.verified_bot_developer:
-            badge += "<:botdev:1045796472408506368> Developer\n"
+            badge += Emojis.botdev
         if member.public_flags.partner:
-            badge += "<:partner:1045796481518551102> Partner\n"
+            badge += Emojis.partner
         if member.public_flags.staff:
-            badge += "<:staff:1045796482705543168> Staff\n"
+            badge += Emojis.staff
         if member.public_flags.hypesquad_balance:
-            badge += f"<:hypesquad_balance:1045796476992884838> Hypesquad Balance\n"
+            badge += Emojis.hypesquad_balance
         if member.public_flags.hypesquad_bravery:
-            badge += f"<:hypesquad_bravery:1045796478507032638> Hypesquad Bravery\n"
+            badge += Emojis.hypesquad_bravery
         if member.public_flags.hypesquad_brilliance:
-            badge += f"<:hypesquad_brilliance:1045796480172163152> Hypesquad Brilliance\n"
+            badge += Emojis.hypesquad_brilliance
+        if member.public_flags.active_developer:
+            badge += Emojis.dev
 
         user_banner = await bot.fetch_user(member.id)
 
@@ -683,7 +685,7 @@ class ModeratorCommands(commands.Cog):
                         value=member.mention,
                         inline=True)
         embed.add_field(name="Nick:",
-                        value=f"`{member.nick}`" if member.nick else "Nicht gesetzt",
+                        value=f"`{member.nick}`" if member.nick else "Not set",
                         inline=True)
         embed.add_field(name="ID:",
                         value=f"`{member.id}`",
@@ -691,33 +693,33 @@ class ModeratorCommands(commands.Cog):
 
         if member.status == discord.Status.online:
             if member.is_on_mobile():
-                embed.add_field(name="Status:", value="`Handy`")
+                embed.add_field(name="Status:", value=f"{Emojis.phone} `Mobile`")
             else:
-                embed.add_field(name="Status", value=f"`Online`")
+                embed.add_field(name="Status", value=f"{Emojis.online} `Online`")
         elif member.status == discord.Status.idle:
             embed.add_field(name="Status:",
-                            value=f"`Abwesend`")
+                            value=f"{Emojis.idle} `Idle`")
         elif member.status == discord.Status.dnd:
             embed.add_field(name="Status:",
-                            value=f"`Beschäftigt`")
+                            value=f"{Emojis.dnd} `Do not disturb`")
         elif member.status == discord.Status.offline:
             embed.add_field(name="Status:",
-                            value=f"`Offline`")
+                            value=f"{Emojis.invisible} `Offline`")
         elif member.status == discord.Status.invisible:
             embed.add_field(name="Status:",
-                            value=f"`Unsichtbar`")
+                            value=f"{Emojis.invisible} `Invisible`")
 
-        embed.add_field(name="Erstellt am:",
+        embed.add_field(name="Created on:",
                         value=f"<t:{unix_create_time}:f> (<t:{unix_create_time}:R>)",
                         inline=True)
-        embed.add_field(name="Beigetreten am:",
+        embed.add_field(name="Joined on:",
                         value=f'<t:{unix_join_time}:f> (<t:{unix_join_time}:R>)',
                         inline=True)
-        embed.add_field(name="Höchste Rolle:",
+        embed.add_field(name="Highest role:",
                         value=member.top_role.mention,
                         inline=True)
-        embed.add_field(name="<:booster:1045801339780862063> Booster:",
-                        value=f"`Ja`" if member.premium_since else "`Nein`",
+        embed.add_field(name=f"{Emojis.boost} Booster:",
+                        value=f"`Yes`" if member.premium_since else "`No`",
                         inline=True)
         if badge != "":
             embed.add_field(name="Badges:",
@@ -732,7 +734,7 @@ class ModeratorCommands(commands.Cog):
 
         embed.set_thumbnail(url=f'{member.avatar.url}')
 
-        await ctx.reply(embed=embed)
+        await ctx.respond(embed=embed)
             
 
 def setup(bot):

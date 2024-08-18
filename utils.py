@@ -6,6 +6,7 @@ import discord.ext
 from discord.ext.commands import MissingPermissions
 import discord
 from discord.ext import commands
+from discord.interactions import Interaction
 import mysql.connector
 import requests
 from discord.ui import Select, View, Button, Modal
@@ -39,7 +40,26 @@ class Emojis:
     help_emoji = "<:shiro_help:1092872576017109033>"
     exclamation_mark_emoji = "<a:shiro_important:1092870970785665055>"
     succesfully_emoji = "<a:shiro_successful:1092862166702510290>"
-        
+
+    # user info emojis
+    phone = "<:phone:1274727307902455943>"
+    partner = "<:partner:1274727306438377594>"
+    online = "<:online:1274727305125564557>"
+    invisible = "<:invisible:1274727303808815124>"
+    idle = "<:idle:1274727302596395028>"
+    hypesquad_brilliance = "<:hypesquad_brilliance:1274727325149429792>"
+    hypesquad_bravery = "<:hypesquad_bravery:1274727560856735796>"
+    hypesquad_balance = "<:hypesquad_balance:1274727321898586144>"
+    earlysupporter = "<:earlysupporter:1274727559611027558>"
+    dnd = "<:dnd:1274727317528121394>"
+    dev = "<:dev:1274727557928976435>"
+    bughunter2 = "<:bughunter2:1274727314084724737>"
+    bughunter = "<:bughunter:1274727312583163905>"
+    botdev = "<:botdev:1274727311186595911>"
+    boost = "<:boost:1274727309672452126>"
+    staff = "<:staff:1274729786685657118>"
+    spotify = "<:spotify:1274729775214104637>"
+    
 with open("config.yaml", 'r') as f:
     data = yaml.safe_load(f)
 
@@ -281,9 +301,10 @@ class HelpMenuSelect(discord.ui.View):
             discord.SelectOption(label="Level commands part 1", description="Shows you all commands that belong to the level system part 1", value="level_one"),
             discord.SelectOption(label="Level commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two"),
             discord.SelectOption(label="Statistics commands", description="Shows you all commands that belong to the statistics system", value="statistic"),
-            discord.SelectOption(label="Other system commands", description="Zeigt dir alle commands die zu den neben systeme gehören", value="other_systems")
+            discord.SelectOption(label="Other system commands", description="Shows you all commands that belong to the other systems", value="other_systems")
         ],
         custom_id = "help_menu_select")
+    
     async def help_menue_select(self, select, interaction:discord.Interaction):
 
         if select.values[0] == "mod":
@@ -302,7 +323,7 @@ class HelpMenuSelect(discord.ui.View):
                 value="Cancel the timeout of a user", inline=True)
             emb.add_field(name="/clear", 
                 value="Delete messages in a channel", inline=True)
-            await interaction.response.edit_message(embed=emb, attachments=[])
+            await interaction.response.send_message(embed=emb, ephemeral=True)
             
 
         if select.values[0] == "fun":
@@ -319,7 +340,7 @@ class HelpMenuSelect(discord.ui.View):
                 value="Show you a random anime meme", inline=True)
             emb.add_field(name="/anime gif (tag)",
                 value="Tags: kiss, hug, lick, feed, idk, dance, slap, fbi, embarres, pet", inline=True)
-            await interaction.response.edit_message(embed=emb, attachments=[])
+            await interaction.response.send_message(embed=emb, ephemeral=True)
 
 
         if select.values[0] == "level_one":
@@ -352,7 +373,7 @@ class HelpMenuSelect(discord.ui.View):
                 value="Shows you the level blacklist", inline=True)
             emb.add_field(name="/reset-level-blacklist", 
                 value="Resets the level blacklist", inline=True)
-            await interaction.response.edit_message(embed=emb, attachments=[])
+            await interaction.response.send_message(embed=emb, ephemeral=True)
 
 
         if select.values[0] == "level_two":
@@ -378,7 +399,7 @@ class HelpMenuSelect(discord.ui.View):
                 value="Shows you the bonus xp list", inline=True)
             emb.add_field(name="/reset-bonus-xp-list", 
                 value="Resets the bonus xp list", inline=True)
-            await interaction.response.edit_message(embed=emb, attachments=[])
+            await interaction.response.send_message(embed=emb, ephemeral=True)
 
 
         if select.values[0] == "statistic":
@@ -404,7 +425,7 @@ class HelpMenuSelect(discord.ui.View):
                 value="Display all information about a user", inline=True)
             emb.add_field(name="/serverinfo", 
                 value="Show all information about your server", inline=True)
-            await interaction.response.edit_message(embed=emb, attachments=[])
+            await interaction.response.send_message(embed=emb, ephemeral=True)
 
 
         if select.values[0] == "other_systems":
@@ -437,18 +458,18 @@ class HelpMenuSelect(discord.ui.View):
                 value="Resets the whitelist", inline=True)
             emb.add_field(name="/ghost-ping-settings", 
                 value="Set the ghost ping system", inline=True)
-            await interaction.response.edit_message(embed=emb, attachments=[])
+            await interaction.response.send_message(embed=emb, ephemeral=True)
 
 
-    @discord.ui.button(label=f"🡐 Back", style=discord.ButtonStyle.gray, custom_id="back_button")
-    async def back_help_button(self, button, interaction:discord.Interaction):
-
-        emb = GetEmbed.get_embed(embed_index = 2)
+    @discord.ui.button(
+            label="✕ Close",
+            style=discord.ButtonStyle.blurple,
+            custom_id="close_button"
+        )
+    
+    async def callback(self, interaction:Interaction):
         
-        file = discord.File('assets/images/shiro_help_banner.png', filename='shiro_help_banner.png')
-        emb.set_image(url=f"attachment://shiro_help_banner.png")
-        await interaction.response.edit_message(embed=emb, view=HelpMenuSelect(), file=file)
-
+        await interaction.message.delete()
 
 
 bot.add_cog(HelpMenu(bot))
