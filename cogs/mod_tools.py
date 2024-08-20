@@ -544,14 +544,14 @@ class ModeratorCommands(commands.Cog):
     @commands.slash_command(name = "server-info", description="Server info!")
     async def serverinfo(self, ctx):
 
-        embed = discord.Embed(title=f"{ctx.guild.name} Info", description="Information of this Server", color=discord.Colour.blue())
-        embed.add_field(name='🆔Server ID', value=f"{ctx.guild.id}")
+        embed = discord.Embed(title=f"{ctx.guild.name} Info", description="Information of this Server", color=bot_colour)
+        embed.add_field(name='Server ID', value=f"{ctx.guild.id}")
         embed.add_field(name='📆Created On', value=ctx.guild.created_at.strftime("%b %d %Y"))
         embed.add_field(name='👑Owner', value=f"{ctx.guild.owner.mention}")
         embed.add_field(name='👥Members', value=f'{ctx.guild.member_count} Members')
-        embed.add_field(name='🌎Region', value=f'{ctx.guild.preferred_locale}')
-        embed.add_field(name='🌎Roles', value=f'{len(ctx.guild.roles)}')
-        embed.add_field(name='🌎Boosts', value=f'{len(ctx.guild.premium_subscribers)}')
+        embed.add_field(name='Region', value=f'{ctx.guild.preferred_locale}')
+        embed.add_field(name='Roles', value=f'{len(ctx.guild.roles)}')
+        embed.add_field(name=f'{Emojis.boost}Boosts', value=f'{len(ctx.guild.premium_subscribers)}')
         embed.add_field(name='💬 Channels', value=f'Text [{len(ctx.guild.text_channels)}], Voice [{len(ctx.guild.voice_channels)}], \nCategories [{len(ctx.guild.categories)}], \nThreads [{len(ctx.guild.threads)}], Stage [{len(ctx.guild.stage_channels)}]', inline=False)
         embed.set_thumbnail(url=ctx.guild.icon.url)
         embed.set_author(name=str(ctx.author.name), icon_url=ctx.author.avatar.url)
@@ -657,23 +657,23 @@ class ModeratorCommands(commands.Cog):
 
         if user_banner.banner is not None:
             if member.avatar is not None:
-                embed = discord.Embed(colour=member.color,
+                embed = discord.Embed(colour=bot_colour,
                                     timestamp=datetime.utcnow(),
                                     description=f"[User Avatar]({member.avatar.url}) | [User Banner]({user_banner.banner.url})")
                 embed.set_image(url=f"{user_banner.banner.url}")
                 embed.set_thumbnail(url=f'{member.display_avatar.url}')
             else:
-                embed = discord.Embed(colour=member.color,
+                embed = discord.Embed(colour=bot_colour,
                                     timestamp=datetime.utcnow(),
                                     description=f"[User Banner]({user_banner.banner.url})")
                 embed.set_image(url=f"{user_banner.banner.url}")
         elif member.avatar is not None:
-            embed = discord.Embed(colour=member.color,
+            embed = discord.Embed(colour=bot_colour,
                                     timestamp=datetime.utcnow(),
                                     description=f"[User Avatar]({member.avatar.url})")
             embed.set_thumbnail(url=f'{member.display_avatar.url}')
         else:
-            embed = discord.Embed(colour=member.color,
+            embed = discord.Embed(colour=bot_colour,
                                     timestamp=datetime.utcnow())
 
         embed.set_author(name=f"Userinfo")
