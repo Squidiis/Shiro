@@ -236,7 +236,7 @@ class Main(commands.Cog):
         self.bot.add_view(SetInviteleaderboard())
 
         # Auto-reaction
-        view.add_item(AutoReactionOnOffSwitch())
+        self.bot.add_view(AutoReactionOnOffSwitch())
         self.bot.add_view(ShowAutoReactions())
 
         # Other Systems

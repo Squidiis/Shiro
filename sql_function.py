@@ -377,7 +377,7 @@ class DatabaseCheck():
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
 
-        check_settings = f"SELECT * FROM {'LeaderboardSettingsMessage' if system == "message" else 'LeaderboardSettingsInvite'} WHERE guildId = %s"
+        check_settings = f"SELECT * FROM {'LeaderboardSettingsMessage' if system == 'message' else 'LeaderboardSettingsInvite'} WHERE guildId = %s"
         check_settings_values = [guild_id]
         cursor.execute(check_settings, check_settings_values)
 
@@ -1389,7 +1389,11 @@ class DatabaseUpdates():
         channel_id:int = None,
         back_to_none = None
         ):
-    
+
+        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message")[1]
+        if status == None:
+            return
+
         column_name_settings = {
             "daily":"bourdMessageIdDay" if settings != "tracking" else "dailyCountMessage", 
             "weekly":"bourdMessageIdWeek" if settings != "tracking" else "weeklyCountMessage", 
@@ -1405,7 +1409,7 @@ class DatabaseUpdates():
             "monthly":message_id,
             "whole":message_id,
             "channel":channel_id,
-            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message")[1] == 1 else 1
+            "status":0 if status else 1
         }
         
         db_connect = DatabaseSetup.db_connector()
@@ -1437,7 +1441,7 @@ class DatabaseUpdates():
 
             elif back_to_none != None:
 
-                set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == "tracking" else 'LeaderboardSettingsMessage'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+                set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == 'tracking' else 'LeaderboardSettingsMessage'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
                 set_back_to_none_values = [guild_id]
                 cursor.execute(set_back_to_none, set_back_to_none_values)
             
@@ -1499,6 +1503,11 @@ class DatabaseUpdates():
         back_to_none = None
         ):
 
+        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite")[1]
+        if status == None:
+            return
+
+
         column_name_settings = {
             "weekly":"invitebourdMessageIdWeek" if settings != "tracking" else "weeklyCountInvite", 
             "monthly":"invitebourdMessageIdMonth" if settings != "tracking" else "monthlyCountInvite", 
@@ -1514,7 +1523,7 @@ class DatabaseUpdates():
             "quarterly":message_id,
             "whole":message_id,
             "channel":channel_id,
-            "status":0 if DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite")[1] == 1 else 1
+            "status":0 if status else 1
         }
 
         db_connect = DatabaseSetup.db_connector()
@@ -1546,7 +1555,7 @@ class DatabaseUpdates():
 
             elif back_to_none != None:
 
-                set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == "tracking" else 'LeaderboardSettingsInvite'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
+                set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == 'tracking' else 'LeaderboardSettingsInvite'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
                 set_back_to_none_values = [guild_id]
                 cursor.execute(set_back_to_none, set_back_to_none_values)
             

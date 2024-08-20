@@ -24,7 +24,7 @@ class AutoReaction(commands.Cog):
         - If no auto-reactions are set, information about this is returned
     '''
     def show_auto_reactions_all(guild_id:int):
-
+        print(1)
         all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = guild_id)
 
         if all_auto_reactions:
@@ -124,7 +124,8 @@ class AutoReaction(commands.Cog):
 
         emb = discord.Embed(description=f"""## Settings menu for the auto reaction system
             {Emojis.dot_emoji} With the button below you can either switch the auto-reactions menu on or off
-            {Emojis.help_emoji} With the command `add-auto-reaction` you can then set auto-reactions that automatically leave a reaction in the areas you specify""")
+            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id) == 0 else 'switched on'}
+            {Emojis.help_emoji} With the command `add-auto-reaction` you can then set auto-reactions that automatically leave a reaction in the areas you specify""", color=bot_colour)
         await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
 
 
@@ -209,7 +210,7 @@ class AutoReaction(commands.Cog):
     async def show_auto_reactions(self, ctx:discord.ApplicationContext):
         
         all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id)
-
+        
         if all_auto_reactions:
 
             emb = discord.Embed(description=f"""## Current auto-reactions
@@ -218,6 +219,12 @@ class AutoReaction(commands.Cog):
                 {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
+        else:
+
+            emb = discord.Embed(description=f"""## No auto-reactions were found
+                {Emojis.dot_emoji} No auto-reactions have been set for this server
+                {Emojis.help_emoji} If you want to set some use the commad `add-auto-reactions`""", color=bot_colour)
+            await ctx.respond(embed = emb)
     
     @commands.slash_command(name = "reset-auto-reactions", description = "Resets all auto-reactions of the server!")
     @commands.has_permissions(administrator = True)
@@ -247,16 +254,17 @@ def setup(bot):
 
 
 
-class AutoReactionOnOffSwitch(discord.ui.Button):
+class AutoReactionOnOffSwitch(discord.ui.View):
 
     def __init__(self):
-        super().__init__(
-            label="on / off switch",
-            style=discord.ButtonStyle.blurple,
-            custom_id="on_off_switch_auto_reaction"
-        )
+        super().__init__(timeout=None)
 
-    async def callback(self, interaction:discord.Interaction):
+
+    @discord.ui.button(
+        label="on / off switch",
+        style=discord.ButtonStyle.blurple,
+        custom_id="on_off_switch_auto_reaction")
+    async def auto_reaction_settings(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 

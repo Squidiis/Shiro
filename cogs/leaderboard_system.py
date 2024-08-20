@@ -214,7 +214,8 @@ class LeaderboardSystem(commands.Cog):
 
                 emb = discord.Embed(description=f"""## {'This role is currently set as a general role' if check_role[1] != role.id else 'This interval already has a general role'} for the {system} leaderboard
                     {Emojis.dot_emoji} The role <@&{check_role[1]}> is currently defined as the general role for the interval {interval_list[check_role[4]]}
-                    {Emojis.dot_emoji} {f'Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and set this as a new general role?\n{Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role' 
+                    {Emojis.dot_emoji} {f'''Would you like to replace the role <@&{check_role[1]}> with the role {role.mention} and set this as a new general role?
+                    {Emojis.dot_emoji} Everyone who is then listed on the leaderboard will then receive this role'''
                     if check_role[1] != role.id else 
                     f'Do you want to assign the role <@&{check_role[1]}> as a normal role for the {position} space?'}""", color=bot_colour)
                 await ctx.respond(embed=emb, view=OverwriteRole(role=role, position=position_db, interval=interval_db, settings="role" if check_role[1] != role.id else "interval", delete=check_role))
@@ -489,11 +490,15 @@ class LeaderboardSystem(commands.Cog):
         if message.author.bot:
             return
         
-        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
+        if message != None:
+        
+            check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
 
-        if check[1] == 1:
-    
-            await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
+            if check:
+
+                if check[1] == 1:
+                    
+                    await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
 
     
     @commands.Cog.listener()
