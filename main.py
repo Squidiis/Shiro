@@ -19,9 +19,7 @@ class Main(commands.Cog):
         self.bot = bot
 
 
-    '''
-    
-    '''
+    # Creates all important tables for the bot 
     async def create_db_table():
 
         db_connect = DatabaseSetup.db_connector()
@@ -108,7 +106,6 @@ class Main(commands.Cog):
                 bourdMessageIdWhole BIGINT UNSIGNED NULL,
                 leaderboardChannel BIGINT UNSIGNED NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LeaderboardTacking (

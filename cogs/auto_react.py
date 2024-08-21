@@ -23,7 +23,7 @@ class AutoReaction(commands.Cog):
         - guild_id must be specified
         - If no auto-reactions are set, information about this is returned
     '''
-    def show_auto_reactions_all(guild_id:int):
+    def show_auto_reactions_all(self, guild_id:int):
         print(1)
         all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = guild_id)
 
@@ -124,7 +124,7 @@ class AutoReaction(commands.Cog):
 
         emb = discord.Embed(description=f"""## Settings menu for the auto reaction system
             {Emojis.dot_emoji} With the button below you can either switch the auto-reactions menu on or off
-            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id) == 0 else 'switched on'}
+            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)[5] == 0 else 'switched on'}
             {Emojis.help_emoji} With the command `add-auto-reaction` you can then set auto-reactions that automatically leave a reaction in the areas you specify""", color=bot_colour)
         await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
 
@@ -264,11 +264,13 @@ class AutoReactionOnOffSwitch(discord.ui.View):
         label="on / off switch",
         style=discord.ButtonStyle.blurple,
         custom_id="on_off_switch_auto_reaction")
+    
     async def auto_reaction_settings(self, button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
             settings = DatabaseCheck.check_bot_settings(guild_id = interaction.guild.id)
+            await DatabaseUpdates.update_bot_settings(guild_id = interaction.guild.id, auto_reaction = 1 if settings[5] == 0 else 0)
 
             emb = discord.Embed(description=f"""## The auto reaction system is now {'activated' if settings[5] == 0 else 'deactivated'}.
                 {Emojis.dot_emoji} {'From now on, reactions will be assigned automatically according to the previously set parameters' if settings[5] == 0 else 'From now on, no new reactions will be added automatically'}

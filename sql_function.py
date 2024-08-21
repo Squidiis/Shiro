@@ -791,14 +791,15 @@ class DatabaseUpdates():
         ghost_ping:int = None, 
         antilink:int = None, 
         antilink_timeout:int = None,
+        auto_reaction:int = None,
         back_to_none:int = None
         ):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
         
-        column_name = ["botColour", "ghostPing", "antiLink", "antiLinkTimeout"]
-        items = [bot_colour, ghost_ping, antilink]
+        column_name = ["botColour", "ghostPing", "antiLink", "antiLinkTimeout", "autoReaction"]
+        items = [bot_colour, ghost_ping, antilink, antilink_timeout, auto_reaction]
 
         try:
             
