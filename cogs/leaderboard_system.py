@@ -761,11 +761,11 @@ class LeaderboardSystem(commands.Cog):
                             message = await channel.fetch_message(message_id)
                             message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                            if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
+                            if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
 
                                 await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
 
-                            if message_name == "1_week_old" and (current_date - message_age) > timedelta(minutes=1):
+                            if message_name == "1_week_old" and (current_date - message_age) > timedelta(days=1):
 
                                 await self.update_weekly_leaderboard_invite(guild_id=guild.id, message=message)
 
@@ -868,11 +868,11 @@ class LeaderboardSystem(commands.Cog):
                                 message = await channel.fetch_message(message_id)
                                 message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
+                                if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
 
                                     await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
 
-                                if message_name == "1_day_old" and (current_date - message_age) > timedelta(minutes=1):
+                                if message_name == "1_day_old" and (current_date - message_age) > timedelta(days=1):
 
                                     await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
 
@@ -995,7 +995,7 @@ class SetleaderboardChannel(discord.ui.View):
 
                 elif settings[6] == select.values[0].id:
 
-                    await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=5), view=ContinueSettingLeaderboard())
+                    await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=5, settings=system), view=ContinueSettingLeaderboard())
 
                 else:
                     
@@ -1090,8 +1090,9 @@ class SetMessageleaderboard(discord.ui.View):
 
             if any(elem is not None for elem in [settings[2], settings[3], settings[4]]):
                 
-                if all(elem in value_check.keys() and value_check[elem] is not None for elem in select.values):
-                            
+                if (all(option in value_check and value_check[option] is not None for option in select.values) and
+                    len(select.values) == sum(1 for key, value in value_check.items() if value is not None)):
+
                     emb = discord.Embed(description=f"""## These intervals are already set
                         {Emojis.dot_emoji} You have already defined these intervals for the message leaderboard
                         {Emojis.help_emoji} If you want to have other intervals you can simply execute this command again and overwrite them""", color=bot_colour)
@@ -1112,7 +1113,7 @@ class SetMessageleaderboard(discord.ui.View):
                         {Emojis.dot_emoji} The following intervals are currently active:\n
                             {''.join(check_list)}
                         {Emojis.help_emoji} Do you want to overwrite them? the previously sent leaderboard will be deleted""", color=bot_colour)
-                    await interaction.response.edit_message(embed=emb, view=OverwriteMessageInterval(intervals=select.values))
+                    await interaction.response.edit_message(embed=emb, view=OverwriteInterval(intervals=select.values))
 
             else:
 
@@ -1194,8 +1195,9 @@ class SetInviteleaderboard(discord.ui.View):
 
             if any(elem is not None for elem in [settings[2], settings[3], settings[4]]):
                 
-                if all(elem in value_check.keys() and value_check[elem] is not None for elem in select.values):
-                            
+                if (all(option in value_check and value_check[option] is not None for option in select.values) and
+                    len(select.values) == sum(1 for key, value in value_check.items() if value is not None)): 
+
                     emb = discord.Embed(description=f"""## These intervals are already set
                         {Emojis.dot_emoji} You have already defined these intervals for the invite leaderboard
                         {Emojis.help_emoji} If you want to have other intervals you can simply execute this command again and overwrite them""", color=bot_colour)
@@ -1216,7 +1218,7 @@ class SetInviteleaderboard(discord.ui.View):
                         {Emojis.dot_emoji} The following intervals are currently active:\n
                             {''.join(check_list)}
                         {Emojis.help_emoji} Do you want to overwrite them? the previously sent leaderboard will be deleted""", color=bot_colour)
-                    await interaction.response.edit_message(embed=emb, view=OverwriteMessageInterval(intervals=select.values))
+                    await interaction.response.edit_message(embed=emb, view=OverwriteInterval(intervals=select.values))
 
             else:
 
@@ -1363,7 +1365,7 @@ class OverwriteMessageChannel(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
             
-            system = 'message' if 'Set the message leaderboard' in interaction.message.embeds[0].description else 'invite'
+            system = 'message' if 'message leaderboard' in interaction.message.embeds[0].description else 'invite'
 
             emb = discord.Embed(description=f"""## Channel is retained
                 {Emojis.dot_emoji} The channel <#{DatabaseCheck.check_leaderboard_settings(guild_id = interaction.guild.id, system = system)[6]}> will be retained as a leaderboard channel
@@ -1392,7 +1394,7 @@ class ContinueSettingLeaderboard(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            system = 'message' if 'Set the message leaderboard' in interaction.message.embeds[0].description else 'invite'
+            system = 'message' if 'message leaderboard' in interaction.message.embeds[0].description else 'invite'
 
             emb = discord.Embed(description=f"""## Set intervals
                 {Emojis.dot_emoji} With the lower select menu you can define an interval in which periods the {system} leaderboard should be updated
@@ -1405,12 +1407,12 @@ class ContinueSettingLeaderboard(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-class OverwriteMessageInterval(discord.ui.View):
+class OverwriteInterval(discord.ui.View):
 
     def __init__(self, intervals):
         self.intervals = intervals
         super().__init__(timeout=None)
-        self.add_item(CancelButton(system = "message leaderboard system"))
+        self.add_item(CancelButton(system=None))
 
     @discord.ui.button(
         label="overwrite the intervals",
@@ -1437,6 +1439,13 @@ class OverwriteMessageInterval(discord.ui.View):
                 order = sorted(self.intervals, key=lambda item: ["weekly", "monthly", "quarterly"].index(item) if system == "invite" else ["daily", "weekly", "monthly"].index(item))
 
                 channel = bot.get_channel(settings[6])
+
+                for ids in [settings[2], settings[3], settings[4], settings[5]]:
+
+                    if ids != None:
+
+                        old_message = await channel.fetch_message(ids)
+                        await old_message.delete()
 
                 message = await channel.send(embed=GetEmbed.get_embed(embed_index=7))
                 await (DatabaseUpdates.manage_leaderboard_invite if system == "invite" else DatabaseUpdates.manage_leaderboard_message)(
@@ -1497,27 +1506,27 @@ class OverwriteMessageInterval(discord.ui.View):
                 for _, _, day, week, month, _, _ in check_settings:
 
                     if day is not None:
-                        list_intervals.append(f"{Emojis.dot_emoji} Daily updated leaderboard")
+                        list_intervals.append(f"{Emojis.dot_emoji} Daily updated leaderboard\n")
                     if week is not None:
-                        list_intervals.append(f"{Emojis.dot_emoji} Weekly updated leaderboard")
+                        list_intervals.append(f"{Emojis.dot_emoji} Weekly updated leaderboard\n")
                     if month is not None:
-                        list_intervals.append(f"{Emojis.dot_emoji} Monthly updated leaderboard")
+                        list_intervals.append(f"{Emojis.dot_emoji} Monthly updated leaderboard\n")
 
             else:
 
                 for _, _, week, month, quarter, _, _ in check_settings:
 
                     if week is not None:
-                        list_intervals.append(f"{Emojis.dot_emoji} Weekly updated leaderboard")
+                        list_intervals.append(f"{Emojis.dot_emoji} Weekly updated leaderboard\n")
                     if month is not None:
-                        list_intervals.append(f"{Emojis.dot_emoji} Monthly updated leaderboard")
+                        list_intervals.append(f"{Emojis.dot_emoji} Monthly updated leaderboard\n")
                     if quarter is not None:
-                        list_intervals.append(f"{Emojis.dot_emoji} Quarterly updated leaderboard")
+                        list_intervals.append(f"{Emojis.dot_emoji} Quarterly updated leaderboard\n")
 
             emb = discord.Embed(
                 description=f"""## The current intervals are retained
                 {Emojis.dot_emoji} Here you can see an overview of the currently defined intervals
-                {"\n".join(list_intervals)}""",
+                {"".join(list_intervals)}""",
                 color=bot_colour)
             await interaction.response.edit_message(embed=emb, view=None)
 

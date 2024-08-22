@@ -222,7 +222,7 @@ class Main(commands.Cog):
         self.bot.add_view(SetMessageleaderboard())
         self.bot.add_view(OverwriteMessageChannel(channel_id=None))
         self.bot.add_view(ContinueSettingLeaderboard())
-        self.bot.add_view(OverwriteMessageInterval(intervals=None))
+        self.bot.add_view(OverwriteInterval(intervals=None))
         self.bot.add_view(OverwriteRole(role=None, interval=None, position=None, settings=None, delete=None))
         self.bot.add_view(ShowLeaderboardRolesButton())
         self.bot.add_view(ShowLeaderboardRolesSelectMessage())

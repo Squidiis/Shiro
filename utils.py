@@ -196,8 +196,8 @@ class GetEmbed():
         elif embed_index == 5:
 
             emb = discord.Embed(description=f"""## This channel has already been set as a leaderboard channel
-                {Emojis.dot_emoji} This channel has already been set for the message leaderboard
-                {Emojis.dot_emoji} Would you like to continue setting the message leaderboard (the channel will not be changed) or re-execute the command and set a different channel for the message leaderboard""", color=bot_colour)
+                {Emojis.dot_emoji} This channel has already been set for the {'message' if settings == 'message' else 'invite'} leaderboard
+                {Emojis.dot_emoji} Would you like to continue setting the {'message' if settings == 'message' else 'invite'} leaderboard (the channel will not be changed) or re-execute the command and set a different channel for the {'message' if settings == 'message' else 'invite'} leaderboard""", color=bot_colour)
     
         elif embed_index == 6:
 
