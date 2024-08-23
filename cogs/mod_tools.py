@@ -216,7 +216,7 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "show-antilink-settings")
+    @commands.slash_command(name = "show-antilink-settings", description = "Shows how the anti-link system is set!")
     async def show_antilink_settings(self, ctx:discord.ApplicationContext):
 
         settings_text = {
@@ -482,7 +482,7 @@ class ModeratorCommands(commands.Cog):
             await member.kick()
 
 
-    @commands.slash_command(name = 'timeout', description = "Send a user to timeout!")
+    @commands.slash_command(name = "timeout", description = "Send a user to timeout!")
     @commands.has_permissions(moderate_members = True)
     async def timeout(self, ctx:discord.ApplicationContext, 
         user:Option(discord.Member, required = True, description="Select the user you want to timeout!"), 
@@ -515,7 +515,7 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = 'remove-timeout', description = "Cancel the timeout of a user!")
+    @commands.slash_command(name = "remove-timeout", description = "Cancel the timeout of a user!")
     @commands.has_permissions(moderate_members = True)
     async def remove_timeout(self, ctx:discord.ApplicationContext, member:Option(discord.Member, required = True, description="Select a user from whom you want to cancel the timeout!")):
 
@@ -533,6 +533,58 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(embed=emb)
 
 
+    @commands.slash_command(name = "give-role", description = "Add a role to a specific user!")
+    @commands.has_permissions(moderate_members = True)
+    async def give_role(self, ctx:discord.ApplicationContext, 
+        user:Option(discord.User, description="Choose a user you want to add the role to!"),
+        role:Option(discord.Role, description="Choose a role that you want to add to the user!")):
+
+        if role.permissions.administrator or role.permissions.moderate_members:
+
+            emb = discord.Embed(description=f"""## The role has admin or moderation rights
+                {Emojis.dot_emoji} I can't give the role to a user because it has admin or moderation rights
+                {Emojis.help_emoji} If you want to give another role to a user just use the `give-role` command""")
+
+        else:
+
+            try:
+
+                await user.add_roles(role)
+
+                emb = discord.Embed(description=f"""## The role was successfully added
+                    {Emojis.dot_emoji} The role {role.mention} would be successfully added to the user {user.mention}
+                    {Emojis.help_emoji} If you want to remove the role again, you can do this using the `remove-role` command""", color=bot_colour)
+                await ctx.respond(embed=emb)
+
+            except:
+
+                emb = discord.Embed(description=f"""## The role could not be added
+                    {Emojis.dot_emoji} The role {role.mention} could not be added because {user.mention} already has it
+                    {Emojis.help_emoji} If you want to add another role you can do this via the `give-role` command""", color=bot_colour)
+                await ctx.respond(embed=emb)
+
+
+    @commands.slash_command(name = "remove-role", description = "Removes a role from a specific user!")
+    @commands.has_permissions(moderate_members = True)
+    async def remove_role(self, ctx:discord.ApplicationContext,
+        user:Option(discord.User, description="Choose from which user you want to remove the role!"),
+        role:Option(discord.Role, description="Select which role you want to remove from the user!")):
+        
+        try:
+
+            emb = discord.Embed(description=f"""## The role has been successfully removed
+                {Emojis.dot_emoji} {user.mention} was successfully removed from the {role.mention} role
+                {Emojis.dot_emoji} If you want to add a role again you can use the `give-role` command""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+        except:
+
+            emb = discord.Embed(description=f"""## The role could not be removed
+                {Emojis.dot_emoji} The {role.mention} role could not be removed because {user.mention} does not have it
+                {Emojis.help_emoji} If you want to remove another role, you can do this using the `remove-role` command""", color=bot_colour)
+            await ctx.respond(embed=emb)
+
+
     @commands.slash_command(name = "clear", description = "Delete messages in the channel!")
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx:discord.ApplicationContext, quantity:Option(int, description = "How many messages do you want to delete?", required = True)):
@@ -541,7 +593,7 @@ class ModeratorCommands(commands.Cog):
         await ctx.send(f"I have deleted {len(z)} messages.")
 
 
-    @commands.slash_command(name = "server-info", description="Server info!")
+    @commands.slash_command(name = "server-info", description="Displays all server data!")
     async def serverinfo(self, ctx):
 
         embed = discord.Embed(title=f"{ctx.guild.name} Info", description="Information of this Server", color=bot_colour)
@@ -588,7 +640,7 @@ class ModeratorCommands(commands.Cog):
                         await message.channel.send(embed=embed)
 
 
-    @commands.slash_command(name = "ghost-ping-settings", description = "Schalte das ghost ping system ein oder aus!")
+    @commands.slash_command(name = "ghost-ping-settings", description = "Switch the ghost ping system on or off!")
     async def ghost_ping_settings(self, ctx:discord.ApplicationContext):
 
         # If the database contains 0, the system is deactivated; if it contains 1, it is activated
@@ -600,8 +652,8 @@ class ModeratorCommands(commands.Cog):
         await ctx.respond(embed=emb, view=GhostPingButtons())
 
 
-    @commands.slash_command(name = "show-invites")
-    async def show_invites(self, ctx:discord.ApplicationContext, user:Option(discord.Member)):
+    @commands.slash_command(name = "show-invites", description = "Shows how many users have been invited by a specific user!")
+    async def show_invites(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user of whom you want to see how many other users he has invited!")):
 
         if user is None:
 
@@ -624,7 +676,7 @@ class ModeratorCommands(commands.Cog):
             await ctx.respond(f"{user.mention} has invited {total_invites} member to the server.")
 
 
-    @commands.slash_command()
+    @commands.slash_command(description = "Displays all information about a user!")
     async def userinfo(self, ctx:discord.ApplicationContext, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
         member = ctx.author if not member else member
 

@@ -137,6 +137,7 @@ class GetEmbed():
                 8: Settings message leaderboard
                 9: Antilink violation
                 10: Error embed for overrides
+                11: Mod role (for leaderboard system)
         - settings
             The correct information that must be inserted in the embed
         - settings2 (same as settings)
@@ -240,6 +241,12 @@ class GetEmbed():
             emb = discord.Embed(description=f"""## An error has occurred
                 {Emojis.dot_emoji} The {settings} could not be overwritten this happens if the option remains unanswered for too long or if I lose the connection
                 {Emojis.dot_emoji} If you want {settings2}, you just have to execute the command `/{settings3}` again""", color=bot_colour)
+            
+        elif embed_index == 11:
+
+            emb = discord.Embed(description=f"""## This role cannot be set as a leaderboard role
+                {Emojis.dot_emoji} This role has admin or moderation rights, so it would be too dangerous to assign them through the leaderboard
+                {Emojis.help_emoji} If you want to set a different role as leaderboard-role just run the command again""", color=bot_colour)
 
         return emb
     
@@ -323,6 +330,10 @@ class HelpMenuSelect(discord.ui.View):
                 value="Cancel the timeout of a user", inline=True)
             emb.add_field(name="/clear", 
                 value="Delete messages in a channel", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/give-role", value="Gives a user a role chosen by you", inline=True)
+            emb.add_field(name="/remove-role", value="Removes a user a role chosen by you", inline=True)
+
             await interaction.response.send_message(embed=emb, ephemeral=True)
             
 

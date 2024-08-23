@@ -152,6 +152,8 @@ This project is licensed under the [Custom License](LICENSE.txt). For commercial
 |kick|Kicks a user from the server|
 |timeout|Sends a user to a timeout for a time specified by you|
 |remove-timeout|Removes a timeout of a user of your choice|
+|give-role|Gives a user a role chosen by you|
+|remove-role|Removes a user a role chosen by you|
 |clear|Deletes a number of messages of your choice|
 |serverinfo-slash|Displays all relevant information about the server|
 |userinfo|Displays all relevant information about a user|

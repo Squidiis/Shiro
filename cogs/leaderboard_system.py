@@ -369,7 +369,11 @@ class LeaderboardSystem(commands.Cog):
             choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]),
         interval:Option(str, description="Select the leaderboard for which this role is to be assigned", 
             choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
-    
+
+        if role.permissions.administrator or role.permissions.moderate_members:
+
+            await ctx.respond(embed=GetEmbed.get_embed(embed_index=11))
+
         await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="message")
 
     
@@ -440,7 +444,11 @@ class LeaderboardSystem(commands.Cog):
             choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]),
         interval:Option(str, description="Select the leaderboard for which this role is to be assigned", 
             choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
-    
+
+        if role.permissions.administrator or role.permissions.moderate_members:
+
+            await ctx.respond(embed=GetEmbed.get_embed(embed_index=11))
+
         await self.process_add_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="invite")
 
     

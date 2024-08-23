@@ -1211,7 +1211,7 @@ class LevelSystem(commands.Cog):
             await ctx.respond(embed=emb)
 
 
-    @commands.slash_command(name = "reset-level-roles", description = "Setze alle level roles zurück!")
+    @commands.slash_command(name = "reset-level-roles", description = "Reset all level roles!")
     @commands.has_permissions(administrator = True)
     async def reset_level_roles(self, ctx:discord.ApplicationContext):
 
