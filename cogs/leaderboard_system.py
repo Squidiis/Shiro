@@ -2,7 +2,7 @@ from discord.interactions import Interaction
 from utils import *
 from sql_function import *
 from discord.ext import tasks
-
+from datetime import timezone
 
 # Dictionary for the check functions (does not have to be in each command individually)
 interval_list_message = {
@@ -866,7 +866,7 @@ class LeaderboardSystem(commands.Cog):
                     
                     if leaderboard_settings[6] is not None:
 
-                        current_date = datetime.now(UTC)
+                        current_date = datetime.now(timezone.utc)
                         channel = self.bot.get_channel(leaderboard_settings[6])
 
                         for message_name, message_id in message_ids:

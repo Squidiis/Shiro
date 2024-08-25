@@ -1391,7 +1391,7 @@ class DatabaseUpdates():
         back_to_none = None
         ):
 
-        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message")[1]
+        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message")
         if status == None:
             return
 
@@ -1410,7 +1410,7 @@ class DatabaseUpdates():
             "monthly":message_id,
             "whole":message_id,
             "channel":channel_id,
-            "status":0 if status else 1
+            "status":0 if status[1] else 1
         }
         
         db_connect = DatabaseSetup.db_connector()
@@ -1504,7 +1504,8 @@ class DatabaseUpdates():
         back_to_none = None
         ):
 
-        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite")[1]
+        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite")
+
         if status == None:
             return
 
@@ -1524,7 +1525,7 @@ class DatabaseUpdates():
             "quarterly":message_id,
             "whole":message_id,
             "channel":channel_id,
-            "status":0 if status else 1
+            "status":0 if status[1] else 1
         }
 
         db_connect = DatabaseSetup.db_connector()
