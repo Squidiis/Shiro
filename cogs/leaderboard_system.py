@@ -579,40 +579,49 @@ class LeaderboardSystem(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_message_delete(self, message:discord.Message):
+    async def on_raw_message_delete(self, payload):
 
-        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "message")
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = payload.guild_id, system = "message")
+        
+        if check:
+
+            if payload.message_id == check[2]:
+
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = payload.guild_id, back_to_none = "daily")
+
+            elif payload.message_id == check[3]:
+
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = payload.guild_id, back_to_none = "weekly")
+
+
+            elif payload.message_id == check[4]:
+
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = payload.guild_id, back_to_none = "monthly")
+
+            elif payload.message_id == check[5]:
+
+                await DatabaseUpdates.manage_leaderboard_message(guild_id = payload.guild_id, back_to_none = "whole")
+
+
+        check = DatabaseCheck.check_leaderboard_settings(guild_id = payload.guild_id, system = "invite")
 
         if check:
 
-            if message.id == check[2]:
+            if payload.message_id == check[2]:
 
-                await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "daily")
+                await DatabaseUpdates.manage_leaderboard_invite(guild_id = payload.guild_id, back_to_none = "weekly")
 
-            elif message.id == check[3]:
+            elif payload.message_id == check[3]:
 
-                await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "weekly")
+                await DatabaseUpdates.manage_leaderboard_invite(guild_id = payload.guild_id, back_to_none = "monthly")
 
+            elif payload.message_id == check[4]:
 
-            elif message.id == check[4]:
+                await DatabaseUpdates.manage_leaderboard_invite(guild_id = payload.guild_id, back_to_none = "quarterly")
 
-                await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, back_to_none = "monthly")
+            elif payload.message_id == check[5]:
 
-        check = DatabaseCheck.check_leaderboard_settings(guild_id = message.guild.id, system = "invite")
-
-        if check:
-
-            if message.id == check[2]:
-
-                await DatabaseUpdates.manage_leaderboard_invite(guild_id = message.guild.id, back_to_none = "weekly")
-
-            elif message.id == check[3]:
-
-                await DatabaseUpdates.manage_leaderboard_invite(guild_id = message.guild.id, back_to_none = "monthly")
-
-            elif message.id == check[4]:
-
-                await DatabaseUpdates.manage_leaderboard_invite(guild_id = message.guild.id, back_to_none = "quarterly")
+                await DatabaseUpdates.manage_leaderboard_invite(guild_id = payload.guild_id, back_to_none = "whole")
 
 
     @commands.Cog.listener()
@@ -759,7 +768,7 @@ class LeaderboardSystem(commands.Cog):
                 
                 if leaderboard_settings[6] is not None:
 
-                    current_date = datetime.now(UTC)
+                    current_date = datetime.now(timezone.utc)
                     channel = self.bot.get_channel(leaderboard_settings[6])
 
                     for message_name, message_id in message_ids:
