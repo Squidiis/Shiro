@@ -82,26 +82,31 @@ class AutoReaction(commands.Cog):
 
         check_settings = DatabaseCheck.check_bot_settings(guild_id = message.guild.id)
 
-        if check_settings[5] == 0:
-            return
+        if check_settings:
 
-        recations = DatabaseCheck.check_auto_reaction(guild_id = message.guild.id)
+            if check_settings[5] == 0:
+                return
 
-        if not recations:
-            return
-        
-        for _, channel, category, parameter, emoji in recations:
+            recations = DatabaseCheck.check_auto_reaction(guild_id = message.guild.id)
+
+            if not recations:
+                return
             
-            if (channel is not None and message.channel.id == channel) or (category is not None and message.channel.category_id == category):
+            for _, channel, category, parameter, emoji in recations:
                 
-                if await self.should_react(parameter = parameter, message = message) == True:
+                if (channel is not None and message.channel.id == channel) or (category is not None and message.channel.category_id == category):
+                    
+                    if await self.should_react(parameter = parameter, message = message) == True:
 
-                    try:
+                        try:
 
-                        await message.add_reaction(emoji = emoji)
+                            await message.add_reaction(emoji = emoji)
 
-                    except:
-                        pass
+                        except:
+                            pass
+
+        else:
+            return
     
     
     @commands.Cog.listener()

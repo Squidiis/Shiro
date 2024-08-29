@@ -7,7 +7,6 @@ from discord.ext.commands import MissingPermissions
 import discord
 from discord.ext import commands
 from discord.interactions import Interaction
-import mysql.connector
 import requests
 from discord.ui import Select, View, Button, Modal
 from discord.commands import Option, SlashCommandGroup
@@ -16,7 +15,7 @@ from sql_function import *
 import yaml
 from discord.ext.pages import Paginator, Page
 from datetime import timedelta
-from datetime import datetime, UTC
+from datetime import datetime
 import re
 
 
@@ -65,8 +64,8 @@ with open("config.yaml", 'r') as f:
 
 
 #Intents
-intents = discord.Intents.all()
-
+intents = discord.Intents.default()
+intents.message_content = True
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
 
 
@@ -331,8 +330,10 @@ class HelpMenuSelect(discord.ui.View):
             emb.add_field(name="/clear", 
                 value="Delete messages in a channel", inline=True)
             emb.add_field(name=" ", value=" ", inline=False)
-            emb.add_field(name="/give-role", value="Gives a user a role chosen by you", inline=True)
-            emb.add_field(name="/remove-role", value="Removes a user a role chosen by you", inline=True)
+            emb.add_field(name="/give-role", 
+                value="Gives a user a role chosen by you", inline=True)
+            emb.add_field(name="/remove-role", 
+                value="Removes a user a role chosen by you", inline=True)
 
             await interaction.response.send_message(embed=emb, ephemeral=True)
             

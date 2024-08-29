@@ -3,6 +3,5 @@ Pillow==10.0.1
 py-cord==2.5.0
 python-dotenv==1.0.0
 requests==2.31.0
-ui==0.1.4
 PyYAML==6.0.1
 DateTime==5.5

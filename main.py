@@ -8,9 +8,11 @@ from cogs.leaderboard_system import *
 from cogs.auto_react import *
 
 
-@bot.slash_command(description="Shows you the ping.")
-async def ping(ctx):
-    await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
+@bot.command()
+async def test(ctx):
+    print("test")
+    await ctx.send(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
+
 
 
 class Main(commands.Cog):
@@ -188,7 +190,7 @@ class Main(commands.Cog):
         print(f'Logged in as: {bot.user.name}')
         print(f'With ID: {bot.user.id}')
         self.bot.loop.create_task(status_task())
-        
+
         print("┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓")
         print("┃┏━┓┃ ┃┏━┓┃ ┃┃ ┃┃ ┗┫┣┛ ┗┓┏┓┃ ┗┫┣┛")
         print("┃┗━━┓ ┃┃ ┃┃ ┃┃ ┃┃  ┃┃   ┃┃┃┃  ┃┃")
@@ -248,6 +250,11 @@ class Main(commands.Cog):
         await LeaderboardSystem.check_expired_invites()
 
 
+    @commands.slash_command(description="Shows you the ping.")
+    async def ping(self, ctx):
+        await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
+
+
 # Status task while the bot is active, the status is permanently updated
 async def status_task():
     while True:
@@ -256,56 +263,29 @@ async def status_task():
         await bot.change_presence(activity=discord.Game('Developed by Squidi'), status=discord.Status.online)
         await asyncio.sleep(15)
 
+
+def load_cogs():
+
+    for filename in os.listdir("cogs"):
+
+        if filename.endswith(".py"):
+
+            cog_name = f"cogs.{filename[:-3]}"
+
+            try:
+
+                bot.load_extension(cog_name)
+                print(f"Loaded {cog_name}")
+
+            except Exception as e:
+
+                print(f"Failed to load {cog_name}: {e}")
+
 bot.add_cog(Main(bot))
 
-
-class AntiSpam(commands.Cog):
-
-    def __init__(self, bot):
-        self.bot = bot
-
-        self.anti_spam = commands.CooldownMapping.from_cooldown(5, 15, commands.BucketType.member)
-        self.too_many_violations = commands.CooldownMapping.from_cooldown(4, 60, commands.BucketType.member)
-
-    @commands.Cog.listener()
-    async def on_message(self, message:discord.Message):
-
-        if type(message.channel) is not discord.TextChannel or message.author.bot: 
-            return
-        
-        bucket = self.anti_spam.get_bucket(message)
-        retry_after = bucket.update_rate_limit()
-        
-        if retry_after:
-
-            await message.delete()
-            await message.channel.send(f"{message.author.mention}, don't spam!", delete_after = 10)
-
-            violations = self.too_many_violations.get_bucket(message)
-            check = violations.update_rate_limit()
-
-            if check:
-
-                await message.author.timeout(timedelta(minutes=10))
-
-                try: 
-
-                    await message.author.send("You have been muted for spamming!")
-
-                except:
-
-                    return
-                
-bot.add_cog(AntiSpam(bot))
-
-
-
-
 if __name__ == "__main__":
-    for filename in os.listdir("cogs"):
-        if filename.endswith(".py"):
-            bot.load_extension(f"cogs.{filename[:-3]}")
 
     load_dotenv()
+    load_cogs()
     bot.run(os.getenv("TOKEN"))
 
