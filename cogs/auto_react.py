@@ -23,7 +23,7 @@ class AutoReaction(commands.Cog):
         - guild_id must be specified
         - If no auto-reactions are set, information about this is returned
     '''
-    def show_auto_reactions_all(self, guild_id:int):
+    def show_auto_reactions_all(guild_id:int):
         
         all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = guild_id)
 

@@ -701,10 +701,16 @@ class LeaderboardSystem(commands.Cog):
         user_names, users = [], []
         for t in user_list:
             
-            user = await guild.fetch_member(t[1])
-            user_names.append(user.name)
-            users.append(user)
-            max_lengths[0] = max(max_lengths[0], len(user.name))
+            try:
+
+                user = await guild.fetch_member(t[1])
+                user_names.append(user.name)
+                users.append(user)
+                max_lengths[0] = max(max_lengths[0], len(user.name))
+
+            except:
+
+                DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
 
         padded_tuples = [
             (
@@ -782,15 +788,15 @@ class LeaderboardSystem(commands.Cog):
 
                                 await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
 
-                            if message_name == "1_week_old" and (current_date - message_age) > timedelta(days=1):
+                            if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
 
                                 await self.update_weekly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                            if message_name == "1_month_old" and (current_date - message_age) > timedelta(weeks=1):
+                            if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
 
                                 await self.update_monthly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                            if message_name == "1_quarter_old" and (current_date - message_age) > timedelta(days=30):
+                            if message_name == "1_quarter_old" and (current_date - message_age) > timedelta(days=90):
 
                                 await self.update_quarterly_leaderboard_invite(guild_id=guild.id, message=message)
 

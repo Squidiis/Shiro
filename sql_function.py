@@ -1999,6 +1999,39 @@ class DatabaseRemoveDatas():
             DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
+    ''' 
+    Removes the entries of users on the tracking system
+
+    Parameters:
+    -----------
+        - guild_id
+            Id of the server
+        - user_id
+            Id of the user
+
+    Info:
+        - guild_id and user_id must be specified
+    '''
+    async def remove_leaderboard_tracking(guild_id:int, user_id:int):
+
+        db_connect = DatabaseSetup.db_connector()
+        cursor = db_connect.cursor()
+
+        try:
+
+            delete_user_entry = f"DELETE FROM LeaderboardTacking WHERE guildId = %s AND userId = %s"
+            delete_user_entry_values = [guild_id, user_id]
+            cursor.execute(delete_user_entry, delete_user_entry_values)
+            db_connect.commit()
+
+        except mysql.connector.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+
+
     '''
     Removes individual roles or resets all of them
 
