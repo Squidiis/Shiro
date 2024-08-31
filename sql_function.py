@@ -491,7 +491,7 @@ class DatabaseCheck():
         check = False
         if role_id != None and position != None:
 
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND status = %s AND roleId = %s OR rankingPosition = %s"
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND status = %s AND roleId = %s AND rankingPosition = %s"
             check_roles_values = [guild_id, system, role_id, position]
 
         elif role_id:
@@ -2069,7 +2069,12 @@ class DatabaseRemoveDatas():
 
         try:
             
-            if any(x != None for x in [role_id, position, interval]):
+            if position != None and role_id != None and interval != None:
+
+                delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND status = %s AND roleId = %s AND rankingPosition = %s AND roleInterval = %s"
+                delete_leaderboard_role_values = [guild_id, system, role_id, position, interval]
+
+            elif any(x != None for x in [role_id, position, interval]):
 
                 delete_leaderboard_role = f"DELETE FROM LeaderboardRoles WHERE guildId = %s AND status = %s AND {'roleId = %s' if position == None else 'rankingPosition = %s'} AND roleInterval = %s"
                 delete_leaderboard_role_values = [guild_id, system, role_id if position == None else position, interval]
