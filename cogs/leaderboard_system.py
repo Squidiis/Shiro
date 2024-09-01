@@ -711,7 +711,6 @@ class LeaderboardSystem(commands.Cog):
             max(len(str(t[i])) for t in user_list)
             for i in range(10)
         ]
-        
         user_names, users = [], []
         for t in user_list:
             
@@ -724,17 +723,19 @@ class LeaderboardSystem(commands.Cog):
 
             except:
 
-                DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
-
+                await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
+      
         padded_tuples = [
-            (
+            (   
+                print(f"Das ist i {i}"),
+                print(len(user_names)),
                 user_names[i].ljust(max_lengths[0]), 
                 str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
                 str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
                 str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[8]).ljust(max_lengths[8]),
                 str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[9]).ljust(max_lengths[9])
             )
-            for i, t in enumerate(user_list)
+            for i, t in enumerate(iterable=user_list, start=0)
         ]
         
         await self.remove_leaderboard_roles(guild=guild, interval=interval_list[interval], system=system)
@@ -1648,8 +1649,11 @@ Parameters:
         Which leaderboard is involved
 '''
 def show_leaderboard_roles(guild_id, interval, system):
+    
+    interval_list = interval_list_message if system == "message" else interval_list_invite
+    interval_db = next((key for key, value in interval_list.items() if value == interval), None)
 
-    check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval, system = system)
+    check = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_db, system = system)
     leaderboard = []
 
     if check:

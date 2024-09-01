@@ -495,7 +495,7 @@ class DatabaseCheck():
             check_roles_values = [guild_id, system, role_id, position]
 
         elif role_id:
-
+            
             check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND roleId = %s AND status = %s"
             check_roles_values = [guild_id, role_id, system]
 
@@ -511,7 +511,7 @@ class DatabaseCheck():
             check_roles_values = [guild_id, role_id, interval, system]
 
         else:
-            
+
             check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s AND status = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
             check_roles_values = [guild_id, system] if interval == None else [guild_id, system, interval]
 
