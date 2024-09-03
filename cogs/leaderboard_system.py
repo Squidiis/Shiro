@@ -122,7 +122,7 @@ class LeaderboardSystem(commands.Cog):
         emb = discord.Embed(description=f"""## Set the {system} leaderboard
             {Emojis.dot_emoji} With the lower select menu you can define a channel in which the leaderboard should be sent
             {Emojis.dot_emoji} Then you can also set an interval at which time intervals the leaderboard should be updated
-            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[0] else 'switched on'}. (as soon as it is switched off, no more {'invitations' if system == 'invite' else 'message'} are counted and when it is switched on, the leaderboard is reset)
+            {Emojis.dot_emoji} You can also switch the system off or on currently it is {'switched off' if settings[1] == 0 else 'switched on'}. (as soon as it is switched off, no more {'invitations' if system == 'invite' else 'message'} are counted and when it is switched on, the leaderboard is reset)
             {Emojis.help_emoji} The leaderboard is edited when you update it, so you should make sure that no one else can write in the channel you specified
             {Emojis.help_emoji} **The leaderboard always shows the data from the previous interval, e.g. the best users who have {'invited' if system == "invite" else "wrote"} the most {'users' if system == "invite" else 'messages'} in the last week**""", color=bot_colour)        
         await ctx.respond(embed=emb, view = SetleaderboardChannel())
@@ -160,7 +160,7 @@ class LeaderboardSystem(commands.Cog):
                 if i is not None:
                     intervals_text.append(f"{Emojis.dot_emoji} {intervals[i]} updating {system} leaderboard\n")
             
-            emb = discord.Embed(f"""## Here you can see all the settings of the {system} leaderboard
+            emb = discord.Embed(description=f"""## Here you can see all the settings of the {system} leaderboard
             {Emojis.dot_emoji} The {system} leaderboard is currently {'switched on' if settings[1] == 0 else 'switched off'}
             {Emojis.dot_emoji} {f'Currently <#{settings[6]}> is set as' if settings[5] is not None else 'No'} {system} leaderboard channel has been set
             {Emojis.dot_emoji} **The following intervals are currently defined for which a leaderboard exists:**
@@ -522,10 +522,10 @@ class LeaderboardSystem(commands.Cog):
                     
                     await DatabaseUpdates.manage_leaderboard_message(guild_id = message.guild.id, user_id = message.author.id, interval = "countMessage")
 
-    
+
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
-        
+
         if member.bot:
             return
     
@@ -585,7 +585,7 @@ class LeaderboardSystem(commands.Cog):
             for entry_before in result_before:
                 
                 if entry_after[1] == entry_before[1] and entry_before[2] < entry_after[2]:
-
+                    
                     await DatabaseUpdates.manage_leaderboard_invite(guild_id = member.guild.id, user_id = entry_before[1], settings = "tracking", interval = "countInvite")
                     await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_before[1], invite_code = entry_before[0], uses = entry_after[2])
                     await self.check_expired_invites()
@@ -721,21 +721,18 @@ class LeaderboardSystem(commands.Cog):
                 users.append(user)
                 max_lengths[0] = max(max_lengths[0], len(user.name))
 
-            except:
-
+            except Exception as e:
                 await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
       
         padded_tuples = [
             (   
-                print(f"Das ist i {i}"),
-                print(len(user_names)),
                 user_names[i].ljust(max_lengths[0]), 
                 str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
                 str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
                 str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[8]).ljust(max_lengths[8]),
                 str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[9]).ljust(max_lengths[9])
             )
-            for i, t in enumerate(iterable=user_list, start=0)
+            for i, t in enumerate(iterable=user_list)
         ]
         
         await self.remove_leaderboard_roles(guild=guild, interval=interval_list[interval], system=system)
@@ -764,8 +761,8 @@ class LeaderboardSystem(commands.Cog):
                 num_str = f" #{num_str}  "
             elif len(num_str) == 2:
                 num_str = f" #{num_str} "
-            
-            leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
+
+            leaderboard.append(f"`{num_str}` `{padded_tuples[i][2]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
             
         return "".join(leaderboard)
 
@@ -774,50 +771,56 @@ class LeaderboardSystem(commands.Cog):
     async def edit_leaderboard_invite(self):
 
         await self.bot.wait_until_ready()
+        
+        try:
 
-        for guild in self.bot.guilds:
-            leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="invite")
+            for guild in self.bot.guilds:
+                leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="invite")
 
-            if leaderboard_settings and leaderboard_settings[1] == 1:
+                if leaderboard_settings and leaderboard_settings[1] == 1:
 
-                message_ids = [
-                    ("1_week_old", leaderboard_settings[2]),
-                    ("1_month_old", leaderboard_settings[3]),
-                    ("1_quarter_old", leaderboard_settings[4]),
-                    ("whole", leaderboard_settings[5])
-                ]
-                
-                if leaderboard_settings[6] is not None:
+                    message_ids = [
+                        ("1_week_old", leaderboard_settings[2]),
+                        ("1_month_old", leaderboard_settings[3]),
+                        ("1_quarter_old", leaderboard_settings[4]),
+                        ("whole", leaderboard_settings[5])
+                    ]
+                        
+                    if leaderboard_settings[6] is not None:
 
-                    current_date = datetime.now(timezone.utc)
-                    channel = self.bot.get_channel(leaderboard_settings[6])
+                        current_date = datetime.now(timezone.utc)
+                        channel = self.bot.get_channel(leaderboard_settings[6])
 
-                    for message_name, message_id in message_ids:
+                        for message_name, message_id in message_ids:
 
-                        if message_id is not None:
+                            if message_id is not None:
 
-                            message = await channel.fetch_message(message_id)
-                            message_age = message.edited_at if message.edited_at is not None else message.created_at
+                                message = await channel.fetch_message(message_id)
+                                message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                            if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
+                                if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
 
-                                await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
+                                    await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
 
-                            if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
+                                if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
 
-                                await self.update_weekly_leaderboard_invite(guild_id=guild.id, message=message)
+                                    await self.update_weekly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                            if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
+                                if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
 
-                                await self.update_monthly_leaderboard_invite(guild_id=guild.id, message=message)
+                                    await self.update_monthly_leaderboard_invite(guild_id=guild.id, message=message)
 
-                            if message_name == "1_quarter_old" and (current_date - message_age) > timedelta(days=90):
+                                if message_name == "1_quarter_old" and (current_date - message_age) > timedelta(days=90):
 
-                                await self.update_quarterly_leaderboard_invite(guild_id=guild.id, message=message)
+                                    await self.update_quarterly_leaderboard_invite(guild_id=guild.id, message=message)
 
-        else:
+            else:
 
-            return
+                return
+    
+        except Exception as e:
+            print(f"Exception in edit_leaderboard_invite: {e}")
+
         
 
     async def update_whole_leaderboard_invite(self, guild_id:int, message:discord.Message):
@@ -879,52 +882,58 @@ class LeaderboardSystem(commands.Cog):
 
         await self.bot.wait_until_ready()
         
-        for guild in self.bot.guilds:
-            
-            leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="message")
+        try:
 
-            if leaderboard_settings:
 
-                if leaderboard_settings and leaderboard_settings[1] == 1:
-
-                    message_ids = [
-                        ("1_day_old", leaderboard_settings[2]),
-                        ("1_week_old", leaderboard_settings[3]),
-                        ("1_month_old", leaderboard_settings[4]),
-                        ("whole", leaderboard_settings[5])
-                    ]
+            for guild in self.bot.guilds:
                     
-                    if leaderboard_settings[6] is not None:
+                leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="message")
 
-                        current_date = datetime.now(timezone.utc)
-                        channel = self.bot.get_channel(leaderboard_settings[6])
+                if leaderboard_settings:
 
-                        for message_name, message_id in message_ids:
+                    if leaderboard_settings and leaderboard_settings[1] == 1:
 
-                            if message_id is not None:
+                        message_ids = [
+                            ("1_day_old", leaderboard_settings[2]),
+                            ("1_week_old", leaderboard_settings[3]),
+                            ("1_month_old", leaderboard_settings[4]),
+                            ("whole", leaderboard_settings[5])
+                        ]
+                            
+                        if leaderboard_settings[6] is not None:
 
-                                message = await channel.fetch_message(message_id)
-                                message_age = message.edited_at if message.edited_at is not None else message.created_at
+                            current_date = datetime.now(timezone.utc)
+                            channel = self.bot.get_channel(leaderboard_settings[6])
 
-                                if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
+                            for message_name, message_id in message_ids:
 
-                                    await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
+                                if message_id is not None:
 
-                                if message_name == "1_day_old" and (current_date - message_age) > timedelta(days=1):
+                                    message = await channel.fetch_message(message_id)
+                                    message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                    await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
+                                    if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
 
-                                if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
+                                        await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
 
-                                    await self.update_weekly_leaderboard_message(guild_id=guild.id, message=message)
+                                    if message_name == "1_day_old" and (current_date - message_age) > timedelta(days=1):
 
-                                if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
+                                        await self.update_daily_leaderboard_message(guild_id=guild.id, message=message)
 
-                                    await self.update_monthly_leaderboard_message(guild_id=guild.id, message=message)
+                                    if message_name == "1_week_old" and (current_date - message_age) > timedelta(weeks=1):
 
-            else:
-    
-                return
+                                        await self.update_weekly_leaderboard_message(guild_id=guild.id, message=message)
+
+                                    if message_name == "1_month_old" and (current_date - message_age) > timedelta(days=30):
+
+                                        await self.update_monthly_leaderboard_message(guild_id=guild.id, message=message)
+
+                else:
+            
+                    return
+            
+        except Exception as e:
+            print(f"Exception in edit_leaderboard_message: {e}")
 
 
     async def update_whole_leaderboard_message(self, guild_id:int, message:discord.Message):

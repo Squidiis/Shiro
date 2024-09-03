@@ -66,8 +66,9 @@ with open("config.yaml", 'r') as f:
 #Intents
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
+intents.members = True
 
+bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
 
 # The red colour for the fail / error embeds
 error_red = discord.Colour.brand_red()
