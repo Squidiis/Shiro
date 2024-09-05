@@ -722,10 +722,12 @@ class LeaderboardSystem(commands.Cog):
                 max_lengths[0] = max(max_lengths[0], len(user.name))
 
             except Exception as e:
+                print(f"User not found: {e}")
                 await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
       
         padded_tuples = [
             (   
+                print(f"len {len(user_names)}, this is I {i}"),
                 user_names[i].ljust(max_lengths[0]), 
                 str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
                 str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
@@ -761,8 +763,8 @@ class LeaderboardSystem(commands.Cog):
                 num_str = f" #{num_str}  "
             elif len(num_str) == 2:
                 num_str = f" #{num_str} "
-
-            leaderboard.append(f"`{num_str}` `{padded_tuples[i][2]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
+            print(padded_tuples[i])
+            leaderboard.append(f"`{num_str}` `{padded_tuples[i][1]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
             
         return "".join(leaderboard)
 
@@ -798,7 +800,7 @@ class LeaderboardSystem(commands.Cog):
                                 message = await channel.fetch_message(message_id)
                                 message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
+                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
 
                                     await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
 
@@ -912,7 +914,7 @@ class LeaderboardSystem(commands.Cog):
                                     message = await channel.fetch_message(message_id)
                                     message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                    if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
+                                    if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
 
                                         await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
 

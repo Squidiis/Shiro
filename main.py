@@ -246,13 +246,23 @@ class Main(commands.Cog):
         
         self.bot.add_view(view)
         await Main.create_db_table()
-        await LeaderboardSystem.collects_invitation_links()
         await LeaderboardSystem.check_expired_invites()
 
 
     @commands.slash_command(description="Shows you the ping.")
     async def ping(self, ctx):
         await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
+
+    
+    @commands.Cog.listener()
+    async def on_disconnect():
+        print("Bot has lost the connection.")
+
+
+    @commands.Cog.listener()
+    async def on_resumed():
+        print("Connection restored.")
+
 
 
 # Status task while the bot is active, the status is permanently updated
