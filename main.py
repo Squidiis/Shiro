@@ -255,13 +255,47 @@ class Main(commands.Cog):
 
     
     @commands.Cog.listener()
-    async def on_disconnect():
+    async def on_disconnect(self):
         print("Bot has lost the connection.")
+        LeaderboardSystem.edit_leaderboard_invite.stop()
+        LeaderboardSystem.edit_leaderboard_message.stop()
+        await self.reconnect_to_discord()
+        await self.restart_tasks()
 
 
     @commands.Cog.listener()
-    async def on_resumed():
+    async def on_resumed(self):
+            
         print("Connection restored.")
+        await self.restart_tasks()
+
+
+    async def reconnect_to_discord(self):
+
+        for _ in range(5):
+            try:
+                await bot.connect(reconnect=True)
+
+                print("Connection successfully re-established!")
+
+                return
+            except Exception as e:
+
+                print(f"Error during connection setup: {e}")
+                await asyncio.sleep(5)
+
+        print("Could not establish a connection after several attempts.")
+
+    
+    async def restart_tasks(self):
+
+        if not LeaderboardSystem.edit_leaderboard_invite.is_running():
+
+            LeaderboardSystem.edit_leaderboard_invite.start()
+
+        if not LeaderboardSystem.edit_leaderboard_message.is_running():
+
+            LeaderboardSystem.edit_leaderboard_message.start()
 
 
 
