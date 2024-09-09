@@ -41,6 +41,50 @@ class LeaderboardSystem(commands.Cog):
         self.check_expired_invite_liks.start()
 
 
+    @commands.Cog.listener()
+    async def on_disconnect(self):
+        print("Bot has lost the connection.")
+        self.edit_leaderboard_invite.stop()
+        self.edit_leaderboard_message.stop()
+        await self.reconnect_to_discord()
+        await self.restart_tasks()
+
+
+    @commands.Cog.listener()
+    async def on_resumed(self):
+            
+        print("Connection restored.")
+        await self.restart_tasks()
+
+
+    async def reconnect_to_discord(self):
+
+        for _ in range(5):
+            try:
+                await self.bot.connect(reconnect=True)
+
+                print("Connection successfully re-established!")
+
+                return
+            except Exception as e:
+
+                print(f"Error during connection setup: {e}")
+                await asyncio.sleep(5)
+
+        print("Could not establish a connection after several attempts.")
+
+    
+    async def restart_tasks(self):
+
+        if not self.edit_leaderboard_invite.is_running():
+
+            self.edit_leaderboard_invite.start()
+
+        if not self.edit_leaderboard_message.is_running():
+
+            self.edit_leaderboard_message.start()
+
+
     '''
     Adds all existing Invite links to a database
 
@@ -724,11 +768,12 @@ class LeaderboardSystem(commands.Cog):
             except Exception as e:
                 print(f"User not found: {e}")
                 await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
-      
+
+        max_index = len(user_names) - 1
+
         padded_tuples = [
             (   
-                print(f"len {len(user_names)}, this is I {i}"),
-                user_names[i].ljust(max_lengths[0]), 
+                user_names[min(i, max_index)].ljust(max_lengths[0]),
                 str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
                 str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
                 str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[8]).ljust(max_lengths[8]),
@@ -763,7 +808,7 @@ class LeaderboardSystem(commands.Cog):
                 num_str = f" #{num_str}  "
             elif len(num_str) == 2:
                 num_str = f" #{num_str} "
-            print(padded_tuples[i])
+
             leaderboard.append(f"`{num_str}` `{padded_tuples[i][1]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
             
         return "".join(leaderboard)
@@ -800,7 +845,7 @@ class LeaderboardSystem(commands.Cog):
                                 message = await channel.fetch_message(message_id)
                                 message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
+                                if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
 
                                     await self.update_whole_leaderboard_invite(guild_id=guild.id, message=message)
 
@@ -886,7 +931,6 @@ class LeaderboardSystem(commands.Cog):
         
         try:
 
-
             for guild in self.bot.guilds:
                     
                 leaderboard_settings = DatabaseCheck.check_leaderboard_settings(guild_id=guild.id, system="message")
@@ -914,7 +958,7 @@ class LeaderboardSystem(commands.Cog):
                                     message = await channel.fetch_message(message_id)
                                     message_age = message.edited_at if message.edited_at is not None else message.created_at
 
-                                    if message_name == "whole" and (current_date - message_age) > timedelta(minutes=1):
+                                    if message_name == "whole" and (current_date - message_age) > timedelta(days=1):
 
                                         await self.update_whole_leaderboard_message(guild_id=guild.id, message=message)
 
@@ -959,7 +1003,7 @@ class LeaderboardSystem(commands.Cog):
             {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(days=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
-            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=1)).timestamp())}>""", color=bot_colour)
         await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
         await DatabaseUpdates.manage_leaderboard_message(guild_id=guild_id, back_to_none="daily", settings="tracking")
 
@@ -973,7 +1017,7 @@ class LeaderboardSystem(commands.Cog):
             {Emojis.dot_emoji} These are the users who have written the most messages in the period from <t:{int((datetime.now() - timedelta(weeks=1)).timestamp())}> to <t:{int((datetime.now()).timestamp())}>
 
             {users}
-            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(days=30)).timestamp())}>""", color=bot_colour)
+            {Emojis.dot_emoji} The leaderboard will next be updated on <t:{int((datetime.now() + timedelta(weeks=1)).timestamp())}>""", color=bot_colour)
         await message.edit(embed=emb, view=ShowLeaderboardGivenRoles())
         await DatabaseUpdates.manage_leaderboard_message(guild_id=guild_id, back_to_none="weekly", settings="tracking")
 

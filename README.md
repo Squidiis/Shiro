@@ -29,7 +29,7 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - Individual blacklist commands to exclude individual channels, categories, roles or users from the level system.
     - Commands to manage and change the statistics of individual users.
     - Ranking command to show how far users are in the level system.
-    - Ranking list of the top 10 users.
+    - Ranking list of the top 15 users.
     - Commands to set how much XP is awarded per message.
     - Commands to give individual XP bonuses to individual channels, categories, roles and users.
     - Level role system to reward users with roles when they reach a certain level (level roles can be customized).
