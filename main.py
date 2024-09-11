@@ -189,7 +189,6 @@ class Main(commands.Cog):
         view = View(timeout=None)
         print(f'Logged in as: {bot.user.name}')
         print(f'With ID: {bot.user.id}')
-        self.bot.loop.create_task(status_task())
 
         print("┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓")
         print("┃┏━┓┃ ┃┏━┓┃ ┃┃ ┃┃ ┗┫┣┛ ┗┓┏┓┃ ┗┫┣┛")
@@ -253,15 +252,6 @@ class Main(commands.Cog):
     async def ping(self, ctx):
         await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
-
-
-# Status task while the bot is active, the status is permanently updated
-async def status_task():
-    while True:
-        await bot.change_presence(activity=discord.Game('/help to see all commands'), status=discord.Status.online)
-        await asyncio.sleep(15)
-        await bot.change_presence(activity=discord.Game('Developed by Squidi'), status=discord.Status.online)
-        await asyncio.sleep(15)
 
 
 def load_cogs():

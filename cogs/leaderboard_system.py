@@ -737,7 +737,7 @@ class LeaderboardSystem(commands.Cog):
             Which leaderboard should be created
     '''
     async def sort_leaderboard(self, user_list, interval, guild_id, system):
-    
+        
         guild = self.bot.get_guild(guild_id)
         interval_list = ["", "day", "week", "month", "whole"] if system == "message" else ["", "week", "month", "quarter", "whole"]
         check_roles = DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval], system = system)
@@ -764,9 +764,11 @@ class LeaderboardSystem(commands.Cog):
                 user_names.append(user.name)
                 users.append(user)
                 max_lengths[0] = max(max_lengths[0], len(user.name))
+                await asyncio.sleep(0.1)
 
             except Exception as e:
                 print(f"User not found: {e}")
+                print(t)
                 await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
 
         max_index = len(user_names) - 1
@@ -794,6 +796,7 @@ class LeaderboardSystem(commands.Cog):
                 if general_role != None and count < 1:
                     
                     await users[i].add_roles(general_role)
+                    await asyncio.sleep(0.1)
                     await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = system, interval = interval_list[interval])
                     count =+ 1
 
@@ -801,6 +804,7 @@ class LeaderboardSystem(commands.Cog):
 
                     leaderboard_role = guild.get_role(role[1])
                     await users[i].add_roles(leaderboard_role)
+                    await asyncio.sleep(0.1)
                     await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = system, interval = interval_list[interval])
                 
             num_str = str(i + 1)

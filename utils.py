@@ -67,8 +67,8 @@ with open("config.yaml", 'r') as f:
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-
-bot = commands.Bot(command_prefix=data["Prefix"], intents=intents)
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix=data["Prefix"], intents=intents, activity = discord.Game(name="developed by squidi"))
 
 # The red colour for the fail / error embeds
 error_red = discord.Colour.brand_red()

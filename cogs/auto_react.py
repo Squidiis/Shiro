@@ -102,8 +102,9 @@ class AutoReaction(commands.Cog):
 
                             await message.add_reaction(emoji = emoji)
 
-                        except:
-                            pass
+                        except Exception as e:
+                        
+                            print(f"Auto-reaction {e}")
 
         else:
             return
