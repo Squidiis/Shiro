@@ -6,6 +6,7 @@ from cogs.fun_commands import *
 from utils import *
 from cogs.leaderboard_system import *
 from cogs.auto_react import *
+import logging
 
 
 @bot.command()
@@ -13,6 +14,7 @@ async def test(ctx):
     print("test")
     await ctx.send(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
+logging.basicConfig(level=logging.INFO)
 
 
 class Main(commands.Cog):
@@ -252,6 +254,76 @@ class Main(commands.Cog):
     async def ping(self, ctx):
         await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
+    
+    @commands.Cog.listener()
+    async def on_disconnect():
+        print("Bot has lost the connection.")
+        LeaderboardSystem.edit_leaderboard_invite.stop()
+        LeaderboardSystem.edit_leaderboard_message.stop()
+        
+
+    @commands.Cog.listener()
+    async def on_resumed(self):
+            
+        print("Connection restored.")
+        
+        if not LeaderboardSystem.edit_leaderboard_invite.is_running():
+
+            LeaderboardSystem.edit_leaderboard_invite.start()
+
+        if not LeaderboardSystem.edit_leaderboard_message.is_running():
+
+            LeaderboardSystem.edit_leaderboard_message.start()
+
+
+    @commands.Cog.listener()
+    async def on_error(event, *args, **kwargs):
+        logging.error(f"An error occurred in event {event}: {args} {kwargs}", exc_info=True)
+
+
+    @tasks.loop(seconds=60)
+    async def monitor_bot_status(self):
+
+        try:
+
+            if bot.is_closed():
+                logging.warning("Bot is not connected. Attempting to reconnect...")
+                await self.restart_bot()
+            else:
+                logging.info("Bot is running fine.")
+
+        except Exception as e:
+            logging.error(f"Error in monitor_bot_status: {e}")
+            await self.restart_bot()
+
+
+    async def restart_bot():
+
+        try:
+            logging.info("Restarting bot...")
+            
+            await bot.close()
+
+            await asyncio.sleep(5)
+
+            bot.run(os.getenv("TOKEN"))
+
+        except Exception as e:
+            logging.error(f"Failed to restart bot: {e}")
+
+    
+
+logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='w',
+    format='%(asctime)s - %(levelname)s - %(message)s')
+
+def handle_exception(loop, context):
+    msg = context.get("exception", context["message"])
+    logging.error(f"Caught exception: {msg}")
+    print(f"Caught exception: {msg}")
+
+loop = asyncio.get_event_loop()
+loop.set_exception_handler(handle_exception)
+
 
 
 def load_cogs():
@@ -273,9 +345,17 @@ def load_cogs():
 
 bot.add_cog(Main(bot))
 
+
 if __name__ == "__main__":
 
-    load_dotenv()
-    load_cogs()
-    bot.run(os.getenv("TOKEN"))
+    try:
+
+        load_dotenv()
+        load_cogs()
+        bot.run(os.getenv("TOKEN"))
+
+    except Exception as e:
+
+        logging.error(f"Bot crashed with error: {e}")
+        asyncio.run(Main.restart_bot())
 

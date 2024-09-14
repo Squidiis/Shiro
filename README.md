@@ -2,7 +2,7 @@
 
 
 <h1 align="center">
-    This project is currently in development!<br>
+    Version 1.1!<br>
 </h1>
 
 <h4 align="center">
