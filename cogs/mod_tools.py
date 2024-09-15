@@ -12,9 +12,9 @@ class ModeratorCommands(commands.Cog):
         self.bot = bot
 
     # Returns the antilink whitelist completely formatted 
-    def show_antilink_system_whitelist(guild_id:int):
+    async def show_antilink_system_whitelist(guild_id:int):
 
-        white_list = DatabaseCheck.check_antilink_whitelist(guild_id = guild_id)
+        white_list = await DatabaseCheck.check_antilink_whitelist(guild_id = guild_id)
 
         channel_whitelist, category_whitelist, role_whitelist, user_whitelist = [], [], [], []
         for _, channel, category, role, user in white_list:
@@ -47,9 +47,9 @@ class ModeratorCommands(commands.Cog):
     
     # Checks the whitelist and checks whether there is a match in the channels, categories, roles or user entries
     @staticmethod
-    def check_whitelist_antilink(message:discord.Message):
+    async def check_whitelist_antilink(message:discord.Message):
         
-        check_whitelist = DatabaseCheck.check_antilink_whitelist(guild_id = message.guild.id)
+        check_whitelist = await DatabaseCheck.check_antilink_whitelist(guild_id = message.guild.id)
             
         if check_whitelist:
                 
@@ -126,7 +126,7 @@ class ModeratorCommands(commands.Cog):
             if message.author.bot:
                 return
 
-            if self.check_whitelist_antilink(message=message) == True:
+            if await self.check_whitelist_antilink(message=message) == True:
                 return
 
             else:
@@ -136,13 +136,13 @@ class ModeratorCommands(commands.Cog):
 
                 else:
 
-                    check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
+                    check_settings = await DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
 
                     # Antilink system is disabled 
                     if check_settings[3] == 3:
                         return
 
-                    if self.check_rule_violation(check_settings = check_settings, message = message) == True:
+                    if await self.check_rule_violation(check_settings = check_settings, message = message) == True:
             
                         await message.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=message, settings2=check_settings), delete_after=5)
                         await message.delete()
@@ -163,7 +163,7 @@ class ModeratorCommands(commands.Cog):
             if after.author.guild_permissions.administrator:
                 return
             
-            check_settings = DatabaseCheck.check_bot_settings(guild_id=after.guild.id)
+            check_settings = await DatabaseCheck.check_bot_settings(guild_id=after.guild.id)
 
             # Antilink system is disabled 
             if check_settings[3] == 3:
@@ -190,7 +190,7 @@ class ModeratorCommands(commands.Cog):
             description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
             choices = [0, 5, 10, 20, 30, 40, 50, 60])):
 
-        check_settings = DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
+        check_settings = await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
 
         if check_settings[3] == int(settings) and check_settings[4] == timeout:
 
@@ -225,7 +225,7 @@ class ModeratorCommands(commands.Cog):
             2:"All messages with a link will be deleted this also includes pictures and videos",
             3:"Nothing is deleted as the Antilink system is deactivated."}
 
-        settings = DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
+        settings = await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
 
         emb = discord.Embed(description=f"""## {Emojis.help_emoji} Here you can see the current anti-link settings
             {Emojis.dot_emoji} The anti-link system is currently set to:\n`{settings_text[settings[3]]}`
@@ -270,10 +270,10 @@ class ModeratorCommands(commands.Cog):
 
         if [x for x in [channel, category, role, user] if x]:
             
-            check_channel = DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, channel_id = channel.id) if channel != None else False
-            check_category = DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, category_id = category.id) if category != None else False
-            check_role = DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, role_id = role.id) if role != None else False
-            check_user = DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, user_id = user.id) if user != None else False
+            check_channel = await DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, channel_id = channel.id) if channel != None else False
+            check_category = await DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, category_id = category.id) if category != None else False
+            check_role = await DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, role_id = role.id) if role != None else False
+            check_user = await DatabaseCheck.check_antilink_whitelist(guild_id = guild_id, user_id = user.id) if user != None else False
 
 
             items = {0:check_channel, 1:check_category, 2:check_role, 3:check_user}
@@ -376,7 +376,7 @@ class ModeratorCommands(commands.Cog):
     @commands.slash_command(name = "show-antilink-whitelist", description = "Shows what is listed on the anti-link whitelist")
     async def show_antilink_whitelist(self, ctx:discord.ApplicationContext):
 
-        white_list = ModeratorCommands.show_antilink_system_whitelist(guild_id = ctx.guild.id)
+        white_list = await ModeratorCommands.show_antilink_system_whitelist(guild_id = ctx.guild.id)
         
         emb = discord.Embed(description=f"""## Anti-link whitelist
             {Emojis.dot_emoji} Here you can see all entries of the anti-link whitelist:
@@ -389,7 +389,7 @@ class ModeratorCommands(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_antilink_whitelist(self, ctx:discord.ApplicationContext):
         
-        check_whitelist = DatabaseCheck.check_antilink_whitelist(guild_id = ctx.guild.id)
+        check_whitelist = await DatabaseCheck.check_antilink_whitelist(guild_id = ctx.guild.id)
 
         if check_whitelist:
             
@@ -614,7 +614,7 @@ class ModeratorCommands(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message:discord.Message):
 
-        check_settings = DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
+        check_settings = await DatabaseCheck.check_bot_settings(guild_id=message.guild.id)
 
         if isinstance(message.channel, discord.DMChannel):
             return
@@ -644,7 +644,7 @@ class ModeratorCommands(commands.Cog):
     async def ghost_ping_settings(self, ctx:discord.ApplicationContext):
 
         # If the database contains 0, the system is deactivated; if it contains 1, it is activated
-        check_settings = DatabaseCheck.check_bot_settings(guild_id=ctx.guild.id)
+        check_settings = await DatabaseCheck.check_bot_settings(guild_id=ctx.guild.id)
 
         emb = discord.Embed(title=f"{Emojis.settings_emoji} Here you can set the anti ghost ping system ", 
             description=f"""{Emojis.dot_emoji} Currently the anti ghost ping system is {'**enabled**' if check_settings[2] == 0 else '**disabled**'}
@@ -804,7 +804,7 @@ class GhostPingButtons(discord.ui.View):
     @discord.ui.button(label="Turn off / on the Ghost ping system", style=discord.ButtonStyle.blurple, custom_id="turn_off_on", row=1)
     async def on_off_ghost_ping(self, button, interaction:discord.Interaction):
 
-        check_settings = DatabaseCheck.check_bot_settings(guild_id=interaction.guild.id)
+        check_settings = await DatabaseCheck.check_bot_settings(guild_id=interaction.guild.id)
         await DatabaseUpdates.update_bot_settings(guild_id=interaction.guild.id, ghost_ping=1 if check_settings[2] == 0 else 0)
 
         emb = discord.Embed(title=f"{Emojis.help_emoji} You have successfully switched the ghost ping system {'**off**' if check_settings[2] != 0 else '**on**'}", 

@@ -84,7 +84,7 @@ class DatabaseCheck():
         - If only the `guild_id` is specified, all entries specified for the server are returned
         - Always specify only one id otherwise errors may occur     
     '''
-    def check_blacklist(
+    async def check_blacklist(
         guild_id:int, 
         channel_id:int = None, 
         category_id:int = None, 
@@ -138,7 +138,7 @@ class DatabaseCheck():
         - The guild_id must be specified
         - If only the `guild_id` is specified, all entries specified for the server are returned
     '''
-    def check_level_system_stats(guild_id:int, user_id:int = None):
+    async def check_level_system_stats(guild_id:int, user_id:int = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -189,7 +189,7 @@ class DatabaseCheck():
         - If only one role is specified and no level or status, the entry with the role is returned
         - If no entry exists, None is returned
     '''
-    def check_level_system_levelroles(
+    async def check_level_system_levelroles(
         guild_id:int, 
         level_role:int = None, 
         needed_level:int = None, 
@@ -261,7 +261,7 @@ class DatabaseCheck():
         - If only the `guild_id` is specified, all entries specified for the server are returned
         - Always specify only one id otherwise errors may occur     
     '''
-    def check_xp_bonus_list(
+    async def check_xp_bonus_list(
         guild_id:int, 
         channel_id:int = None, 
         category_id:int = None, 
@@ -312,7 +312,7 @@ class DatabaseCheck():
     Info:
         - guild_id must be specified
     '''
-    def check_level_settings(guild_id:int):
+    async def check_level_settings(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -347,7 +347,7 @@ class DatabaseCheck():
         - Depending on which item you specify, you will receive the respective entries from the database
         - If you do not specify a channel, category, role or user id, the entire whitelist will be returned
     '''
-    def check_antilink_whitelist(
+    async def check_antilink_whitelist(
         guild_id:int, 
         channel_id:int = None, 
         category_id:int = None, 
@@ -398,7 +398,7 @@ class DatabaseCheck():
     Info:
         - guild_id must be specified
     '''
-    def check_leaderboard_settings(guild_id:int, system:str = None):
+    async def check_leaderboard_settings(guild_id:int, system:str = None):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -434,7 +434,7 @@ class DatabaseCheck():
         - Depending on which item you specify, you will receive the respective entries from the database
         - If you do not specify a channel, category, role or user id, the entire whitelist will be returned
     '''
-    def check_leaderboard(
+    async def check_leaderboard(
         guild_id:int,
         system:str, 
         user_id:int = None,
@@ -503,7 +503,7 @@ class DatabaseCheck():
         - If only one role is specified and no interval or position, the entry with the role is returned
         - If no entry exists, None is returned
     '''
-    def check_leaderboard_roles(
+    async def check_leaderboard_roles(
         guild_id:int,
         system:str,
         role_id:int = None, 
@@ -572,7 +572,7 @@ class DatabaseCheck():
     Info:
         - All variables must always be specified
     '''
-    def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
+    async def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -604,7 +604,7 @@ class DatabaseCheck():
     Info:
         - guild_id must be specified
     '''
-    def check_invite_codes(
+    async def check_invite_codes(
         guild_id:int,
         invite_code:str = None,  
         user_id:int = None,
@@ -658,7 +658,7 @@ class DatabaseCheck():
         - guild_id must be specified
         - If no channel or category is specified, all auto-reactions are returned
     '''
-    def check_auto_reaction(
+    async def check_auto_reaction(
         guild_id:int,
         channel_id:int = None,
         category_id:int = None,
@@ -715,7 +715,7 @@ class DatabaseCheck():
     Info:
         - guild_id must be specified
     '''
-    def check_bot_settings(guild_id:int):
+    async def check_bot_settings(guild_id:int):
 
         db_connect = DatabaseSetup.db_connector()
         cursor = db_connect.cursor()
@@ -1420,7 +1420,7 @@ class DatabaseUpdates():
         back_to_none = None
         ):
 
-        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message")
+        status = await DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "message")
         if status == None:
             return
 
@@ -1455,7 +1455,7 @@ class DatabaseUpdates():
 
             elif interval:
                 
-                check_user = DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id, system = "message")
+                check_user = await DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id, system = "message")
 
                 if check_user and interval == "countMessage":
                     
@@ -1533,7 +1533,7 @@ class DatabaseUpdates():
         back_to_none = None
         ):
 
-        status = DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite")
+        status = await DatabaseCheck.check_leaderboard_settings(guild_id = guild_id, system = "invite")
 
         if status == None:
             return
@@ -1570,7 +1570,7 @@ class DatabaseUpdates():
 
             elif interval:
                 
-                check_user = DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id, system = "invite")
+                check_user = await DatabaseCheck.check_leaderboard(guild_id = guild_id, user_id = user_id, system = "invite")
 
                 if check_user != None and interval == "countInvite":
                 
@@ -1672,7 +1672,7 @@ class DatabaseUpdates():
 
         try:
 
-            invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+            invite_code_check = await DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
 
             if invite_code_check:
                 

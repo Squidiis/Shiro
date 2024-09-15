@@ -23,9 +23,9 @@ class AutoReaction(commands.Cog):
         - guild_id must be specified
         - If no auto-reactions are set, information about this is returned
     '''
-    def show_auto_reactions_all(guild_id:int):
+    async def show_auto_reactions_all(guild_id:int):
         
-        all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = guild_id)
+        all_auto_reactions = await DatabaseCheck.check_auto_reaction(guild_id = guild_id)
 
         if all_auto_reactions:
 
@@ -80,14 +80,14 @@ class AutoReaction(commands.Cog):
         if not message.guild:
             return
 
-        check_settings = DatabaseCheck.check_bot_settings(guild_id = message.guild.id)
+        check_settings = await DatabaseCheck.check_bot_settings(guild_id = message.guild.id)
 
         if check_settings:
 
             if check_settings[5] == 0:
                 return
 
-            recations = DatabaseCheck.check_auto_reaction(guild_id = message.guild.id)
+            recations = await DatabaseCheck.check_auto_reaction(guild_id = message.guild.id)
 
             if not recations:
                 return
@@ -130,7 +130,7 @@ class AutoReaction(commands.Cog):
 
         emb = discord.Embed(description=f"""## Settings menu for the auto reaction system
             {Emojis.dot_emoji} With the button below you can either switch the auto-reactions menu on or off
-            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)[5] == 0 else 'switched on'}
+            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)[5] == 0 else 'switched on'}
             {Emojis.help_emoji} With the command `add-auto-reaction` you can then set auto-reactions that automatically leave a reaction in the areas you specify""", color=bot_colour)
         await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
 
@@ -143,7 +143,7 @@ class AutoReaction(commands.Cog):
             choices = ["links, images and videos", "images and videos", "links", "text messages", "any message"]), 
         emoji:Option(str, required = True, description="Enter the emoji you want for this auto-reaction (just insert it and it'll be set)!")):
 
-        check_reaction = DatabaseCheck.check_auto_reaction(
+        check_reaction = await DatabaseCheck.check_auto_reaction(
             guild_id = ctx.guild.id, 
             channel_id = area.id if isinstance(area, discord.TextChannel) else None,
             category_id = None if isinstance(area, discord.TextChannel) else area.id,
@@ -182,7 +182,7 @@ class AutoReaction(commands.Cog):
         area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, 
             description="Select which channel or category you want to remove from the auto-reaction system!")):
         
-        auto_reactions = DatabaseCheck.check_auto_reaction(
+        auto_reactions = await DatabaseCheck.check_auto_reaction(
             guild_id = ctx.guild.id,
             channel_id = area.id if isinstance(area, discord.TextChannel) else None,
             category_id = area.id if isinstance(area, discord.CategoryChannel) else None
@@ -207,7 +207,7 @@ class AutoReaction(commands.Cog):
                 {Emojis.dot_emoji} This auto-reaction could not be removed because it is not set as an auto-reaction
                 {Emojis.dot_emoji} Here you can see all auto-reactions that are set for this server
                 
-                {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
+                {await self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
 
@@ -215,14 +215,14 @@ class AutoReaction(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def show_auto_reactions(self, ctx:discord.ApplicationContext):
         
-        all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id)
+        all_auto_reactions = await DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id)
         
         if all_auto_reactions:
 
             emb = discord.Embed(description=f"""## Current auto-reactions
                 {Emojis.dot_emoji} Here you can see all auto-reactions that have been set for the server {ctx.guild.name}
                 
-                {self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
+                {await self.show_auto_reactions_all(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -236,7 +236,7 @@ class AutoReaction(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_auto_reactions(self, ctx:discord.ApplicationContext):
 
-        all_auto_reactions = DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id)
+        all_auto_reactions = await DatabaseCheck.check_auto_reaction(guild_id = ctx.guild.id)
 
         if all_auto_reactions:
 
@@ -275,7 +275,7 @@ class AutoReactionOnOffSwitch(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            settings = DatabaseCheck.check_bot_settings(guild_id = interaction.guild.id)
+            settings = await DatabaseCheck.check_bot_settings(guild_id = interaction.guild.id)
             await DatabaseUpdates.update_bot_settings(guild_id = interaction.guild.id, auto_reaction = 1 if settings[5] == 0 else 0)
 
             emb = discord.Embed(description=f"""## The auto reaction system is now {'activated' if settings[5] == 0 else 'deactivated'}.
@@ -306,7 +306,7 @@ class ShowAutoReactions(discord.ui.View):
             emb = discord.Embed(description=f"""## Auto reactions
                 {Emojis.dot_emoji} Here you can see a list of all auto-reactions that have been set for the server {interaction.guild.name} 
                 
-                {AutoReaction.show_auto_reactions_all(guild_id = interaction.guild.id)}""", color=bot_colour)
+                {await AutoReaction.show_auto_reactions_all(guild_id = interaction.guild.id)}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb)
 
         else:

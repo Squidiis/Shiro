@@ -11,10 +11,10 @@ from utils import *
 
 
 # level up message
-def level_message(guild_id:int, user_id:int, level:int):
+async def level_message(guild_id:int, user_id:int, level:int):
 
     user = f"<@{user_id}>"
-    level_up_message = eval("f'{}'".format(DatabaseCheck.check_level_settings(guild_id=guild_id)[4]))
+    level_up_message = eval("f'{}'".format(await DatabaseCheck.check_level_settings(guild_id=guild_id)[4]))
     return level_up_message
 
 
@@ -35,10 +35,10 @@ class CheckLevelSystem():
         - guild_id and message must be specified
         - message must be specified as discord.message object
     '''
-    def check_bonus_xp(guild_id:int, message:discord.Message):
+    async def check_bonus_xp(guild_id:int, message:discord.Message):
 
-        check_settings = DatabaseCheck.check_level_settings(guild_id=guild_id)
-        check_bonus_xp_list = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id)
+        check_settings = await DatabaseCheck.check_level_settings(guild_id=guild_id)
+        check_bonus_xp_list = await DatabaseCheck.check_xp_bonus_list(guild_id=guild_id)
         
         if check_bonus_xp_list:
             
@@ -74,9 +74,9 @@ class CheckLevelSystem():
     Info: 
         - guild_id must be specified 
     '''
-    def show_level_roles(guild_id:int):
+    async def show_level_roles(guild_id:int):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id = guild_id, status = "level_role")
+        level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id = guild_id, status = "level_role")
 
         if level_roles:
 
@@ -103,9 +103,9 @@ class CheckLevelSystem():
     Info:
         - guild_id must be specified
     '''    
-    def show_blacklist(guild_id:int):
+    async def show_blacklist(guild_id:int):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id = guild_id)
+        blacklist = await DatabaseCheck.check_blacklist(guild_id = guild_id)
 
         channel_blacklist, category_blacklist, role_blacklist, user_blacklist = [], [], [], []
         for _, channel, category, role, user in blacklist:
@@ -147,9 +147,9 @@ class CheckLevelSystem():
     Info:
         - guild_id must be specified
     '''
-    def show_bonus_xp_list(guild_id:int):
+    async def show_bonus_xp_list(guild_id:int):
 
-        bonus_list = DatabaseCheck.check_xp_bonus_list(guild_id = guild_id)
+        bonus_list = await DatabaseCheck.check_xp_bonus_list(guild_id = guild_id)
 
         if bonus_list:
 
@@ -307,10 +307,10 @@ class LevelSystem(commands.Cog):
 
     # Check how much XP must be awarded
     @staticmethod
-    def xp_generator(guild_id:int, message:discord.Message = None):
+    async def xp_generator(guild_id:int, message:discord.Message = None):
 
-        settings = DatabaseCheck.check_level_settings(guild_id=guild_id) 
-        check_bonus_xp_system = CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message) if message != None else 0
+        settings = await DatabaseCheck.check_level_settings(guild_id=guild_id) 
+        check_bonus_xp_system = await CheckLevelSystem.check_bonus_xp(guild_id=guild_id, message=message) if message != None else 0
      
         if check_bonus_xp_system != 0 and check_bonus_xp_system != None:
         
@@ -336,11 +336,11 @@ class LevelSystem(commands.Cog):
 
     # Returns True if an element is on the blacklist.
     @staticmethod
-    def blacklist_check_text(guild_id:int, message_check:discord.Message):
+    async def blacklist_check_text(guild_id:int, message_check:discord.Message):
 
         if isinstance(message_check.channel, discord.TextChannel):
 
-            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
+            levelsystem_blacklist = await DatabaseCheck.check_blacklist(guild_id=guild_id)
 
             if levelsystem_blacklist:
 
@@ -367,9 +367,9 @@ class LevelSystem(commands.Cog):
 
     # Returns the value True if "on" in the database and False when not
     @staticmethod
-    def check_level_system_status(guild_id:int):
+    async def check_level_system_status(guild_id:int):
 
-        levelsystem_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
+        levelsystem_status = await DatabaseCheck.check_level_settings(guild_id=guild_id)
         # Anpassen das es auch überprüft ob voice und so an ist!
         if levelsystem_status:
 
@@ -405,7 +405,7 @@ class LevelSystem(commands.Cog):
             return 
 
         # Checks the settings and returns false if the level system is disabled and none if no entry was found 
-        check_settings = self.check_level_system_status(guild_id=message.guild.id)
+        check_settings = await self.check_level_system_status(guild_id=message.guild.id)
         
         if check_settings == None:
             await DatabaseUpdates._create_bot_settings(guild_id=message.guild.id)
@@ -415,7 +415,7 @@ class LevelSystem(commands.Cog):
             return
                 
         # Checks the blacklist and returns true if the channel is on the blacklist
-        check_blacklist = self.blacklist_check_text(message_check=message, guild_id=message.guild.id)
+        check_blacklist = await self.blacklist_check_text(message_check=message, guild_id=message.guild.id)
                         
         if isinstance(message.channel, discord.TextChannel):
                     
@@ -424,7 +424,7 @@ class LevelSystem(commands.Cog):
                 try:   
                             
                     # Database check for all values 
-                    check_if_exists = DatabaseCheck.check_level_system_stats(guild_id=message.guild.id, user_id=message.author.id)
+                    check_if_exists = await DatabaseCheck.check_level_system_stats(guild_id=message.guild.id, user_id=message.author.id)
 
                     if check_if_exists:
                                      
@@ -453,14 +453,14 @@ class LevelSystem(commands.Cog):
                             finally:   
 
                                 # Checks if a level role or a level up channel is defined                                
-                                check_level_role = DatabaseCheck.check_level_system_levelroles(guild_id=message.guild.id, needed_level=new_level)
-                                check_level_up_channel = DatabaseCheck.check_level_settings(guild_id=message.guild.id)
+                                check_level_role = await DatabaseCheck.check_level_system_levelroles(guild_id=message.guild.id, needed_level=new_level)
+                                check_level_up_channel = await DatabaseCheck.check_level_settings(guild_id=message.guild.id)
 
                                 if check_level_up_channel[3]:
                                     
                                     channel = bot.get_channel(check_level_up_channel[3])
                             
-                                    await channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
+                                    await channel.send(await level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
 
                                     if check_level_role:
 
@@ -470,7 +470,7 @@ class LevelSystem(commands.Cog):
                                 
                                 else:
 
-                                    await message.channel.send(level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
+                                    await message.channel.send(await level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
 
                                     if check_level_role:
 
@@ -533,7 +533,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+            check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
             if check_stats:
                 
@@ -557,16 +557,16 @@ class LevelSystem(commands.Cog):
                         new_level = user_level + 1
                                             
                         await DatabaseUpdates.update_user_stats_level(guild_id=ctx.guild.id, user_id=user.id, level=new_level, whole_xp=new_whole_xp)
-                        levelup_channel_check = DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
+                        levelup_channel_check = await DatabaseCheck.check_level_settings(guild_id=ctx.guild.id)
 
                         if levelup_channel_check[3] == None:
 
-                            await ctx.send(level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
+                            await ctx.send(await level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
                             
                         else:
                             
                             levelup_channel = bot.get_channel(levelup_channel_check[3])
-                            await levelup_channel.send(level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
+                            await levelup_channel.send(await level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
                 else:
         
                     emb = discord.Embed(description=f"""## The XP you want to give is too high
@@ -586,7 +586,7 @@ class LevelSystem(commands.Cog):
     async def remove_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user from which you want to remove xp"),
         xp:Option(int, description="Specify a quantity of Xp to be removed!")):
             
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+        check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -626,7 +626,7 @@ class LevelSystem(commands.Cog):
     async def give_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user you want to give the levels to"), 
         level:Option(int, description="Specify a set of levels that you want to assign")):
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+        check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -666,7 +666,7 @@ class LevelSystem(commands.Cog):
     async def remove_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user from whom you want to remove the level"), 
         level:Option(int, description="Specify how many levels should be removed")):
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+        check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
         
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -705,7 +705,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_level(self, ctx:discord.ApplicationContext):
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id)
+        check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id)
 
         if check_stats:
 
@@ -727,7 +727,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_user_stats(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user whose stats you want to reset")):
 
-        check_stats = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+        check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
         if check_stats:
 
@@ -760,7 +760,7 @@ class LevelSystem(commands.Cog):
             {Emojis.dot_emoji} The user was not found, it is possible that no entry has been created yet 
             {Emojis.dot_emoji} Entries for the level system are only created when the user writes in a message and receives XP for it""", color=bot_colour)
 
-        check_user = DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+        check_user = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
         
         if check_user:
 
@@ -948,10 +948,10 @@ class LevelSystem(commands.Cog):
 
         if [x for x in [channel, category, role, user] if x]:
             
-            check_channel = DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=channel.id) if channel != None else False
-            check_category = DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=category.id) if category != None else False
-            checK_role = DatabaseCheck.check_blacklist(guild_id=guild_id, role_id=role.id) if role != None else False
-            check_user = DatabaseCheck.check_blacklist(guild_id=guild_id, user_id=user.id) if user != None else False
+            check_channel = await DatabaseCheck.check_blacklist(guild_id=guild_id, channel_id=channel.id) if channel != None else False
+            check_category = await DatabaseCheck.check_blacklist(guild_id=guild_id, category_id=category.id) if category != None else False
+            checK_role = await DatabaseCheck.check_blacklist(guild_id=guild_id, role_id=role.id) if role != None else False
+            check_user = await DatabaseCheck.check_blacklist(guild_id=guild_id, user_id=user.id) if user != None else False
 
             items = {0:check_channel, 1:check_category, 2:checK_role, 3:check_user}
             items_list = [channel, category, role, user]
@@ -1022,7 +1022,7 @@ class LevelSystem(commands.Cog):
         role:Option(discord.Role, required = False, description="Select a role that you want to exclude from the level system"),
         user:Option(discord.User, required = False, description="Select a user that you want to exclude from the level system")):
 
-        check_blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
+        check_blacklist = await DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
 
         filtered_list = []
         if category != None:
@@ -1085,7 +1085,7 @@ class LevelSystem(commands.Cog):
             {Emojis.dot_emoji} Everything that is on the blacklist is excluded from the level system so you will not receive any XP when you perform an activity
             Here you can see all items that are on the blacklist:
                 
-            {CheckLevelSystem.show_blacklist(guild_id = ctx.guild.id)}""", color=bot_colour)
+            {await CheckLevelSystem.show_blacklist(guild_id = ctx.guild.id)}""", color=bot_colour)
         await ctx.respond(embed=emb)
 
 
@@ -1093,7 +1093,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_blacklist(self, ctx:discord.ApplicationContext):
 
-        blacklist = DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
+        blacklist = await DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
 
         if blacklist:
 
@@ -1121,7 +1121,7 @@ class LevelSystem(commands.Cog):
     async def add_level_role(self, ctx:discord.ApplicationContext, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
         level:Option(int, description = "Enter a level from which this role should be assigned")):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status = "check")
+        level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status = "check")
 
         emb_level_0 = discord.Embed(description=f"""## The level you want to set is 0
             {Emojis.dot_emoji} The level to vest a level role must be at least level **1**
@@ -1157,7 +1157,7 @@ class LevelSystem(commands.Cog):
 
             else:
 
-                check_same = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level)
+                check_same = await DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level)
                     
                 if check_same:
 
@@ -1190,7 +1190,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def remove_level_role(self, ctx:discord.ApplicationContext, role:Option(discord.Role, description="Select a level role that you want to remove")):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id)
+        level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id)
 
         if level_roles:
             
@@ -1203,7 +1203,7 @@ class LevelSystem(commands.Cog):
 
         else:
 
-            level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
+            level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status="level_role")
 
             emb = discord.Embed(description=f"""## This role is not defined as a level role
                 {Emojis.dot_emoji} This role cannot be removed because it is not set as a level role
@@ -1215,7 +1215,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_level_roles(self, ctx:discord.ApplicationContext):
 
-        check_level_roles = DatabaseCheck.check_level_system_levelroles(guild_id = ctx.guild.id)
+        check_level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id = ctx.guild.id)
 
         if check_level_roles:
             
@@ -1236,7 +1236,7 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-level-roles", description = "View all rolls that are available with a level!")
     async def show_level_system_roles(self, ctx:discord.ApplicationContext):
 
-        level_roles = DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status = "level_role")
+        level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, status = "level_role")
         
         if level_roles:
             
@@ -1244,7 +1244,7 @@ class LevelSystem(commands.Cog):
                 {Emojis.dot_emoji} Level roles are always assigned when the user has reached the required level
                 **{Emojis.dot_emoji} Here you can see all currently set level roles:**
                 
-                {CheckLevelSystem.show_level_roles(guild_id = ctx.guild.id)}""", color=bot_colour)
+                {await CheckLevelSystem.show_level_roles(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1261,7 +1261,7 @@ class LevelSystem(commands.Cog):
 
     # Checks how high the bonus percentage should be
     @staticmethod
-    def check_bonus_percentage(guild_id:int, bonus:int = None):
+    async def check_bonus_percentage(guild_id:int, bonus:int = None):
 
         if bonus != 0 and bonus != None:
 
@@ -1269,7 +1269,7 @@ class LevelSystem(commands.Cog):
 
         else:
             
-            percentage = DatabaseCheck.check_level_settings(guild_id=guild_id)
+            percentage = await DatabaseCheck.check_level_settings(guild_id=guild_id)
             bonus_percentage = percentage[5]
         
         return bonus_percentage
@@ -1314,10 +1314,10 @@ class LevelSystem(commands.Cog):
 
         if [x for x in [channel, category, role, user] if x]:
             
-            check_channel = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, channel_id=channel.id) if channel != None else False
-            check_category = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, category_id=category.id) if category != None else False
-            check_role = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, role_id=role.id) if role != None else False
-            check_user = DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, user_id=user.id) if user != None else False
+            check_channel = await DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, channel_id=channel.id) if channel != None else False
+            check_category = await DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, category_id=category.id) if category != None else False
+            check_role = await DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, role_id=role.id) if role != None else False
+            check_user = await DatabaseCheck.check_xp_bonus_list(guild_id=guild_id, user_id=user.id) if user != None else False
 
             items = {0:check_channel, 1:check_category, 2:check_role, 3:check_user}
             items_list = [channel, category, role, user]
@@ -1343,7 +1343,7 @@ class LevelSystem(commands.Cog):
                     formatted_add_items = "\n".join(second_item) if second_item != [] else "> None of these items can be removed from the Bonus XP list as they are not listed there"
                     
                     await DatabaseUpdates.manage_xp_bonus(guild_id=guild_id, operation="add", channel_id=items_dict[0], category_id=items_dict[1], role_id=items_dict[2], user_id=items_dict[3], bonus = bonus)    
-                    server_bonus = DatabaseCheck.check_level_settings(guild_id=guild_id)[5]
+                    server_bonus = await DatabaseCheck.check_level_settings(guild_id=guild_id)[5]
                     emb = discord.Embed(title=f"{Emojis.help_emoji} The following items have been added to the bonus XP list or were already there", 
                         description=f"""### {Emojis.dot_emoji} The following were already on the XP bonus list:
                         {formatted_items}\n### {Emojis.dot_emoji} Newly added:
@@ -1418,7 +1418,7 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "show-bonus-xp-list", description = "Display everything that is on the bonus xp list!")
     async def show_bonus_xp_list(self, ctx:discord.ApplicationContext):
 
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
+        check_list = await DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
 
         if check_list:
 
@@ -1426,7 +1426,7 @@ class LevelSystem(commands.Cog):
                 {Emojis.dot_emoji} All things that are listed on the bonus XP list are rewarded with a percentage of extra XP when activities take place there this can be divided for each item individually
                 **Here you can see everything on the bonus XP list:**
                 
-                {CheckLevelSystem.show_bonus_xp_list(guild_id = ctx.guild.id)}""", color=bot_colour)
+                {await CheckLevelSystem.show_bonus_xp_list(guild_id = ctx.guild.id)}""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1442,7 +1442,7 @@ class LevelSystem(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def reset_bonus_xp_list(self, ctx:discord.ApplicationContext):
 
-        check_list = DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
+        check_list = await DatabaseCheck.check_xp_bonus_list(guild_id=ctx.guild.id)
 
         if check_list:
 
@@ -1450,7 +1450,7 @@ class LevelSystem(commands.Cog):
 
             emb = discord.Embed(description=f"""## The bonus xp list was reset
                 {Emojis.dot_emoji} All channels, users, roles and categories have been deleted from the xp bonus list
-                {Emojis.dot_emoji} So every activity will be rewarded with {self.xp_generator(guild_id=ctx.guild.id, message=None)} XP""", color=bot_colour)
+                {Emojis.dot_emoji} So every activity will be rewarded with {await self.xp_generator(guild_id=ctx.guild.id, message=None)} XP""", color=bot_colour)
             await ctx.respond(embed=emb)
 
         else:
@@ -1509,7 +1509,7 @@ class LevelSystemSetting(discord.ui.View):
 
     async def select_callback(self, select, interaction:discord.Interaction):
         
-        check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+        check_settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
         view = View(timeout=None)
         view.add_item(CancelButton(system = "level system"))
@@ -1597,7 +1597,7 @@ class LevelSystemOnOffSwitch(discord.ui.Button):
         
         if interaction.user.guild_permissions.administrator:
             
-            settings = DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
+            settings = await DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
 
             await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status='on' if settings == 'off' else 'on')
                         
@@ -1702,7 +1702,7 @@ class SetLevelUpChannelSelect(discord.ui.View):
     
     async def callback(self, select, interaction:discord.Interaction):
         
-        settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+        settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
         if interaction.user.guild_permissions.administrator:
 
@@ -1711,8 +1711,8 @@ class SetLevelUpChannelSelect(discord.ui.View):
                 await DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, level_up_channel = select.values[0].id)
                     
                 emb = discord.Embed(
-                    description=f"""## Level up channel has been {f"set " if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "overwritten"}
-                    {Emojis.dot_emoji} You have set <#{select.values[0].id}> as the {"new" if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} level up channel.
+                    description=f"""## Level up channel has been {f"set " if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "overwritten"}
+                    {Emojis.dot_emoji} You have set <#{select.values[0].id}> as the {"new" if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} level up channel.
                     {Emojis.dot_emoji} All level up messages and all notifications for the level roles will be sent to this channel from now on.""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
             
@@ -1786,7 +1786,7 @@ class BonusXpPercentage(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]
+            check_settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]
 
             if check_settings == select.values[0]:
 
@@ -1837,7 +1837,7 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
         if interaction.user.guild_permissions.administrator:
             
-            check_settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]
+            check_settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]
 
             if check_settings == self.children[0].value:
 
@@ -1901,7 +1901,7 @@ class SetXpRate(discord.ui.View):
     
     async def set_xp_rate_selct(self, select, interaction:discord.Interaction):
         
-        check_xp_rate = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]
+        check_xp_rate = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]
 
         if interaction.user.guild_permissions.administrator:
 
@@ -1959,7 +1959,7 @@ class LevelSystemDefault(discord.ui.View):
                 "bonus_xp_percentage":4
             }
 
-            settings = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+            settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
             default_message = 'Oh nice {user} you have a new level, your newlevel is {level}'
 
             settings_list = {"reset":{
@@ -2107,7 +2107,7 @@ class ShowLevelSettingsSelect(discord.ui.View):
 
             if select.values[0] == "show_level_up_channel":
 
-                level_up_channel = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
+                level_up_channel = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
 
                 emb = discord.Embed(description=f"""## Current level up channel
                     {Emojis.dot_emoji} {f'The current level up channel is {level_up_channel}' if level_up_channel != None else 'No level up channel has been set yet'}
@@ -2117,7 +2117,7 @@ class ShowLevelSettingsSelect(discord.ui.View):
 
             elif select.values[0] == "show_level_up_message":
 
-                level_up_message = DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[4]
+                level_up_message = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[4]
 
                 emb = discord.Embed(description=f"""## Current level up message
                     {Emojis.dot_emoji} Currently is:\n{f'`{level_up_message}`' if level_up_message != default_message else f'`{default_message}`'} the level up message.
@@ -2129,7 +2129,7 @@ class ShowLevelSettingsSelect(discord.ui.View):
 
                 emb = discord.Embed(description=f"""## Current XP rate
                     {Emojis.dot_emoji} The XP rate is the amount of XP you receive as a reward per activity
-                    {Emojis.dot_emoji} The current XP rate is {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]} XP per activity
+                    {Emojis.dot_emoji} The current XP rate is {await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]} XP per activity
                     {Emojis.help_emoji} The XP rate can be influenced by the entries on the bonus XP list if activities take place in a channel, category, role or user that is on this list, extra XP will be awarded""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
@@ -2137,13 +2137,13 @@ class ShowLevelSettingsSelect(discord.ui.View):
 
                 emb = discord.Embed(description=f"""## Current bonus XP percentage 
                     {Emojis.dot_emoji} The bonus percentage is the default value of the bonus XP list and is always taken into account if no own is specified
-                    {Emojis.dot_emoji} Currently the bonus XP percentage is {DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]} % more XP per activity as long as the channel, category, role or user is on the bonus XP list""", color=bot_colour)
+                    {Emojis.dot_emoji} Currently the bonus XP percentage is {await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]} % more XP per activity as long as the channel, category, role or user is on the bonus XP list""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
             elif select.values[0] == "show_level_status":
 
                 emb = discord.Embed(description=f"""## Current status of the level system
-                    {Emojis.dot_emoji} The level system is currently {'switched on' if DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 'on' else 'switched off'}
+                    {Emojis.dot_emoji} The level system is currently {'switched on' if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 'on' else 'switched off'}
                     {Emojis.dot_emoji} All activities are rewarded with XP unless the channel, category, role or user is on the blacklist""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
