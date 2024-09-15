@@ -3,6 +3,8 @@ import mysql.connector
 from mysql.connector import pooling
 from utils import *
 import discord
+from queue import Queue
+
 
 #######################  Database connection  #######################
 
@@ -12,23 +14,43 @@ All required data must be included in the .env file
 '''
 class DatabaseSetup():
 
+    max_connections = 20
+    connection_queue = Queue(maxsize=max_connections)
+
     connection_pool = pooling.MySQLConnectionPool(
         pool_name="mypool",
-        pool_size=10,
+        pool_size=max_connections,
         host=os.getenv('host'),
         user=os.getenv('user'),
         password=os.getenv('sql_password'),
         database=os.getenv('discord_db')
     )
 
+
     def db_connector():
-        return DatabaseSetup.connection_pool.get_connection()
+        connection = DatabaseSetup.get_db_connection()
+        DatabaseSetup.connection_queue.put(connection)
+        return connection
+
 
     def db_close(cursor, db_connection):
 
         if db_connection.is_connected():
-            cursor.close()
+            
+            DatabaseSetup.connection_queue.get()
             db_connection.close()
+
+    @classmethod
+    def get_db_connection(cls):
+
+        while True:
+
+            try:
+                return cls.connection_pool.get_connection()
+
+            except Exception as e:
+                print("Waiting for a free connection...")
+                asyncio.sleep(2)
 
 
 
@@ -561,6 +583,7 @@ class DatabaseCheck():
         cursor.execute(check_users, check_users_values)
         leaderbaord_user_roles = cursor.fetchall()
 
+        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return leaderbaord_user_roles
     
 
@@ -608,6 +631,7 @@ class DatabaseCheck():
         else:
             invite_code_check = cursor.fetchall()
 
+        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return invite_code_check
     
 
@@ -677,6 +701,7 @@ class DatabaseCheck():
         else:
             auto_react_settings = cursor.fetchall()
 
+            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return auto_react_settings
 
 
