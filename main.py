@@ -275,42 +275,7 @@ class Main(commands.Cog):
 
             LeaderboardSystem.edit_leaderboard_message.start()
 
-
-    @commands.Cog.listener()
-    async def on_error(event, *args, **kwargs):
-        logging.error(f"An error occurred in event {event}: {args} {kwargs}", exc_info=True)
-
-
-    @tasks.loop(seconds=60)
-    async def monitor_bot_status(self):
-
-        try:
-
-            if bot.is_closed():
-                logging.warning("Bot is not connected. Attempting to reconnect...")
-                await self.restart_bot()
-            else:
-                logging.info("Bot is running fine.")
-
-        except Exception as e:
-            logging.error(f"Error in monitor_bot_status: {e}")
-            await self.restart_bot()
-
-
-    async def restart_bot():
-
-        try:
-            logging.info("Restarting bot...")
-            
-            await bot.close()
-
-            await asyncio.sleep(5)
-
-            bot.run(os.getenv("TOKEN"))
-
-        except Exception as e:
-            logging.error(f"Failed to restart bot: {e}")
-
+    
     
 
 logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='w',
@@ -357,5 +322,4 @@ if __name__ == "__main__":
     except Exception as e:
 
         logging.error(f"Bot crashed with error: {e}")
-        asyncio.run(Main.restart_bot())
 

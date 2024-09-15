@@ -1,5 +1,6 @@
 import os
 import mysql.connector
+from mysql.connector import pooling
 from utils import *
 import discord
 
@@ -11,20 +12,23 @@ All required data must be included in the .env file
 '''
 class DatabaseSetup():
 
-    def db_connector():
+    connection_pool = pooling.MySQLConnectionPool(
+        pool_name="mypool",
+        pool_size=10,
+        host=os.getenv('host'),
+        user=os.getenv('user'),
+        password=os.getenv('sql_password'),
+        database=os.getenv('discord_db')
+    )
 
-        db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
-        return db_connector
+    def db_connector():
+        return DatabaseSetup.connection_pool.get_connection()
 
     def db_close(cursor, db_connection):
 
         if db_connection.is_connected():
-            
-            db_connection.close()
             cursor.close()
-
-        else:
-            pass
+            db_connection.close()
 
 
 
