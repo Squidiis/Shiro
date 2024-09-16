@@ -431,7 +431,7 @@ class LevelSystem(commands.Cog):
                         if check_if_exists[2] >= 999:
                             return
 
-                        XP = self.xp_generator(guild_id=message.guild.id, message=message)
+                        XP = await self.xp_generator(guild_id=message.guild.id, message=message)
                     
                         user_has_xp = check_if_exists[3] + XP 
                         whole_xp = check_if_exists[6] + XP                     
@@ -447,7 +447,7 @@ class LevelSystem(commands.Cog):
                                 # Updates the XP
                                 await DatabaseUpdates.update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, level=new_level, whole_xp=whole_xp)
 
-                            except mysql.connector.Error as error:
+                            except aiomysql.Error as error:
                                 print("parameterized query failed {}".format(error))
                                                                     
                             finally:   
@@ -484,14 +484,14 @@ class LevelSystem(commands.Cog):
 
                                 await DatabaseUpdates.update_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, xp=user_has_xp, whole_xp=whole_xp)                       
 
-                            except mysql.connector.Error as error:
+                            except aiomysql.Error as error:
                                 print("parameterized query failed {}".format(error))
 
                     else:
                             
                         await DatabaseUpdates.insert_user_stats_level(guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name)
 
-                except mysql.connector.Error as error:
+                except aiomysql.Error as error:
                     print("parameterized query failed {}".format(error))
    
 
@@ -748,134 +748,143 @@ class LevelSystem(commands.Cog):
     @commands.slash_command(name = "rank", description = "Shows you the rank of a user in the level system!")
     async def rank(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Look at the rank of others!")):
 
-        count = 0
-        rank = 0
-        connection_to_db_level = DatabaseSetup.db_connector()
-        my_cursor = connection_to_db_level.cursor()
+        try:
 
-        with open("config.yaml", 'r') as f:
-            background_color = tuple(yaml.safe_load(f)["Rank_card_colour"])
-        
-        error_emb = discord.Embed(description=f"""## The user was not found
-            {Emojis.dot_emoji} The user was not found, it is possible that no entry has been created yet 
-            {Emojis.dot_emoji} Entries for the level system are only created when the user writes in a message and receives XP for it""", color=bot_colour)
+            count = 0
+            rank = 0
+            connection_to_db_level = await DatabaseSetup.db_connector()
+            my_cursor = await connection_to_db_level.cursor()
 
-        check_user = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
-        
-        if check_user:
+            with open("config.yaml", 'r') as f:
+                background_color = tuple(yaml.safe_load(f)["Rank_card_colour"])
+            
+            error_emb = discord.Embed(description=f"""## The user was not found
+                {Emojis.dot_emoji} The user was not found, it is possible that no entry has been created yet 
+                {Emojis.dot_emoji} Entries for the level system are only created when the user writes in a message and receives XP for it""", color=bot_colour)
 
-            rank_show_infos_level = "SELECT * FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC, userXp DESC"
-            rank_show_infos_levels_values = [ctx.guild.id]
-            my_cursor.execute(rank_show_infos_level, rank_show_infos_levels_values)
-            all_info = my_cursor.fetchall()
-          
-            for _, user_id_rank, _, _, _, _, _ in all_info:
+            check_user = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
+
+            if check_user:
+
+                rank_show_infos_level = "SELECT * FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC, userXp DESC"
+                rank_show_infos_levels_values = [ctx.guild.id]
+                await my_cursor.execute(rank_show_infos_level, rank_show_infos_levels_values)
+                all_info = await my_cursor.fetchall()
+            
+                for _, user_id_rank, _, _, _, _, _ in all_info:
+                        
+                    if user.id == user_id_rank:
                     
-                if user.id == user_id_rank:
+                        for rank_count in all_info:
+
+                            count = count + 1
+                                                                
+                            if user.id == rank_count[1]:
+
+                                rank = count 
+                            
+                xp = check_user[3]
+            
+                xp_needed = 5 * (check_user[2] ^ 2) + (50 * check_user[2]) + 100 - check_user[3]
+                final_xp = xp_needed + xp
+                xp_have = check_user[3]
+
+                # Create card
+                big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
+                small_font = ImageFont.truetype("assets/rank-card/arial.ttf", 24)
+
+                background = Image.new("RGBA", (885, 303), color=background_color)
+                new_background = self.round_corner_mask(radius=50, rectangle=background, fill=255)
+                background.paste(new_background[0], (0, 0), new_background[1])
                 
-                    for rank_count in all_info:
-
-                        count = count + 1
-                                                            
-                        if user.id == rank_count[1]:
-
-                            rank = count 
-                           
-            xp = check_user[3]
-        
-            xp_needed = 5 * (check_user[2] ^ 2) + (50 * check_user[2]) + 100 - check_user[3]
-            final_xp = xp_needed + xp
-            xp_have = check_user[3]
-
-            # Create card
-            big_font = ImageFont.FreeTypeFont("assets/rank-card/ABeeZee-Regular.otf", 58)
-            small_font = ImageFont.truetype("assets/rank-card/arial.ttf", 24)
-
-            background = Image.new("RGBA", (885, 303), color=background_color)
-            new_background = self.round_corner_mask(radius=50, rectangle=background, fill=255)
-            background.paste(new_background[0], (0, 0), new_background[1])
-            
-            img = Image.open("assets/rank-card/card2.png").resize((867, 285))
-            filtered_image = img.filter(ImageFilter.BoxBlur(4))
-            new_img = self.round_corner_mask(radius=50, rectangle=filtered_image, fill=255)
-            background.paste(new_img[0], (9, 9), mask=new_img[1])
-            
-            # Get the profile picture and set it on the background
-            pfp = BytesIO(await user.display_avatar.read())
-            profile = Image.open(pfp).resize((225, 225))
-            bigsize = (profile.size[0] * 3, profile.size[1] * 3)
-            mask = Image.new("L", bigsize, 0)
-            draw = ImageDraw.Draw(mask)
-            draw.ellipse((0, 0)+ bigsize, 255)
-            mask = mask.resize(profile.size, Image.LANCZOS)
-            profile.putalpha(mask)
-            
-            background.paste(profile, (47, 39), mask=mask)
-            
-            draw = ImageDraw.Draw(background)
-            
-            bar_offset_x = 304
-            bar_offset_y = 155
-        
-            bar = Image.new('RGBA', (545, 36), (0, 0, 0))
-            bar = self.round_corner_mask(radius=50, rectangle=bar, fill=160)
-            background.paste(bar[0], (bar_offset_x, bar_offset_y), bar[1])
-
-            # Filling Bar
-            bar_length = 849 - bar_offset_x
-            progress = (final_xp - xp_have) * 100 / final_xp
-            progress = 100 - progress
-            progress_bar_length = round(bar_length * progress / 100)
-            bar_offset_x_1 = bar_offset_x + progress_bar_length
-           
-            # Progress Bar
-            if xp != 0:
+                img = Image.open("assets/rank-card/card2.png").resize((867, 285))
+                filtered_image = img.filter(ImageFilter.BoxBlur(4))
+                new_img = self.round_corner_mask(radius=50, rectangle=filtered_image, fill=255)
+                background.paste(new_img[0], (9, 9), mask=new_img[1])
                 
-                progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
-                progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255) 
-                background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
-
-            xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
-            xp_display_line = self.round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
-            offset_y = 200
-            background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
-
-            # Displays the level of the user
-            data_display = Image.new(mode="RGBA", size=(196, 33), color=(0, 0, 0))
-            data_display = self.round_corner_mask(radius=50, rectangle=data_display, fill=160)
-            background.paste(data_display[0], (655, offset_y), data_display[1])
-
-            total_xp_display = Image.new(mode="RGBA", size=(547, 33), color=(0, 0, 0))
-            total_xp_display = self.round_corner_mask(radius=50, rectangle=total_xp_display, fill=160)
-            background.paste(total_xp_display[0], (304, (offset_y + 46)), total_xp_display[1])
-
-            draw.text((304, 75), user.name, font=big_font, fill=(255, 255, 255))
-            draw.text((315, (offset_y + 2)), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
-            draw.text((665, (offset_y + 1)), f"#{rank} Lvl {check_user[2]}", font=small_font, fill=(255, 255, 255))
-            draw.text((315, (offset_y + 48)), f"total: {check_user[6]:,} XP", font=small_font, fill=(255, 255, 255))
-
-            bytes = BytesIO()
-            background.save(bytes, format="PNG")
-            bytes.seek(0)
-            dfile = discord.File(bytes, filename="card.png")
+                # Get the profile picture and set it on the background
+                pfp = BytesIO(await user.display_avatar.read())
+                profile = Image.open(pfp).resize((225, 225))
+                bigsize = (profile.size[0] * 3, profile.size[1] * 3)
+                mask = Image.new("L", bigsize, 0)
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0)+ bigsize, 255)
+                mask = mask.resize(profile.size, Image.LANCZOS)
+                profile.putalpha(mask)
+                
+                background.paste(profile, (47, 39), mask=mask)
+                
+                draw = ImageDraw.Draw(background)
+                
+                bar_offset_x = 304
+                bar_offset_y = 155
             
-            await ctx.respond(file=dfile)
+                bar = Image.new('RGBA', (545, 36), (0, 0, 0))
+                bar = self.round_corner_mask(radius=50, rectangle=bar, fill=160)
+                background.paste(bar[0], (bar_offset_x, bar_offset_y), bar[1])
 
-        else:
+                # Filling Bar
+                bar_length = 849 - bar_offset_x
+                progress = (final_xp - xp_have) * 100 / final_xp
+                progress = 100 - progress
+                progress_bar_length = round(bar_length * progress / 100)
+                bar_offset_x_1 = bar_offset_x + progress_bar_length
+            
+                # Progress Bar
+                if xp != 0:
+                    
+                    progress_bar = Image.new("RGBA", ((bar_offset_x_1 - bar_offset_x), 36), background_color)
+                    progress_bar = self.round_corner_mask(radius=50, rectangle=progress_bar, fill=255) 
+                    background.paste(progress_bar[0], (bar_offset_x, bar_offset_y), progress_bar[1])
 
-            await ctx.respond(embed=error_emb)
+                xp_display_line = Image.new(mode="RGBA", size=(340, 33), color=(0, 0, 0))
+                xp_display_line = self.round_corner_mask(radius=50, rectangle=xp_display_line, fill=160)
+                offset_y = 200
+                background.paste(xp_display_line[0], (304, offset_y), xp_display_line[1])
+
+                # Displays the level of the user
+                data_display = Image.new(mode="RGBA", size=(196, 33), color=(0, 0, 0))
+                data_display = self.round_corner_mask(radius=50, rectangle=data_display, fill=160)
+                background.paste(data_display[0], (655, offset_y), data_display[1])
+
+                total_xp_display = Image.new(mode="RGBA", size=(547, 33), color=(0, 0, 0))
+                total_xp_display = self.round_corner_mask(radius=50, rectangle=total_xp_display, fill=160)
+                background.paste(total_xp_display[0], (304, (offset_y + 46)), total_xp_display[1])
+
+                draw.text((304, 75), user.name, font=big_font, fill=(255, 255, 255))
+                draw.text((315, (offset_y + 2)), f"{xp_have:,} / {final_xp:,} XP", font=small_font, fill=(255, 255, 255))
+                draw.text((665, (offset_y + 1)), f"#{rank} Lvl {check_user[2]}", font=small_font, fill=(255, 255, 255))
+                draw.text((315, (offset_y + 48)), f"total: {check_user[6]:,} XP", font=small_font, fill=(255, 255, 255))
+
+                bytes = BytesIO()
+                background.save(bytes, format="PNG")
+                bytes.seek(0)
+                dfile = discord.File(bytes, filename="card.png")
+                
+                await ctx.respond(file=dfile)
+
+            else:
+
+                await ctx.respond(embed=error_emb)
+
+        except Exception  as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            await DatabaseSetup.db_close(cursor=my_cursor, db_connection=connection_to_db_level)
 
 
     @commands.slash_command(name = "leaderboard-level", description = "Shows the highest ranks in the lavel system!")
     async def leaderboard(self, ctx:discord.ApplicationContext):
 
-        leaderboard_connect = DatabaseSetup.db_connector()
-        my_cursor = leaderboard_connect.cursor()
+        leaderboard_connect = await DatabaseSetup.db_connector()
+        my_cursor = await leaderboard_connect.cursor()
 
         leaderboard_levels = "SELECT userName, userLevel, userXp FROM LevelSystemStats WHERE guildId = %s ORDER BY userLevel DESC, userXp DESC"
         leaderboard_levels_values = [ctx.guild.id]
-        my_cursor.execute(leaderboard_levels, leaderboard_levels_values)
-        leaderboard_members =  my_cursor.fetchall()
+        await my_cursor.execute(leaderboard_levels, leaderboard_levels_values)
+        leaderboard_members = await my_cursor.fetchall()
         
         max_lengths = [
         max(len(str(t[i])) for t in leaderboard_members)
@@ -900,7 +909,8 @@ class LevelSystem(commands.Cog):
                 num_str = f" #{num_str} "
             
             leaderboard.append(f"""`{num_str}` `{padded_tuples[i][0]}` `lvl {padded_tuples[i][1]}` `XP {padded_tuples[i][2]}`\n""")
-        DatabaseSetup.db_close(cursor=my_cursor, db_connection=leaderboard_connect)
+
+        await DatabaseSetup.db_close(cursor=my_cursor, db_connection=leaderboard_connect)
 
         emb = discord.Embed(title="Leaderboard", description=f"{''.join(leaderboard)}", color=bot_colour)
         emb.set_footer(icon_url=ctx.guild.icon.url, text="These are the most active users of this server")

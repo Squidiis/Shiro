@@ -1,7 +1,7 @@
-import mysql.connector
 from discord.ext import commands
 import discord
 from sql_function import DatabaseCheck, DatabaseRemoveDatas, DatabaseSetup
+import aiomysql
 
 
 
@@ -31,15 +31,25 @@ class DeleteData(commands.Cog):
     Info:
         - If the bot itself is kicked from the server, all entries are deleted
     '''
-    def delete_data(table:str, column:str, item):
+    async def delete_data(table:str, column:str, item):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
-        delete_datas = f"DELETE FROM {table} WHERE guildId = %s AND {column} = %s" if column != 'guildId' else f'DELETE FROM {table} WHERE guildId = %s'
-        delete_datas_values = [item.guild.id, item.id] if column != 'guildId' else [item.id]
-        cursor.execute(delete_datas, delete_datas_values)
-        db_connect.commit() 
+        try:
+
+            delete_datas = f"DELETE FROM {table} WHERE guildId = %s AND {column} = %s" if column != 'guildId' else f'DELETE FROM {table} WHERE guildId = %s'
+            delete_datas_values = [item.guild.id, item.id] if column != 'guildId' else [item.id]
+            await cursor.execute(delete_datas, delete_datas_values)
+            await db_connect.commit() 
+
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
 
 
     # Deletes all data when the bot is kicked from the server 
@@ -64,7 +74,7 @@ class DeleteData(commands.Cog):
 
         for table in tables:
 
-            DeleteData.delete_data(table=table, column='guildId', item=guild)
+            await DeleteData.delete_data(table=table, column='guildId', item=guild)
 
 
     # Deletes all data when the user leaves the server 
@@ -86,7 +96,7 @@ class DeleteData(commands.Cog):
             
             for table in tables:
 
-                DeleteData.delete_data(table=table, column='userId', item=member)   
+                await DeleteData.delete_data(table=table, column='userId', item=member)   
 
 
     # Deletes the entries of a channel when it is deleted
@@ -104,7 +114,7 @@ class DeleteData(commands.Cog):
         for table in tables:
             
             column = "channelId" if table != "LevelSystemSettings" else "levelUpChannel"
-            DeleteData.delete_data(table=table, column=column, item=channel)
+            await DeleteData.delete_data(table=table, column=column, item=channel)
 
 
     # Deletes the entries of a role when it is deleted
@@ -122,7 +132,7 @@ class DeleteData(commands.Cog):
         
         for table in tables:
 
-            DeleteData.delete_data(table=table, column='roleId', item=role)
+            await DeleteData.delete_data(table=table, column='roleId', item=role)
 
     
 def setup(bot):

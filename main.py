@@ -26,8 +26,8 @@ class Main(commands.Cog):
     # Creates all important tables for the bot 
     async def create_db_table():
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         tables = [
             # Level system tables
@@ -178,10 +178,10 @@ class Main(commands.Cog):
         try:
 
             for table in tables:
-                cursor.execute(table)
-                db_connect.commit()
+                await cursor.execute(table)
+                await db_connect.commit()
         
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
 
@@ -254,29 +254,11 @@ class Main(commands.Cog):
     async def ping(self, ctx):
         await ctx.respond(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
-    
-    @commands.Cog.listener()
-    async def on_disconnect():
-        print("Bot has lost the connection.")
-        LeaderboardSystem.edit_leaderboard_invite.stop()
-        LeaderboardSystem.edit_leaderboard_message.stop()
-        
 
     @commands.Cog.listener()
-    async def on_resumed(self):
-            
-        print("Connection restored.")
-        
-        if not LeaderboardSystem.edit_leaderboard_invite.is_running():
+    async def on_error(event, *args, **kwargs):
+        logging.error(f"An error occurred in event {event}: {args} {kwargs}", exc_info=True)
 
-            LeaderboardSystem.edit_leaderboard_invite.start()
-
-        if not LeaderboardSystem.edit_leaderboard_message.is_running():
-
-            LeaderboardSystem.edit_leaderboard_message.start()
-
-    
-    
 
 logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='w',
     format='%(asctime)s - %(levelname)s - %(message)s')

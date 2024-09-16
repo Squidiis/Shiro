@@ -1,10 +1,8 @@
 import os
-import mysql.connector
-from mysql.connector import pooling
 from utils import *
 import discord
 from queue import Queue
-
+import aiomysql
 
 #######################  Database connection  #######################
 
@@ -14,43 +12,23 @@ All required data must be included in the .env file
 '''
 class DatabaseSetup():
 
-    max_connections = 20
-    connection_queue = Queue(maxsize=max_connections)
-
-    connection_pool = pooling.MySQLConnectionPool(
-        pool_name="mypool",
-        pool_size=max_connections,
-        host=os.getenv('host'),
-        user=os.getenv('user'),
-        password=os.getenv('sql_password'),
-        database=os.getenv('discord_db')
-    )
 
 
-    def db_connector():
-        connection = DatabaseSetup.get_db_connection()
-        DatabaseSetup.connection_queue.put(connection)
+    async def db_connector():
+
+        connection = await aiomysql.connect(host='db2.sillydevelopment.co.uk',
+        user='u12596_MeyIAVJibL',
+        password='ThyXCtxNmg4qKVAKm!@T2u7Y',
+        db='s12596_shiro_db')
+        
         return connection
 
 
-    def db_close(cursor, db_connection):
+    async def db_close(cursor, db_connection):
+    
+        await cursor.close()
+        db_connection.close()
 
-        if db_connection.is_connected():
-            
-            DatabaseSetup.connection_queue.get()
-            db_connection.close()
-
-    @classmethod
-    def get_db_connection(cls):
-
-        while True:
-
-            try:
-                return cls.connection_pool.get_connection()
-
-            except Exception as e:
-                print("Waiting for a free connection...")
-                asyncio.sleep(2)
 
 
 
@@ -92,8 +70,8 @@ class DatabaseCheck():
         user_id:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
@@ -112,15 +90,15 @@ class DatabaseCheck():
                     check_blacklist = f"SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name[count]} = %s"
                     check_blacklist_values = [guild_id, all_items[count]]
 
-        cursor.execute(check_blacklist, check_blacklist_values)
+        await cursor.execute(check_blacklist, check_blacklist_values)
         
         if all(x is None for x in all_items):
-            blacklist = cursor.fetchall()
+            blacklist = await cursor.fetchall()
         
         else:
-            blacklist = cursor.fetchone()
+            blacklist = await cursor.fetchone()
             
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return blacklist
  
     
@@ -140,8 +118,8 @@ class DatabaseCheck():
     '''
     async def check_level_system_stats(guild_id:int, user_id:int = None):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         if user_id != None:
 
@@ -153,14 +131,14 @@ class DatabaseCheck():
             levelsys_stats_check = "SELECT * FROM LevelSystemStats WHERE guildId = %s"
             levelsys_stats_check_values = [guild_id]
 
-        cursor.execute(levelsys_stats_check, levelsys_stats_check_values)
+        await cursor.execute(levelsys_stats_check, levelsys_stats_check_values)
 
         if user_id != None:
-            levelsys_stats = cursor.fetchone()
+            levelsys_stats = await cursor.fetchone()
         else:
-            levelsys_stats = cursor.fetchall()
+            levelsys_stats = await cursor.fetchall()
 
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return levelsys_stats
     
     
@@ -195,8 +173,8 @@ class DatabaseCheck():
         needed_level:int = None, 
         status:str = None):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         if level_role != None and needed_level != None and status == None:
 
@@ -228,14 +206,14 @@ class DatabaseCheck():
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s"
             levelsys_levelroles_check_values = [guild_id]
 
-        cursor.execute(levelsys_levelroles_check, levelsys_levelroles_check_values)
+        await cursor.execute(levelsys_levelroles_check, levelsys_levelroles_check_values)
 
         if level_role == None and needed_level == None:
-            levelsys_levelroles = cursor.fetchall()
+            levelsys_levelroles = await cursor.fetchall()
         else:
-            levelsys_levelroles = cursor.fetchone()
+            levelsys_levelroles = await cursor.fetchone()
 
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return levelsys_levelroles
     
 
@@ -269,8 +247,8 @@ class DatabaseCheck():
         user_id:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
@@ -289,15 +267,15 @@ class DatabaseCheck():
                     check_xp_bonus_list = f"SELECT * FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
                     check_xp_bonus_list_values = [guild_id, all_items[count]]
 
-        cursor.execute(check_xp_bonus_list, check_xp_bonus_list_values)
+        await cursor.execute(check_xp_bonus_list, check_xp_bonus_list_values)
         
         if all(x is None for x in all_items):
-            xp_bonus_list = cursor.fetchall()
+            xp_bonus_list = await cursor.fetchall()
         
         else:
-            xp_bonus_list = cursor.fetchone()
+            xp_bonus_list = await cursor.fetchone()
             
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return xp_bonus_list
     
 
@@ -314,15 +292,15 @@ class DatabaseCheck():
     '''
     async def check_level_settings(guild_id:int):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         level_settings_check = "SELECT * FROM LevelSystemSettings WHERE guildId = %s"
         level_settings_check_values = [guild_id]
-        cursor.execute(level_settings_check, level_settings_check_values)
-        level_system_settings = cursor.fetchone()
+        await cursor.execute(level_settings_check, level_settings_check_values)
+        level_system_settings = await cursor.fetchone()
 
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return level_system_settings
     
 
@@ -355,8 +333,8 @@ class DatabaseCheck():
         user_id:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
@@ -375,15 +353,15 @@ class DatabaseCheck():
                     check_white_list = f"SELECT * FROM AntiLinkWhiteList WHERE guildId = %s AND {column_name[count]} = %s"
                     check_white_list_values = [guild_id, all_items[count]]
 
-        cursor.execute(check_white_list, check_white_list_values)
+        await cursor.execute(check_white_list, check_white_list_values)
         
         if all(x is None for x in all_items):
-            white_list = cursor.fetchall()
+            white_list = await cursor.fetchall()
         
         else:
-            white_list = cursor.fetchone()
+            white_list = await cursor.fetchone()
             
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return white_list
 
 
@@ -400,16 +378,16 @@ class DatabaseCheck():
     '''
     async def check_leaderboard_settings(guild_id:int, system:str = None):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         check_settings = f"SELECT * FROM {'LeaderboardSettingsMessage' if system == 'message' else 'LeaderboardSettingsInvite'} WHERE guildId = %s"
         check_settings_values = [guild_id]
-        cursor.execute(check_settings, check_settings_values)
+        await cursor.execute(check_settings, check_settings_values)
 
-        leaderboard_settings = cursor.fetchone()
+        leaderboard_settings = await cursor.fetchone()
 
-        DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+        await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
         return leaderboard_settings
     
 
@@ -441,8 +419,8 @@ class DatabaseCheck():
         interval:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         column_name = [
             "dailyCountMessage", "weeklyCountMessage", "monthlyCountMessage", "wholeCountMessage"
@@ -459,14 +437,14 @@ class DatabaseCheck():
             check_leaderboard_count = f"SELECT * FROM LeaderboardTacking WHERE guildId = %s AND userId = %s"
             check_leaderboard_count_values = [guild_id, user_id]
 
-        cursor.execute(check_leaderboard_count, check_leaderboard_count_values)
+        await cursor.execute(check_leaderboard_count, check_leaderboard_count_values)
 
         if interval != None:
-            leaderboard = cursor.fetchall()
+            leaderboard = await cursor.fetchall()
         else:
-            leaderboard = cursor.fetchone()
+            leaderboard = await cursor.fetchone()
 
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return leaderboard
     
 
@@ -511,8 +489,8 @@ class DatabaseCheck():
         interval:str = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         check = False
         if role_id != None and position != None:
@@ -541,13 +519,14 @@ class DatabaseCheck():
             check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s AND status = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
             check_roles_values = [guild_id, system] if interval == None else [guild_id, system, interval]
 
-        cursor.execute(check_roles, check_roles_values)
+        await cursor.execute(check_roles, check_roles_values)
+
         if role_id == None and position == None or check == True:
-            leaderboard_roles = cursor.fetchall()
+            leaderboard_roles = await cursor.fetchall()
         else:
-            leaderboard_roles = cursor.fetchone()
+            leaderboard_roles = await cursor.fetchone()
         
-        DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+        await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
         return leaderboard_roles
     
 
@@ -574,16 +553,16 @@ class DatabaseCheck():
     '''
     async def check_leaderboard_roles_users(guild_id:int, interval:str, status:str):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         check_users = "SELECT * FROM LeaderboardGivenRoles WHERE guildId = %s AND roleInterval = %s AND status = %s"
         check_users_values = [guild_id, interval, status]
 
-        cursor.execute(check_users, check_users_values)
-        leaderbaord_user_roles = cursor.fetchall()
+        await cursor.execute(check_users, check_users_values)
+        leaderbaord_user_roles = await cursor.fetchall()
 
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return leaderbaord_user_roles
     
 
@@ -611,8 +590,8 @@ class DatabaseCheck():
         remove_value:str = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         if invite_code:
 
@@ -624,14 +603,14 @@ class DatabaseCheck():
             check_invite = f"SELECT {'*' if remove_value == None else 'inviteCode'} FROM LeaderboardInviteTracking WHERE guildId = %s"
             check_invite_values = [guild_id]
         
-        cursor.execute(check_invite, check_invite_values)
+        await cursor.execute(check_invite, check_invite_values)
 
         if invite_code:
-            invite_code_check = cursor.fetchone()
+            invite_code_check = await cursor.fetchone()
         else:
-            invite_code_check = cursor.fetchall()
+            invite_code_check = await cursor.fetchall()
 
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return invite_code_check
     
 
@@ -666,8 +645,8 @@ class DatabaseCheck():
         emoji:str = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         column_name = ["channelId", "categoryId", "parameter", "emoji"]
         column_value = [channel_id, category_id, parameter, emoji]
@@ -694,14 +673,14 @@ class DatabaseCheck():
                 check_autoreact = f"SELECT * FROM AutoReactions WHERE guildId = %s"
                 check_autoreact_values = [guild_id] 
 
-        cursor.execute(check_autoreact, check_autoreact_values)
+        await cursor.execute(check_autoreact, check_autoreact_values)
 
         if check == True:
-            auto_react_settings = cursor.fetchone()
+            auto_react_settings = await cursor.fetchone()
         else:
-            auto_react_settings = cursor.fetchall()
+            auto_react_settings = await cursor.fetchall()
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return auto_react_settings
 
 
@@ -717,15 +696,15 @@ class DatabaseCheck():
     '''
     async def check_bot_settings(guild_id:int):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         bot_settings_check = "SELECT * FROM BotSettings WHERE guildId = %s"
         bot_settings_check_values = [guild_id]
-        cursor.execute(bot_settings_check, bot_settings_check_values)
-        bot_settings = cursor.fetchone()
+        await cursor.execute(bot_settings_check, bot_settings_check_values)
+        bot_settings = await cursor.fetchone()
 
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return bot_settings
     
 
@@ -760,8 +739,8 @@ class DatabaseUpdates():
     '''
     async def _create_bot_settings(guild_id:int):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         sql_tables = ["BotSettings", "LevelSystemSettings"]
 
@@ -771,15 +750,15 @@ class DatabaseUpdates():
 
                 creat_bot_settings = f"INSERT INTO {table} (guildId) VALUES (%s)"
                 creat_bot_settings_values = [guild_id]
-                cursor.execute(creat_bot_settings, creat_bot_settings_values)
-                db_connect.commit()
+                await cursor.execute(creat_bot_settings, creat_bot_settings_values)
+                await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
            print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -824,8 +803,8 @@ class DatabaseUpdates():
         back_to_none:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         column_name = ["botColour", "ghostPing", "antiLink", "antiLinkTimeout", "autoReaction"]
         items = [bot_colour, ghost_ping, antilink, antilink_timeout, auto_reaction]
@@ -840,22 +819,22 @@ class DatabaseUpdates():
 
                         update_settings = f'UPDATE BotSettings SET {column_name[count]} = %s{f", antiLinkTimeout = {antilink_timeout}" if antilink_timeout != None else ""} WHERE guildId = %s'
                         update_settings_values = (items[count], guild_id)
-                        cursor.execute(update_settings, update_settings_values)
-                        db_connect.commit()
+                        await cursor.execute(update_settings, update_settings_values)
+                        await db_connect.commit()
 
             else:
 
                 update_settings = f'UPDATE BotSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s'
                 update_settings_values = [guild_id]
-                cursor.execute(update_settings, update_settings_values)
-                db_connect.commit()
+                await cursor.execute(update_settings, update_settings_values)
+                await db_connect.commit()
             
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print('parameterized query failed {}'.format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -892,8 +871,8 @@ class DatabaseUpdates():
         user_id:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
@@ -916,23 +895,23 @@ class DatabaseUpdates():
                             white_list = f"DELETE FROM AntiLinkWhiteList WHERE guildId = %s AND {column_name[count]} = %s"
                             white_list_values = [guild_id, items[count]]
 
-                        cursor.execute(white_list, white_list_values)
-                        db_connect.commit()
+                        await cursor.execute(white_list, white_list_values)
+                        await db_connect.commit()
 
             elif operation == "reset":
                 
                 white_list = f"DELETE FROM AntiLinkWhiteList WHERE guildId = %s"
                 white_list_values = [guild_id]
 
-                cursor.execute(white_list, white_list_values)
-                db_connect.commit()
+                await cursor.execute(white_list, white_list_values)
+                await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
 
@@ -970,22 +949,22 @@ class DatabaseUpdates():
         whole_xp:int = 0
         ):
     
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
             insert_new_user = "INSERT INTO LevelSystemStats (guildId, userId, userLevel, userXp, userName, wholeXp) VALUES (%s, %s, %s, %s, %s, %s)"        
             insert_new_user_values = [guild_id, user_id, user_level, user_xp, user_name, whole_xp]
-            cursor.execute(insert_new_user, insert_new_user_values)
-            db_connect.commit()
+            await cursor.execute(insert_new_user, insert_new_user_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
     
 
     '''
@@ -1009,22 +988,22 @@ class DatabaseUpdates():
         level:int
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
             insert_level_role = "INSERT INTO LevelSystemRoles (guildId, roleId, roleLevel) VALUES (%s, %s, %s)"
             insert_level_role_values = [guild_id, role_id, level]
-            cursor.execute(insert_level_role, insert_level_role_values)
-            db_connect.commit()
+            await cursor.execute(insert_level_role, insert_level_role_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         
 
     '''
@@ -1061,8 +1040,8 @@ class DatabaseUpdates():
         user_id:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
@@ -1085,23 +1064,23 @@ class DatabaseUpdates():
                             level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name[count]} = %s"
                             level_sys_blacklist_values = [guild_id, items[count]]
 
-                        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-                        db_connect.commit()
+                        await cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
+                        await db_connect.commit()
 
             elif operation == "reset":
                 
                 level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
                 level_sys_blacklist_values = [guild_id]
         
-                cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-                db_connect.commit()
+                await cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
+                await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     
     '''
@@ -1144,8 +1123,8 @@ class DatabaseUpdates():
         back_to_none:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         column_name = ["xpRate", "levelStatus", "levelUpChannel", "levelUpMessage","bonusXpPercentage"]
         items = [xp_rate, level_status, level_up_channel, level_up_message, percentage]
@@ -1160,22 +1139,22 @@ class DatabaseUpdates():
 
                         update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
                         update_settings_values = (items[count], guild_id)
-                        cursor.execute(update_settings, update_settings_values)
-                        db_connect.commit()
+                        await cursor.execute(update_settings, update_settings_values)
+                        await db_connect.commit()
 
             else:
 
                 update_settings = f"UPDATE LevelSystemSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s"
                 update_settings_values = [guild_id]
-                cursor.execute(update_settings, update_settings_values)
-                db_connect.commit()
+                await cursor.execute(update_settings, update_settings_values)
+                await db_connect.commit()
             
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -1206,8 +1185,8 @@ class DatabaseUpdates():
         whole_xp:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
@@ -1226,15 +1205,15 @@ class DatabaseUpdates():
                 update_stats = f"UPDATE LevelSystemStats SET userLevel = %s, userXp = %s, wholeXp = %s WHERE guildId = %s AND userId = %s"
                 update_stats_values = [level, 0, whole_xp, guild_id, user_id]
             
-            cursor.execute(update_stats, update_stats_values)
-            db_connect.commit()
+            await cursor.execute(update_stats, update_stats_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -1264,8 +1243,8 @@ class DatabaseUpdates():
         status:str = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor() 
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor() 
      
         try:
 
@@ -1279,15 +1258,15 @@ class DatabaseUpdates():
                 update_level_roles = "UPDATE LevelSystemRoles SET roleId = %s WHERE guildId = %s AND roleLevel = %s"
                 update_level_roles_values = [role_id, guild_id, role_level]
 
-            cursor.execute(update_level_roles, update_level_roles_values)
-            db_connect.commit()
+            await cursor.execute(update_level_roles, update_level_roles_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     
     '''
@@ -1325,8 +1304,8 @@ class DatabaseUpdates():
         bonus:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
@@ -1349,23 +1328,23 @@ class DatabaseUpdates():
                             bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
                             bonus_list_values = [guild_id, items[count]]
 
-                        cursor.execute(bonus_list, bonus_list_values)
-                        db_connect.commit()
+                        await cursor.execute(bonus_list, bonus_list_values)
+                        await db_connect.commit()
 
             elif operation == "reset":
                 
                 bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s"
                 bonus_list_values = [guild_id]
 
-                cursor.execute(bonus_list, bonus_list_values)
-                db_connect.commit()
+                await cursor.execute(bonus_list, bonus_list_values)
+                await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
 
@@ -1442,8 +1421,8 @@ class DatabaseUpdates():
             "status":0 if status[1] else 1
         }
         
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         try:
             
             if settings != None and settings != "tracking":
@@ -1451,7 +1430,7 @@ class DatabaseUpdates():
                 value = coulmn_values[settings]
                 settings = f"UPDATE LeaderboardSettingsMessage SET {column_name_settings[settings]} = %s WHERE guildId = %s"
                 settings_values = [value, guild_id]
-                cursor.execute(settings, settings_values)
+                await cursor.execute(settings, settings_values)
 
             elif interval:
                 
@@ -1467,22 +1446,22 @@ class DatabaseUpdates():
                     update_stats = f"INSERT INTO LeaderboardTacking (guildId, userId) VALUES (%s, %s)"
                     update_stats_values = [guild_id, user_id]
                 
-                cursor.execute(update_stats, update_stats_values)
+                await cursor.execute(update_stats, update_stats_values)
 
             elif back_to_none != None:
 
                 set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == 'tracking' else 'LeaderboardSettingsMessage'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
                 set_back_to_none_values = [guild_id]
-                cursor.execute(set_back_to_none, set_back_to_none_values)
+                await cursor.execute(set_back_to_none, set_back_to_none_values)
             
-            db_connect.commit()
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     
     '''
@@ -1557,8 +1536,9 @@ class DatabaseUpdates():
             "status":0 if status[1] else 1
         }
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
         try:
             
             if settings != None and settings != "tracking":
@@ -1566,7 +1546,7 @@ class DatabaseUpdates():
                 value = coulmn_values[settings]
                 settings = f"UPDATE LeaderboardSettingsInvite SET {column_name_settings[settings]} = %s WHERE guildId = %s"
                 settings_values = [value, guild_id]
-                cursor.execute(settings, settings_values)
+                await cursor.execute(settings, settings_values)
 
             elif interval:
                 
@@ -1582,22 +1562,22 @@ class DatabaseUpdates():
                     update_stats = f"INSERT INTO LeaderboardTacking (guildId, userId) VALUES (%s, %s)"
                     update_stats_values = [guild_id, user_id]
                 
-                cursor.execute(update_stats, update_stats_values)
+                await cursor.execute(update_stats, update_stats_values)
 
             elif back_to_none != None:
 
                 set_back_to_none = f"UPDATE {'LeaderboardTacking' if settings == 'tracking' else 'LeaderboardSettingsInvite'} SET {column_name_settings[back_to_none]} = DEFAULT WHERE guildId = %s"
                 set_back_to_none_values = [guild_id]
-                cursor.execute(set_back_to_none, set_back_to_none_values)
+                await cursor.execute(set_back_to_none, set_back_to_none_values)
             
-            db_connect.commit()
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -1624,23 +1604,23 @@ class DatabaseUpdates():
         channel_id:int = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
             create_settings = f"INSERT INTO {'LeaderboardSettingsMessage' if system == 'message' else 'LeaderboardSettingsInvite'} (guildId, leaderboardChannel) VALUES (%s, %s)"
             create_settings_values = [guild_id, channel_id]
 
-            cursor.execute(create_settings, create_settings_values)
-            db_connect.commit()
+            await cursor.execute(create_settings, create_settings_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -1667,8 +1647,8 @@ class DatabaseUpdates():
         uses:int
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
@@ -1684,15 +1664,15 @@ class DatabaseUpdates():
                 update_invites = "INSERT INTO LeaderboardInviteTracking (guildId, userId, inviteCode, usesCount) VALUES (%s, %s, %s, %s)"
                 update_invites_values = [guild_id, user_id, invite_code, uses]
 
-            cursor.execute(update_invites, update_invites_values)
-            db_connect.commit()
+            await cursor.execute(update_invites, update_invites_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
     
     '''
@@ -1735,8 +1715,8 @@ class DatabaseUpdates():
         interval:str = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         try:
 
@@ -1767,15 +1747,15 @@ class DatabaseUpdates():
                 update_roles = f"INSERT INTO LeaderboardRoles (guildId, roleId, rankingPosition, status, roleInterval) VALUES (%s, %s, %s, %s, %s)"
                 update_roles_values = [guild_id, role_id, position, status, interval]
 
-            cursor.execute(update_roles, update_roles_values)
-            db_connect.commit()
+            await cursor.execute(update_roles, update_roles_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
     
     '''
@@ -1817,8 +1797,8 @@ class DatabaseUpdates():
         user_id:int = None,
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
         
         try:
 
@@ -1831,15 +1811,15 @@ class DatabaseUpdates():
                 manage_role = "DELETE FROM LeaderboardGivenRoles WHERE guildId = %s AND roleInterval = %s AND status = %s"
                 manage_role_values = [guild_id, interval, status]
 
-            cursor.execute(manage_role, manage_role_values)
-            db_connect.commit()
+            await cursor.execute(manage_role, manage_role_values)
+            await db_connect.commit()
         
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
     '''
@@ -1879,8 +1859,8 @@ class DatabaseUpdates():
         parameter:str = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
@@ -1894,15 +1874,15 @@ class DatabaseUpdates():
                 manage_reaction = f"DELETE FROM AutoReactions WHERE guildId = %s AND emoji = %s AND {'channelId' if channel_id != None else 'categoryId'}"
                 manage_reaction_values = [guild_id, channel_id, parameter, emoji] if channel_id != None else [guild_id, category_id, parameter, emoji]
 
-            cursor.execute(manage_reaction, manage_reaction_values)
-            db_connect.commit()
+            await cursor.execute(manage_reaction, manage_reaction_values)
+            await db_connect.commit()
         
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
 
@@ -1922,23 +1902,23 @@ class DatabaseRemoveDatas():
     '''
     async def remove_level_system_stats(guild_id:int, user_id:int = None):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
         
             remove_stats = "DELETE FROM LevelSystemStats WHERE guildId = %s AND userId = %s" if user_id != None else "DELETE FROM LevelSystemStats WHERE guildId = %s"
             remove_stats_values = [guild_id, user_id] if user_id != None else [guild_id]
             
-            cursor.execute(remove_stats, remove_stats_values)
-            db_connect.commit()
+            await cursor.execute(remove_stats, remove_stats_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
     '''
@@ -1959,8 +1939,8 @@ class DatabaseRemoveDatas():
     '''
     async def remove_level_system_level_roles(guild_id:int, role_id:int = None, role_level:int = None):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         if role_id != None and role_level == None:
             column_name, data = "roleId", role_id
@@ -1978,15 +1958,15 @@ class DatabaseRemoveDatas():
                 remove_level_role = f"DELETE FROM LevelSystemRoles WHERE guildId = %s AND {column_name} = %s"
                 remove_level_role_values = [guild_id, data]
 
-            cursor.execute(remove_level_role, remove_level_role_values)
-            db_connect.commit()
+            await cursor.execute(remove_level_role, remove_level_role_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
 
@@ -2010,22 +1990,22 @@ class DatabaseRemoveDatas():
     '''
     async def remove_leaderboard_settings(guild_id:int, system:str):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
             delete_message_id = f"DELETE FROM {'LeaderboardSettingsMessage' if system == 'message' else 'LeaderboardSettingsInvite'} WHERE guildId = %s"
             delete_message_id_values = [guild_id]
-            cursor.execute(delete_message_id, delete_message_id_values)
-            db_connect.commit()
+            await cursor.execute(delete_message_id, delete_message_id_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
     ''' 
@@ -2043,22 +2023,22 @@ class DatabaseRemoveDatas():
     '''
     async def remove_leaderboard_tracking(guild_id:int, user_id:int):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
             delete_user_entry = f"DELETE FROM LeaderboardTacking WHERE guildId = %s AND userId = %s"
             delete_user_entry_values = [guild_id, user_id]
-            cursor.execute(delete_user_entry, delete_user_entry_values)
-            db_connect.commit()
+            await cursor.execute(delete_user_entry, delete_user_entry_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
 
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
     '''
@@ -2093,8 +2073,8 @@ class DatabaseRemoveDatas():
         interval:str = None
         ):
         
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
             
@@ -2113,15 +2093,15 @@ class DatabaseRemoveDatas():
                 delete_leaderboard_role = "DELETE FROM LeaderboardRoles WHERE guildId = %s AND status = %s"
                 delete_leaderboard_role_values = [guild_id, system]
 
-            cursor.execute(delete_leaderboard_role, delete_leaderboard_role_values)
-            db_connect.commit()
+            await cursor.execute(delete_leaderboard_role, delete_leaderboard_role_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
         
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
     '''
@@ -2146,8 +2126,8 @@ class DatabaseRemoveDatas():
         user_id:int = None
         ):
         
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
@@ -2161,15 +2141,15 @@ class DatabaseRemoveDatas():
                 delete_invite_link = "DELETE FROM LeaderboardInviteTracking WHERE guildId = %s AND inviteCode = %s"
                 delete_invite_link_values = [guild_id, invite_code]
 
-            cursor.execute(delete_invite_link, delete_invite_link_values)
-            db_connect.commit()
+            await cursor.execute(delete_invite_link, delete_invite_link_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
         
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
 
@@ -2199,8 +2179,8 @@ class DatabaseRemoveDatas():
         emoji:str = None
         ):
 
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
 
         try:
 
@@ -2219,12 +2199,12 @@ class DatabaseRemoveDatas():
                 delete_auto_reaction = "DELETE FROM AutoReactions WHERE guildId = %s"
                 delete_auto_reaction_values = [guild_id]
 
-            cursor.execute(delete_auto_reaction, delete_auto_reaction_values)
-            db_connect.commit()
+            await cursor.execute(delete_auto_reaction, delete_auto_reaction_values)
+            await db_connect.commit()
 
-        except mysql.connector.Error as error:
+        except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
         
         finally:
 
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
+            await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)

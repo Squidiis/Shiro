@@ -142,7 +142,7 @@ class ModeratorCommands(commands.Cog):
                     if check_settings[3] == 3:
                         return
 
-                    if await self.check_rule_violation(check_settings = check_settings, message = message) == True:
+                    if self.check_rule_violation(check_settings = check_settings, message = message) == True:
             
                         await message.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=message, settings2=check_settings), delete_after=5)
                         await message.delete()
@@ -152,7 +152,7 @@ class ModeratorCommands(commands.Cog):
     @commands.Cog.listener()
     async def on_message_edit(self, before:discord.Message, after:discord.Message):
         
-        if self.check_whitelist_antilink(message=after) == True:
+        if await self.check_whitelist_antilink(message=after) == True:
             return
         
         if after.author.bot:

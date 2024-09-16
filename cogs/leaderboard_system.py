@@ -43,6 +43,27 @@ class LeaderboardSystem(commands.Cog):
         self.check_expired_invite_liks.start()
 
 
+    @commands.Cog.listener()
+    async def on_disconnect(self):
+        print("Bot has lost the connection.")
+        self.edit_leaderboard_invite.stop()
+        self.edit_leaderboard_message.stop()
+        
+
+    @commands.Cog.listener()
+    async def on_resumed(self):
+            
+        print("Connection restored.")
+        
+        if not self.edit_leaderboard_invite.is_running():
+
+            self.edit_leaderboard_invite.start()
+
+        if not self.edit_leaderboard_message.is_running():
+
+            self.edit_leaderboard_message.start()
+
+
     '''
     Adds all existing Invite links to a database
 
@@ -529,7 +550,11 @@ class LeaderboardSystem(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         guild_id = member.guild.id
 
-        if await DatabaseCheck.check_leaderboard_settings(guild_id=guild_id, system="message")[1] == 0 or member.bot:
+        check = await DatabaseCheck.check_leaderboard_settings(guild_id=guild_id, system="message")
+        if check[1] == 0:
+            return
+        
+        if member.bot:
             return
 
         invites_before = await DatabaseCheck.check_invite_codes(guild_id=guild_id)

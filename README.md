@@ -56,7 +56,7 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 
 ## 📝 Requirements
 
-- [mysql-connector-python 8.1.0](https://pypi.org/project/mysql-connector-python/)
+- [aiomysql==0.2.0](https://pypi.org/project/aiomysql/)
 - [Pillow 10.0.0](https://pypi.org/project/Pillow/)
 - [py-cord 2.4.1](https://pypi.org/project/py-cord/)
 - [python-dotenv 1.0.0](https://pypi.org/project/python-dotenv/)
