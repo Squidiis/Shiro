@@ -14,7 +14,8 @@ from utils import *
 async def level_message(guild_id:int, user_id:int, level:int):
 
     user = f"<@{user_id}>"
-    level_up_message = eval("f'{}'".format(await DatabaseCheck.check_level_settings(guild_id=guild_id)[4]))
+    message = await DatabaseCheck.check_level_settings(guild_id=guild_id)[4]
+    level_up_message = eval("f'{}'".format(message))
     return level_up_message
 
 
