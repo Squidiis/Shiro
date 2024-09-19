@@ -551,7 +551,8 @@ class LeaderboardSystem(commands.Cog):
         guild_id = member.guild.id
 
         check = await DatabaseCheck.check_leaderboard_settings(guild_id=guild_id, system="message")
-        if check[1] == 0:
+
+        if check[1] == 0 or check == [] or check == None:
             return
         
         if member.bot:
@@ -1884,7 +1885,7 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
                 for role in check_roles:
                     
                     check_position = await DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = role[1], system = system)
-
+                    
                     if check_position[2] != 0:
 
                         user_list.append(f"{Emojis.dot_emoji} The user <@{role[2]}> has received the role <@&{role[1]}> for reaching place {check_position[2]}\n")
