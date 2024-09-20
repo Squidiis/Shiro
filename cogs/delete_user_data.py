@@ -93,10 +93,14 @@ class DeleteData(commands.Cog):
                 "LeaderboardGivenRoles",
                 "LeaderboardTacking"
                 ]
-            
+                
             for table in tables:
 
-                await DeleteData.delete_data(table=table, column='userId', item=member)   
+                await DeleteData.delete_data(table=table, column='userId', item=member)
+
+        else:
+
+            return
 
 
     # Deletes the entries of a channel when it is deleted

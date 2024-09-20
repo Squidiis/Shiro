@@ -45,6 +45,7 @@ class LeaderboardSystem(commands.Cog):
 
     @commands.Cog.listener()
     async def on_disconnect(self):
+        
         print("Bot has lost the connection.")
         self.edit_leaderboard_invite.stop()
         self.edit_leaderboard_message.stop()
@@ -552,55 +553,60 @@ class LeaderboardSystem(commands.Cog):
 
         check = await DatabaseCheck.check_leaderboard_settings(guild_id=guild_id, system="message")
 
-        if check[1] == 0 or check == [] or check == None:
-            return
-        
-        if member.bot:
-            return
-
-        invites_before = await DatabaseCheck.check_invite_codes(guild_id=guild_id)
-        invites_after = await member.guild.invites()
-
-        summary_before = defaultdict(lambda: {"codes": set(), "uses": defaultdict(int)})
-        for _, user_id, code, uses in invites_before:
-
-            summary_before[user_id]["codes"].add(code)
-            summary_before[user_id]["uses"][code] += uses
-
-        result_before = [
-            (code, user_id, sum(summary_before[user_id]["uses"].values()))
-            for user_id in summary_before
-            for code in summary_before[user_id]["codes"]
-        ]
-
-        summary_after = defaultdict(lambda: {"codes": set(), "uses": defaultdict(int)})
-        for invite in invites_after:
-
-            inviter_id = invite.inviter.id
-            summary_after[inviter_id]["codes"].add(invite.code)
-            summary_after[inviter_id]["uses"][invite.code] += invite.uses
-
-        result_after = [
-            (code, inviter_id, sum(summary_after[inviter_id]["uses"].values()))
-            for inviter_id in summary_after
-            for code in summary_after[inviter_id]["codes"]
-        ]
-
-        for entry_after in result_after:
-            code_after, user_id_after, total_uses_after = entry_after
-            corresponding_before = next(
-                (entry_before for entry_before in result_before if entry_before[1] == user_id_after), None
-            )
-
-            if not corresponding_before:
-
-                await DatabaseUpdates.manage_leaderboard_invite_list(guild_id=guild_id, user_id=user_id_after, invite_code=code_after, uses=total_uses_after)
-
-            elif corresponding_before[2] < total_uses_after:
-
-                await DatabaseUpdates.manage_leaderboard_invite(guild_id=guild_id, user_id=user_id_after, settings="tracking", interval="countInvite")
-                await DatabaseUpdates.manage_leaderboard_invite_list(guild_id=guild_id, user_id=user_id_after, invite_code=corresponding_before[0], uses=total_uses_after)
+        if check:
+                
+            if check[1] == 0:
                 return
+            
+            if member.bot:
+                return
+
+            invites_before = await DatabaseCheck.check_invite_codes(guild_id=guild_id)
+            invites_after = await member.guild.invites()
+
+            summary_before = defaultdict(lambda: {"codes": set(), "uses": defaultdict(int)})
+            for _, user_id, code, uses in invites_before:
+
+                summary_before[user_id]["codes"].add(code)
+                summary_before[user_id]["uses"][code] += uses
+
+            result_before = [
+                (code, user_id, sum(summary_before[user_id]["uses"].values()))
+                for user_id in summary_before
+                for code in summary_before[user_id]["codes"]
+            ]
+
+            summary_after = defaultdict(lambda: {"codes": set(), "uses": defaultdict(int)})
+            for invite in invites_after:
+
+                inviter_id = invite.inviter.id
+                summary_after[inviter_id]["codes"].add(invite.code)
+                summary_after[inviter_id]["uses"][invite.code] += invite.uses
+
+            result_after = [
+                (code, inviter_id, sum(summary_after[inviter_id]["uses"].values()))
+                for inviter_id in summary_after
+                for code in summary_after[inviter_id]["codes"]
+            ]
+
+            for entry_after in result_after:
+                code_after, user_id_after, total_uses_after = entry_after
+                corresponding_before = next(
+                    (entry_before for entry_before in result_before if entry_before[1] == user_id_after), None
+                )
+
+                if not corresponding_before:
+
+                    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id=guild_id, user_id=user_id_after, invite_code=code_after, uses=total_uses_after)
+
+                elif corresponding_before[2] < total_uses_after:
+
+                    await DatabaseUpdates.manage_leaderboard_invite(guild_id=guild_id, user_id=user_id_after, settings="tracking", interval="countInvite")
+                    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id=guild_id, user_id=user_id_after, invite_code=corresponding_before[0], uses=total_uses_after)
+                    return
+                
+        else:
+            return
 
 
     @commands.Cog.listener()

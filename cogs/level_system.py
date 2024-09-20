@@ -374,7 +374,7 @@ class LevelSystem(commands.Cog):
         # Anpassen das es auch überprüft ob voice und so an ist!
         if levelsystem_status:
 
-            if levelsystem_status[2] == "on":
+            if levelsystem_status[2] == 1:
                 return True
             
             else:
@@ -868,7 +868,7 @@ class LevelSystem(commands.Cog):
 
                 await ctx.respond(embed=error_emb)
 
-        except Exception  as error:
+        except Exception as error:
             print("parameterized query failed {}".format(error))
 
         finally:
@@ -1610,11 +1610,11 @@ class LevelSystemOnOffSwitch(discord.ui.Button):
             
             settings = await DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
 
-            await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status='on' if settings == 'off' else 'on')
+            await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status=1 if settings == 0 else 0)
                         
-            emb = discord.Embed(description=f"""## The level system was switched {' off' if settings == 'on' else 'on'}
-                {Emojis.dot_emoji} {'From now on, XP will no longer be given as a reward.' if settings == 'on' else 'From now on all activities will be rewarded with XP, you can adjust the amount manually using the **/set-level-system** command'}
-                {Emojis.help_emoji} If you want to {'turn on' if settings == 'on' else 'switch off'} the level system, just use this command again""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The level system was switched {0 if settings == 1 else 1}
+                {Emojis.dot_emoji} {'From now on, XP will no longer be given as a reward.' if settings == 1 else 'From now on all activities will be rewarded with XP, you can adjust the amount manually using the **/set-level-system** command'}
+                {Emojis.help_emoji} If you want to {'turn on' if settings == 1 else 'switch off'} the level system, just use this command again""", color=bot_colour)
             await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
         else:
@@ -1862,14 +1862,18 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
                         await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, percentage=self.children[0].value)
 
-                        embed = discord.Embed(description=f"""## Your bonus XP percentage has been set
+                        emb = discord.Embed(description=f"""## Your bonus XP percentage has been set
                             {Emojis.dot_emoji} The bonus XP percentage was set to **{self.children[0].value}** %
                             {Emojis.dot_emoji} Here you can also see an overview of what the new bonus XP percentage applies to, as well as a list of those that have their own percentage value
-                            {CheckLevelSystem.bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
-                        await interaction.response.edit_message(embeds=[embed], view=None)
+                            {await CheckLevelSystem.show_bonus_xp_list(guild_id=interaction.guild.id)}""", color=bot_colour)
+                        await interaction.response.edit_message(embeds=[emb], view=None)
 
                     else:
-                        raise Exception('Exception message')
+
+                        emb = discord.Embed(description=f"""## Your input is invalid
+                            {Emojis.dot_emoji} Your input is either greater than 100 or contains letters, special characters or a comma
+                            {Emojis.dot_emoji} You can enter a new value by pressing the button again or you can cancel the setting by pressing the red button.""", color=bot_colour)
+                        await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
                 except:
 
@@ -2154,7 +2158,7 @@ class ShowLevelSettingsSelect(discord.ui.View):
             elif select.values[0] == "show_level_status":
 
                 emb = discord.Embed(description=f"""## Current status of the level system
-                    {Emojis.dot_emoji} The level system is currently {'switched on' if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 'on' else 'switched off'}
+                    {Emojis.dot_emoji} The level system is currently {'switched on' if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 1 else 'switched off'}
                     {Emojis.dot_emoji} All activities are rewarded with XP unless the channel, category, role or user is on the blacklist""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 

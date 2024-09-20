@@ -13,15 +13,20 @@ All required data must be included in the .env file
 class DatabaseSetup():
 
 
-
     async def db_connector():
 
-        connection = await aiomysql.connect(host='db2.sillydevelopment.co.uk',
-        user='u12596_MeyIAVJibL',
-        password='ThyXCtxNmg4qKVAKm!@T2u7Y',
-        db='s12596_shiro_db')
+        try:
+
+            connection = await aiomysql.connect(
+            host=os.getenv("host"),
+            user=os.getenv("user"),
+            password=os.getenv("sql_password"),
+            db=os.getenv("discord_db"))
+            
+            return connection
         
-        return connection
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
 
 
     async def db_close(cursor, db_connection):

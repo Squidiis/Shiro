@@ -45,7 +45,7 @@ DROP TABLE IF EXISTS `LevelSystemSettings`;
 CREATE TABLE LevelSystemSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     xpRate INT UNSIGNED DEFAULT 20,
-    levelStatus VARCHAR(50) DEFAULT 'on',
+    levelStatus BIT DEFAULT 0,
     levelUpChannel BIGINT UNSIGNED NULL,
     levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
     bonusXpPercentage INT UNSIGNED DEFAULT 10

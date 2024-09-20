@@ -62,7 +62,7 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS LevelSystemSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 xpRate INT UNSIGNED DEFAULT 20,
-                levelStatus VARCHAR(50) DEFAULT 'on',
+                levelStatus BIT DEFAULT 0,
                 levelUpChannel BIGINT UNSIGNED NULL,
                 levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
                 bonusXpPercentage INT UNSIGNED DEFAULT 10
@@ -258,6 +258,12 @@ class Main(commands.Cog):
     @commands.Cog.listener()
     async def on_error(event, *args, **kwargs):
         logging.error(f"An error occurred in event {event}: {args} {kwargs}", exc_info=True)
+
+    
+    @commands.Cog.listener()
+    async def on_guild_join(guild):
+
+        await DatabaseUpdates._create_bot_settings(guild_id=guild.id)
 
 
 logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='w',
