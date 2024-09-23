@@ -79,7 +79,7 @@ class ModeratorCommands(commands.Cog):
 
 
     # Checks whether there has been a violation of the antilink system
-    def check_rule_violation(self, check_settings, message:discord.Message):
+    async def check_rule_violation(self, check_settings, message:discord.Message):
 
         check_link = self.contains_invite(message.content.replace(" ", ""))
 
@@ -142,7 +142,7 @@ class ModeratorCommands(commands.Cog):
                     if check_settings[3] == 3:
                         return
 
-                    if self.check_rule_violation(check_settings = check_settings, message = message) == True:
+                    if await self.check_rule_violation(check_settings = check_settings, message = message) == True:
             
                         await message.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=message, settings2=check_settings), delete_after=5)
                         await message.delete()
@@ -169,7 +169,7 @@ class ModeratorCommands(commands.Cog):
             if check_settings[3] == 3:
                 return           
 
-            if self.check_rule_violation(check_settings = check_settings, message = after):
+            if await self.check_rule_violation(check_settings = check_settings, message = after):
                 
                 await after.channel.send(embed=GetEmbed.get_embed(embed_index=9, settings=after, settings2=check_settings), delete_after=5)
                 await after.delete()
@@ -226,9 +226,10 @@ class ModeratorCommands(commands.Cog):
             3:"Nothing is deleted as the Antilink system is deactivated."}
 
         settings = await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
-
+    
         emb = discord.Embed(description=f"""## {Emojis.help_emoji} Here you can see the current anti-link settings
-            {Emojis.dot_emoji} The anti-link system is currently set to:\n`{settings_text[settings[3]]}`
+            {Emojis.dot_emoji} The anti-link system is currently set to:
+            `{settings_text[settings[3]]}`
             {Emojis.dot_emoji} In the event of violations, you will receive a timeout of {settings[4]} minutes""", color=bot_colour)
         await ctx.respond(embed=emb)
 
