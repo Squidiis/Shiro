@@ -102,9 +102,9 @@ class AutoReaction(commands.Cog):
 
                             await message.add_reaction(emoji = emoji)
 
-                        except Exception as e:
+                        except Exception as error:
                         
-                            print(f"Auto-reaction {e}")
+                            print("parameterized query failed {}".format(error))
 
         else:
             return

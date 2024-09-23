@@ -11,7 +11,6 @@ import logging
 
 @bot.command()
 async def test(ctx):
-    print("test")
     await ctx.send(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
 logging.basicConfig(level=logging.INFO)
