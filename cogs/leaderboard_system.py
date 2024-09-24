@@ -46,15 +46,15 @@ class LeaderboardSystem(commands.Cog):
     @commands.Cog.listener()
     async def on_disconnect(self):
 
-        print("Bot has lost the connection.")
+        print(f"Bot has lost the connection {datetime.now().timestamp()}.")    
         self.edit_leaderboard_invite.stop()
         self.edit_leaderboard_message.stop()
         
 
     @commands.Cog.listener()
     async def on_resumed(self):
-            
-        print("Connection restored.")
+        
+        print(f"Connection restored {datetime.now().timestamp()}.")
         
         if not self.edit_leaderboard_invite.is_running():
 
