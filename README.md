@@ -2,7 +2,11 @@
 
 
 <h1 align="center">
+<<<<<<< HEAD
     This project is currently in development!<br>
+=======
+    Version 1.1!<br>
+>>>>>>> neues-repo/main
 </h1>
 
 <h4 align="center">
@@ -11,8 +15,13 @@
 </h4>
 
 <h4 align="center">
+<<<<<<< HEAD
     <a href="https://discord.gg/Zv5JtYhd9r"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
     <br>Start of development Tue, Jan 04, 2022 | end of development Sun, Mar 31, 2024
+=======
+    <a href="https://discord.gg/UKZkmeJYsA"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
+    <br>Start of development Tue, Jan 04, 2022
+>>>>>>> neues-repo/main
 </h4>
 
 ## 👋 About
@@ -29,7 +38,11 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - Individual blacklist commands to exclude individual channels, categories, roles or users from the level system.
     - Commands to manage and change the statistics of individual users.
     - Ranking command to show how far users are in the level system.
+<<<<<<< HEAD
     - Ranking list of the top 10 users.
+=======
+    - Ranking list of the top 15 users.
+>>>>>>> neues-repo/main
     - Commands to set how much XP is awarded per message.
     - Commands to give individual XP bonuses to individual channels, categories, roles and users.
     - Level role system to reward users with roles when they reach a certain level (level roles can be customized).
@@ -38,7 +51,13 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 * Moderation System
     - ban, kick, mute, unmute, clear commands
     - server-info, user-info commands
+<<<<<<< HEAD
     - anti link system (with whitelist function) 
+=======
+    - anti-link system (with whitelist function)
+    - anti-ghost ping system
+    - invite tracker
+>>>>>>> neues-repo/main
 
 * Fun commands
     - RPS (Rock, Paper, Scissors) alone against a bot or against your friends
@@ -47,16 +66,34 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - Anime gif commands (kiss, hug and much more) uses all the [tenor API](https://tenor.com/gifapi/documentation)
     - Anime meme command with the [reddit API](https://www.reddit.com/dev/api/)
 
+<<<<<<< HEAD
 ## 📝 Requirements
 
 - [mysql-connector-python 8.1.0](https://pypi.org/project/mysql-connector-python/)
+=======
+* Statistics system
+    - Message Leaderboard system (The top 15 users who have written the most messages in an interval determined by the server owner are presented on a leaderboard)
+    - Invite Leaderboard system (The top 15 users who invite the most users in an interval determined by the server owner are presented on a leaderboard)
+    - Leaderboard roles to reward users who have reached a certain place (Message and Invite Leaderboard have their own roles, each place can also be filled with an individual role)
+
+## 📝 Requirements
+
+- [aiomysql==0.2.0](https://pypi.org/project/aiomysql/)
+>>>>>>> neues-repo/main
 - [Pillow 10.0.0](https://pypi.org/project/Pillow/)
 - [py-cord 2.4.1](https://pypi.org/project/py-cord/)
 - [python-dotenv 1.0.0](https://pypi.org/project/python-dotenv/)
 - [requests 2.31.0](https://pypi.org/project/requests/)
+<<<<<<< HEAD
 - [ui 0.1.4](https://pypi.org/project/ui/)
 
 # How to set up
+=======
+- [PyYAML 6.0.1](https://pypi.org/project/PyYAML/)
+- [DateTime 5.5](https://pypi.org/project/DateTime/)
+
+## How to set up
+>>>>>>> neues-repo/main
 
 Setting up the bot has been made as simple as possible.
 
@@ -73,9 +110,15 @@ To run the code on your bot customize the [`.env`](.env) file simply fill in all
 |user|Enter the user name of your MySQL database here this can be `root` if you run it locally or a custom name of your choice.|
 |discord_db|Here the name of the database schema.|
 
+<<<<<<< HEAD
 In the [`ultils.py`](ultils.py) file add the emojis to the variables if you don't know here is a YouTube tutorial just click [here](https://www.youtube.com/watch?app=desktop&v=-w7XYr22UEw&t=182)
 
 # How to start?
+=======
+In the [`ultils.py`](ultils.py) file add the emojis to the variables [emojis](emojis)
+
+## How to start?
+>>>>>>> neues-repo/main
 
 Once you have configured everything and adjusted the required variables in [`config.yaml`](config.yaml) and [`.env`](.env), all you have to do is install the required packages
 ```
@@ -87,12 +130,20 @@ After that you can start it with
 ```
 python bot.py
 ```
+<<<<<<< HEAD
 If you encounter problems use the discord server linked above or press [here](https://discord.gg/Zv5JtYhd9r) to be redirected directly to in.
+=======
+If you encounter problems use the discord server linked above or press [here](https://discord.gg/UKZkmeJYsA) to be redirected directly to in.
+
+## License
+This project is licensed under the [Custom License](LICENSE.txt). For commercial use, please contact [Squidi](https://github.com/Squidiis) at papersquidi@outlook.de.
+>>>>>>> neues-repo/main
 
 ## All commands
 
 | Command | Description |
 | --- | --- |
+<<<<<<< HEAD
 |help|Shows all the commands the bot has and explains what they can do.|
 |give-xp|Gives a user a quantity of XP that you choose.|
 |remove-xp|Removes a user a quantity of XP chosen by you.|
@@ -130,11 +181,51 @@ If you encounter problems use the discord server linked above or press [here](ht
 |gif pet|Send an anime gif of a head pet (a user can also be tagged).|
 |animememe|Displays a random anime meme from Reddit.|
 |set-antilink-system|Deletes all messages with a link you can choose what to delete (options: Everything, only invite links to other servers, everything except pictures and vidoes, nothing).|
+=======
+|help|Shows all the commands the bot has and explains what they can do|
+|give-xp|Gives a user a quantity of XP that you choose|
+|remove-xp|Removes a user a quantity of XP chosen by you|
+|give-level|Gives a user a quantity of level that you choose|
+|remove-level|Removes a user a quantity of level chosen by you|
+|reset-level|Resets the forward step of all users on the server to 0|
+|reset-user-stats|Resets all stats of a user to 0|
+|rank|Shows the progress of a user in the level system with the help of a rank card, for example [press here](https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/rank-card/example_rank_card.png?raw=true)|
+|leaderboard-level|Shows the 15 users with the highest level on the server|
+|level-system-settings|Enables the level system to be set|
+|add-level-blacklist|Excludes a channel, category, role or user from the level system, after which activities in the channel or categories and by users or role holders are no longer rewarded with XP|
+|remove-level-blacklist|Deletes a channel, category, role or user from the level system blacklist then you can get XP again by being active|
+|show-level-blacklist|Shows everything that is on the blacklist|
+|reset-level-blacklist|Resets the entire blacklist|
+|add-level-role|Adds a level role when you reach a certain level that you can freely choose, this is then awarded|
+|remove-level-role|Removes a role as a level role|
+|reset-level-role|Removes all level roles|
+|show-level-roles|Displays all level roles|
+|add-bonus-xp-list|Reward activities in a category or channel with more XP you can also select roles and users the percentage rate for the bonus XP items can be chosen freely|
+|remove-bonus-xp-list|Remove categories, channels, roles and users from the Bonus XP list|
+|show-bonus-xp-list|Shows all channels, categories, roles and users that are rewarded with extra XP for activities|
+|reset-bonus-xp-list|Resets the entire bonus XP list|
+|rps|Play rock, paper, scissors against another user or a bot|
+|cocktails|Send a recipe of a random cocktail|
+|coinflip|Toss a coin where heads or tails can come out|
+|gif kiss|Send an anime gif of someone being kissed (a user can also be tagged)|
+|gif hug|Send an anime gif where someone is hugged (a user can also be marked)|
+|gif lick|Send an anime gif where someone is put down (a user can also be tagged)|
+|gif feed|Send an anime gif where someone is being fed (a user can also be tagged)|
+|gif idk|Send an anime gif that expresses cluelessness (you can also mark a user)|
+|gif dance|Send an anime gif with dancing characters (a user can also be tagged)|
+|gif slap|Send an anime slap gif (a user can also be tagged)|
+|gif fbi|Send an anime FBI gif (a user can also be tagged)|
+|gif embarres|Send an anime gif (You can also mark a user)|
+|gif pet|Send an anime gif of a head pet (a user can also be tagged)|
+|animememe|Displays a random anime meme from Reddit|
+|set-antilink-system|Deletes all messages with a link you can choose what to delete (options: Everything, only invite links to other servers, everything except pictures and vidoes, nothing)|
+>>>>>>> neues-repo/main
 |show-antilink-settings|Shows you how the antilink system is set up|
 |add-antilink-whitelist|Excludes channels, categories, roles and users from the antilink system|
 |remove-antilink-whitelist|Deletes channels, categories, roles and users from the antilyk system white list|
 |show-antilink-whitelist|Shows what is already listed on the antilink white list|
 |reset-antilink-whitelist|Resets the antilink whitelist|
+<<<<<<< HEAD
 |ban|Bans a user of your choice who can no longer enter the server.|
 |unban|Unban a user of your choice.|
 |kick|Kicks a user from the server.|
@@ -145,3 +236,28 @@ If you encounter problems use the discord server linked above or press [here](ht
 |userinfo|Displays all relevant information about a user.|
 |ghost-ping-settings|Set the ghost ping system if someone tags you and deletes the message a message will be sent with the content and the sender can be turned on/off.|
 
+=======
+|ban|Bans a user of your choice who can no longer enter the server|
+|unban|Unban a user of your choice|
+|kick|Kicks a user from the server|
+|timeout|Sends a user to a timeout for a time specified by you|
+|remove-timeout|Removes a timeout of a user of your choice|
+|give-role|Gives a user a role chosen by you|
+|remove-role|Removes a user a role chosen by you|
+|clear|Deletes a number of messages of your choice|
+|serverinfo-slash|Displays all relevant information about the server|
+|userinfo|Displays all relevant information about a user|
+|ghost-ping-settings|Set the ghost ping system if someone tags you and deletes the message a message will be sent with the content and the sender can be turned on/off|
+|show-invites|Shows how many members a user has invited|
+|set-message-leaderboard|Set the message leaderboard system|
+|show-message-leaderboard-setting|Show how the message leaderboard system is set|
+|add-message-leaderboard-role|Determine which roles should be assigned for which place on the leaderboard|
+|remove-message-leaderboard-role|Remove roles as leaderboard roles|
+|show-message-leaderboard-roles|Displays all roles that are set for the leaderboard system|
+|reset-message-leaderboard-roles|Resets all roles of the leaderboard system|
+|set-auto-reaction|Set the auto-reaction system|
+|add-auto-reaction|Add an auto-reaction|
+|remove-auto-reaction|Remove an auto-reaction|
+|show-auto-reaction|Display all auto-reactions set for a server|
+|reset-auto-reaction|resets all auto-reactions set for a server|
+>>>>>>> neues-repo/main

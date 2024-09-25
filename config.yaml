@@ -1,6 +1,18 @@
+<<<<<<< HEAD
 Prefix: "$"
 
 Bot_colour: 0x89d7ff
 
+=======
+
+# This is the prifix of the bot if a message begins with this character the bot reacts (do not separate with a leading character)
+Prefix: "$"
+
+# This is the color that all embed messages have (must be specified in the hex fromat the 0x must also remain in front of it)
+Bot_colour: 0x89d7ff
+
+# Color code for the rank cards (must be specified in RGB format)
+Rank_card_colour: [8, 120, 151]
+>>>>>>> neues-repo/main
 
 
