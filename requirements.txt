@@ -1,17 +1,7 @@
-<<<<<<< HEAD
-
-mysql-connector-python==8.3.0
-=======
 aiomysql==0.2.0
->>>>>>> neues-repo/main
 Pillow==10.0.1
 py-cord==2.5.0
 python-dotenv==1.0.0
 requests==2.31.0
-<<<<<<< HEAD
-ui==0.1.4
-PyYAML==6.0.1
-=======
 PyYAML==6.0.1
 DateTime==5.5
->>>>>>> neues-repo/main

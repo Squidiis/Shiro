@@ -1,0 +1,1867 @@
+2024-09-14 07:46:43,198 - INFO - logging in using static token
+2024-09-14 07:46:43,646 - INFO - Shard ID None has sent the IDENTIFY payload.
+2024-09-14 07:46:43,818 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-88hf",{"micros":66015,"calls":["id_created",{"micros":2137,"calls":[]},"session_lookup_time",{"micros":7427,"calls":[]},"session_lookup_finished",{"micros":15,"calls":[]},"discord-sessions-prd-1-63",{"micros":56008,"calls":["start_session",{"micros":43158,"calls":["discord-api-rpc-59bf7655c7-8jdsp",{"micros":39645,"calls":["get_user",{"micros":13830},"get_guilds",{"micros":3485},"send_scheduled_deletion_message",{"micros":7},"guild_join_requests",{"micros":1},"authorized_ip_coro",{"micros":7}]}]},"starting_guild_connect",{"micros":84,"calls":[]},"presence_started",{"micros":308,"calls":[]},"guilds_started",{"micros":104,"calls":[]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":12322,"calls":[]},"connect_finished",{"micros":12328,"calls":[]},"build_ready",{"micros":20,"calls":[]},"clean_ready",{"micros":1,"calls":[]},"optimize_ready",{"micros":0,"calls":[]},"split_ready",{"micros":1,"calls":[]}]}]}] (Session ID: d0876674a794aaf91146a0301fabf0b3).
+2024-09-14 07:57:12,574 - WARNING - Shard ID None heartbeat blocked for more than 10 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 07:57:22,661 - WARNING - Shard ID None heartbeat blocked for more than 20 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1666, in manage_leaderboard_invite_list
+    DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+  File "/home/container/sql_function.py", line 21, in db_close
+    if db_connection.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 07:57:32,749 - WARNING - Shard ID None heartbeat blocked for more than 30 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1642, in manage_leaderboard_invite_list
+    cursor = db_connect.cursor()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 727, in cursor
+    if not self.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 07:57:42,760 - WARNING - Shard ID None heartbeat blocked for more than 40 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:57:52,769 - WARNING - Shard ID None heartbeat blocked for more than 50 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1271, in set_charset_collation
+    self._execute_query(f"SET NAMES '{charset_name}' COLLATE '{collation_name}'")
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 07:58:02,781 - WARNING - Shard ID None heartbeat blocked for more than 60 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1316, in _post_connection
+    self.autocommit = self._autocommit
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 216, in autocommit
+    self._cmysql.autocommit(value)
+
+2024-09-14 07:58:12,786 - WARNING - Shard ID None heartbeat blocked for more than 70 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:58:22,849 - WARNING - Shard ID None heartbeat blocked for more than 80 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:58:32,854 - WARNING - Shard ID None heartbeat blocked for more than 90 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:58:42,858 - WARNING - Shard ID None heartbeat blocked for more than 100 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 07:58:52,862 - WARNING - Shard ID None heartbeat blocked for more than 110 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:59:02,866 - WARNING - Shard ID None heartbeat blocked for more than 120 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 07:59:12,869 - WARNING - Shard ID None heartbeat blocked for more than 130 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:59:22,872 - WARNING - Shard ID None heartbeat blocked for more than 140 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:59:32,876 - WARNING - Shard ID None heartbeat blocked for more than 150 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 07:59:42,883 - WARNING - Shard ID None heartbeat blocked for more than 160 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1658, in manage_leaderboard_invite_list
+    cursor.execute(update_invites, update_invites_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 07:59:52,886 - WARNING - Shard ID None heartbeat blocked for more than 170 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:00:03,140 - WARNING - Shard ID None heartbeat blocked for more than 180 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1642, in manage_leaderboard_invite_list
+    cursor = db_connect.cursor()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 727, in cursor
+    if not self.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:00:13,246 - WARNING - Shard ID None heartbeat blocked for more than 190 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1658, in manage_leaderboard_invite_list
+    cursor.execute(update_invites, update_invites_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:00:23,447 - WARNING - Shard ID None heartbeat blocked for more than 200 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1316, in _post_connection
+    self.autocommit = self._autocommit
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 216, in autocommit
+    self._cmysql.autocommit(value)
+
+2024-09-14 08:00:33,453 - WARNING - Shard ID None heartbeat blocked for more than 210 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1271, in set_charset_collation
+    self._execute_query(f"SET NAMES '{charset_name}' COLLATE '{collation_name}'")
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:00:43,501 - WARNING - Shard ID None heartbeat blocked for more than 220 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 588, in check_invite_codes
+    cursor = db_connect.cursor()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 727, in cursor
+    if not self.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:00:53,623 - WARNING - Shard ID None heartbeat blocked for more than 230 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1316, in _post_connection
+    self.autocommit = self._autocommit
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 216, in autocommit
+    self._cmysql.autocommit(value)
+
+2024-09-14 08:01:03,631 - WARNING - Shard ID None heartbeat blocked for more than 240 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:01:13,693 - WARNING - Shard ID None heartbeat blocked for more than 250 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1666, in manage_leaderboard_invite_list
+    DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+  File "/home/container/sql_function.py", line 21, in db_close
+    if db_connection.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:01:23,695 - WARNING - Shard ID None heartbeat blocked for more than 260 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 08:01:33,702 - WARNING - Shard ID None heartbeat blocked for more than 270 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:01:43,706 - WARNING - Shard ID None heartbeat blocked for more than 280 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:01:53,793 - WARNING - Shard ID None heartbeat blocked for more than 290 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1666, in manage_leaderboard_invite_list
+    DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+  File "/home/container/sql_function.py", line 21, in db_close
+    if db_connection.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:02:03,875 - WARNING - Shard ID None heartbeat blocked for more than 300 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 588, in check_invite_codes
+    cursor = db_connect.cursor()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 727, in cursor
+    if not self.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:02:13,940 - WARNING - Shard ID None heartbeat blocked for more than 310 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1642, in manage_leaderboard_invite_list
+    cursor = db_connect.cursor()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 727, in cursor
+    if not self.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:02:23,942 - WARNING - Shard ID None heartbeat blocked for more than 320 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 08:02:34,045 - WARNING - Shard ID None heartbeat blocked for more than 330 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1658, in manage_leaderboard_invite_list
+    cursor.execute(update_invites, update_invites_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:02:44,128 - WARNING - Shard ID None heartbeat blocked for more than 340 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 588, in check_invite_codes
+    cursor = db_connect.cursor()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 727, in cursor
+    if not self.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:02:54,256 - WARNING - Shard ID None heartbeat blocked for more than 350 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1316, in _post_connection
+    self.autocommit = self._autocommit
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 216, in autocommit
+    self._cmysql.autocommit(value)
+
+2024-09-14 08:03:04,446 - WARNING - Shard ID None heartbeat blocked for more than 360 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1659, in manage_leaderboard_invite_list
+    db_connect.commit()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 532, in commit
+    self._cmysql.commit()
+
+2024-09-14 08:03:14,448 - WARNING - Shard ID None heartbeat blocked for more than 370 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:03:24,462 - WARNING - Shard ID None heartbeat blocked for more than 380 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1666, in manage_leaderboard_invite_list
+    DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+  File "/home/container/sql_function.py", line 21, in db_close
+    if db_connection.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:03:34,464 - WARNING - Shard ID None heartbeat blocked for more than 390 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:03:44,466 - WARNING - Shard ID None heartbeat blocked for more than 400 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 08:03:54,469 - WARNING - Shard ID None heartbeat blocked for more than 410 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 08:04:04,501 - WARNING - Shard ID None heartbeat blocked for more than 420 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1642, in manage_leaderboard_invite_list
+    cursor = db_connect.cursor()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 727, in cursor
+    if not self.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:04:14,508 - WARNING - Shard ID None heartbeat blocked for more than 430 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:04:24,530 - WARNING - Shard ID None heartbeat blocked for more than 440 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1316, in _post_connection
+    self.autocommit = self._autocommit
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 216, in autocommit
+    self._cmysql.autocommit(value)
+
+2024-09-14 08:04:34,532 - WARNING - Shard ID None heartbeat blocked for more than 450 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 600, in check_invite_codes
+    cursor.execute(check_invite, check_invite_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:04:44,545 - WARNING - Shard ID None heartbeat blocked for more than 460 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1658, in manage_leaderboard_invite_list
+    cursor.execute(update_invites, update_invites_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:04:54,546 - WARNING - Shard ID None heartbeat blocked for more than 470 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 600, in check_invite_codes
+    cursor.execute(check_invite, check_invite_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:05:04,548 - WARNING - Shard ID None heartbeat blocked for more than 480 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1275, in set_charset_collation
+    self.set_character_set_name(charset_name)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 400, in set_character_set_name
+    self._cmysql.set_character_set(charset)
+
+2024-09-14 08:05:14,560 - WARNING - Shard ID None heartbeat blocked for more than 490 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1666, in manage_leaderboard_invite_list
+    DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+  File "/home/container/sql_function.py", line 21, in db_close
+    if db_connection.is_connected():
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 365, in is_connected
+    return self._cmysql.ping()
+
+2024-09-14 08:05:24,561 - WARNING - Shard ID None heartbeat blocked for more than 500 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:05:34,684 - WARNING - Shard ID None heartbeat blocked for more than 510 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1659, in manage_leaderboard_invite_list
+    db_connect.commit()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 532, in commit
+    self._cmysql.commit()
+
+2024-09-14 08:05:44,686 - WARNING - Shard ID None heartbeat blocked for more than 520 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:05:54,688 - WARNING - Shard ID None heartbeat blocked for more than 530 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:06:04,689 - WARNING - Shard ID None heartbeat blocked for more than 540 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:06:14,691 - WARNING - Shard ID None heartbeat blocked for more than 550 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 600, in check_invite_codes
+    cursor.execute(check_invite, check_invite_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:06:24,693 - WARNING - Shard ID None heartbeat blocked for more than 560 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1271, in set_charset_collation
+    self._execute_query(f"SET NAMES '{charset_name}' COLLATE '{collation_name}'")
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:06:34,696 - WARNING - Shard ID None heartbeat blocked for more than 570 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:06:44,699 - WARNING - Shard ID None heartbeat blocked for more than 580 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1271, in set_charset_collation
+    self._execute_query(f"SET NAMES '{charset_name}' COLLATE '{collation_name}'")
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:06:54,701 - WARNING - Shard ID None heartbeat blocked for more than 590 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 600, in check_invite_codes
+    cursor.execute(check_invite, check_invite_values)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 374, in execute
+    result = self._cnx.cmd_query(
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:07:04,840 - WARNING - Shard ID None heartbeat blocked for more than 600 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1316, in _post_connection
+    self.autocommit = self._autocommit
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 216, in autocommit
+    self._cmysql.autocommit(value)
+
+2024-09-14 08:07:15,021 - WARNING - Shard ID None heartbeat blocked for more than 610 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1316, in _post_connection
+    self.autocommit = self._autocommit
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 216, in autocommit
+    self._cmysql.autocommit(value)
+
+2024-09-14 08:07:25,046 - WARNING - Shard ID None heartbeat blocked for more than 620 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1646, in manage_leaderboard_invite_list
+    invite_code_check = DatabaseCheck.check_invite_codes(guild_id = guild_id, invite_code = invite_code)
+  File "/home/container/sql_function.py", line 587, in check_invite_codes
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+
+2024-09-14 08:07:35,048 - WARNING - Shard ID None heartbeat blocked for more than 630 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1375, in connect
+    self._post_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1315, in _post_connection
+    self.set_charset_collation(self._charset_id)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1271, in set_charset_collation
+    self._execute_query(f"SET NAMES '{charset_name}' COLLATE '{collation_name}'")
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 74, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 661, in cmd_query
+    self._cmysql.query(
+
+2024-09-14 08:07:45,051 - WARNING - Shard ID None heartbeat blocked for more than 640 seconds.
+Loop thread traceback (most recent call last):
+  File "/home/container/main.py", line 301, in <module>
+    bot.run(os.getenv("TOKEN"))
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 756, in run
+    loop.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1986, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/container/.local/lib/python3.12/site-packages/discord/client.py", line 400, in _run_event
+    await coro(*args, **kwargs)
+  File "/home/container/cogs/leaderboard_system.py", line 627, in on_member_join
+    await DatabaseUpdates.manage_leaderboard_invite_list(guild_id = member.guild.id, user_id = entry_after[1], invite_code = entry_after[0], uses = entry_after[2])
+  File "/home/container/sql_function.py", line 1641, in manage_leaderboard_invite_list
+    db_connect = DatabaseSetup.db_connector()
+  File "/home/container/sql_function.py", line 16, in db_connector
+    db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 140, in __init__
+    self.connect(**kwargs)
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/abstracts.py", line 1363, in connect
+    self._open_connection()
+  File "/home/container/.local/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 323, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+

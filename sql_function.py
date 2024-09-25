@@ -1,16 +1,8 @@
 import os
-<<<<<<< HEAD
-import mysql.connector
-
-import discord
-from discord.ext import commands
-
-=======
 from utils import *
 import discord
 from queue import Queue
 import aiomysql
->>>>>>> neues-repo/main
 
 #######################  Database connection  #######################
 
@@ -20,73 +12,6 @@ All required data must be included in the .env file
 '''
 class DatabaseSetup():
 
-<<<<<<< HEAD
-    def db_connector():
-
-        db_connector = mysql.connector.connect(host=os.getenv('host'), user=os.getenv('user'), password=os.getenv("sql_password"), database=os.getenv('discord_db'), buffered=True)
-        return db_connector
-
-    def db_close(cursor, db_connection):
-
-        if db_connection.is_connected():
-            
-            db_connection.close()
-            cursor.close()
-
-        else:
-            pass
-
-        
-
-# Contains all important check functions for the level system 
-class DatabaseStatusCheck():
-
-    # Returns True if an element is on the blacklist.
-    def _blacklist_check_text(guild_id:int, message_check:discord.Message):
-
-        if isinstance(message_check.channel, discord.TextChannel):
-
-            levelsystem_blacklist = DatabaseCheck.check_blacklist(guild_id=guild_id)
-
-            if levelsystem_blacklist:
-
-                for _, channel_blacklist, category_blacklist, role_blacklist, user_blacklist in levelsystem_blacklist:
-                   
-                    if user_blacklist == message_check.author.id:
-                        return True
-
-                    if role_blacklist != None:
-                        
-                        blacklist_role = message_check.guild.get_role(role_blacklist)
-                        if blacklist_role in message_check.author.roles:
-                            return True
-                                
-                    if message_check.channel.category_id == category_blacklist:
-                        return True
-
-                    if message_check.channel.id == channel_blacklist:
-                        return True
-                        
-            else:
-                return None
-            
-    
-    # Returns the value True if "on" in the database and False when not
-    def _level_system_status(guild_id:int):
-
-        levelsystem_status = DatabaseCheck.check_level_settings(guild_id=guild_id)
-        # Anpassen das es auch überprüft ob voice und so an ist!
-        if levelsystem_status:
-
-            if levelsystem_status[2] == "on":
-                return True
-            
-            else:
-                return False
-            
-        else:
-            return None
-=======
 
     async def db_connector():
 
@@ -109,7 +34,6 @@ class DatabaseStatusCheck():
         await cursor.close()
         db_connection.close()
 
->>>>>>> neues-repo/main
 
 
 
@@ -123,10 +47,6 @@ class DatabaseCheck():
     
     '''
     Checks whether a channel, category, role or user is on the blacklist
-<<<<<<< HEAD
-    '''
-    def check_blacklist(
-=======
     if you specify individual IDs, the system only checks whether they are present, if they are not present, none is returned if they are present, the entire entry is returned 
 
     Parameters:
@@ -148,7 +68,6 @@ class DatabaseCheck():
         - Always specify only one id otherwise errors may occur     
     '''
     async def check_blacklist(
->>>>>>> neues-repo/main
         guild_id:int, 
         channel_id:int = None, 
         category_id:int = None, 
@@ -156,13 +75,8 @@ class DatabaseCheck():
         user_id:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
@@ -181,17 +95,6 @@ class DatabaseCheck():
                     check_blacklist = f"SELECT * FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name[count]} = %s"
                     check_blacklist_values = [guild_id, all_items[count]]
 
-<<<<<<< HEAD
-        cursor.execute(check_blacklist, check_blacklist_values)
-        
-        if all(x is None for x in all_items):
-            blacklist = cursor.fetchall()
-        
-        else:
-            blacklist = cursor.fetchone()
-            
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
         await cursor.execute(check_blacklist, check_blacklist_values)
         
         if all(x is None for x in all_items):
@@ -201,26 +104,11 @@ class DatabaseCheck():
             blacklist = await cursor.fetchone()
             
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
         return blacklist
  
     
     '''
     If you specify a user, the user's statistics are returned; if no user is specified, the statistics of all users on the server are returned
-<<<<<<< HEAD
-    Info:
-        - The guild_id must be specified
-    '''
-    def check_level_system_stats(guild_id:int, user:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        if user != None:
-
-            levelsys_stats_check = "SELECT * FROM LevelSystemStats WHERE guildId = %s AND userId = %s"
-            levelsys_stats_check_values = [guild_id, user]
-=======
 
     Parameters:
     -----------
@@ -242,23 +130,12 @@ class DatabaseCheck():
 
             levelsys_stats_check = "SELECT * FROM LevelSystemStats WHERE guildId = %s AND userId = %s"
             levelsys_stats_check_values = [guild_id, user_id]
->>>>>>> neues-repo/main
 
         else:
 
             levelsys_stats_check = "SELECT * FROM LevelSystemStats WHERE guildId = %s"
             levelsys_stats_check_values = [guild_id]
 
-<<<<<<< HEAD
-        cursor.execute(levelsys_stats_check, levelsys_stats_check_values)
-
-        if user != None:
-            levelsys_stats = cursor.fetchone()
-        else:
-            levelsys_stats = cursor.fetchall()
-
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
         await cursor.execute(levelsys_stats_check, levelsys_stats_check_values)
 
         if user_id != None:
@@ -267,16 +144,12 @@ class DatabaseCheck():
             levelsys_stats = await cursor.fetchall()
 
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
         return levelsys_stats
     
     
     '''
     Returns all level roles that are available on the server
-<<<<<<< HEAD
-=======
     if you specify individual IDs, the system only checks whether they are present, if they are not present, none is returned if they are present, the entire entry is returned 
->>>>>>> neues-repo/main
 
     Parameters:
     ------------
@@ -299,23 +172,14 @@ class DatabaseCheck():
         - If only one role is specified and no level or status, the entry with the role is returned
         - If no entry exists, None is returned
     '''
-<<<<<<< HEAD
-    def check_level_system_levelroles(
-=======
     async def check_level_system_levelroles(
->>>>>>> neues-repo/main
         guild_id:int, 
         level_role:int = None, 
         needed_level:int = None, 
         status:str = None):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         if level_role != None and needed_level != None and status == None:
 
@@ -347,16 +211,6 @@ class DatabaseCheck():
             levelsys_levelroles_check = "SELECT * FROM LevelSystemRoles WHERE guildId = %s"
             levelsys_levelroles_check_values = [guild_id]
 
-<<<<<<< HEAD
-        cursor.execute(levelsys_levelroles_check, levelsys_levelroles_check_values)
-
-        if level_role == None and needed_level == None:
-            levelsys_levelroles = cursor.fetchall()
-        else:
-            levelsys_levelroles = cursor.fetchone()
-
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
         await cursor.execute(levelsys_levelroles_check, levelsys_levelroles_check_values)
 
         if level_role == None and needed_level == None:
@@ -365,7 +219,6 @@ class DatabaseCheck():
             levelsys_levelroles = await cursor.fetchone()
 
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
         return levelsys_levelroles
     
 
@@ -391,11 +244,7 @@ class DatabaseCheck():
         - If only the `guild_id` is specified, all entries specified for the server are returned
         - Always specify only one id otherwise errors may occur     
     '''
-<<<<<<< HEAD
-    def check_xp_bonus_list(
-=======
     async def check_xp_bonus_list(
->>>>>>> neues-repo/main
         guild_id:int, 
         channel_id:int = None, 
         category_id:int = None, 
@@ -403,13 +252,8 @@ class DatabaseCheck():
         user_id:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
@@ -428,17 +272,6 @@ class DatabaseCheck():
                     check_xp_bonus_list = f"SELECT * FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
                     check_xp_bonus_list_values = [guild_id, all_items[count]]
 
-<<<<<<< HEAD
-        cursor.execute(check_xp_bonus_list, check_xp_bonus_list_values)
-        
-        if all(x is None for x in all_items):
-            xp_bonus_list = cursor.fetchall()
-        
-        else:
-            xp_bonus_list = cursor.fetchone()
-            
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
         await cursor.execute(check_xp_bonus_list, check_xp_bonus_list_values)
         
         if all(x is None for x in all_items):
@@ -448,26 +281,11 @@ class DatabaseCheck():
             xp_bonus_list = await cursor.fetchone()
             
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
         return xp_bonus_list
     
 
     '''
     Returns the settings of a server if you enter the guild_id
-<<<<<<< HEAD
-    '''
-    def check_level_settings(guild_id:int):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        level_settings_check = "SELECT * FROM LevelSystemSettings WHERE guildId = %s"
-        level_settings_check_values = [guild_id]
-        cursor.execute(level_settings_check, level_settings_check_values)
-        level_system_settings = cursor.fetchone()
-
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
 
     Parameters:
     -----------
@@ -488,7 +306,6 @@ class DatabaseCheck():
         level_system_settings = await cursor.fetchone()
 
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
         return level_system_settings
     
 
@@ -513,11 +330,7 @@ class DatabaseCheck():
         - Depending on which item you specify, you will receive the respective entries from the database
         - If you do not specify a channel, category, role or user id, the entire whitelist will be returned
     '''
-<<<<<<< HEAD
-    def check_antilink_whitelist(
-=======
     async def check_antilink_whitelist(
->>>>>>> neues-repo/main
         guild_id:int, 
         channel_id:int = None, 
         category_id:int = None, 
@@ -525,13 +338,8 @@ class DatabaseCheck():
         user_id:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         
@@ -550,20 +358,6 @@ class DatabaseCheck():
                     check_white_list = f"SELECT * FROM AntiLinkWhiteList WHERE guildId = %s AND {column_name[count]} = %s"
                     check_white_list_values = [guild_id, all_items[count]]
 
-<<<<<<< HEAD
-        cursor.execute(check_white_list, check_white_list_values)
-        
-        if all(x is None for x in all_items):
-            white_list = cursor.fetchall()
-        
-        else:
-            white_list = cursor.fetchone()
-            
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-        return white_list
-
-
-=======
         await cursor.execute(check_white_list, check_white_list_values)
         
         if all(x is None for x in all_items):
@@ -893,7 +687,6 @@ class DatabaseCheck():
 
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return auto_react_settings
->>>>>>> neues-repo/main
 
 
 
@@ -906,19 +699,6 @@ class DatabaseCheck():
     Info:
         - guild_id must be specified
     '''
-<<<<<<< HEAD
-    def check_bot_settings(guild_id:int):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        bot_settings_check = "SELECT * FROM BotSettings WHERE guildId = %s"
-        bot_settings_check_values = [guild_id]
-        cursor.execute(bot_settings_check, bot_settings_check_values)
-        bot_settings = cursor.fetchone()
-
-        DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
     async def check_bot_settings(guild_id:int):
 
         db_connect = await DatabaseSetup.db_connector()
@@ -930,7 +710,6 @@ class DatabaseCheck():
         bot_settings = await cursor.fetchone()
 
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
         return bot_settings
     
 
@@ -963,17 +742,10 @@ class DatabaseUpdates():
             levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
             bonusXpPercentage INT UNSIGNED DEFAULT 10
     '''
-<<<<<<< HEAD
-    def _create_bot_settings(guild_id:int):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
     async def _create_bot_settings(guild_id:int):
 
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         sql_tables = ["BotSettings", "LevelSystemSettings"]
 
@@ -983,26 +755,15 @@ class DatabaseUpdates():
 
                 creat_bot_settings = f"INSERT INTO {table} (guildId) VALUES (%s)"
                 creat_bot_settings_values = [guild_id]
-<<<<<<< HEAD
-                cursor.execute(creat_bot_settings, creat_bot_settings_values)
-                db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
                 await cursor.execute(creat_bot_settings, creat_bot_settings_values)
                 await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
            print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
 
 
     '''
@@ -1037,26 +798,12 @@ class DatabaseUpdates():
         - guild_id must be specified
         - all values must have the specified data type
     '''
-<<<<<<< HEAD
-    def update_bot_settings(
-=======
     async def update_bot_settings(
->>>>>>> neues-repo/main
         guild_id:int, 
         bot_colour:str = None, 
         ghost_ping:int = None, 
         antilink:int = None, 
         antilink_timeout:int = None,
-<<<<<<< HEAD
-        back_to_none:int = None
-        ):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-        
-        column_name = ["botColour", "ghostPing", "antiLink", "antiLinkTimeout"]
-        items = [bot_colour, ghost_ping, antilink]
-=======
         auto_reaction:int = None,
         back_to_none:int = None
         ):
@@ -1066,7 +813,6 @@ class DatabaseUpdates():
         
         column_name = ["botColour", "ghostPing", "antiLink", "antiLinkTimeout", "autoReaction"]
         items = [bot_colour, ghost_ping, antilink, antilink_timeout, auto_reaction]
->>>>>>> neues-repo/main
 
         try:
             
@@ -1078,38 +824,22 @@ class DatabaseUpdates():
 
                         update_settings = f'UPDATE BotSettings SET {column_name[count]} = %s{f", antiLinkTimeout = {antilink_timeout}" if antilink_timeout != None else ""} WHERE guildId = %s'
                         update_settings_values = (items[count], guild_id)
-<<<<<<< HEAD
-                        cursor.execute(update_settings, update_settings_values)
-                        db_connect.commit()
-=======
                         await cursor.execute(update_settings, update_settings_values)
                         await db_connect.commit()
->>>>>>> neues-repo/main
 
             else:
 
                 update_settings = f'UPDATE BotSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s'
                 update_settings_values = [guild_id]
-<<<<<<< HEAD
-                cursor.execute(update_settings, update_settings_values)
-                db_connect.commit()
-            
-        except mysql.connector.Error as error:
-=======
                 await cursor.execute(update_settings, update_settings_values)
                 await db_connect.commit()
             
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print('parameterized query failed {}'.format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
 
 
     '''
@@ -1137,11 +867,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified either add, remove or reset
     '''
-<<<<<<< HEAD
-    def manage_antilink_whitelist(
-=======
     async def manage_antilink_whitelist(
->>>>>>> neues-repo/main
         guild_id:int, 
         operation:str, 
         channel_id:int = None, 
@@ -1150,13 +876,8 @@ class DatabaseUpdates():
         user_id:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
@@ -1179,47 +900,27 @@ class DatabaseUpdates():
                             white_list = f"DELETE FROM AntiLinkWhiteList WHERE guildId = %s AND {column_name[count]} = %s"
                             white_list_values = [guild_id, items[count]]
 
-<<<<<<< HEAD
-                        cursor.execute(white_list, white_list_values)
-                        db_connect.commit()
-=======
                         await cursor.execute(white_list, white_list_values)
                         await db_connect.commit()
->>>>>>> neues-repo/main
 
             elif operation == "reset":
                 
                 white_list = f"DELETE FROM AntiLinkWhiteList WHERE guildId = %s"
                 white_list_values = [guild_id]
 
-<<<<<<< HEAD
-                cursor.execute(white_list, white_list_values)
-                db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
                 await cursor.execute(white_list, white_list_values)
                 await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-
-
-
-########################################  Insert into / Update the Level System  ##################################################
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
 
 ########################################  Insert into / Update the level System  ##################################################
->>>>>>> neues-repo/main
 
 
     '''
@@ -1244,11 +945,7 @@ class DatabaseUpdates():
         - guild_id, user_id, user_level must be specified
         - All other values have a default value and do not need to be changed
     '''
-<<<<<<< HEAD
-    def _insert_user_stats_level(
-=======
     async def insert_user_stats_level(
->>>>>>> neues-repo/main
         guild_id:int, 
         user_id:int, 
         user_name:str, 
@@ -1257,38 +954,22 @@ class DatabaseUpdates():
         whole_xp:int = 0
         ):
     
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         try:
 
             insert_new_user = "INSERT INTO LevelSystemStats (guildId, userId, userLevel, userXp, userName, wholeXp) VALUES (%s, %s, %s, %s, %s, %s)"        
             insert_new_user_values = [guild_id, user_id, user_level, user_xp, user_name, whole_xp]
-<<<<<<< HEAD
-            cursor.execute(insert_new_user, insert_new_user_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
             await cursor.execute(insert_new_user, insert_new_user_values)
             await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
     
 
     '''
@@ -1302,34 +983,10 @@ class DatabaseUpdates():
             Id of the new level role
         - level
             Level from which the level role should be assigned
-<<<<<<< HEAD
-        - guild_name
-            Name of the server
-=======
->>>>>>> neues-repo/main
     
     Info:
         - All values must be specified
     '''
-<<<<<<< HEAD
-    def _insert_level_roles(
-        guild_id:int, 
-        role_id:int, 
-        level:int, 
-        guild_name:str):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-
-        try:
-
-            insert_level_role = "INSERT INTO LevelSystemRoles (guildId, roleId, roleLevel, guildName) VALUES (%s, %s, %s, %s)"
-            insert_level_role_values = [guild_id, role_id, level, guild_name]
-            cursor.execute(insert_level_role, insert_level_role_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
     async def insert_level_roles(
         guild_id:int, 
         role_id:int, 
@@ -1347,16 +1004,11 @@ class DatabaseUpdates():
             await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
         
 
     '''
@@ -1384,11 +1036,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified either add, remove or reset
     '''
-<<<<<<< HEAD
-    def manage_blacklist(
-=======
     async def manage_blacklist(
->>>>>>> neues-repo/main
         guild_id:int, 
         operation:str, 
         channel_id:int = None, 
@@ -1397,13 +1045,8 @@ class DatabaseUpdates():
         user_id:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
@@ -1426,39 +1069,23 @@ class DatabaseUpdates():
                             level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s AND {column_name[count]} = %s"
                             level_sys_blacklist_values = [guild_id, items[count]]
 
-<<<<<<< HEAD
-                        cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-                        db_connect.commit()
-=======
                         await cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
                         await db_connect.commit()
->>>>>>> neues-repo/main
 
             elif operation == "reset":
                 
                 level_sys_blacklist = f"DELETE FROM LevelSystemBlacklist WHERE guildId = %s"
                 level_sys_blacklist_values = [guild_id]
         
-<<<<<<< HEAD
-                cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
-                db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
                 await cursor.execute(level_sys_blacklist, level_sys_blacklist_values)
                 await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
 
     
     '''
@@ -1489,15 +1116,9 @@ class DatabaseUpdates():
 
     Info:
         - guild_id must be specified
-<<<<<<< HEAD
-        - all values must have the specified data type
-    '''
-    def update_level_settings(
-=======
         - All values must have the specified data type
     '''
     async def update_level_settings(
->>>>>>> neues-repo/main
         guild_id:int, 
         xp_rate:int = None, 
         level_status:str = None, 
@@ -1507,13 +1128,8 @@ class DatabaseUpdates():
         back_to_none:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         column_name = ["xpRate", "levelStatus", "levelUpChannel", "levelUpMessage","bonusXpPercentage"]
         items = [xp_rate, level_status, level_up_channel, level_up_message, percentage]
@@ -1528,38 +1144,22 @@ class DatabaseUpdates():
 
                         update_settings = f"UPDATE LevelSystemSettings SET {column_name[count]} = %s WHERE guildId = %s"
                         update_settings_values = (items[count], guild_id)
-<<<<<<< HEAD
-                        cursor.execute(update_settings, update_settings_values)
-                        db_connect.commit()
-=======
                         await cursor.execute(update_settings, update_settings_values)
                         await db_connect.commit()
->>>>>>> neues-repo/main
 
             else:
 
                 update_settings = f"UPDATE LevelSystemSettings SET {column_name[back_to_none]} = DEFAULT WHERE guildId = %s"
                 update_settings_values = [guild_id]
-<<<<<<< HEAD
-                cursor.execute(update_settings, update_settings_values)
-                db_connect.commit()
-            
-        except mysql.connector.Error as error:
-=======
                 await cursor.execute(update_settings, update_settings_values)
                 await db_connect.commit()
             
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
 
 
     '''
@@ -1582,11 +1182,7 @@ class DatabaseUpdates():
         - guild_id and user_id must be specified as well as either XP and whole_xp or level
         - If you give a user XP without having earned it through activities, it will not be counted towards the whole_xp
     ''' 
-<<<<<<< HEAD
-    def _update_user_stats_level(
-=======
     async def update_user_stats_level(
->>>>>>> neues-repo/main
         guild_id:int, 
         user_id:int, 
         level:int = None, 
@@ -1594,13 +1190,8 @@ class DatabaseUpdates():
         whole_xp:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         try:
 
@@ -1619,26 +1210,15 @@ class DatabaseUpdates():
                 update_stats = f"UPDATE LevelSystemStats SET userLevel = %s, userXp = %s, wholeXp = %s WHERE guildId = %s AND userId = %s"
                 update_stats_values = [level, 0, whole_xp, guild_id, user_id]
             
-<<<<<<< HEAD
-            cursor.execute(update_stats, update_stats_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
             await cursor.execute(update_stats, update_stats_values)
             await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
 
 
     '''
@@ -1659,28 +1239,17 @@ class DatabaseUpdates():
 
     Info:
         - guild_id must be specified
-<<<<<<< HEAD
-        - status only needs to be specified if you want to overwrite an existing entry 
-    '''
-    def update_level_roles(
-=======
         - Status only needs to be specified if you want to overwrite an existing entry 
     '''
     async def update_level_roles(
->>>>>>> neues-repo/main
         guild_id:int, 
         role_id:int = None, 
         role_level:int = None, 
         status:str = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor() 
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor() 
->>>>>>> neues-repo/main
      
         try:
 
@@ -1694,26 +1263,15 @@ class DatabaseUpdates():
                 update_level_roles = "UPDATE LevelSystemRoles SET roleId = %s WHERE guildId = %s AND roleLevel = %s"
                 update_level_roles_values = [role_id, guild_id, role_level]
 
-<<<<<<< HEAD
-            cursor.execute(update_level_roles, update_level_roles_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
             await cursor.execute(update_level_roles, update_level_roles_values)
             await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
 
     
     '''
@@ -1741,11 +1299,7 @@ class DatabaseUpdates():
         - guild_id must be specified
         - An operation must be specified either add, remove or reset
     '''
-<<<<<<< HEAD
-    def manage_xp_bonus(
-=======
     async def manage_xp_bonus(
->>>>>>> neues-repo/main
         guild_id:int, 
         operation:str, 
         channel_id:int = None, 
@@ -1755,13 +1309,8 @@ class DatabaseUpdates():
         bonus:int = None
         ):
 
-<<<<<<< HEAD
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
         
         column_name = ["channelId", "categoryId", "roleId", "userId"]
         items = [channel_id, category_id, role_id, user_id]
@@ -1784,37 +1333,22 @@ class DatabaseUpdates():
                             bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s AND {column_name[count]} = %s"
                             bonus_list_values = [guild_id, items[count]]
 
-<<<<<<< HEAD
-                        cursor.execute(bonus_list, bonus_list_values)
-                        db_connect.commit()
-=======
                         await cursor.execute(bonus_list, bonus_list_values)
                         await db_connect.commit()
->>>>>>> neues-repo/main
 
             elif operation == "reset":
                 
                 bonus_list = f"DELETE FROM BonusXpList WHERE guildId = %s"
                 bonus_list_values = [guild_id]
 
-<<<<<<< HEAD
-                cursor.execute(bonus_list, bonus_list_values)
-                db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
                 await cursor.execute(bonus_list, bonus_list_values)
                 await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
-=======
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
@@ -2354,7 +1888,6 @@ class DatabaseUpdates():
         finally:
 
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
->>>>>>> neues-repo/main
 
 
 
@@ -2372,43 +1905,25 @@ class DatabaseRemoveDatas():
         - guild_id must be specified
         - If no user_id is specified, all entries belonging to the server are deleted
     '''
-<<<<<<< HEAD
-    def _remove_level_system_stats(guild_id:int, user_id:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
     async def remove_level_system_stats(guild_id:int, user_id:int = None):
 
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         try:
         
             remove_stats = "DELETE FROM LevelSystemStats WHERE guildId = %s AND userId = %s" if user_id != None else "DELETE FROM LevelSystemStats WHERE guildId = %s"
             remove_stats_values = [guild_id, user_id] if user_id != None else [guild_id]
             
-<<<<<<< HEAD
-            cursor.execute(remove_stats, remove_stats_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
             await cursor.execute(remove_stats, remove_stats_values)
             await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
-=======
             await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
->>>>>>> neues-repo/main
 
 
     '''
@@ -2427,17 +1942,10 @@ class DatabaseRemoveDatas():
         - guild_id must be specified
         - If no role_id or role_level is specified, all roles are removed as level roles
     '''
-<<<<<<< HEAD
-    def _remove_level_system_level_roles(guild_id:int, role_id:int = None, role_level:int = None):
-
-        db_connect = DatabaseSetup.db_connector()
-        cursor = db_connect.cursor()
-=======
     async def remove_level_system_level_roles(guild_id:int, role_id:int = None, role_level:int = None):
 
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
->>>>>>> neues-repo/main
 
         if role_id != None and role_level == None:
             column_name, data = "roleId", role_id
@@ -2455,27 +1963,14 @@ class DatabaseRemoveDatas():
                 remove_level_role = f"DELETE FROM LevelSystemRoles WHERE guildId = %s AND {column_name} = %s"
                 remove_level_role_values = [guild_id, data]
 
-<<<<<<< HEAD
-            cursor.execute(remove_level_role, remove_level_role_values)
-            db_connect.commit()
-
-        except mysql.connector.Error as error:
-=======
             await cursor.execute(remove_level_role, remove_level_role_values)
             await db_connect.commit()
 
         except aiomysql.Error as error:
->>>>>>> neues-repo/main
             print("parameterized query failed {}".format(error))
 
         finally:
 
-<<<<<<< HEAD
-            DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
-
-
-
-=======
             await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
 
 
@@ -2718,4 +2213,3 @@ class DatabaseRemoveDatas():
         finally:
 
             await DatabaseSetup.db_close(db_connection=db_connect, cursor=cursor)
->>>>>>> neues-repo/main
