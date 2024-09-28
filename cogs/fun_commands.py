@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-
-"""
-┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
-┃┏━┓┃ ┃┏━┓┃ ┃┃ ┃┃ ┗┫┣┛ ┗┓┏┓┃ ┗┫┣┛
-┃┗━━┓ ┃┃ ┃┃ ┃┃ ┃┃  ┃┃   ┃┃┃┃  ┃┃
-┗━━┓┃ ┃┗━┛┃ ┃┃ ┃┃  ┃┃   ┃┃┃┃  ┃┃
-┃┗━┛┃ ┗━━┓┃ ┃┗━┛┃ ┏┫┣┓ ┏┛┗┛┃ ┏┫┣┓
-┗━━━┛    ┗┛ ┗━━━┛ ┗━━┛ ┗━━━┛ ┗━━┛
-"""
-
-=======
->>>>>>> neues-repo/main
 from datetime import * 
 from discord import ButtonStyle, Interaction
 import requests
@@ -41,11 +28,7 @@ class RPSButtons(discord.ui.View):
             description=f"""{Emojis.dot_emoji} Wait for the answer from your opponent""", color=bot_colour)
     
 
-<<<<<<< HEAD
-    def rps_analysis(self):
-=======
     async def rps_analysis(self):
->>>>>>> neues-repo/main
 
         bot_choice = random.choice(["rock", "paper", "scissors"])
         choice_line = f"""{Emojis.dot_emoji} {f'Choice from {self.second_user.mention}: {bot_choice}' if self.user_choice["second_user_choice"] == None else f'Choice from {self.second_user.mention}: {self.user_choice["second_user_choice"]}'}"""
@@ -67,11 +50,7 @@ class RPSButtons(discord.ui.View):
         return results[self.user_choice["first_user_choice"]][self.user_choice["second_user_choice"]] if self.game_mode == 1 else results[self.user_choice["first_user_choice"]][bot_choice]
 
 
-<<<<<<< HEAD
-    def rps_check(self, choice:str, user_id:int):
-=======
     async def rps_check(self, choice:str, user_id:int):
->>>>>>> neues-repo/main
 
         if self.game_mode == 1:
             
@@ -81,11 +60,7 @@ class RPSButtons(discord.ui.View):
 
                 if self.user_choice["first_user_choice"] != "":
 
-<<<<<<< HEAD
-                    return [self.rps_analysis(), None]
-=======
                     return [await self.rps_analysis(), None]
->>>>>>> neues-repo/main
 
             elif user_id == self.second_user.id and self.check_useres["second_user"] == True:
                 
@@ -97,11 +72,7 @@ class RPSButtons(discord.ui.View):
 
                 if self.user_choice["second_user_choice"] != "":
                     
-<<<<<<< HEAD
-                    return [self.rps_analysis(), None]
-=======
                     return [await self.rps_analysis(), None]
->>>>>>> neues-repo/main
 
             elif user_id == self.first_user.id and self.check_useres["first_user"] == True:
 
@@ -114,11 +85,7 @@ class RPSButtons(discord.ui.View):
         elif self.game_mode == 0:
 
             self.check_useres["first_user"], self.user_choice["first_user_choice"], self.user_choice["second_user_choice"] = True, choice, None
-<<<<<<< HEAD
-            return [self.rps_analysis(), None]
-=======
             return [await self.rps_analysis(), None]
->>>>>>> neues-repo/main
         
         else:
             
@@ -130,11 +97,7 @@ class RPSButtons(discord.ui.View):
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple, custom_id="rock", emoji="🪨")
     async def rock_callback(self, button, interaction:discord.Interaction):
 
-<<<<<<< HEAD
-        emb = self.rps_check(user_id=interaction.user.id, choice="rock")
-=======
         emb = await self.rps_check(user_id=interaction.user.id, choice="rock")
->>>>>>> neues-repo/main
         if emb == None:
             await interaction.response.defer()
         else:
@@ -144,11 +107,7 @@ class RPSButtons(discord.ui.View):
     @discord.ui.button(label="paper", style=discord.ButtonStyle.blurple, custom_id="paper", emoji="🧻")
     async def paper_callback(self, button, interaction:discord.Interaction):
 
-<<<<<<< HEAD
-        emb = self.rps_check(user_id=interaction.user.id, choice="paper")
-=======
         emb = await self.rps_check(user_id=interaction.user.id, choice="paper")
->>>>>>> neues-repo/main
         if emb == None:
             await interaction.response.defer()
         else:
@@ -158,11 +117,7 @@ class RPSButtons(discord.ui.View):
     @discord.ui.button(label="scissors", style=discord.ButtonStyle.blurple, custom_id="scissors", emoji="✂️")
     async def scissors_callback(self, button, interaction:discord.Interaction):
 
-<<<<<<< HEAD
-        emb = self.rps_check(user_id=interaction.user.id, choice="scissors")
-=======
         emb = await self.rps_check(user_id=interaction.user.id, choice="scissors")
->>>>>>> neues-repo/main
         if emb == None:
             await interaction.response.defer()
         else:
