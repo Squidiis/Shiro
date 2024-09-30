@@ -2132,33 +2132,39 @@ class ShowLevelSettingsSelect(discord.ui.View):
 
             elif select.values[0] == "show_level_up_message":
 
-                level_up_message = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[4]
+                level_up_message = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
                 emb = discord.Embed(description=f"""## Current level up message
-                    {Emojis.dot_emoji} Currently is:\n{f'`{level_up_message}`' if level_up_message != default_message else f'`{default_message}`'} the level up message.
+                    {Emojis.dot_emoji} Currently is:\n{f'`{level_up_message[4]}`' if level_up_message[4] != default_message else f'`{default_message}`'} the level up message.
                     {Emojis.dot_emoji} The level up message is always sent when someone gets a level up
                     {Emojis.help_emoji} You also have several parameters to customize them exactly in the curly brackets you can either use the parameter user or level""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
             elif select.values[0] == "show_xp_rate":
 
+                xp_rate = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+
                 emb = discord.Embed(description=f"""## Current XP rate
                     {Emojis.dot_emoji} The XP rate is the amount of XP you receive as a reward per activity
-                    {Emojis.dot_emoji} The current XP rate is {await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]} XP per activity
+                    {Emojis.dot_emoji} The current XP rate is {xp_rate[1]} XP per activity
                     {Emojis.help_emoji} The XP rate can be influenced by the entries on the bonus XP list if activities take place in a channel, category, role or user that is on this list, extra XP will be awarded""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
             elif select.values[0] == "show_bonus_xp_percentage":
 
+                xp_percentage = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+
                 emb = discord.Embed(description=f"""## Current bonus XP percentage 
                     {Emojis.dot_emoji} The bonus percentage is the default value of the bonus XP list and is always taken into account if no own is specified
-                    {Emojis.dot_emoji} Currently the bonus XP percentage is {await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]} % more XP per activity as long as the channel, category, role or user is on the bonus XP list""", color=bot_colour)
+                    {Emojis.dot_emoji} Currently the bonus XP percentage is {xp_percentage[5]} % more XP per activity as long as the channel, category, role or user is on the bonus XP list""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
             elif select.values[0] == "show_level_status":
 
+                status = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+
                 emb = discord.Embed(description=f"""## Current status of the level system
-                    {Emojis.dot_emoji} The level system is currently {'switched on' if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[2] == 1 else 'switched off'}
+                    {Emojis.dot_emoji} The level system is currently {'switched on' if status[2] == 1 else 'switched off'}
                     {Emojis.dot_emoji} All activities are rewarded with XP unless the channel, category, role or user is on the blacklist""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
