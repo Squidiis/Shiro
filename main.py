@@ -61,7 +61,7 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS LevelSystemSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 xpRate INT UNSIGNED DEFAULT 20,
-                levelStatus BIT DEFAULT 0,
+                levelStatus INT DEFAULT 0,
                 levelUpChannel BIGINT UNSIGNED NULL,
                 levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
                 bonusXpPercentage INT UNSIGNED DEFAULT 10
@@ -92,10 +92,10 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS BotSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 botColour VARCHAR(20) NULL,
-                ghostPing BIT DEFAULT 0,
-                antiLink BIT(4) DEFAULT 3,
+                ghostPing INT DEFAULT 0,
+                antiLink INT DEFAULT 3,
                 antiLinkTimeout INT DEFAULT 0,
-                autoReaction BIT DEFAULT 0
+                autoReaction INT DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             # Leaderboard tables
