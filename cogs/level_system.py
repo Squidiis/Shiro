@@ -1608,13 +1608,13 @@ class LevelSystemOnOffSwitch(discord.ui.Button):
         
         if interaction.user.guild_permissions.administrator:
             
-            settings = await DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)[2]
+            settings = await DatabaseCheck.check_level_settings(guild_id=interaction.guild.id)
 
-            await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status=1 if settings == 0 else 0)
+            await DatabaseUpdates.update_level_settings(guild_id=interaction.guild.id, level_status=1 if settings[2] == 0 else 0)
                         
-            emb = discord.Embed(description=f"""## The level system was switched {0 if settings == 1 else 1}
-                {Emojis.dot_emoji} {'From now on, XP will no longer be given as a reward.' if settings == 1 else 'From now on all activities will be rewarded with XP, you can adjust the amount manually using the **/set-level-system** command'}
-                {Emojis.help_emoji} If you want to {'turn on' if settings == 1 else 'switch off'} the level system, just use this command again""", color=bot_colour)
+            emb = discord.Embed(description=f"""## The level system was switched {"off" if settings[2] == 1 else "on"}
+                {Emojis.dot_emoji} {'From now on, XP will no longer be given as a reward.' if settings[2] == 1 else 'From now on all activities will be rewarded with XP, you can adjust the amount manually using the **/set-level-system** command'}
+                {Emojis.help_emoji} If you want to {'turn on' if settings[2] == 1 else 'switch off'} the level system, just use this command again""", color=bot_colour)
             await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
         else:
