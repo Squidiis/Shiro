@@ -128,9 +128,11 @@ class AutoReaction(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def set_auto_reaction(self, ctx:discord.ApplicationContext):
 
+        settings = await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
+
         emb = discord.Embed(description=f"""## Settings menu for the auto reaction system
             {Emojis.dot_emoji} With the button below you can either switch the auto-reactions menu on or off
-            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)[5] == 0 else 'switched on'}
+            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if settings[5] == 0 else 'switched on'}
             {Emojis.help_emoji} With the command `add-auto-reaction` you can then set auto-reactions that automatically leave a reaction in the areas you specify""", color=bot_colour)
         await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
 
