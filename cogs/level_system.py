@@ -1720,10 +1720,11 @@ class SetLevelUpChannelSelect(discord.ui.View):
             if settings[3] != select.values[0].id:
 
                 await DatabaseUpdates.update_level_settings(guild_id = interaction.guild.id, level_up_channel = select.values[0].id)
-                    
+                settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
+
                 emb = discord.Embed(
-                    description=f"""## Level up channel has been {f"set " if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else "overwritten"}
-                    {Emojis.dot_emoji} You have set <#{select.values[0].id}> as the {"new" if await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3] == None else ""} level up channel.
+                    description=f"""## Level up channel has been {f"set " if settings[3] == None else "overwritten"}
+                    {Emojis.dot_emoji} You have set <#{select.values[0].id}> as the {"new" if settings[3] == None else ""} level up channel.
                     {Emojis.dot_emoji} All level up messages and all notifications for the level roles will be sent to this channel from now on.""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
             
@@ -1797,11 +1798,11 @@ class BonusXpPercentage(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            check_settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]
+            check_settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
-            if check_settings == select.values[0]:
+            if check_settings[5] == select.values[0]:
 
-                await interaction.response.send_message(embed=GetEmbed.get_embed(settings=check_settings, embed_index=0), ephemeral=True, view=None)
+                await interaction.response.send_message(embed=GetEmbed.get_embed(settings=check_settings[5], embed_index=0), ephemeral=True, view=None)
 
             else:
             
@@ -1848,11 +1849,11 @@ class BonusXpPercentageModal(discord.ui.Modal):
 
         if interaction.user.guild_permissions.administrator:
             
-            check_settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[5]
+            check_settings = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
-            if check_settings == self.children[0].value:
+            if check_settings[5] == self.children[0].value:
 
-                await interaction.response.send_message(embed=GetEmbed.get_embed(settings=check_settings, embed_index=0), ephemeral=True, view=None)
+                await interaction.response.send_message(embed=GetEmbed.get_embed(settings=check_settings[5], embed_index=0), ephemeral=True, view=None)
 
             else:
 
@@ -1916,14 +1917,14 @@ class SetXpRate(discord.ui.View):
     
     async def set_xp_rate_selct(self, select, interaction:discord.Interaction):
         
-        check_xp_rate = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[1]
+        check_xp_rate = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
         if interaction.user.guild_permissions.administrator:
 
-            if select.values[0] == check_xp_rate:
+            if select.values[0] == check_xp_rate[1]:
 
                 emb = discord.Embed(description=f"""## {Emojis.help_emoji} This value is already set as the bonus XP value
-                    {Emojis.dot_emoji} The bonus XP value is already set to {check_xp_rate} XP per message""", color=bot_colour)
+                    {Emojis.dot_emoji} The bonus XP value is already set to {check_xp_rate[1]} XP per message""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
             else:
