@@ -238,7 +238,7 @@ class OverwriteBoosterChannel(discord.ui.Button):
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
+ 
 
 class OverwriteBoosterChannelSelect(discord.ui.View):
 
