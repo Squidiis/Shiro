@@ -45,7 +45,7 @@ DROP TABLE IF EXISTS `LevelSystemSettings`;
 CREATE TABLE LevelSystemSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     xpRate INT UNSIGNED DEFAULT 20,
-    levelStatus BIT DEFAULT 0,
+    levelStatus INT DEFAULT 0,
     levelUpChannel BIGINT UNSIGNED NULL,
     levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
     bonusXpPercentage INT UNSIGNED DEFAULT 10
@@ -159,10 +159,10 @@ DROP TABLE IF EXISTS `BotSettings`;
 CREATE TABLE BotSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     botColour VARCHAR(20) NULL,
-    ghostPing BIT DEFAULT 0,
-    antiLink BIT(4) DEFAULT 3,
+    ghostPing INT DEFAULT 0,
+    antiLink INT DEFAULT 3,
     antiLinkTimeout INT DEFAULT 0,
-    autoReaction BIT DEFAULT 0
+    autoReaction INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -179,3 +179,34 @@ CREATE TABLE AutoReactionSettings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+-------------- Table for the booster system ---------------
+
+DROP TABLE IF EXISTS `BoosterSystem`;
+
+CREATE TABLE BoosterSystem (
+    guildId BIGINT UNSIGNED NOT NULL,
+    status INT UNSIGNED DEFAULT 1,
+    channelId BIGINT NULL,
+    message VARCHAR(4000) DEFAULT 'Thank you, {username}, for boosting the server! Your support helps make this community even better. We appreciate you!'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-------------- Table for the sticky message ---------------
+
+DROP TABLE IF EXISTS `StickyMessage`;
+
+CREATE TABLE StickyMessage (
+    guildId BIGINT UNSIGNED NOT NULL,
+    channelId BIGINT NOT NULL,
+    messageId BIGINT NULL,
+    message VARCHAR(4000) NULL,
+    status INT DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `StickyMessageSettings`;
+
+CREATE TABLE StickyMessage (
+    guildId BIGINT UNSIGNED NOT NULL,
+    status INT UNSIGNED DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

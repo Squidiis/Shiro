@@ -8,4 +8,5 @@ Bot_colour: 0x89d7ff
 # Color code for the rank cards (must be specified in RGB format)
 Rank_card_colour: [8, 120, 151]
 
-
+# Invitation link to the support server
+Support_server_inv: "https://discord.gg/9kJaPrWdwM"

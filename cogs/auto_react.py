@@ -23,7 +23,7 @@ class AutoReaction(commands.Cog):
         - guild_id must be specified
         - If no auto-reactions are set, information about this is returned
     '''
-    async def show_auto_reactions_all(guild_id:int):
+    async def show_auto_reactions_all(self, guild_id:int):
         
         all_auto_reactions = await DatabaseCheck.check_auto_reaction(guild_id = guild_id)
 
@@ -128,9 +128,11 @@ class AutoReaction(commands.Cog):
     @commands.has_permissions(administrator = True)
     async def set_auto_reaction(self, ctx:discord.ApplicationContext):
 
+        settings = await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
+
         emb = discord.Embed(description=f"""## Settings menu for the auto reaction system
             {Emojis.dot_emoji} With the button below you can either switch the auto-reactions menu on or off
-            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)[5] == 0 else 'switched on'}
+            {Emojis.dot_emoji} The auto-reaction system is currently {'switched off' if settings[5] == 0 else 'switched on'}
             {Emojis.help_emoji} With the command `add-auto-reaction` you can then set auto-reactions that automatically leave a reaction in the areas you specify""", color=bot_colour)
         await ctx.respond(embed=emb, view = AutoReactionOnOffSwitch())
 
@@ -231,7 +233,8 @@ class AutoReaction(commands.Cog):
                 {Emojis.dot_emoji} No auto-reactions have been set for this server
                 {Emojis.help_emoji} If you want to set some use the commad `add-auto-reactions`""", color=bot_colour)
             await ctx.respond(embed = emb)
-    
+            
+            
     @commands.slash_command(name = "reset-auto-reactions", description = "Resets all auto-reactions of the server!")
     @commands.has_permissions(administrator = True)
     async def reset_auto_reactions(self, ctx:discord.ApplicationContext):
@@ -269,7 +272,8 @@ class AutoReactionOnOffSwitch(discord.ui.View):
     @discord.ui.button(
         label="on / off switch",
         style=discord.ButtonStyle.blurple,
-        custom_id="on_off_switch_auto_reaction")
+        custom_id="on_off_switch_auto_reaction"
+    )
     
     async def auto_reaction_settings(self, button, interaction:discord.Interaction):
 
@@ -297,16 +301,22 @@ class ShowAutoReactions(discord.ui.View):
         label="show auto-reactions",
         style=discord.ButtonStyle.blurple,
         custom_id="show_all_auto_reactions"
-        )
+    )
 
     async def show_auto_reactions_button(self, button, interaction: Interaction):
         
         if interaction.user.guild_permissions.administrator:
 
+            auto_reaction_cog = bot.get_cog('AutoReaction')
+
+            if auto_reaction_cog:
+                reactions = await auto_reaction_cog.show_auto_reactions_all(interaction.guild.id)
+
+
             emb = discord.Embed(description=f"""## Auto reactions
                 {Emojis.dot_emoji} Here you can see a list of all auto-reactions that have been set for the server {interaction.guild.name} 
                 
-                {await AutoReaction.show_auto_reactions_all(guild_id = interaction.guild.id)}""", color=bot_colour)
+                {reactions}""", color=bot_colour)
             await interaction.response.edit_message(embed=emb)
 
         else:

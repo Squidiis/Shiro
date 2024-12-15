@@ -41,6 +41,7 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - anti-link system (with whitelist function)
     - anti-ghost ping system
     - invite tracker
+    - sticky-message system (Ensures that a specific message is always at the end of the chat)
 
 * Fun commands
     - RPS (Rock, Paper, Scissors) alone against a bot or against your friends
@@ -53,6 +54,7 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - Message Leaderboard system (The top 15 users who have written the most messages in an interval determined by the server owner are presented on a leaderboard)
     - Invite Leaderboard system (The top 15 users who invite the most users in an interval determined by the server owner are presented on a leaderboard)
     - Leaderboard roles to reward users who have reached a certain place (Message and Invite Leaderboard have their own roles, each place can also be filled with an individual role)
+    - Booster channel system (Always sends a notification when someone boosts the server)
 
 ## 📝 Requirements
 
@@ -169,3 +171,12 @@ This project is licensed under the [Custom License](LICENSE.txt). For commercial
 |remove-auto-reaction|Remove an auto-reaction|
 |show-auto-reaction|Display all auto-reactions set for a server|
 |reset-auto-reaction|resets all auto-reactions set for a server|
+|add-sticky-messagge|Adds a new sticky-message|
+|remove-sticky-message|Removes a sticky-message|
+|show-sticky-message|Displays all sticky-messages created for a server|
+|reset-sticky-message|Deletes all sticky-messages|
+|set-sticky-message|Sets the sticky-messages and can edit individual sticky-messages|
+|add-booster-channel|Adds a booster channel to which a message is always sent when the server is boosted|
+|remove-booster-channel|Removes the booster channel|
+|set-booster-channel|Sets the booster channel (activate, deactivate, overwrite the channel)|
+|show-booster-channel|Displays which channel is currently set as the booster channel|

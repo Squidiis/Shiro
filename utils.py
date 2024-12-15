@@ -138,6 +138,8 @@ class GetEmbed():
                 9: Antilink violation
                 10: Error embed for overrides
                 11: Mod role (for leaderboard system)
+                12: Start page cannot be changed 
+                13: No sticky messages defined yet
         - settings
             The correct information that must be inserted in the embed
         - settings2 (same as settings)
@@ -248,6 +250,24 @@ class GetEmbed():
                 {Emojis.dot_emoji} This role has admin or moderation rights, so it would be too dangerous to assign them through the leaderboard
                 {Emojis.help_emoji} If you want to set a different role as leaderboard-role just run the command again""", color=bot_colour)
 
+        elif embed_index == 12:
+
+            emb = discord.Embed(description=f"""## You cannot change the start page
+                {Emojis.dot_emoji} No changes can be made to the start page, please select another page""", color=bot_colour)
+            
+        elif embed_index == 13:
+
+            emb = discord.Embed(description=f"""## No sticky messages have been defined yet
+                {Emojis.dot_emoji} No sticky messages have been set for this server
+                {Emojis.dot_emoji} If you want to set some use the `add-sticky-message` command""", color=bot_colour)
+
+        else:
+            
+            with open("config.yaml", 'r') as f:
+                data = yaml.safe_load(f)
+            emb = discord.Embed(description=f"""## An error has occurred
+                {Emojis.dot_emoji} Please try again, if this problem persists please inform an admin on {data['Support_server_inv']}""", color=bot_colour)
+            
         return emb
     
     
@@ -308,6 +328,8 @@ class HelpMenuSelect(discord.ui.View):
             discord.SelectOption(label="Level commands part 1", description="Shows you all commands that belong to the level system part 1", value="level_one"),
             discord.SelectOption(label="Level commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two"),
             discord.SelectOption(label="Statistics commands", description="Shows you all commands that belong to the statistics system", value="statistic"),
+            discord.SelectOption(label="Anti-link commands", description="Shows you all commands that belong to the anti-link system", value="antilink"),
+            discord.SelectOption(label="Auto-reaction commands", description="Shows you all commands that belong to the auto-reaction system", value="auto_reaction"),
             discord.SelectOption(label="Other system commands", description="Shows you all commands that belong to the other systems", value="other_systems")
         ],
         custom_id = "help_menu_select")
@@ -440,10 +462,28 @@ class HelpMenuSelect(discord.ui.View):
                 value="Show all information about your server", inline=True)
             await interaction.response.send_message(embed=emb, ephemeral=True)
 
+        
+        if select.values[0] == "antilink":
 
-        if select.values[0] == "other_systems":
+            emb = discord.Embed(description=f"""## Anti-link system commands""", color=bot_colour)
+            emb.add_field(name="set-anti-link", 
+                value="Set the anti-link system", inline=True)
+            emb.add_field(name="/show-antilink-settings", 
+                value="Shows how the antilin system is set", inline=True)
+            emb.add_field(name="/add-antilink-whitelist", 
+                value="Adds items to the whitelist", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/remove-antilink-whitelist", 
+                value="Removes items from the whitelist", inline=True)
+            emb.add_field(name="/show-antilink-whitelist", 
+                value="Shows what is on the white list", inline=True)
+            emb.add_field(name="/reset-antilink-whitelist", 
+                value="Resets the whitelist", inline=True)
+            
+        
+        if select.values[0] == "auto_reaction":
 
-            emb = discord.Embed(description="""## Other system commands""", color=bot_colour)
+            emb = discord.Embed(description=f"""## Auto-reaction system commands""", color=bot_colour)
             emb.add_field(name="set-auto-reaction",
                 value="Sets the auto-reaction system", inline=True)
             emb.add_field(name="add-auto-reaction",
@@ -455,22 +495,34 @@ class HelpMenuSelect(discord.ui.View):
                 value="Shows all auto-reactions that are set on the server", inline=True)
             emb.add_field(name="reset-auto-reactions",
                 value="Resets all auto-reactions that are set for the server", inline=True)
-            emb.add_field(name="set-anti-link", 
-                value="Set the anti-link system", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
-            emb.add_field(name="/show-antilink-settings", 
-                value="Shows how the antilin system is set", inline=True)
-            emb.add_field(name="/add-antilink-whitelist", 
-                value="Adds items to the whitelist", inline=True)
-            emb.add_field(name="/remove-antilink-whitelist", 
-                value="Removes items from the whitelist", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
-            emb.add_field(name="/show-antilink-whitelist", 
-                value="Shows what is on the white list", inline=True)
-            emb.add_field(name="/reset-antilink-whitelist", 
-                value="Resets the whitelist", inline=True)
+
+
+        if select.values[0] == "other_systems":
+
+            emb = discord.Embed(description="""## Other system commands""", color=bot_colour)
             emb.add_field(name="/ghost-ping-settings", 
                 value="Set the ghost ping system", inline=True)
+            emb.add_field(name="/set-booster-channel", 
+                value="Sets the booster channel system", inline=True)
+            emb.add_field(name="/add-booster-channel", 
+                value="Defines a channel as a booster channel", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/remove-booster-channel", 
+                value="Removes the booster channel", inline=True)
+            emb.add_field(name="/show-booster-channel", 
+                value="Shows which channel is set as the booster channel", inline=True)
+            emb.add_field(name="/set-sticky-message", 
+                value="Sets the sticky message", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/add-sticky-message", 
+                value="Adds a sticky message", inline=True)
+            emb.add_field(name="/remove-sticky-message", 
+                value="Removes a sticky message", inline=True)
+            emb.add_field(name="/show-sticky-message", 
+                value="Shows all sticky messages", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/reset-sticky-message", 
+                value="Deletes all sticky messages", inline=True)
             await interaction.response.send_message(embed=emb, ephemeral=True)
 
 

@@ -152,10 +152,10 @@ class ModeratorCommands(commands.Cog):
     @commands.Cog.listener()
     async def on_message_edit(self, before:discord.Message, after:discord.Message):
         
-        if await self.check_whitelist_antilink(message=after) == True:
-            return
-        
         if after.author.bot:
+            return
+
+        if await self.check_whitelist_antilink(message=after) == True:
             return
         
         else:

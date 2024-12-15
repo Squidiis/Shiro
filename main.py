@@ -6,6 +6,8 @@ from cogs.fun_commands import *
 from utils import *
 from cogs.leaderboard_system import *
 from cogs.auto_react import *
+from cogs.booster_system import *
+from cogs.sticky_message import *
 import logging
 
 
@@ -61,7 +63,7 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS LevelSystemSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 xpRate INT UNSIGNED DEFAULT 20,
-                levelStatus BIT DEFAULT 0,
+                levelStatus INT DEFAULT 0,
                 levelUpChannel BIGINT UNSIGNED NULL,
                 levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
                 bonusXpPercentage INT UNSIGNED DEFAULT 10
@@ -92,10 +94,10 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS BotSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 botColour VARCHAR(20) NULL,
-                ghostPing BIT DEFAULT 0,
-                antiLink BIT(4) DEFAULT 3,
+                ghostPing INT DEFAULT 0,
+                antiLink INT DEFAULT 3,
                 antiLinkTimeout INT DEFAULT 0,
-                autoReaction BIT DEFAULT 0
+                autoReaction INT DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             # Leaderboard tables
@@ -171,6 +173,31 @@ class Main(commands.Cog):
                 parameter VARCHAR(255) NOT NULL,
                 emoji VARCHAR(255) NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            # Booster system
+            '''
+            CREATE TABLE IF NOT EXISTS BoosterSystem (
+                guildId BIGINT UNSIGNED NOT NULL,
+                status INT UNSIGNED DEFAULT 1,
+                channelId BIGINT NULL,
+                message VARCHAR(4000) DEFAULT 'Thank you, [user], for boosting the server! Your support helps make this community even better. We appreciate you!'
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            # Sticky message
+            '''
+            CREATE TABLE IF NOT EXISTS StickyMessage (
+                guildId BIGINT UNSIGNED NOT NULL,
+                channelId BIGINT NOT NULL,
+                messageId BIGINT NULL,
+                message VARCHAR(4000) NULL,
+                status INT DEFAULT 1
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS StickyMessageSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                status INT UNSIGNED DEFAULT 1
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             '''
             ]
 
@@ -197,6 +224,10 @@ class Main(commands.Cog):
         print("┗━━┓┃ ┃┗━┛┃ ┃┃ ┃┃  ┃┃   ┃┃┃┃  ┃┃")
         print("┃┗━┛┃ ┗━━┓┃ ┃┗━┛┃ ┏┫┣┓ ┏┛┗┛┃ ┏┫┣┓")
         print("┗━━━┛    ┗┛ ┗━━━┛ ┗━━┛ ┗━━━┛ ┗━━┛")
+
+        no_page = discord.Embed(description=f"""## An error has occurred
+            {Emojis.dot_emoji} This interaction has been updated and therefore no pages can be accessed
+            {Emojis.dot_emoji} Please try again later by calling the command again""", color=bot_colour)
 
         # level system
         self.bot.add_view(LevelRolesButtons(role_id=None, role_level=None, status=None))
@@ -237,6 +268,22 @@ class Main(commands.Cog):
         # Auto-reaction
         self.bot.add_view(AutoReactionOnOffSwitch())
         self.bot.add_view(ShowAutoReactions())
+
+        # Sticky message
+        self.bot.add_view(SetStickyMessage())
+        self.bot.add_view(PaginatorViewStickyMessage(pages=[no_page]))
+        self.bot.add_view(OverwriteChannelSelect())
+        self.bot.add_view(AddStickyMessageText(channel=None))
+        view.add_item(EditStickyMessage(channel=None))
+        view.add_item(ShowStickyMessage())
+
+        # Booster system
+        self.bot.add_view(OverwriteBoosterChannelSelect())
+        self.bot.add_view(ShowBoosterMessage())
+        view.add_item(SetBoosterChannel())
+        view.add_item(OverwriteBoosterChannel())
+        view.add_item(OverwriteBoosterMessage())
+        view.add_item(SetBoosterMessage())
 
         # Other Systems
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))

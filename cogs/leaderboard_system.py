@@ -216,7 +216,7 @@ class LeaderboardSystem(commands.Cog):
         interval_db = next((key for key, value in interval_list.items() if value == interval), None)
         position_db = 0 if "general role" == position else int(position)
 
-        check_role = await DatabaseCheck.check_leaderboard_roles(guild_id=ctx.guild.id, role_id=role.id, position=position_db, system=system)
+        check_role = await DatabaseCheck.check_leaderboard_roles(guild_id=ctx.guild.id, role_id=role.id, position=position_db, system=system, interval = interval_db)
         
         if check_role is not None and check_role[4] == interval_db:
             
@@ -609,7 +609,7 @@ class LeaderboardSystem(commands.Cog):
                         return
                     
         except Exception as e:
-            print(f"Error in sort leaderboard {e}")
+            print(f"Error: [member join] {e}")
 
 
     @commands.Cog.listener()
@@ -713,88 +713,77 @@ class LeaderboardSystem(commands.Cog):
             Which leaderboard should be created
     '''
     async def sort_leaderboard(self, user_list, interval, guild_id, system):
-        
+
         try:
 
             guild = self.bot.get_guild(guild_id)
-            interval_list = ["", "daily", "weekly", "monthly", "whole"] if system == "message" else ["", "weekly", "monthly", "quarterly", "whole"]
-            check_roles = await DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, interval = interval_list[interval], system = system)
+            interval_list = ["", "day", "week", "month", "general"] if system == "message" else ["", "week", "month", "quarter", "general"]
+            interval_value = interval_list[interval]
+
+            check_roles = await DatabaseCheck.check_leaderboard_roles(guild_id=guild_id, interval=interval_value, system=system)
             
             general_role = None
             if check_roles:
+                general_role = next((guild.get_role(i[1]) for i in check_roles if i[2] == 0), None)
 
-                for i in check_roles:
-
-                    if i[2] == 0:
-
-                        general_role = guild.get_role(i[1])
-
-            max_lengths = [
-                max(len(str(t[i])) for t in user_list)
-                for i in range(10)
-            ]
+            max_lengths = [max(len(str(t[i])) for t in user_list) for i in range(10)]
+            
             user_names, users = [], []
             for t in user_list:
-                
+            
                 try:
-
                     user = await guild.fetch_member(t[1])
                     user_names.append(user.name)
                     users.append(user)
-                    max_lengths[0] = max(max_lengths[0], len(user.name))
+                    max_lengths[0] = max(max_lengths[0], len(user.name)) 
                     await asyncio.sleep(0.1)
 
                 except Exception as e:
-                    print(f"User not found: {e}")
-                    await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id = guild_id, user_id = t[1])
+                    print(f"Exception: [sort_leaderboard:user check] {e}")
+                    await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id=guild_id, user_id=t[1])
 
             max_index = len(user_names) - 1
 
             padded_tuples = [
-                (   
+                (
                     user_names[min(i, max_index)].ljust(max_lengths[0]),
                     str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
                     str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
                     str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[8]).ljust(max_lengths[8]),
                     str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[9]).ljust(max_lengths[9])
                 )
-                for i, t in enumerate(iterable=user_list)
+                for i, t in enumerate(user_list)
             ]
+        
+            await self.remove_leaderboard_roles(guild=guild, interval=interval_value, system=system)
             
-            await self.remove_leaderboard_roles(guild=guild, interval=interval_list[interval], system=system)
-            
-            leaderboard, count = [], 0
+            leaderboard = []
+            count = 0
             for i in range(min(len(user_list), 15)):
-                
-                if check_roles and i != None:
+
+                if check_roles:
                     
-                    role = await DatabaseCheck.check_leaderboard_roles(guild_id = guild_id, position = i + 1, system = system)
+                    role = await DatabaseCheck.check_leaderboard_roles(guild_id=guild_id, position=i + 1, system=system, interval = interval_value)
 
-                    if general_role != None and count < 1:
-                        
+                    if general_role and count < 1:
                         await users[i].add_roles(general_role)
-                        await asyncio.sleep(0.1)
-                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = general_role.id, operation = "add", status = system, interval = interval_list[interval])
-                        count =+ 1
+                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=general_role.id, operation="add", status=system, interval=interval_value)
+                        count += 1
 
-                    if role != None:
-
+                    if role:
+                        
                         leaderboard_role = guild.get_role(role[1])
                         await users[i].add_roles(leaderboard_role)
                         await asyncio.sleep(0.1)
-                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild_id, user_id = users[i].id, role_id = role[1], operation = "add", status = system, interval = interval_list[interval])
-                    
-                num_str = str(i + 1)
-                if len(num_str) == 1:
-                    num_str = f" #{num_str}  "
-                elif len(num_str) == 2:
-                    num_str = f" #{num_str} "
-                leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
+                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=role[1], operation="add", status=system, interval=interval_value)
                 
+                num_str = f" #{i + 1:2d} "
+                leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
+            
             return "".join(leaderboard)
-        
+
         except Exception as e:
-            print(f"Error in sort leaderboard {e}")
+            print(f"Error: [sort_leaderboard] {e}")
 
 
     @tasks.loop(hours=1)
@@ -849,7 +838,7 @@ class LeaderboardSystem(commands.Cog):
                     return
     
         except Exception as e:
-            print(f"Exception in edit_leaderboard_invite: {e}")
+            print(f"Exception: [edit_leaderboard_invite] {e}")
 
         
 
@@ -962,7 +951,7 @@ class LeaderboardSystem(commands.Cog):
                     return
             
         except Exception as e:
-            print(f"Exception in edit_leaderboard_message: {e}")
+            print(f"Exception [edit_leaderboard_message]: {e}")
 
 
     async def update_whole_leaderboard_message(self, guild_id:int, message:discord.Message):
@@ -1035,6 +1024,7 @@ class SetleaderboardChannel(discord.ui.View):
         self.add_item(DefaultSettingsLeaderboard())
         self.add_item(CancelButton(system = None))
 
+
     @discord.ui.channel_select(
         placeholder = "Choose a channel that you want to set as the leaderboard channel for the inivte leaderboard!",
         min_values = 1,
@@ -1090,7 +1080,7 @@ class SetleaderboardChannel(discord.ui.View):
 
 
     @discord.ui.button(
-        label="skip channel setting",
+        label="Skip channel setting",
         style=discord.ButtonStyle.blurple,
         custom_id="skip_channel"
     )
@@ -1125,6 +1115,7 @@ class SetMessageleaderboard(discord.ui.View):
         super().__init__(timeout=None)
         self.add_item(SkipIntervalSetting())
         self.add_item(CancelButton(system = "message leaderboard system"))
+
 
     @discord.ui.select(
         placeholder = "Select the intervals at which the activities should be displayed!",
@@ -1231,6 +1222,7 @@ class SetInviteleaderboard(discord.ui.View):
         self.add_item(SkipIntervalSetting())
         self.add_item(CancelButton(system = "invite leaderboard system"))
 
+
     @discord.ui.select(
         placeholder = "Select the intervals at which the activities should be displayed!",
         min_values = 1,
@@ -1333,7 +1325,7 @@ class SkipIntervalSetting(discord.ui.Button):
 
     def __init__(self):
         super().__init__(
-            label="skip interval setting",
+            label="Skip interval setting",
             style=discord.ButtonStyle.blurple,
             custom_id="skip_interval_setting"
         )
@@ -1374,14 +1366,14 @@ class SkipIntervalSetting(discord.ui.Button):
 
 class OverwriteMessageChannel(discord.ui.View):
 
-    def __init__(
-            self, channel_id):
+    def __init__(self, channel_id):
         super().__init__(timeout=None)
         self.channel_id = channel_id
         self.add_item(CancelButton(system=None))
 
+
     @discord.ui.button(
-        label="overwrite channel",
+        label="Overwrite channel",
         style=discord.ButtonStyle.blurple,
         custom_id="overwrite_leaderboard_channel"
     )
@@ -1432,7 +1424,7 @@ class OverwriteMessageChannel(discord.ui.View):
 
 
     @discord.ui.button(
-        label="keep current channel",
+        label="Keep current channel",
         style=discord.ButtonStyle.blurple,
         custom_id="keep_channel"
     )
@@ -1461,7 +1453,7 @@ class ContinueSettingLeaderboard(discord.ui.View):
         self.add_item(CancelButton(system=None))
 
     @discord.ui.button(
-        label="continue settings",
+        label="Continue settings",
         style=discord.ButtonStyle.blurple,
         custom_id="continue_setting_leaderbaord"
     )
@@ -1490,8 +1482,9 @@ class OverwriteInterval(discord.ui.View):
         super().__init__(timeout=None)
         self.add_item(CancelButton(system=None))
 
+
     @discord.ui.button(
-        label="overwrite the intervals",
+        label="Overwrite the intervals",
         style=discord.ButtonStyle.blurple,
         custom_id="overwrite_intervals"
     )
@@ -1563,7 +1556,7 @@ class OverwriteInterval(discord.ui.View):
 
 
     @discord.ui.button(
-        label="keep intervals",
+        label="Keep intervals",
         style=discord.ButtonStyle.blurple,
         custom_id="keep_intervals_message"
     )
@@ -1589,7 +1582,7 @@ class OverwriteInterval(discord.ui.View):
                         list_intervals.append(f"{Emojis.dot_emoji} Monthly updated leaderboard\n")
 
             else:
-
+            
                 for _, _, week, month, quarter, _, _ in check_settings:
 
                     if week is not None:
@@ -1617,7 +1610,7 @@ class LeaderboardOnOffSwitch(discord.ui.Button):
         super().__init__(
             label = "on / off switch",
             style = discord.ButtonStyle.blurple,
-            custom_id = "on_off_switch"
+            custom_id = "on_off_switch_leaderboard"
         )
 
     async def callback(self, interaction:discord.Interaction):
@@ -1687,7 +1680,7 @@ Parameters:
         Which leaderboard is involved
 '''
 async def show_leaderboard_roles(guild_id, interval, system):
-    
+
     interval_list = interval_list_message if system == "message" else interval_list_invite
     interval_db = next((key for key, value in interval_list.items() if value == interval), None)
 
@@ -1731,8 +1724,9 @@ class OverwriteRole(discord.ui.View):
         super().__init__(timeout=None)
         self.add_item(CancelButton(system = "message leaderboard roles"))
 
+
     @discord.ui.button(
-        label="overwrite entry",
+        label="Overwrite entry",
         style=discord.ButtonStyle.blurple,
         custom_id="overwrite_role_entry"
     )
@@ -1748,7 +1742,7 @@ class OverwriteRole(discord.ui.View):
                 check_role = await DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = self.delete[1], system = system)
                 if check_role:
                     await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = self.delete[1], interval = self.interval, system = system)
-                check_positon = await DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position, system = system)
+                check_positon = await DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, position = self.position, system = system, interval = self.interval)
                 if check_positon:
                     await DatabaseRemoveDatas.remove_leaderboard_role(guild_id = interaction.guild.id, role_id = check_positon[1], interval = self.interval, system = system)
 
@@ -1769,7 +1763,7 @@ class OverwriteRole(discord.ui.View):
 
 
     @discord.ui.button(
-        label="keep entry",
+        label="Keep entry",
         style=discord.ButtonStyle.blurple,
         custom_id="keep_role_entry"
     )
@@ -1793,8 +1787,9 @@ class ShowLeaderboardRolesButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+
     @discord.ui.button(
-        label = "show all leaderboard roles",
+        label = "Show all leaderboard roles",
         style = discord.ButtonStyle.blurple,
         custom_id = "show_leaderboard_roles_button"
     )
@@ -1832,6 +1827,7 @@ class ShowLeaderboardRolesSelectMessage(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+
     @discord.ui.select(
         placeholder = "Choose from which leaderboard you want to see all roles!",
         min_values = 1,
@@ -1849,10 +1845,12 @@ class ShowLeaderboardRolesSelectMessage(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
+            roles = await show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0], system="message")
+
             emb = discord.Embed(description=f"""## Leaderboard roles for the {select.values[0]} message leaderboard
                 {Emojis.dot_emoji} Here you can see an overview of all roles that are listed on the {select.values[0]} leaderboard
 
-                {await show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0], system="message")}""", color=bot_colour)
+                {roles}""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
         else:
@@ -1865,8 +1863,9 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
     
+
     @discord.ui.button(
-        label="Take a look at who has been given which role",
+        label="Show all given roles",
         style=discord.ButtonStyle.blurple,
         custom_id="show_leaderboar_given_roles"
     )
@@ -1876,25 +1875,25 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
         system = "message" if "message leaderboard" in interaction.message.embeds[0].description else "invite"
 
         intervals = [
-            "Whole",
-            "Daily" if system == "message" else "Weekly",
-            "Weekly" if system == "message" else "Monthly",
-            "Monthly" if system == "message" else "Quarterly"
+            ("Whole", "general"),
+            ("Daily", "day") if system == "message" else ("Weekly", "week"),
+            ("Weekly", "week") if system == "message" else ("Monthly", "month"),
+            ("Monthly", "month") if system == "message" else ("Quarterly", "quarter")
         ]
         
-        for key in intervals:
+        for name, key in intervals:
 
-            if key in interaction.message.embeds[0].description:
-
-                check_roles = await DatabaseCheck.check_leaderboard_roles_users(guild_id = interaction.guild.id, status = system, interval = key.lower())
-            
+            if name in interaction.message.embeds[0].description:
+                
+                check_roles = await DatabaseCheck.check_leaderboard_roles_users(guild_id = interaction.guild.id, status = system, interval = key)
+                
                 user_list, general_role = [], None
                 for role in check_roles:
                     
                     check_position = await DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = role[1], system = system)
-                    
+                  
                     if check_position[2] != 0:
-
+                    
                         user_list.append(f"{Emojis.dot_emoji} The user <@{role[2]}> has received the role <@&{role[1]}> for reaching place {check_position[2]}\n")
 
                     else:
@@ -1905,7 +1904,7 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
                     user_list.append(f"{Emojis.dot_emoji} No roles were assigned as no roles were defined for specific positions")
 
                 emb = discord.Embed(description=f"""## The following roles have been assigned
-                    {Emojis.dot_emoji} Here you can see which roles have been awarded for reaching certain places on the {key.lower()} leaderboard {general_role if general_role != None else ''}
+                    {Emojis.dot_emoji} Here you can see which roles have been awarded for reaching certain places on the **{name.lower()}** leaderboard {general_role if general_role != None else ''}
                         
                     {"".join(user_list)}
                     """, color=bot_colour)
@@ -1916,6 +1915,7 @@ class ShowLeaderboardRolesSelectInvite(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+
 
     @discord.ui.select(
         placeholder = "Choose from which leaderboard you want to see all roles!",
@@ -1934,10 +1934,12 @@ class ShowLeaderboardRolesSelectInvite(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
+            roles = await show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0], system="message")
+
             emb = discord.Embed(description=f"""## Leaderboard roles for the {select.values[0]} invite leaderboard
                 {Emojis.dot_emoji} Here you can see an overview of all roles that are listed on the {select.values[0]} leaderboard
 
-                {await show_leaderboard_roles(guild_id=interaction.guild.id, interval=select.values[0], system="invite")}""", color=bot_colour)
+                {roles}""", color=bot_colour)
             await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
         else:

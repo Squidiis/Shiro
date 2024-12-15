@@ -1,7 +1,6 @@
 import os
 from utils import *
 import discord
-from queue import Queue
 import aiomysql
 
 #######################  Database connection  #######################
@@ -510,8 +509,8 @@ class DatabaseCheck():
 
         elif position:
 
-            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND rankingPosition = %s AND status = %s"
-            check_roles_values = [guild_id, position, system]
+            check_roles = "SELECT * FROM LeaderboardRoles WHERE guildId = %s AND rankingPosition = %s AND status = %s AND roleInterval = %s"
+            check_roles_values = [guild_id, position, system, interval]
 
         elif interval and role_id:
 
@@ -520,10 +519,10 @@ class DatabaseCheck():
             check_roles_values = [guild_id, role_id, interval, system]
 
         else:
-
+            
             check_roles = f"SELECT * FROM LeaderboardRoles WHERE guildId = %s AND status = %s {'AND roleInterval = %s' if interval != None else ''} ORDER BY rankingPosition DESC"
             check_roles_values = [guild_id, system] if interval == None else [guild_id, system, interval]
-
+            
         await cursor.execute(check_roles, check_roles_values)
 
         if role_id == None and position == None or check == True:
@@ -685,9 +684,77 @@ class DatabaseCheck():
         else:
             auto_react_settings = await cursor.fetchall()
 
-            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return auto_react_settings
 
+
+    '''
+    
+    '''
+    async def check_sticky_message(
+            guild_id: int, 
+            channel_id: int = None, 
+            message_id: int = None
+        ):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_message = "SELECT * FROM StickyMessage WHERE guildId = %s"
+        check_message_values = [guild_id]
+
+        if channel_id is not None:
+            check_message += " AND channelId = %s"
+            check_message_values.append(channel_id)
+        
+        if message_id is not None:
+            check_message += " AND messageId = %s"
+            check_message_values.append(message_id)
+
+        await cursor.execute(check_message, check_message_values)
+        
+        if message_id is not None or channel_id is not None:
+            sticky_message = await cursor.fetchone()
+        else:
+            sticky_message = await cursor.fetchall()
+
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            
+        return sticky_message
+
+
+    '''
+    
+    '''
+    async def check_sticky_message_settings(guild_id:int):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_settings = "SELECT * FROM StickyMessageSettings WHERE guildId = %s"
+        check_settings_values = [guild_id]
+
+        await cursor.execute(check_settings, check_settings_values)
+        sticky_message_settings = await cursor.fetchone()
+
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return sticky_message_settings
+    
+
+    async def check_booster_channel(guild_id:int):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_settings = "SELECT * FROM BoosterSystem WHERE guildId = %s"
+        check_settings_values = [guild_id]
+
+        await cursor.execute(check_settings, check_settings_values)
+        sticky_message_settings = await cursor.fetchone()
+
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return sticky_message_settings
+    
 
 
 ########################################################  Checks the bot settings  ##############################################
@@ -1121,7 +1188,7 @@ class DatabaseUpdates():
     async def update_level_settings(
         guild_id:int, 
         xp_rate:int = None, 
-        level_status:str = None, 
+        level_status:int = None, 
         level_up_channel:int = None, 
         level_up_message:str = None, 
         percentage:int = None, 
@@ -1428,6 +1495,7 @@ class DatabaseUpdates():
         
         db_connect = await DatabaseSetup.db_connector()
         cursor = await db_connect.cursor()
+
         try:
             
             if settings != None and settings != "tracking":
@@ -1808,6 +1876,7 @@ class DatabaseUpdates():
         try:
 
             if operation == "add":
+                
                 manage_role = "INSERT INTO LeaderboardGivenRoles (guildId, roleId, userId, roleInterval, status) VALUES (%s, %s, %s, %s, %s)"
                 manage_role_values = [guild_id, role_id, user_id, interval, status]
 
@@ -1887,6 +1956,111 @@ class DatabaseUpdates():
 
         finally:
 
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
+    '''
+    
+    '''
+    async def manage_sticky_message(
+        guild_id: int,
+        operation: str,
+        status: int = None,
+        channel_id: int = None,
+        channel_id_new: int = None,
+        message_id: int = None,
+        message: str = None
+        ):
+        
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        try:
+
+            sticky_message = None
+            sticky_message_values = []
+
+            if operation == "update_settings" and status is not None:
+
+                sticky_message = "UPDATE StickyMessageSettings SET status = %s WHERE guildId = %s"
+                sticky_message_values = [status, guild_id]
+
+            elif operation == "update":
+                
+                if any(param is not None for param in [status, message_id, message, channel_id]):
+
+                    sticky_message = f"UPDATE StickyMessage SET {', '.join(
+                        f"{field} = %s" for field, param in zip(['status', 'messageId', 'message', 'channelId'], [status, message_id, message, channel_id_new]) if param is not None)} WHERE guildId = %s AND channelId = %s"
+                    sticky_message_values = [param for param in [status, message_id, message, channel_id_new] if param is not None] + [guild_id, channel_id]
+                    
+            elif operation == "insert":
+
+                sticky_message = "INSERT INTO StickyMessage (guildId, channelId) VALUES (%s, %s)"
+                sticky_message_values = [guild_id, channel_id]
+
+            elif operation == "delete":
+
+                sticky_message = f"DELETE FROM StickyMessage WHERE guildId = %s {f'AND channelId = %s' if channel_id is not None else ''}"
+                sticky_message_values = [guild_id] if channel_id is None else [guild_id, channel_id]
+  
+            if sticky_message:
+
+                await cursor.execute(sticky_message, sticky_message_values)
+                await db_connect.commit()
+
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+            
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
+    '''
+    
+    '''
+    async def manage_booster_channel(
+        guild_id:int, 
+        operation:str,
+        channel_id:int = None,
+        message:str = None,
+        status:int = None
+        ):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        booster_channel = None
+        booster_channel_values = []
+
+        try:
+
+            if operation == "insert":
+
+                booster_channel = "INSERT INTO BoosterSystem (guildId, channelId) VALUES (%s, %s)"
+                booster_channel_values = [guild_id, channel_id]
+
+            elif operation == "update":
+
+                booster_channel = f"UPDATE BoosterSystem SET {', '.join(
+                    f"{field} = %s" for field, param in zip(['status', 'channelId', 'message'], [status, channel_id, message]) if param is not None)} WHERE guildId = %s"
+                booster_channel_values = [param for param in [status, channel_id, message] if param is not None] + [guild_id]
+
+            elif operation == "delete":
+
+                booster_channel = "DELETE FROM BoosterSystem WHERE guildId = %s"
+                booster_channel_values = [guild_id]
+
+            if booster_channel:
+
+                await cursor.execute(booster_channel, booster_channel_values)
+                await db_connect.commit()
+        
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+            
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
