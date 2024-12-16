@@ -126,6 +126,12 @@ class StickyMessage(commands.Cog):
 
         else:
 
+            settings = await DatabaseCheck.check_sticky_message_settings(guild_id = ctx.guild.id)
+
+            if settings is None:
+
+                await DatabaseUpdates.manage_sticky_message(guild_id = ctx.guild.id, operation = "insert")
+
             await DatabaseUpdates.manage_sticky_message(guild_id = ctx.guild.id, channel_id = channel.id, operation = "insert")
 
             emb = discord.Embed(description=f"""## A channel for this sticky message has been defined

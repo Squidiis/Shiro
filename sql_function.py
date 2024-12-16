@@ -1995,8 +1995,8 @@ class DatabaseUpdates():
                     
             elif operation == "insert":
 
-                sticky_message = "INSERT INTO StickyMessage (guildId, channelId) VALUES (%s, %s)"
-                sticky_message_values = [guild_id, channel_id]
+                sticky_message = f"INSERT INTO {'StickyMessage' if channel_id is not None else 'StickyMessageSettings'} (guildId, {'channelId' if channel_id is not None else ''}) VALUES (%s {', %s' if channel_id is not None else ''})"
+                sticky_message_values = [guild_id, channel_id] if channel_id is not None else [guild_id]
 
             elif operation == "delete":
 
