@@ -143,15 +143,16 @@ class ApiSearchCommands(commands.Cog):
         await ctx.respond(embed=emb)
 
 
-    @commands.command()
+    @commands.slash_command(name = "anime-meme", description = "Send an anime meme!")
     async def animememe(self, ctx):
+
         async with aiohttp.ClientSession() as cd:
             async with cd.get('https://www.reddit.com/r/animememes.json') as r:
                 animememe = await r.json()
-                emb = discord.Embed(color=discord.Colour.random())
+                emb = discord.Embed(color=bot_colour)
                 emb.set_image(url=animememe["data"]["children"][random.randint(0, 20)]["data"]["url"])
                 emb.set_footer(text=f"Meme send by {ctx.author}")
-                await ctx.send(embed=emb)
+                await ctx.respond(embed=emb)
 
 
 def setup(bot):

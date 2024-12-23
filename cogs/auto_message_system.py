@@ -234,6 +234,9 @@ class AutoMessageSystem(commands.Cog):
             
             auto_messages = await DatabaseCheck.check_auto_message(guild_id = guild.id)
 
+            if auto_messages is None:
+                return
+            
             for message in auto_messages:
               
                 if message[4] == 0:
