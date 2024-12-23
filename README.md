@@ -2,7 +2,7 @@
 
 
 <h1 align="center">
-    Version 1.1!<br>
+    Version 1.4!<br>
 </h1>
 
 <h4 align="center">
