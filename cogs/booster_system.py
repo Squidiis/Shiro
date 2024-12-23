@@ -153,6 +153,9 @@ def setup(bot):
 
 
 
+#######################################  Booster system interactions  #######################################
+
+
 class SetBoosterChannel(discord.ui.Button):
 
     def __init__(self):

@@ -10,6 +10,13 @@ class StickyMessage(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.check_sticky_message_task.start()
+
+
+    async def check_lines_sticky_message(text:str):
+
+        match = re.search(r"<#(\d+)>", text)
+        return int(match.group(1)) if match else None
 
 
     async def update_paginator(guild_id):
@@ -46,6 +53,10 @@ class StickyMessage(commands.Cog):
         if reset is not None:
 
             all_messages = await DatabaseCheck.check_sticky_message(guild_id = guild_id)
+
+            if all_messages is None:
+                return
+
             for sticky_message in all_messages:
 
                 try:
@@ -64,6 +75,9 @@ class StickyMessage(commands.Cog):
         else:
 
             sticky_message = await DatabaseCheck.check_sticky_message(guild_id = guild_id, channel_id = channel.id)
+
+            if sticky_message is None:
+                return
 
             try:
 
@@ -109,20 +123,20 @@ class StickyMessage(commands.Cog):
             if check_channel[2] != None:
 
                 emb = discord.Embed(description=f"""## The channel has already been selected for a sticky message
-                    {Emojis.dot_emoji} A message has also already been set
+                    {Emojis.dot_emoji} An sticky message has already been defined for the channel {channel.mention} and a message has also already been defined
                     The following message has already been set:
                     ```{check_channel[3]}````
                     {Emojis.dot_emoji} Do you want to overwrite the message?
                     {Emojis.help_emoji} With the lower button `edit message` you can overwrite the message""", color=bot_colour)
-                await ctx.respond(embed=emb, view=EditStickyMessage(channel=channel))
+                await ctx.respond(embed=emb, view=EditStickyMessage())
 
             else:
                 
                 emb = discord.Embed(description=f"""## This channel has already been selected for a sticky message
-                    {Emojis.dot_emoji} No message has been set
+                    {Emojis.dot_emoji} No message has been set for the channel {channel.mention}
                     {Emojis.dot_emoji} Do you want to set a message now? 
                     {Emojis.help_emoji} You can add a sticky message with the `edit message` button below""", color=bot_colour)
-                await ctx.respond(embed=emb)
+                await ctx.respond(embed=emb, view=EditStickyMessage())
 
         else:
 
@@ -138,7 +152,7 @@ class StickyMessage(commands.Cog):
                 {Emojis.dot_emoji} The channel {channel.mention} is now equipped with a sticky message
                 {Emojis.dot_emoji} Please set a text for the sticky message now
                 {Emojis.help_emoji} Press the lower button `add message` to add the text""", color=bot_colour)
-            await ctx.respond(embed=emb, view=AddStickyMessageText(channel = channel))
+            await ctx.respond(embed=emb, view=AddStickyMessageText())
 
     
     @commands.slash_command(name = "remove-sticky-message", description = "Deletes a sticky message!")
@@ -194,7 +208,7 @@ class StickyMessage(commands.Cog):
         if check_channel:
                 
             emb = discord.Embed(description=f"""## Sticky messages have been reset
-                {Emojis.dot_emoji} All sticky messages have been deleted, the messages remain in the chats but are no longer placed at the beginning
+                {Emojis.dot_emoji} All sticky messages have been deleted
                 {Emojis.dot_emoji} You can easily create new sticky message at any time by using the `/add-sticky-message` command""", color=bot_colour)
             await ctx.respond(embed=emb)
 
@@ -236,25 +250,60 @@ class StickyMessage(commands.Cog):
                 
                 new_message = await message.channel.send(embed=emb)
                 await DatabaseUpdates.manage_sticky_message(guild_id = message.guild.id, channel_id = message.channel.id, message_id = new_message.id, operation = "update")
+            
+
+    @tasks.loop(hours=24)
+    async def check_sticky_message_task(self):
+
+        await self.bot.wait_until_ready()
+
+        for guild in self.bot.guilds:
+            
+            settings = await DatabaseCheck.check_sticky_message_settings(guild_id = guild.id)
+           
+            if settings is None:
+                return
+
+            if settings[0] == 0:
+                return
+            
+            all_sticky_messages = await DatabaseCheck.check_sticky_message(guild_id = guild.id)
+            
+            if all_sticky_messages is None:
+                return
+
+            for sticky_message in all_sticky_messages:
+
+                if sticky_message[4] == 0:
+                    return
+                    
+                channel = bot.get_channel(sticky_message[1])
+
+                async for recent_message in channel.history(limit=1):
+                
+                    if recent_message.id == sticky_message[2]:
+                        return
+
+                try:
+                    old_message = await channel.fetch_message(sticky_message[2])
+                    await old_message.delete()
+                except discord.NotFound:
+                   pass 
+                    
+                emb = discord.Embed(description=f"""{sticky_message[3]}""", color=bot_colour)
+                message = await channel.send(embed=emb)
+                await DatabaseUpdates.manage_sticky_message(guild_id = guild.id, channel_id = channel.id, message_id = message.id, operation = "update")
 
 
-    @commands.Cog.listener()
-    async def on_message_delete(self, message:discord.Message):
-        
-        if isinstance(message.channel, discord.DMChannel):
-            return
-        
-        sticky_message = await DatabaseCheck.check_sticky_message(guild_id = message.guild.id, message_id = message.id)
 
-        if sticky_message:
-
-            await DatabaseUpdates.manage_sticky_message(guild_id = message.guild.id, channel_id = sticky_message[1], operation = "delete")
-
-
+            
 
 def setup(bot):
     bot.add_cog(StickyMessage(bot))
 
+
+
+#######################################  Sticky message system interactions  #######################################
 
 
 class SetStickyMessage(discord.ui.View):
@@ -295,12 +344,6 @@ class PaginatorViewStickyMessage(discord.ui.View):
         self.pages = pages
         self.current_page = 0
         self.update_buttons()
-
-
-    async def check_lines(text:str):
-
-        match = re.search(r"<#(\d+)>", text)
-        return int(match.group(1)) if match else None
 
 
     def update_buttons(self):
@@ -403,7 +446,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
 
             embed_text = interaction.message.embeds[0].description
         
-            channel_id = await PaginatorViewStickyMessage.check_lines(text=embed_text)
+            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
             channel = await bot.fetch_channel(int(channel_id))
             if channel_id:
 
@@ -456,13 +499,13 @@ class PaginatorViewStickyMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await PaginatorViewStickyMessage.check_lines(text=embed_text)
+            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
 
             if channel_id:
                 
                 emb = discord.Embed(description=f"""## Sticky message has been deleted
                     {Emojis.dot_emoji} The sticky message has been successfully deleted, the message already sent was also deleted
-                    {Emojis.dot_emoji} You can easily create a new sticky message at any time by using the `/set-sticky-message` command""", color=bot_colour)
+                    {Emojis.dot_emoji} You can easily create a new sticky message at any time by using the `/add-sticky-message` command""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)
 
                 await DatabaseUpdates.manage_sticky_message(guild_id = interaction.guild.id, channel_id = int(channel_id), operation = "delete")
@@ -494,7 +537,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await PaginatorViewStickyMessage.check_lines(text=embed_text)
+            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
 
             if channel_id:
 
@@ -528,7 +571,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await PaginatorViewStickyMessage.check_lines(text=embed_text)
+            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
 
             if channel_id:
 
@@ -575,7 +618,7 @@ class OverwriteChannelSelect(discord.ui.View):
             else:
 
                 embed_text = interaction.message.embeds[0].description
-                channel_id = await PaginatorViewStickyMessage.check_lines(text=embed_text)
+                channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
                 
                 sticky_message = await DatabaseCheck.check_sticky_message(guild_id = interaction.guild.id, channel_id = channel_id)
 
@@ -624,9 +667,8 @@ class ShowStickyMessage(discord.ui.Button):
 
 class AddStickyMessageText(discord.ui.View):
     
-    def __init__(self, channel):
+    def __init__(self):
         super().__init__(timeout=None)
-        self.channel = channel
         self.add_item(CancelButton(system = "Sticky message system"))
 
 
@@ -640,16 +682,10 @@ class AddStickyMessageText(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            if self.channel == None:
+            channel_id = await StickyMessage.check_lines_sticky_message(text=interaction.message.embeds[0].description)
+            channel = bot.get_channel(channel_id)
 
-                emb = discord.Embed(description=f"""## An error has occurred
-                    {Emojis.dot_emoji} I have lost the connection, so no message can be set
-                    {Emojis.help_emoji} Please try again later by simply executing the command again""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
-
-            else:
-
-                await interaction.response.send_modal(StickyMessageModal(channel=self.channel))
+            await interaction.response.send_modal(StickyMessageModal(channel=channel))
 
         else:
 
@@ -665,7 +701,7 @@ class StickyMessageModal(discord.ui.Modal):
             timeout=None,
             custom_id="add_sticky_message_modal"
         )
-        self.add_item(discord.ui.InputText(label="Enter the text for the sticky message here", style=discord.InputTextStyle.paragraph, placeholder="Write the text for the sticky message here"))
+        self.add_item(discord.ui.InputText(label="Enter the text for the sticky message here", style=discord.InputTextStyle.paragraph, placeholder="Write the text for the sticky message here", max_length=3000))
 
 
     async def callback(self, interaction:discord.Interaction):
@@ -698,8 +734,7 @@ class StickyMessageModal(discord.ui.Modal):
 
 class EditStickyMessage(discord.ui.Button):
 
-    def __init__(self, channel):
-        self.channel = channel
+    def __init__(self):
         super().__init__(
             label="edit sticky message",
             style=discord.ButtonStyle.blurple,
@@ -710,16 +745,10 @@ class EditStickyMessage(discord.ui.Button):
 
         if interaction.user.guild_permissions.administrator:
 
-            if self.channel == None:
-
-                emb = discord.Embed(description=f"""## An error has occurred
-                    {Emojis.dot_emoji} I have lost the connection, so no message can be set
-                    {Emojis.help_emoji} Please try again later by simply executing the command again""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
+            channel_id = await StickyMessage.check_lines_sticky_message(text=interaction.message.embeds[0].description)
+            channel = bot.get_channel(channel_id)
             
-            else:
-
-                await interaction.response.send_modal(StickyMessageModal(channel=self.channel))
+            await interaction.response.send_modal(StickyMessageModal(channel=channel))
 
         else:
 

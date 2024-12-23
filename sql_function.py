@@ -308,6 +308,10 @@ class DatabaseCheck():
         return level_system_settings
     
 
+#################################################  Checks anti-link system  ##############################################################
+
+
+
     '''
     Returns either all entries of the antilink whitelist or only specific ones depending on which item is specified
 
@@ -367,6 +371,10 @@ class DatabaseCheck():
             
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return white_list
+
+
+#################################################  Checks leaderboard system  ##############################################################
+
 
 
     '''
@@ -618,6 +626,10 @@ class DatabaseCheck():
         return invite_code_check
     
 
+#################################################  Checks auto-reaction system  ##############################################################
+
+
+
     '''
     Returns all auto-reactions or only specific ones
 
@@ -688,13 +700,29 @@ class DatabaseCheck():
         return auto_react_settings
 
 
+#################################################  Checks sticky-message system  ##############################################################
+
+
+
     '''
+    Returns all sticky-messages or only specific ones
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+        - channel_id
+            Id of the channel to be scanned
+        - message_id
+            Id of the sticky message
     
+    Info:
+        - guild_id must be specified
     '''
     async def check_sticky_message(
-            guild_id: int, 
-            channel_id: int = None, 
-            message_id: int = None
+        guild_id: int, 
+        channel_id: int = None, 
+        message_id: int = None
         ):
 
         db_connect = await DatabaseSetup.db_connector()
@@ -724,7 +752,15 @@ class DatabaseCheck():
 
 
     '''
+    Returns the settings of the sticky-message
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
     
+    Info:
+        - guild_id must be specified
     '''
     async def check_sticky_message_settings(guild_id:int):
 
@@ -739,8 +775,23 @@ class DatabaseCheck():
 
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return sticky_message_settings
-    
 
+
+#################################################  Checks booster system  ##############################################################
+
+
+
+    '''
+    Returns the settings of the booster-channel
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+    
+    Info:
+        - guild_id must be specified
+    '''
     async def check_booster_channel(guild_id:int):
 
         db_connect = await DatabaseSetup.db_connector()
@@ -754,10 +805,87 @@ class DatabaseCheck():
 
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return sticky_message_settings
+
+
+#################################################  Checks auto-message system  ##############################################################
+
+
+
+    '''
+    Returns all auto-messages or only specific ones
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+        - channel_id
+            Id of the channel to be scanned
+        - message_id
+            Id of the auto message
     
+    Info:
+        - guild_id must be specified
+    '''
+    async def check_auto_message(
+        guild_id: int, 
+        channel_id: int = None, 
+        message_id: int = None
+        ):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_message = "SELECT * FROM AutoMessage WHERE guildId = %s"
+        check_message_values = [guild_id]
+
+        if channel_id is not None:
+            check_message += " AND channelId = %s"
+            check_message_values.append(channel_id)
+        
+        if message_id is not None:
+            check_message += " AND messageId = %s"
+            check_message_values.append(message_id)
+
+        await cursor.execute(check_message, check_message_values)
+        
+        if message_id is not None or channel_id is not None:
+            auto_message = await cursor.fetchone()
+        else:
+            auto_message = await cursor.fetchall()
+
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+            
+        return auto_message
+
+
+    '''
+    Returns the settings of the auto-message
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+    
+    Info:
+        - guild_id must be specified
+    '''
+    async def check_auto_message_settings(guild_id:int):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_settings = "SELECT * FROM AutoMessageSettings WHERE guildId = %s"
+        check_settings_values = [guild_id]
+
+        await cursor.execute(check_settings, check_settings_values)
+        auto_message_settings = await cursor.fetchone()
+
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return auto_message_settings
 
 
 ########################################################  Checks the bot settings  ##############################################
+
 
 
     '''
@@ -909,6 +1037,10 @@ class DatabaseUpdates():
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
+########################################  Insert into / Update the anti-link system  ##################################################
+
+
+
     '''
     Serves to set the antilink whitelist, can add as well as remove or completely reset things
 
@@ -987,7 +1119,7 @@ class DatabaseUpdates():
 
 
 
-########################################  Insert into / Update the level System  ##################################################
+########################################  Insert into / Update the level system  ##################################################
 
 
     '''
@@ -1896,6 +2028,10 @@ class DatabaseUpdates():
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
+########################################  Insert into / Update the auto-reaction system  ##################################################
+
+
+
     '''
     Manages the auto-reaction system
 
@@ -1959,8 +2095,39 @@ class DatabaseUpdates():
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
+########################################  Insert into / Update the sticky-message system  ##################################################
+
+
+
     '''
-    
+    Manages the sticky-message system
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - operation
+            Which action should be performed
+                - update: Updates content in the database
+                - insert: Inserts content into the database
+                - delete: Deletes content in the database
+        - status
+            Status whether the sticky message is switched on or off
+            0: Switched off
+            1: Switched on
+        - channel_id
+            Id of the channel in which the sticky message is to be sent
+        - channel_id_new
+            Id of the new channel (intended to overwrite the old one)
+        - message_id
+            Id of the sticky message sent
+        - message
+            The content of the message to be sent
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
+        - Either StickyMessage or StickyMessageSettings can be set 
     '''
     async def manage_sticky_message(
         guild_id: int,
@@ -2016,8 +2183,34 @@ class DatabaseUpdates():
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
+########################################  Insert into / Update the booster system  ##################################################
+
+
+
     '''
-    
+    Manages the booster-channel system
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - operation
+            Which action should be performed
+                - update: Updates content in the database
+                - insert: Inserts content into the database
+                - delete: Deletes content in the database
+        - channel_id
+            Id of the channel in which the booster message is to be sent
+        - message_id
+            Id of the sticky message sent
+        - message
+            The content of the message to be sent
+        - status
+
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
     '''
     async def manage_booster_channel(
         guild_id:int, 
@@ -2062,6 +2255,112 @@ class DatabaseUpdates():
         finally:
             
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
+########################################  Insert into / Update the auto-message system  ##################################################
+
+
+
+    '''
+    Manages the auto-message system
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - operation
+            Which action should be performed
+                - update: Updates content in the database
+                - insert: Inserts content into the database
+                - delete: Deletes content in the database
+        - status
+            Status whether the auto message is switched on or off
+            0: Switched off
+            1: Switched on
+        - channel_id
+            Id of the channel in which the auto message is to be sent
+        - channel_id_new
+            Id of the new channel (intended to overwrite the old one)
+        - message_id
+            Id of the auto message sent
+        - message
+            The content of the message to be sent
+        - interval
+            The interval after how many days the next message should be sent
+        - send_time
+            The time stamp when the last auto message was sent 
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
+        - Either AutoMessage or AutoMessageSettings can be set 
+    '''
+    async def manage_auto_message(
+        guild_id: int,
+        operation: str,
+        status: int = None,
+        channel_id: int = None,
+        channel_id_new: int = None,
+        message_id: int = None,
+        message: str = None,
+        interval: int = None,
+        send_time:datetime = None
+        ):
+        
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        try:
+
+            auto_message = None
+            auto_message_values = []
+
+            if operation == "update_settings" and status is not None:
+
+                auto_message = "UPDATE AutoMessageSettings SET status = %s WHERE guildId = %s"
+                auto_message_values = [status, guild_id]
+
+            elif operation == "update":
+                
+                if any(param is not None for param in [status, message_id, message, channel_id]):
+
+                    auto_message = f"UPDATE AutoMessage SET {', '.join(
+                        f"{field} = %s" for field, param in zip(['status', 'messageId', 'message', 'channelId', 'sendInterval', 'messageSendTime'], [status, message_id, message, channel_id_new, interval, send_time]) if param is not None)} WHERE guildId = %s AND channelId = %s"
+                    auto_message_values = [param for param in [status, message_id, message, channel_id_new, interval, send_time] if param is not None] + [guild_id, channel_id]
+
+            elif operation == "insert":
+                
+                values = [guild_id]
+                columns = []
+
+                if channel_id is not None:
+                    values.append(channel_id)
+                    columns.append("channelId")
+
+                if interval is not None:
+                    values.append(interval)
+                    columns.append("sendInterval")
+
+                auto_message = f"INSERT INTO {'AutoMessage' if channel_id is not None else 'AutoMessageSettings'} (guildId, {', '.join(columns)}) VALUES (%s, {', '.join(['%s'] * len(columns))})"
+                auto_message_values = values
+
+            elif operation == "delete":
+
+                auto_message = f"DELETE FROM AutoMessage WHERE guildId = %s {f'AND channelId = %s' if channel_id is not None else ''}"
+                auto_message_values = [guild_id] if channel_id is None else [guild_id, channel_id]
+  
+            if auto_message:
+
+                await cursor.execute(auto_message, auto_message_values)
+                await db_connect.commit()
+
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+            
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
 
 
 

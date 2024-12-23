@@ -1,4 +1,4 @@
-<img draggable="false" src="https://github.com/Squidiis/Discord-bot-Shiro/blob/master/assets/images/Shiro_banner4.png"></a>
+<img draggable="false" src="https://github.com/Squidiis/Shiro/blob/main/assets/images/Shiro_banner4.png"></a>
 
 
 <h1 align="center">
@@ -56,6 +56,10 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
     - Leaderboard roles to reward users who have reached a certain place (Message and Invite Leaderboard have their own roles, each place can also be filled with an individual role)
     - Booster channel system (Always sends a notification when someone boosts the server)
 
+* Message system
+    - Sticky message (ensures that a message you specify is always at the end of a channel, if a new message is sent, the sticky message is packed back to the end of the channel)
+    - Auto message (always sends a message to a specific channel in a selected interval maxiaml in a 30 day cycle) 
+
 ## 📝 Requirements
 
 - [aiomysql==0.2.0](https://pypi.org/project/aiomysql/)
@@ -95,7 +99,7 @@ python -m pip install -r requirements.txt
 After that you can start it with
 
 ```
-python bot.py
+Executing the main.py file
 ```
 If you encounter problems use the discord server linked above or press [here](https://discord.gg/UKZkmeJYsA) to be redirected directly to in.
 
@@ -180,3 +184,8 @@ This project is licensed under the [Custom License](LICENSE.txt). For commercial
 |remove-booster-channel|Removes the booster channel|
 |set-booster-channel|Sets the booster channel (activate, deactivate, overwrite the channel)|
 |show-booster-channel|Displays which channel is currently set as the booster channel|
+|set-auto-message|Sets the auto message system|
+|add-auto-messagge|Adds a new auto-message|
+|remove-auto-message|Removes a auto-message|
+|show-auto-message|Displays all auto-messages created for a server|
+|reset-auto-message|Deletes all auto-messages|

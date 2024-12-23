@@ -43,28 +43,6 @@ class LeaderboardSystem(commands.Cog):
         self.check_expired_invite_liks.start()
 
 
-    @commands.Cog.listener()
-    async def on_disconnect(self):
-
-        print(f"Bot has lost the connection {datetime.now().timestamp()}.")    
-        self.edit_leaderboard_invite.stop()
-        self.edit_leaderboard_message.stop()
-        
-
-    @commands.Cog.listener()
-    async def on_resumed(self):
-        
-        print(f"Connection restored {datetime.now().timestamp()}.")
-        
-        if not self.edit_leaderboard_invite.is_running():
-
-            self.edit_leaderboard_invite.start()
-
-        if not self.edit_leaderboard_message.is_running():
-
-            self.edit_leaderboard_message.start()
-
-
     '''
     Adds all existing Invite links to a database
 

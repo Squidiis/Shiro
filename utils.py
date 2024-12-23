@@ -140,6 +140,7 @@ class GetEmbed():
                 11: Mod role (for leaderboard system)
                 12: Start page cannot be changed 
                 13: No sticky messages defined yet
+                14: No auto-messages defined yet
         - settings
             The correct information that must be inserted in the embed
         - settings2 (same as settings)
@@ -177,6 +178,11 @@ class GetEmbed():
                 > {Emojis.dot_emoji} Fun commands
                 > {Emojis.dot_emoji} Level System commands part 1
                 > {Emojis.dot_emoji} Level System commands part 2
+                > {Emojis.dot_emoji} Statistics system commands
+                > {Emojis.dot_emoji} Anti-link system commands
+                > {Emojis.dot_emoji} Auto-reaction commands
+                > {Emojis.dot_emoji} Message system commands
+                > {Emojis.dot_emoji} Other system commands
 
                 **Bot links:**
                 {Emojis.dot_emoji} Support server: https://discord.gg/9kJaPrWdwM
@@ -260,6 +266,12 @@ class GetEmbed():
             emb = discord.Embed(description=f"""## No sticky messages have been defined yet
                 {Emojis.dot_emoji} No sticky messages have been set for this server
                 {Emojis.dot_emoji} If you want to set some use the `add-sticky-message` command""", color=bot_colour)
+            
+        elif embed_index == 14:
+
+            emb = discord.Embed(description=f"""## No auto-messages have been defined yet
+                {Emojis.dot_emoji} No auto-messages have been set for this server
+                {Emojis.dot_emoji} If you want to set some use the `add-auto-message` command""", color=bot_colour)
 
         else:
             
@@ -325,11 +337,12 @@ class HelpMenuSelect(discord.ui.View):
         options = [
             discord.SelectOption(label="Mod commands", description="Shows you all commands that belong to the mod system", value="mod"),
             discord.SelectOption(label="Fun commands", description="Shows you all commands that belong to the Fun system", value="fun"),
-            discord.SelectOption(label="Level commands part 1", description="Shows you all commands that belong to the level system part 1", value="level_one"),
-            discord.SelectOption(label="Level commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two"),
-            discord.SelectOption(label="Statistics commands", description="Shows you all commands that belong to the statistics system", value="statistic"),
-            discord.SelectOption(label="Anti-link commands", description="Shows you all commands that belong to the anti-link system", value="antilink"),
+            discord.SelectOption(label="Level system commands part 1", description="Shows you all commands that belong to the level system part 1", value="level_one"),
+            discord.SelectOption(label="Level system commands part 2", description="Shows you all commands that belong to the level system part 2", value="level_two"),
+            discord.SelectOption(label="Statistics system commands", description="Shows you all commands that belong to the statistics system", value="statistic"),
+            discord.SelectOption(label="Anti-link system commands", description="Shows you all commands that belong to the anti-link system", value="antilink"),
             discord.SelectOption(label="Auto-reaction commands", description="Shows you all commands that belong to the auto-reaction system", value="auto_reaction"),
+            discord.SelectOption(label="Message system commands", description="Shows you all commands that belong to the auto-reaction system", value="message_system"),
             discord.SelectOption(label="Other system commands", description="Shows you all commands that belong to the other systems", value="other_systems")
         ],
         custom_id = "help_menu_select")
@@ -495,6 +508,29 @@ class HelpMenuSelect(discord.ui.View):
                 value="Shows all auto-reactions that are set on the server", inline=True)
             emb.add_field(name="reset-auto-reactions",
                 value="Resets all auto-reactions that are set for the server", inline=True)
+        
+
+        if select.values[0] == "message_system":
+
+            emb = discord.Embed(description=f"""## Message system commands""", color=bot_colour)
+            emb.add_field(name="/add-sticky-message", 
+                value="Adds a sticky message", inline=True)
+            emb.add_field(name="/remove-sticky-message", 
+                value="Removes a sticky message", inline=True)
+            emb.add_field(name="/show-sticky-message", 
+                value="Shows all sticky messages", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/reset-sticky-message", 
+                value="Deletes all sticky messages", inline=True)
+            emb.add_field(name="/add-auto-message", 
+                value="Adds a auto message", inline=True)
+            emb.add_field(name="/remove-auto-message", 
+                value="Removes a auto message", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
+            emb.add_field(name="/show-auto-message", 
+                value="Shows all auto messages", inline=True)
+            emb.add_field(name="/reset-auto-message", 
+                value="Deletes all auto messages", inline=True)
 
 
         if select.values[0] == "other_systems":

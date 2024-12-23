@@ -47,7 +47,7 @@ CREATE TABLE LevelSystemSettings (
     xpRate INT UNSIGNED DEFAULT 20,
     levelStatus INT DEFAULT 0,
     levelUpChannel BIGINT UNSIGNED NULL,
-    levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
+    levelUpMessage VARCHAR(1000) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
     bonusXpPercentage INT UNSIGNED DEFAULT 10
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -187,7 +187,7 @@ CREATE TABLE BoosterSystem (
     guildId BIGINT UNSIGNED NOT NULL,
     status INT UNSIGNED DEFAULT 1,
     channelId BIGINT NULL,
-    message VARCHAR(4000) DEFAULT 'Thank you, {username}, for boosting the server! Your support helps make this community even better. We appreciate you!'
+    message VARCHAR(3000) DEFAULT 'Thank you, {username}, for boosting the server! Your support helps make this community even better. We appreciate you!'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -199,7 +199,7 @@ CREATE TABLE StickyMessage (
     guildId BIGINT UNSIGNED NOT NULL,
     channelId BIGINT NOT NULL,
     messageId BIGINT NULL,
-    message VARCHAR(4000) NULL,
+    message VARCHAR(3000) NULL,
     status INT DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -207,6 +207,29 @@ CREATE TABLE StickyMessage (
 DROP TABLE IF EXISTS `StickyMessageSettings`;
 
 CREATE TABLE StickyMessage (
+    guildId BIGINT UNSIGNED NOT NULL,
+    status INT UNSIGNED DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-------------- Table for the auto message system ---------------
+
+DROP TABLE IF EXISTS `AutoMessage`;
+
+CREATE TABLE StickyMessage (
+    guildId BIGINT UNSIGNED NOT NULL,
+    channelId BIGINT NOT NULL,
+    messageId BIGINT NULL,
+    message VARCHAR(3000) NULL,
+    status INT DEFAULT 1,
+    sendInterval INT NOT NULL,
+    messageSendTime TIMESTAMP NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `AutoMessageSettings`;
+
+CREATE TABLE AutoMessageSystemSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     status INT UNSIGNED DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

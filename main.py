@@ -9,11 +9,8 @@ from cogs.auto_react import *
 from cogs.booster_system import *
 from cogs.sticky_message import *
 import logging
+from cogs.auto_message_system import *
 
-
-@bot.command()
-async def test(ctx):
-    await ctx.send(f"Pong! Latency is ``{round(bot.latency*1000)}`` ms")
 
 logging.basicConfig(level=logging.INFO)
 
@@ -65,7 +62,7 @@ class Main(commands.Cog):
                 xpRate INT UNSIGNED DEFAULT 20,
                 levelStatus INT DEFAULT 0,
                 levelUpChannel BIGINT UNSIGNED NULL,
-                levelUpMessage VARCHAR(500) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
+                levelUpMessage VARCHAR(1000) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
                 bonusXpPercentage INT UNSIGNED DEFAULT 10
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
@@ -189,12 +186,29 @@ class Main(commands.Cog):
                 guildId BIGINT UNSIGNED NOT NULL,
                 channelId BIGINT NOT NULL,
                 messageId BIGINT NULL,
-                message VARCHAR(4000) NULL,
+                message VARCHAR(3000) NULL,
                 status INT DEFAULT 1
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             '''
             CREATE TABLE IF NOT EXISTS StickyMessageSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                status INT UNSIGNED DEFAULT 1
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS AutoMessage (
+                guildId BIGINT UNSIGNED NOT NULL,
+                channelId BIGINT NOT NULL,
+                messageId BIGINT NULL,
+                message VARCHAR(3000) NULL,
+                status INT DEFAULT 1,
+                sendInterval INT NOT NULL,
+                messageSendTime TIMESTAMP NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS AutoMessageSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 status INT UNSIGNED DEFAULT 1
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -273,8 +287,8 @@ class Main(commands.Cog):
         self.bot.add_view(SetStickyMessage())
         self.bot.add_view(PaginatorViewStickyMessage(pages=[no_page]))
         self.bot.add_view(OverwriteChannelSelect())
-        self.bot.add_view(AddStickyMessageText(channel=None))
-        view.add_item(EditStickyMessage(channel=None))
+        self.bot.add_view(AddStickyMessageText())
+        view.add_item(EditStickyMessage())
         view.add_item(ShowStickyMessage())
 
         # Booster system
@@ -284,6 +298,15 @@ class Main(commands.Cog):
         view.add_item(OverwriteBoosterChannel())
         view.add_item(OverwriteBoosterMessage())
         view.add_item(SetBoosterMessage())
+
+        # Auto message
+        self.bot.add_view(SetAutoMessage())
+        self.bot.add_view(PaginatorViewAutoMessage(pages=[no_page]))
+        self.bot.add_view(OverwriteChannelSelectAutoMessage())
+        self.bot.add_view(AddAutoMessageText())
+        self.bot.add_view(OverwriteIntervalAutoMessage(interval=None))
+        self.bot.add_view(EditAutoMessage())
+        view.add_item(ShowAutoMessage())
 
         # Other Systems
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
@@ -310,6 +333,39 @@ class Main(commands.Cog):
     async def on_guild_join(guild):
 
         await DatabaseUpdates._create_bot_settings(guild_id=guild.id)
+
+
+    @commands.Cog.listener()
+    async def on_disconnect(self):
+
+        print(f"Bot has lost the connection {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}") 
+
+        LeaderboardSystem.edit_leaderboard_invite.stop()
+        LeaderboardSystem.edit_leaderboard_message.stop()
+        StickyMessage.check_sticky_message_task.stop()
+        AutoMessageSystem.auto_message.stop()
+        
+
+    @commands.Cog.listener()
+    async def on_resumed(self):
+        
+        print(f"Connection restored {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}.")
+        
+        if not LeaderboardSystem.edit_leaderboard_invite.is_running():
+
+            LeaderboardSystem.edit_leaderboard_invite.start()
+
+        if not LeaderboardSystem.edit_leaderboard_message.is_running():
+
+            LeaderboardSystem.edit_leaderboard_message.start()
+
+        if not StickyMessage.check_sticky_message_task.is_running():
+
+            StickyMessage.check_sticky_message_task.start()
+
+        if not AutoMessageSystem.auto_message.is_running():
+
+            AutoMessageSystem.auto_message.start()
 
 
 logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='w',
