@@ -193,6 +193,7 @@ class AutoMessageSystem(commands.Cog):
         if pages != []:
 
             paginator_view = PaginatorViewAutoMessage(pages=pages)
+            paginator_view.add_item(CancelButton(system="auto message system"))
             await ctx.respond(embed=pages[0], view=paginator_view)
 
         else:
@@ -274,6 +275,7 @@ class OverwriteIntervalAutoMessage(discord.ui.View):
     def __init__(self, interval):
         super().__init__(timeout=None)
         self.interval = interval
+        self.add_item(CancelButton(system="auto message system"))
 
     
     @discord.ui.button(
@@ -412,6 +414,7 @@ class ShowAutoMessage(discord.ui.Button):
             if pages != []:
 
                 paginator_view = PaginatorViewAutoMessage(pages=pages)
+                paginator_view.add_item(CancelButton(system="auto message system"))
                 await interaction.response.send_message(embed=pages[0], view=paginator_view)
 
             else:
@@ -680,6 +683,7 @@ class OverwriteChannelSelectAutoMessage(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system="auto message system"))
 
 
     @discord.ui.channel_select(

@@ -192,6 +192,7 @@ class StickyMessage(commands.Cog):
         if pages != []:
 
             paginator_view = PaginatorViewStickyMessage(pages=pages)
+            paginator_view.add_item(CancelButton(system="sticky message system"))
             await ctx.respond(embed=pages[0], view=paginator_view)
 
         else:
@@ -228,28 +229,29 @@ class StickyMessage(commands.Cog):
 
         settings = await DatabaseCheck.check_sticky_message_settings(guild_id = message.guild.id)
 
-        if settings[1] == 1:
+        if settings is None or settings[1] == 0:
+            return
 
-            sticky_message = await DatabaseCheck.check_sticky_message(guild_id = message.guild.id, channel_id = message.channel.id)
+        sticky_message = await DatabaseCheck.check_sticky_message(guild_id = message.guild.id, channel_id = message.channel.id)
 
-            if sticky_message:
+        if sticky_message:
 
-                await asyncio.sleep(10)
+            await asyncio.sleep(10)
 
-                async for recent_message in message.channel.history(limit=1):
-                    if recent_message.id != message.id:
-                        return
+            async for recent_message in message.channel.history(limit=1):
+                if recent_message.id != message.id:
+                    return
 
-                try:
-                    old_message = await message.channel.fetch_message(sticky_message[2])
-                    await old_message.delete()
-                except discord.NotFound:
-                    pass 
+            try:
+                old_message = await message.channel.fetch_message(sticky_message[2])
+                await old_message.delete()
+            except discord.NotFound:
+                pass 
                 
-                emb = discord.Embed(description=f"""{sticky_message[3]}""", color=bot_colour)
+            emb = discord.Embed(description=f"""{sticky_message[3]}""", color=bot_colour)
                 
-                new_message = await message.channel.send(embed=emb)
-                await DatabaseUpdates.manage_sticky_message(guild_id = message.guild.id, channel_id = message.channel.id, message_id = new_message.id, operation = "update")
+            new_message = await message.channel.send(embed=emb)
+            await DatabaseUpdates.manage_sticky_message(guild_id = message.guild.id, channel_id = message.channel.id, message_id = new_message.id, operation = "update")
             
 
     @tasks.loop(hours=24)
@@ -591,6 +593,7 @@ class OverwriteChannelSelect(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system="sticky message system"))
 
 
     @discord.ui.channel_select(
@@ -654,6 +657,7 @@ class ShowStickyMessage(discord.ui.Button):
             if pages != []:
 
                 paginator_view = PaginatorViewStickyMessage(pages=pages)
+                paginator_view.add_item(CancelButton(system="sticky message system"))
                 await interaction.response.send_message(embed=pages[0], view=paginator_view)
 
             else:
@@ -732,15 +736,19 @@ class StickyMessageModal(discord.ui.Modal):
 
 
 
-class EditStickyMessage(discord.ui.Button):
+class EditStickyMessage(discord.ui.View):
 
     def __init__(self):
-        super().__init__(
-            label="edit sticky message",
-            style=discord.ButtonStyle.blurple,
-            custom_id="edit_sticky_message"
-        )
+        super().__init__(timeout=None)
+        self.add_item(CancelButton(system="sticky message system"))
+    
 
+    @discord.ui.button(
+        label="edit sticky message",
+        style=discord.ButtonStyle.blurple,
+        custom_id="edit_sticky_message"
+        )
+    
     async def callback(self, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:

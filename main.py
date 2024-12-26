@@ -289,7 +289,7 @@ class Main(commands.Cog):
         self.bot.add_view(PaginatorViewStickyMessage(pages=[no_page]))
         self.bot.add_view(OverwriteChannelSelect())
         self.bot.add_view(AddStickyMessageText())
-        view.add_item(EditStickyMessage())
+        self.bot.add_view(EditStickyMessage())
         view.add_item(ShowStickyMessage())
 
         # Booster system
