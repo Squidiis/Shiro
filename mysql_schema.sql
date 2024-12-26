@@ -137,7 +137,8 @@ CREATE TABLE LeaderboardGivenRoles (
     roleId BIGINT UNSIGNED NOT NULL,
     userId BIGINT UNSIGNED NOT NULL,
     roleInterval VARCHAR(10) NOT NULL,
-    status VARCHAR(20) NOT NULL
+    status VARCHAR(20) NOT NULL,
+    rankingPosition INT UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

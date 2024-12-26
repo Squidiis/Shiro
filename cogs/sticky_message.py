@@ -274,7 +274,7 @@ class StickyMessage(commands.Cog):
 
             for sticky_message in all_sticky_messages:
 
-                if sticky_message[4] == 0:
+                if sticky_message is None or sticky_message[4] == 0:
                     return
                     
                 channel = bot.get_channel(sticky_message[1])

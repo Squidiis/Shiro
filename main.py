@@ -138,7 +138,8 @@ class Main(commands.Cog):
                 roleId BIGINT UNSIGNED NOT NULL,
                 userId BIGINT UNSIGNED NOT NULL,
                 roleInterval VARCHAR(10) NOT NULL,
-                status VARCHAR(20) NOT NULL
+                status VARCHAR(20) NOT NULL,
+                rankingPosition INT UNSIGNED NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
             '''
@@ -337,35 +338,55 @@ class Main(commands.Cog):
 
     @commands.Cog.listener()
     async def on_disconnect(self):
-
-        print(f"Bot has lost the connection {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}") 
-
-        LeaderboardSystem.edit_leaderboard_invite.stop()
-        LeaderboardSystem.edit_leaderboard_message.stop()
-        StickyMessage.check_sticky_message_task.stop()
-        AutoMessageSystem.auto_message.stop()
+        print(f"Bot has lost the connection {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
         
+        cog = self.bot.get_cog("LeaderboardSystem")
+
+        if cog:
+
+            cog.edit_leaderboard_invite.stop()
+            cog.edit_leaderboard_message.stop()
+
+        sticky_cog = self.bot.get_cog("StickyMessage")
+
+        if sticky_cog:
+
+            sticky_cog.check_sticky_message_task.stop()
+
+        auto_cog = self.bot.get_cog("AutoMessageSystem")
+
+        if auto_cog:
+            
+            auto_cog.auto_message.stop()
+
 
     @commands.Cog.listener()
     async def on_resumed(self):
+        print(f"Connection restored {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
         
-        print(f"Connection restored {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}.")
-        
-        if not LeaderboardSystem.edit_leaderboard_invite.is_running():
+        cog = self.bot.get_cog("LeaderboardSystem")
 
-            LeaderboardSystem.edit_leaderboard_invite.start()
+        if cog:
 
-        if not LeaderboardSystem.edit_leaderboard_message.is_running():
+            if not cog.edit_leaderboard_invite.is_running():
 
-            LeaderboardSystem.edit_leaderboard_message.start()
+                cog.edit_leaderboard_invite.start()
 
-        if not StickyMessage.check_sticky_message_task.is_running():
+            if not cog.edit_leaderboard_message.is_running():
 
-            StickyMessage.check_sticky_message_task.start()
+                cog.edit_leaderboard_message.start()
 
-        if not AutoMessageSystem.auto_message.is_running():
+        sticky_cog = self.bot.get_cog("StickyMessage")
 
-            AutoMessageSystem.auto_message.start()
+        if sticky_cog and not sticky_cog.check_sticky_message_task.is_running():
+
+            sticky_cog.check_sticky_message_task.start()
+
+        auto_cog = self.bot.get_cog("AutoMessageSystem")
+
+        if auto_cog and not auto_cog.auto_message.is_running():
+
+            auto_cog.auto_message.start()
 
 
 logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='w',

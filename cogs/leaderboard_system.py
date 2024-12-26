@@ -745,7 +745,7 @@ class LeaderboardSystem(commands.Cog):
 
                     if general_role and count < 1:
                         await users[i].add_roles(general_role)
-                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=general_role.id, operation="add", status=system, interval=interval_value)
+                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=general_role.id, operation="add", status=system, interval=interval_value, position = 0)
                         count += 1
 
                     if role:
@@ -753,7 +753,7 @@ class LeaderboardSystem(commands.Cog):
                         leaderboard_role = guild.get_role(role[1])
                         await users[i].add_roles(leaderboard_role)
                         await asyncio.sleep(0.1)
-                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=role[1], operation="add", status=system, interval=interval_value)
+                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=role[1], operation="add", status=system, interval=interval_value, position = i+1)
                 
                 num_str = f" #{i + 1:2d} "
                 leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
@@ -1868,11 +1868,9 @@ class ShowLeaderboardGivenRoles(discord.ui.View):
                 user_list, general_role = [], None
                 for role in check_roles:
                     
-                    check_position = await DatabaseCheck.check_leaderboard_roles(guild_id = interaction.guild.id, role_id = role[1], system = system)
-                  
-                    if check_position[2] != 0:
+                    if role[5] != 0:
                     
-                        user_list.append(f"{Emojis.dot_emoji} The user <@{role[2]}> has received the role <@&{role[1]}> for reaching place {check_position[2]}\n")
+                        user_list.append(f"{Emojis.dot_emoji} The user <@{role[2]}> has received the role <@&{role[1]}> for reaching place {role[5]}\n")
 
                     else:
 

@@ -2000,6 +2000,7 @@ class DatabaseUpdates():
         interval:str,
         role_id:int = None, 
         user_id:int = None,
+        position:int = None
         ):
 
         db_connect = await DatabaseSetup.db_connector()
@@ -2009,8 +2010,8 @@ class DatabaseUpdates():
 
             if operation == "add":
                 
-                manage_role = "INSERT INTO LeaderboardGivenRoles (guildId, roleId, userId, roleInterval, status) VALUES (%s, %s, %s, %s, %s)"
-                manage_role_values = [guild_id, role_id, user_id, interval, status]
+                manage_role = "INSERT INTO LeaderboardGivenRoles (guildId, roleId, userId, roleInterval, status, rankingPosition) VALUES (%s, %s, %s, %s, %s, %s)"
+                manage_role_values = [guild_id, role_id, user_id, interval, status, position]
 
             else:
 
