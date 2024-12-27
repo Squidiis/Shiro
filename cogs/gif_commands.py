@@ -16,7 +16,7 @@ class ApiSearchCommands(commands.Cog):
 
     async def search_gif(self, tags:str):
         
-        key = os.getenv("API_KEY")
+        key = os.getenv("API_KEY") 
 
         params = {
             "q": tags,
@@ -26,8 +26,9 @@ class ApiSearchCommands(commands.Cog):
             "media_filter": "gif"
         }
 
-        result = requests.get("https://tenor.googleapis.com/v2/search", params=params)
-        data = result.json()
+        async with aiohttp.ClientSession() as cd:
+            async with cd.get("https://tenor.googleapis.com/v2/search", params=params) as r:
+                data = await r.json()
 
         number = random.randint(0, 9)
         url = data['results'][number]['media_formats']['gif']['url']
@@ -121,12 +122,12 @@ class ApiSearchCommands(commands.Cog):
         await ctx.respond(embed=emb)
 
 
-    @gif.command(description = "Send a anime embarres gif you can also mention someone!")
-    async def embarres(self, ctx, user:discord.Member = None):
+    @gif.command(description = "Send a anime embarrass gif you can also mention someone!")
+    async def embarrass(self, ctx, user:discord.Member = None):
         
-        url = await self.search_gif(tags="anime embarres")
+        url = await self.search_gif(tags="anime embarrass")
 
-        emb = discord.Embed(title="Embarres", description=f"**{ctx.author.mention} is embarrassed, only what?**" if user == None else f"**{ctx.author.mention} was embarrassed by {user.mention}**", color=bot_colour)
+        emb = discord.Embed(title="Embarrass", description=f"**{ctx.author.mention} is embarrassed, only why?**" if user == None else f"**{ctx.author.mention} was embarrassed by {user.mention}**", color=bot_colour)
         emb.set_image(url=url)
         emb.set_footer(text="Via Tenor")
         await ctx.respond(embed=emb)

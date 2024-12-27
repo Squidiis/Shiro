@@ -62,11 +62,11 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 
 ## 📝 Requirements
 
+- [aiohttp==3.9.5](https://pypi.org/project/aiohttp/)
 - [aiomysql==0.2.0](https://pypi.org/project/aiomysql/)
 - [Pillow 10.0.0](https://pypi.org/project/Pillow/)
 - [py-cord 2.4.1](https://pypi.org/project/py-cord/)
 - [python-dotenv 1.0.0](https://pypi.org/project/python-dotenv/)
-- [requests 2.31.0](https://pypi.org/project/requests/)
 - [PyYAML 6.0.1](https://pypi.org/project/PyYAML/)
 - [DateTime 5.5](https://pypi.org/project/DateTime/)
 

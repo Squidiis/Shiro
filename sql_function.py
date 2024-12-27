@@ -879,7 +879,7 @@ class DatabaseCheck():
 
         await cursor.execute(check_settings, check_settings_values)
         auto_message_settings = await cursor.fetchone()
-
+    
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return auto_message_settings
 

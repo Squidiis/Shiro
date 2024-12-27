@@ -1,7 +1,7 @@
+aiohttp==3.9.5
 aiomysql==0.2.0
 Pillow==10.0.1
 py-cord==2.5.0
 python-dotenv==1.0.0
-requests==2.31.0
 PyYAML==6.0.1
 DateTime==5.5

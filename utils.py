@@ -7,7 +7,6 @@ from discord.ext.commands import MissingPermissions
 import discord
 from discord.ext import commands
 from discord.interactions import Interaction
-import requests
 from discord.ui import Select, View, Button, Modal
 from discord.commands import Option, SlashCommandGroup
 from PIL import Image

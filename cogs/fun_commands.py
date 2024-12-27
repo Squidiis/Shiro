@@ -1,8 +1,8 @@
 from datetime import * 
 from discord import ButtonStyle, Interaction
-import requests
 from utils import *
 from typing import List
+import aiohttp
 
 
 
@@ -176,16 +176,24 @@ class Fun(commands.Cog):
 
     @commands.slash_command(description="Gives you a random cocktail recipe!")
     async def cocktails(self, ctx):
-        cocktails = requests.get("https://www.thecocktaildb.com/api/json/v1/1/random.php").json()["drinks"][0]
-        name = cocktails['strDrink']
         
-        alcohol = cocktails['strAlcoholic']
-        instructions = cocktails['strInstructions']
+        key = os.getenv("API_KEY") 
+
+        async with aiohttp.ClientSession() as cd:
+            async with cd.get("https://www.thecocktaildb.com/api/json/v1/1/random.php") as r:
+                data = await r.json()
+
+        selected = data["drinks"][0]
+
+        name = selected['strDrink']
+        
+        alcohol = selected['strAlcoholic']
+        instructions = selected['strInstructions']
         ingredients = []
         
         for i in range(15):
-            measure = cocktails.get(f"strMeasure{i}")
-            ingredient = cocktails.get(f"strIngredient{i}")
+            measure = selected.get(f"strMeasure{i}")
+            ingredient = selected.get(f"strIngredient{i}")
             if ingredient is not None:
                 ingredients.append(f'{ingredient} {measure}')
 
@@ -200,12 +208,13 @@ class Fun(commands.Cog):
         else:
             Alcohol = "No"
     
-        DrinkThumb = cocktails['strDrinkThumb']
+        DrinkThumb = selected['strDrinkThumb']
         
         emb = discord.Embed(title=f"Name: {name}", description=f"""
         Alcoholic: {Alcohol}
         
-        Recipe: {Recipe} 
+        Recipe: 
+        {Recipe} 
 
         Instructions: {instructions}
         
