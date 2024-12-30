@@ -776,10 +776,10 @@ class PaginatorViewHelpMenu(discord.ui.View):
             )
         ] 
         self.current_page = 0
-        self.update_buttons_auto_message()
+        self.update_buttons_help()
 
 
-    def update_buttons_auto_message(self):
+    def update_buttons_help(self):
 
         self.children[0].disabled = self.current_page == 0  
         self.children[1].disabled = self.current_page == 0  
@@ -787,23 +787,23 @@ class PaginatorViewHelpMenu(discord.ui.View):
         self.children[3].disabled = self.current_page == len(self.pages) - 1  
 
 
-    async def update_message_auto_message(self, interaction):
-        self.update_buttons_auto_message()
+    async def update_message_help(self, interaction):
+        self.update_buttons_help()
         await interaction.response.edit_message(embed=self.pages[self.current_page], view=self)
 
 
     @discord.ui.button(
         label="To the first page", 
         style=discord.ButtonStyle.blurple,
-        custom_id="to_first_page_auto_message"
+        custom_id="to_first_page_help"
     )
     
-    async def go_to_first_page_auto_message(self, button, interaction: discord.Interaction):
+    async def go_to_first_page_help(self, button, interaction: discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
             self.current_page = 0
-            await self.update_message_auto_message(interaction)
+            await self.update_message_help(interaction)
 
         else:
 
@@ -813,16 +813,16 @@ class PaginatorViewHelpMenu(discord.ui.View):
     @discord.ui.button(
         label="Back", 
         style=discord.ButtonStyle.blurple,
-        custom_id="back_auto_message"
+        custom_id="back_help"
     )
 
-    async def back_button_auto_message(self, button, interaction: discord.Interaction):
+    async def back_button_help(self, button, interaction: discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
             
             if self.current_page > 0:
                 self.current_page -= 1
-            await self.update_message_auto_message(interaction)
+            await self.update_message_help(interaction)
 
         else:
 
@@ -832,16 +832,16 @@ class PaginatorViewHelpMenu(discord.ui.View):
     @discord.ui.button(
         label="Next", 
         style=discord.ButtonStyle.blurple,
-        custom_id="next_auto_message"
+        custom_id="next_help"
     )
 
-    async def next_button_auto_message(self, button, interaction: discord.Interaction):
+    async def next_button_help(self, button, interaction: discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
             if self.current_page < len(self.pages) - 1:
                 self.current_page += 1
-            await self.update_message_auto_message(interaction)
+            await self.update_message_help(interaction)
 
         else:
 
@@ -851,15 +851,15 @@ class PaginatorViewHelpMenu(discord.ui.View):
     @discord.ui.button(
         label="To the last page", 
         style=discord.ButtonStyle.blurple,
-        custom_id="to_last_page_auto_message"
+        custom_id="to_last_page_help"
     )
 
-    async def go_to_last_page_auto_message(self, button, interaction: discord.Interaction):
+    async def go_to_last_page_help(self, button, interaction: discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
             self.current_page = len(self.pages) - 1
-            await self.update_message_auto_message(interaction)
+            await self.update_message_help(interaction)
 
         else:
 
