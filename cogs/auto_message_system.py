@@ -88,6 +88,7 @@ class AutoMessageSystem(commands.Cog):
 
 
     @commands.slash_command(name = "set-auto-message", description = "Set the auto-message system!")
+    @commands.has_permissions(administrator = True)
     async def set_auto_message(self, ctx:discord.ApplicationContext):
 
         check_settings = await DatabaseCheck.check_auto_message_settings(guild_id = ctx.guild.id)
@@ -108,6 +109,7 @@ class AutoMessageSystem(commands.Cog):
 
         
     @commands.slash_command(name = "add-auto-message", description = "Add a new auto-message!")
+    @commands.has_permissions(administrator = True)
     async def add_auto_message(self, ctx:discord.ApplicationContext, 
         channel:Option(discord.TextChannel, description="Select a channel in which the auto-message should be sent!"), 
         interval:Option(int, min_value=1, max_value=30, description="Specifies an interval after how many days the message should always be sent!")):
@@ -159,6 +161,7 @@ class AutoMessageSystem(commands.Cog):
     
 
     @commands.slash_command(name = "remove-auto-message", description = "Remove an auto-message!")
+    @commands.has_permissions(administrator = True)
     async def remove_auto_message(self, ctx:discord.ApplicationContext, 
         channel:Option(discord.TextChannel, description="Specify the channel from which the auto-message should be removed!")):
 
@@ -202,6 +205,7 @@ class AutoMessageSystem(commands.Cog):
 
 
     @commands.slash_command(name = "reset-auto-message", description = "Deletes all auto-messages created on this server!")
+    @commands.has_permissions(administrator = True)
     async def reset_auto_message(self, ctx:discord.ApplicationContext):
 
         check_channel = await DatabaseCheck.check_auto_message(guild_id = ctx.guild.id)

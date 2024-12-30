@@ -141,6 +141,7 @@ class GetEmbed():
                 12: Start page cannot be changed 
                 13: No sticky messages defined yet
                 14: No auto-messages defined yet
+                15: systems explained
         - settings
             The correct information that must be inserted in the embed
         - settings2 (same as settings)
@@ -272,6 +273,23 @@ class GetEmbed():
             emb = discord.Embed(description=f"""## No auto-messages have been defined yet
                 {Emojis.dot_emoji} No auto-messages have been set for this server
                 {Emojis.dot_emoji} If you want to set some use the `add-auto-message` command""", color=bot_colour)
+            
+        elif embed_index == 15:
+
+            emb = discord.Embed(description=f"""## Overview of all systems with explanation
+                {Emojis.dot_emoji} Here you can see all the systems, including more detailed explanations of the individual commands and the systems themselves
+
+                ```Table of contents```
+                > 1. Level system
+                > 2. Mod commands
+                > 3. Fun commands
+                > 4. Statistic system
+                > 5. Anti-link system
+                > 6. Auto reaction system
+                > 7. Message system
+                > 8. Other systems
+
+                {Emojis.help_emoji} If you use the commands, you will be told exactly how which system works and how you can set it up""", color=bot_colour)
 
         else:
             
@@ -453,24 +471,34 @@ class HelpMenuSelect(discord.ui.View):
         if select.values[0] == "statistic":
 
             emb = discord.Embed(description="""## Statistics system commands """, color=bot_colour)
-            emb.add_field(name="set-message-leaderboard",
+            emb.add_field(name="/set-message-leaderboard",
                 value="Set the message leaderboard", inline=True),
-            emb.add_field(name="show-message-leaderboard-setting",
+            emb.add_field(name="/show-message-leaderboard-setting",
                 value="Shows you how the message leaderboard is set", inline=True),
-            emb.add_field(name="add-message-leaderboard-role",
-                value="Specify roles that are assigned to certain places", inline=True),
+            emb.add_field(name="/add-message-leaderboard-role",
+                value="Adds a role to the message leaderboard", inline=True),
             emb.add_field(name=" ", value=" ", inline=False),
-            emb.add_field(name="remove-message-leaderboard-role",
-                value="Removes roles as leaderboard roles", inline=True),
-            emb.add_field(name="show-message-leaderboard-roles",
-                value="Shows all roles that are set for the leaderbaord", inline=True),
-            emb.add_field(name="reset-message-leaderboard-roles",
-                value="Resets all leaderboard roles", inline=True),
+            emb.add_field(name="/remove-message-leaderboard-role",
+                value="Removes a role from the message leaderboard", inline=True),
+            emb.add_field(name="/show-message-leaderboard-roles",
+                value="Shows all roles that are set for the message leaderbaord", inline=True),
+            emb.add_field(name="/reset-message-leaderboard-roles",
+                value="Resets all message leaderboard roles", inline=True),
             emb.add_field(name=" ", value=" ", inline=False),
-            emb.add_field(name="show-invites",
+            emb.add_field(name="/add-invite-leaderboard-role",
+                value="Add a role to the invite leaderboard", inline=True),
+            emb.add_field(name="/remove-invite-leaderboard-role",
+                value="Removes a role from the invite leaderboard", inline=True),
+            emb.add_field(name="/show-invite-leaderboard-roles",
+                value="Shows all roles from the invite leaderboard", inline=True),
+            emb.add_field(name=" ", value=" ", inline=False),
+            emb.add_field(name="/reset-invite-leaderboard-roles",
+                value="Resets all invite leaderboard roles", inline=True),
+            emb.add_field(name="/show-invites",
                 value="Shows how many users have been invited by a specific user", inline=True),
             emb.add_field(name="/userinfo", 
                 value="Display all information about a user", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False),
             emb.add_field(name="/serverinfo", 
                 value="Show all information about your server", inline=True)
             await interaction.response.send_message(embed=emb, ephemeral=True)
@@ -479,7 +507,7 @@ class HelpMenuSelect(discord.ui.View):
         if select.values[0] == "antilink":
 
             emb = discord.Embed(description=f"""## Anti-link system commands""", color=bot_colour)
-            emb.add_field(name="set-anti-link", 
+            emb.add_field(name="/set-anti-link", 
                 value="Set the anti-link system", inline=True)
             emb.add_field(name="/show-antilink-settings", 
                 value="Shows how the antilin system is set", inline=True)
@@ -497,38 +525,43 @@ class HelpMenuSelect(discord.ui.View):
         if select.values[0] == "auto_reaction":
 
             emb = discord.Embed(description=f"""## Auto-reaction system commands""", color=bot_colour)
-            emb.add_field(name="set-auto-reaction",
+            emb.add_field(name="/set-auto-reaction",
                 value="Sets the auto-reaction system", inline=True)
-            emb.add_field(name="add-auto-reaction",
+            emb.add_field(name="/add-auto-reaction",
                 value="Adds auto-reactions to the server", inline=True)
-            emb.add_field(name="remove-auto-reaction",
+            emb.add_field(name="/remove-auto-reaction",
                 value="Removes auto-reactions from the server", inline=True)
             emb.add_field(name="", value="", inline=False)
-            emb.add_field(name="show-auto-reactions",
+            emb.add_field(name="/show-auto-reactions",
                 value="Shows all auto-reactions that are set on the server", inline=True)
-            emb.add_field(name="reset-auto-reactions",
+            emb.add_field(name="/reset-auto-reactions",
                 value="Resets all auto-reactions that are set for the server", inline=True)
         
 
         if select.values[0] == "message_system":
 
             emb = discord.Embed(description=f"""## Message system commands""", color=bot_colour)
+            emb.add_field(name="/set-sticky-message", 
+                value="Sets the sticky message system", inline=True)
             emb.add_field(name="/add-sticky-message", 
                 value="Adds a sticky message", inline=True)
             emb.add_field(name="/remove-sticky-message", 
                 value="Removes a sticky message", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
             emb.add_field(name="/show-sticky-message", 
                 value="Shows all sticky messages", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
             emb.add_field(name="/reset-sticky-message", 
                 value="Deletes all sticky messages", inline=True)
+            emb.add_field(name="/set-auto-message", 
+                value="Sets the auto message system", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
             emb.add_field(name="/add-auto-message", 
                 value="Adds a auto message", inline=True)
             emb.add_field(name="/remove-auto-message", 
                 value="Removes a auto message", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
             emb.add_field(name="/show-auto-message", 
                 value="Shows all auto messages", inline=True)
+            emb.add_field(name=" ", value=" ", inline=False)
             emb.add_field(name="/reset-auto-message", 
                 value="Deletes all auto messages", inline=True)
 
@@ -547,18 +580,7 @@ class HelpMenuSelect(discord.ui.View):
                 value="Removes the booster channel", inline=True)
             emb.add_field(name="/show-booster-channel", 
                 value="Shows which channel is set as the booster channel", inline=True)
-            emb.add_field(name="/set-sticky-message", 
-                value="Sets the sticky message", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
-            emb.add_field(name="/add-sticky-message", 
-                value="Adds a sticky message", inline=True)
-            emb.add_field(name="/remove-sticky-message", 
-                value="Removes a sticky message", inline=True)
-            emb.add_field(name="/show-sticky-message", 
-                value="Shows all sticky messages", inline=True)
-            emb.add_field(name=" ", value=" ", inline=False)
-            emb.add_field(name="/reset-sticky-message", 
-                value="Deletes all sticky messages", inline=True)
+                        
             await interaction.response.send_message(embed=emb, ephemeral=True)
 
 
@@ -571,6 +593,278 @@ class HelpMenuSelect(discord.ui.View):
     async def callback(self, interaction:Interaction):
         
         await interaction.message.delete()
+
+    @discord.ui.button(
+        label="Explanation of the systems",
+        style=discord.ButtonStyle.blurple,
+        custom_id="explanation_button"
+    )
+
+    async def help_menu_explanation_button(self, button, interaction:discord.Interaction):
+
+        emb = GetEmbed.get_embed(embed_index=15)
+
+        await interaction.response.send_message(embed=emb, view=PaginatorViewHelpMenu(), ephemeral=True)
+
+
+
+class PaginatorViewHelpMenu(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.pages = [
+            GetEmbed.get_embed(embed_index=15),
+            discord.Embed(
+                description=f"""## Level system explained
+                    {Emojis.dot_emoji} The level system allows users to level up by collecting XP, there is a cooldown of 20 seconds
+
+                    ```General information on the level system```
+                    > `set-level-system` Configure the level system. Set a level-up channel for notifications, adjust the XP earned per message, and define bonus XP values in the bonus list.
+                    > `/give-xp` `/remove-xp` `/give-level` `/remove-level` `/reset-user-stats` `/rank` `/leaderboard-level`
+                
+                    ```Level roles```
+                    {Emojis.dot_emoji} Level roles are roles that are assigned to users when they reach a certain level
+
+                    > `/add-level-role` Adds a level role
+                    > `/remove-level-role` Deletes a level role
+                    > `/show-level-roles` Shows all active level roles
+                    > `/reset-level-roles` Deletes all level roles
+                
+                    ```Level Blacklist```
+                    {Emojis.dot_emoji} Users, channels, roles and categories can be blacklisted, if an item is blacklisted no messages will be rewarded with XP
+
+                    > `/add-level-blacklist` Adds something to the level blacklist
+                    > `/remove-level-blacklist` Deletes something from the level blacklist
+                    > `/show-level-blacklist` Shows everything that is listed on the blacklist
+                    > `/reset-level-blacklist` Deletes all entries from the blacklist
+                
+                    ```Bonus XP list```
+                    {Emojis.dot_emoji} Users, channels, roles and categories can be added to the XP bonus list, the items that are on the list are rewarded with extra XP this is calculated as a percentage
+                    
+                    > `/add-bonus-xp-list` Adds something to the bonus XP list 
+                    > `/remove-bonus-xp-list` Delete something from the bonus XP list
+                    > `/show-bonus-xp-list` Shows everything on the bonus XP list
+                    > `/reset-bonus-xp-list` Deletes all entries from the bonus XP list
+                    """, color=bot_colour
+            ),
+            discord.Embed(
+                description=f"""## Mod commands explained
+                    {Emojis.dot_emoji} There are many different mod commands, here is an overview with more detailed explanations
+                    
+                    > `/ban` Bans a user who can then no longer join the server even by invitation
+                    > `/unban` Cancels the ban of a user, but the user ID is required for this
+                    > `/kick` Kicks a user from the server, but he can join again if he receives an invitation
+                    > `/timeout` Sends a user into timeout, depending on the time selected, the user can no longer write or join voice calls for a certain period of time
+                    > `/remove-timeout` Removes a timeout from a user
+                    > `/clear` Deletes the amount of messages you specify when running
+                    > `/give-role` Adds a role to a user provided it is not a role with permissions
+                    > `/remove-role` Removes a role of a user
+                    """, color=bot_colour
+            ),
+            discord.Embed(
+                description=f"""## Fun commands explained
+                    {Emojis.dot_emoji} There are different fun commands, here is an overview with explanations for the individual commands
+                    
+                    > `/rps` Play a round of rock, paper, scissors if you choose a user you can challenge them to a duel, but if you choose a bot or no one you play against shrio
+                    > `/coinflip` Toss a coin, either heads or tails comes out
+                    > `/cocktails` Gives you a random recipe for a cocktail, with the necessary ingredients, preparation and whether it is with alcohol or not, as well as a picture of what it should ideally look like
+                    > `/animememe` Send a random anime meme from reddit
+                    > `/anime gif (tag)` Send a random anime gif for this you can choose from the following tags `kiss` `hug` `lick` `feed` `idk` `dance` `slap` `fbi` `embarres` `pet`
+                    """, color=bot_colour
+            ),
+            discord.Embed(
+                description=f"""## Statistic system explained
+                    {Emojis.dot_emoji} The statistics system consists of two leaderboards, one shows the users who have written the most messages and the other shows who has invited the most other users, for both there are fixed intervals
+
+                    ```General commands for the statistic system```
+                    {Emojis.dot_emoji} There are also commands that show the current numbers of the server or user
+
+                    > `/show-invites` Shows the number of invited users from specific users
+                    > `/userinfo` Displays information about specific users
+                    > `/serverinfo` Displays information about the server
+
+                    ```Leaderboard commands```
+                    {Emojis.dot_emoji} You can set your own intervals for each leaderboard for the message leaderboard there are the intervals, daily, weekly and monthly, for the invite leaderboard weekly, monthly and quarterly is possible in addition a total overview is always sent
+                    
+                    > `/set-message-leaderboard` Let you set the leaderboards, including the intervals and the channel to which the leaderboards should be sent
+                    > `/show-message-leaderboard-setting` Shows how the leaderboard is set and which channels or intervals have been defined
+                    
+                    ```Leaderboard roles```
+                    {Emojis.dot_emoji} You can set whether you should receive a role when you reach a certain place on a leaderboard, it is also possible to set a separate role for each place or a role that is assigned for each place
+                    
+                    > `/add-message-leaderboard-role` Adds a role for the message leaderboard, it can be specified whether only a certain place receives the role or everyone
+                    > `/remove-message-leaderboard-role` Removes a role from the message leaderboard
+                    > `/show-message-leaderboard-roles` Displays all leaderboard roles of the message leaderboard
+                    > `/reset-message-leaderboard-roles` Deletes all leaderboard roles of the message leaderboard
+
+                    > `/add-invite-leaderboard-role` Adds a role for the invite leaderboard, it can also be specified whether only a certain place receives the role or everyone who is on the invite leaderboard
+                    > `/remove-invite-leaderboard-role` Removes a ROlle from the invite leaderboard
+                    > `/show-invite-leaderboard-roles` Shows all roles that are defined for the invite leaderboard
+                    > `/reset-invite-leaderboard-roles` Deletes all roles defined for the invite leaderboard
+                    """, color=bot_colour
+            ),
+            discord.Embed(
+                description=f"""## Anti-link system explained
+                    {Emojis.dot_emoji} The anti-link system prevents users from sending links of any kind or only certain kinds in channels where it is not wanted
+
+                    ```Anti-link commands```
+                    {Emojis.dot_emoji} Set the anti-link system, you can delete all discord links or only allow images / videos, it is also possible to allow no links at all
+
+                    > `/set-anti-link` Choose how the anti-link system should behave
+                    > `/show-antilink-settings` Shows how the anti-link system is set
+
+                    ```Anti-link whitelist ```
+                    {Emojis.dot_emoji} The whitelist is a list for which the anti-link system makes an exception and does not react, channels, users, roles or categories can be listed on it
+
+                    > `/add-antilink-whitelist` Add something to the whitelist
+                    > `/remove-antilink-whitelist` Remove something from the whitelist
+                    > `/show-antilink-whitelist` Shows you what is listed on the anit-link whitelist
+                    > `/reset-antilink-whitelist` Deletes all entries from the whitelist
+                    """, color=bot_colour
+            ),
+            discord.Embed(
+                description=f"""## Auto reaction system explained
+                    {Emojis.dot_emoji} The auto reaction system adds selected reactions to content, you can choose to react only to text, only to images / videos or also to links or simply to every message
+                    
+                    > `/set-auto-reaction` Sets the auto-reaction system, you can choose what the system should react to, text, images / videos, links or everything
+                    > `/add-auto-reaction` Adds something to the auto-reaction system, channel, user, role or categories can be added
+                    > `/remove-auto-reaction` Removes some of the auto-reaction system
+                    > `/show-auto-reactions` Shows how the auto-reaction system is set and what it reacts to
+                    > `/reset-auto-reactions` Resets the auto-reaction system
+                    """, color=bot_colour
+            ),
+            discord.Embed(
+                description=f"""## Message system explained
+                    {Emojis.dot_emoji} The message system consists of two components, the sticky message system and the auto message system, the sticky message system ensures that a message is always at the end of a channel, the auto message system always sends a message to a specific channel at a defined interval
+                    
+                    ```Sticky message```
+                    {Emojis.dot_emoji} The sticky message system always sends a message when another user sends a message to a channel, so the bot's message is always the last message read
+
+                    > `/set-sticky-message` Switch the sticky message system on or off
+                    > `/add-sticky-message` Create a channel in which the sticky message should be sent and a text that should be sent
+                    > `/remove-sticky-message` Removes a sticky message
+                    > `/show-sticky-message` Shows you all sticky messages that have been defined for the server, these can be deactivated or deleted individually, and you can also edit them
+                    > `/reset-sticky-message` Deletes all sticky messages
+
+                    ```Auto message```
+                    {Emojis.dot_emoji} The auto message system always sends a message at a specific interval to a specific channel
+
+                    > `/set-auto-message` Switches the auto message system on or off
+                    > `/add-auto-message` Defines a channel and an interval in which the message is then sent, the text of which can be freely selected
+                    > `/remove-auto-message` Removes an auto message
+                    > `/show-auto-message` Shows you all auto messages that have been defined for the server, these can be deactivated or deleted individually, you can also edit them
+                    > `/reset-auto-message` Deletes all auto messages
+                    """, color=bot_colour
+            ),
+            discord.Embed(
+                description=f"""## Other systems explained
+                    {Emojis.dot_emoji} There are also smaller systems like the ghost ping system and the booster channel system, with the ghost ping system a message is sent when a message is deleted with a ping, with the booster channel system you can set a channel for booster notifications
+
+                    ```Ghost ping system```
+                    {Emojis.dot_emoji} The ghost ping system always reacts when someone sends a message with a ping and then deletes it
+
+                    > `/ghost-ping-settings` Sets the ghost ping system by activating or deactivating it
+                    
+                    ```Booster channel system```
+                    {Emojis.dot_emoji} With the booster channel system you can define a channel for booster notifications, the message to be sent can also be freely defined
+
+                    > `/set-booster-channel` Switches the booster channel system on or off
+                    > `/add-booster-channel` Defines a channel for the booster messages and lets you freely determine the text
+                    > `/remove-booster-channel` Removes the booster channel
+                    > `/show-booster-channel` Shows the current booster channel including message, this can also be adjusted immediately
+                    """, color=bot_colour
+            )
+        ] 
+        self.current_page = 0
+        self.update_buttons_auto_message()
+
+
+    def update_buttons_auto_message(self):
+
+        self.children[0].disabled = self.current_page == 0  
+        self.children[1].disabled = self.current_page == 0  
+        self.children[2].disabled = self.current_page == len(self.pages) - 1 
+        self.children[3].disabled = self.current_page == len(self.pages) - 1  
+
+
+    async def update_message_auto_message(self, interaction):
+        self.update_buttons_auto_message()
+        await interaction.response.edit_message(embed=self.pages[self.current_page], view=self)
+
+
+    @discord.ui.button(
+        label="To the first page", 
+        style=discord.ButtonStyle.blurple,
+        custom_id="to_first_page_auto_message"
+    )
+    
+    async def go_to_first_page_auto_message(self, button, interaction: discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            self.current_page = 0
+            await self.update_message_auto_message(interaction)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+    @discord.ui.button(
+        label="Back", 
+        style=discord.ButtonStyle.blurple,
+        custom_id="back_auto_message"
+    )
+
+    async def back_button_auto_message(self, button, interaction: discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+            
+            if self.current_page > 0:
+                self.current_page -= 1
+            await self.update_message_auto_message(interaction)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+    @discord.ui.button(
+        label="Next", 
+        style=discord.ButtonStyle.blurple,
+        custom_id="next_auto_message"
+    )
+
+    async def next_button_auto_message(self, button, interaction: discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            if self.current_page < len(self.pages) - 1:
+                self.current_page += 1
+            await self.update_message_auto_message(interaction)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
+
+    @discord.ui.button(
+        label="To the last page", 
+        style=discord.ButtonStyle.blurple,
+        custom_id="to_last_page_auto_message"
+    )
+
+    async def go_to_last_page_auto_message(self, button, interaction: discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            self.current_page = len(self.pages) - 1
+            await self.update_message_auto_message(interaction)
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+
 
 
 bot.add_cog(HelpMenu(bot))

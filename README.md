@@ -2,7 +2,7 @@
 
 
 <h1 align="center">
-    Version 1.4!<br>
+    Version 1.5!<br>
 </h1>
 
 <h4 align="center">
@@ -12,7 +12,7 @@
 
 <h4 align="center">
     <a href="https://discord.gg/UKZkmeJYsA"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
-    <br>Start of development Tue, Jan 04, 2022
+    <br>
 </h4>
 
 ## 👋 About
