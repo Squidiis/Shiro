@@ -692,76 +692,70 @@ class LeaderboardSystem(commands.Cog):
     '''
     async def sort_leaderboard(self, user_list, interval, guild_id, system):
 
-        try:
+        guild = self.bot.get_guild(guild_id)
+        interval_list = ["", "day", "week", "month", "general"] if system == "message" else ["", "week", "month", "quarter", "general"]
+        interval_value = interval_list[interval]
 
-            guild = self.bot.get_guild(guild_id)
-            interval_list = ["", "day", "week", "month", "general"] if system == "message" else ["", "week", "month", "quarter", "general"]
-            interval_value = interval_list[interval]
-
-            check_roles = await DatabaseCheck.check_leaderboard_roles(guild_id=guild_id, interval=interval_value, system=system)
+        check_roles = await DatabaseCheck.check_leaderboard_roles(guild_id=guild_id, interval=interval_value, system=system)
             
-            general_role = None
-            if check_roles:
-                general_role = next((guild.get_role(i[1]) for i in check_roles if i[2] == 0), None)
+        general_role = None
+        if check_roles:
+            general_role = next((guild.get_role(i[1]) for i in check_roles if i[2] == 0), None)
 
-            max_lengths = [max(len(str(t[i])) for t in user_list) for i in range(10)]
+        max_lengths = [max(len(str(t[i])) for t in user_list) for i in range(10)]
             
-            user_names, users = [], []
-            for t in user_list:
+        user_names, users = [], []
+        for t in user_list:
             
-                try:
-                    user = await guild.fetch_member(t[1])
-                    user_names.append(user.name)
-                    users.append(user)
-                    max_lengths[0] = max(max_lengths[0], len(user.name)) 
-                    await asyncio.sleep(0.1)
+            try:
+                user = await guild.fetch_member(t[1])
+                user_names.append(user.name)
+                users.append(user)
+                max_lengths[0] = max(max_lengths[0], len(user.name)) 
+                await asyncio.sleep(0.1)
 
-                except Exception as e:
-                    print(f"Exception: [sort_leaderboard:user check] {e}")
-                    await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id=guild_id, user_id=t[1])
+            except Exception as e:
+                await DatabaseRemoveDatas.remove_leaderboard_tracking(guild_id=guild_id, user_id=t[1])
 
-            max_index = len(user_names) - 1
+        max_index = len(user_names) - 1
 
-            padded_tuples = [
-                (
-                    user_names[min(i, max_index)].ljust(max_lengths[0]),
-                    str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
-                    str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
-                    str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[8]).ljust(max_lengths[8]),
-                    str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[9]).ljust(max_lengths[9])
-                )
-                for i, t in enumerate(user_list)
-            ]
+        padded_tuples = [
+            (
+                user_names[min(i, max_index)].ljust(max_lengths[0]),
+                str(t[2]).ljust(max_lengths[2]) if system == "message" else str(t[6]).ljust(max_lengths[6]),
+                str(t[3]).ljust(max_lengths[3]) if system == "message" else str(t[7]).ljust(max_lengths[7]),
+                str(t[4]).ljust(max_lengths[4]) if system == "message" else str(t[8]).ljust(max_lengths[8]),
+                str(t[5]).ljust(max_lengths[5]) if system == "message" else str(t[9]).ljust(max_lengths[9])
+            )
+            for i, t in enumerate(user_list)
+        ]
         
-            await self.remove_leaderboard_roles(guild=guild, interval=interval_value, system=system)
+        await self.remove_leaderboard_roles(guild=guild, interval=interval_value, system=system)
             
-            leaderboard = []
-            count = 0
-            for i in range(min(len(user_list), 15)):
+        leaderboard = []
+        count = 0
+        for i in range(min(len(user_list), 15)):
 
-                if check_roles:
+            if check_roles:
                     
-                    role = await DatabaseCheck.check_leaderboard_roles(guild_id=guild_id, position=i + 1, system=system, interval = interval_value)
+                role = await DatabaseCheck.check_leaderboard_roles(guild_id=guild_id, position=i + 1, system=system, interval = interval_value)
 
-                    if general_role and count < 1:
-                        await users[i].add_roles(general_role)
-                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=general_role.id, operation="add", status=system, interval=interval_value, position = 0)
-                        count += 1
+                if general_role and count < 1:
+                    await users[i].add_roles(general_role)
+                    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=general_role.id, operation="add", status=system, interval=interval_value, position = 0)
+                    count += 1
 
-                    if role:
+                if role:
                         
-                        leaderboard_role = guild.get_role(role[1])
-                        await users[i].add_roles(leaderboard_role)
-                        await asyncio.sleep(0.1)
-                        await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=role[1], operation="add", status=system, interval=interval_value, position = i+1)
+                    leaderboard_role = guild.get_role(role[1])
+                    await users[i].add_roles(leaderboard_role)
+                    await asyncio.sleep(0.1)
+                    await DatabaseUpdates.manage_leaderboard_roles_users(guild_id=guild_id, user_id=users[i].id, role_id=role[1], operation="add", status=system, interval=interval_value, position = i+1)
                 
-                num_str = f" #{i + 1:2d} "
-                leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
+            num_str = f" #{i + 1:2d} "
+            leaderboard.append(f"`{num_str}` `{padded_tuples[i][0]}` `{'messages' if system == 'message' else 'invitations'} {padded_tuples[i][interval]}`\n")
             
-            return "".join(leaderboard)
-
-        except Exception as e:
-            print(f"Error: [sort_leaderboard] {e}")
+        return "".join(leaderboard)
 
 
     @tasks.loop(hours=1)
