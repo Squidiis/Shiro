@@ -331,7 +331,7 @@ class Main(commands.Cog):
 
     
     @commands.Cog.listener()
-    async def on_guild_join(guild):
+    async def on_guild_join(self, guild):
 
         await DatabaseUpdates._create_bot_settings(guild_id=guild.id)
 
