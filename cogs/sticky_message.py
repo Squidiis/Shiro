@@ -250,7 +250,7 @@ class StickyMessage(commands.Cog):
                 
             emb = discord.Embed(description=f"""{sticky_message[3]}""", color=bot_colour)
                 
-            new_message = await message.channel.send(embed=emb)
+            new_message = await message.channel.send(embed=emb, allowed_mentions=True)
             await DatabaseUpdates.manage_sticky_message(guild_id = message.guild.id, channel_id = message.channel.id, message_id = new_message.id, operation = "update")
             
 
@@ -293,7 +293,7 @@ class StickyMessage(commands.Cog):
                    pass 
                     
                 emb = discord.Embed(description=f"""{sticky_message[3]}""", color=bot_colour)
-                message = await channel.send(embed=emb)
+                message = await channel.send(embed=emb, allowed_mentions=True)
                 await DatabaseUpdates.manage_sticky_message(guild_id = guild.id, channel_id = channel.id, message_id = message.id, operation = "update")
 
 
@@ -467,7 +467,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
                     message = await channel.fetch_message(settings[2])
                     await message.delete()
 
-                    new_message = await channel.send(embed=emb)
+                    new_message = await channel.send(embed=emb, allowed_mentions=True)
                     await DatabaseUpdates.manage_sticky_message(guild_id = interaction.guild.id, message_id = new_message.id, channel_id = channel.id, operation = "update", status = 0 if settings[4] == 1 else 1)
                 
                 elif settings[4] == 1:

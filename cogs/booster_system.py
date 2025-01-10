@@ -135,17 +135,12 @@ class BoosterSystem(commands.Cog):
             if settings[1] == 1:
 
                 boost_channel = bot.get_channel(settings[2])
-            
-                try:
+              
 
-                    if boost_channel:
-                        
-                        text = settings[3].replace("[user]", after.user.mention)
-
-                        await boost_channel.send(text)
-
-                except Exception as e:
-                    print(f"Exception: [booster system] {e}")
+                if boost_channel:
+                  
+                    text = settings[3].replace("[user]", after.user.mention)
+                    await boost_channel.send(text, allowed_mentions=True)
 
 
 def setup(bot):

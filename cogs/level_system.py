@@ -465,7 +465,7 @@ class LevelSystem(commands.Cog):
                                     
                                     channel = bot.get_channel(check_level_up_channel[3])
                             
-                                    await channel.send(await level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
+                                    await channel.send(await level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level), allowed_mentions=True)
 
                                     if check_level_role:
 
@@ -566,7 +566,7 @@ class LevelSystem(commands.Cog):
 
                         if levelup_channel_check[3] == None:
 
-                            await ctx.send(await level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level))
+                            await ctx.send(await level_message(guild_id=ctx.guild.id, user_id=user.id, level=new_level), allowed_mentions=True)
                             
                         else:
                             

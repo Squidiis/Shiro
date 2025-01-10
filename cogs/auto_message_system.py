@@ -93,7 +93,7 @@ class AutoMessageSystem(commands.Cog):
 
         check_settings = await DatabaseCheck.check_auto_message_settings(guild_id = ctx.guild.id)
         
-        if check_settings == None:
+        if check_settings is None:
 
             await DatabaseUpdates.manage_auto_message(operation = "insert", guild_id = ctx.guild.id)
             check_settings = await DatabaseCheck.check_auto_message_settings(guild_id = ctx.guild.id)
@@ -225,7 +225,7 @@ class AutoMessageSystem(commands.Cog):
             await ctx.respond(embed=GetEmbed.get_embed(embed_index=14))
 
 
-    @tasks.loop(hours=12)
+    @tasks.loop(hours=2)
     async def auto_message(self):
 
         await self.bot.wait_until_ready()
@@ -262,7 +262,7 @@ class AutoMessageSystem(commands.Cog):
                         pass 
 
                     emb = discord.Embed(description=f"""{message[3]}""", color=bot_colour)
-                    new_message = await channel.send(embed=emb)
+                    new_message = await channel.send(embed=emb, allowed_mentions=True)
                     await DatabaseUpdates.manage_auto_message(guild_id = guild.id, message_id = new_message.id, send_time = new_message.created_at, channel_id = new_message.channel.id, operation = "update")
 
 
@@ -362,6 +362,12 @@ class EditAutoMessage(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
+            check_settings = await DatabaseCheck.check_auto_message_settings(guild_id = interaction.guild.id)
+
+            if check_settings is None:
+
+                await DatabaseUpdates.manage_auto_message(operation = "insert", guild_id = interaction.guild.id)
+            
             channel_id = await AutoMessageSystem.check_lines_auto_message(text=interaction.message.embeds[0].description)
             channel = bot.get_channel(channel_id)
 
@@ -560,7 +566,7 @@ class PaginatorViewAutoMessage(discord.ui.View):
                     message = await channel.fetch_message(settings[2])
                     await message.delete()
 
-                    new_message = await channel.send(embed=emb)
+                    new_message = await channel.send(embed=emb, allowed_mentions=True)
                     await DatabaseUpdates.manage_auto_message(guild_id = interaction.guild.id, message_id = new_message.id, channel_id = channel.id, operation = "update", status = 0 if settings[4] == 1 else 1, send_time = new_message.created_at)
                 
                 elif settings[4] == 1:

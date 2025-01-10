@@ -2336,13 +2336,13 @@ class DatabaseUpdates():
 
                 if channel_id is not None:
                     values.append(channel_id)
-                    columns.append("channelId")
+                    columns.append(", channelId")
 
                 if interval is not None:
                     values.append(interval)
-                    columns.append("sendInterval")
+                    columns.append(", sendInterval")
 
-                auto_message = f"INSERT INTO {'AutoMessage' if channel_id is not None else 'AutoMessageSettings'} (guildId, {', '.join(columns)}) VALUES (%s, {', '.join(['%s'] * len(columns))})"
+                auto_message = f"INSERT INTO {'AutoMessage' if channel_id is not None else 'AutoMessageSettings'} (guildId {''.join(columns)}) VALUES (%s {',' if channel_id is not None else ''} {', '.join(['%s'] * len(columns))})"
                 auto_message_values = values
 
             elif operation == "delete":
