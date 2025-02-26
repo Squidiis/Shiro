@@ -10,6 +10,7 @@ from cogs.booster_system import *
 from cogs.sticky_message import *
 import logging
 from cogs.auto_message_system import *
+from cogs.ticket_system import *
 
 
 logging.basicConfig(level=logging.INFO)
@@ -177,7 +178,7 @@ class Main(commands.Cog):
             CREATE TABLE IF NOT EXISTS BoosterSystem (
                 guildId BIGINT UNSIGNED NOT NULL,
                 status INT UNSIGNED DEFAULT 1,
-                channelId BIGINT NULL,
+                channelId BIGINT UNSIGNED NULL,
                 message VARCHAR(4000) DEFAULT 'Thank you, [user], for boosting the server! Your support helps make this community even better. We appreciate you!'
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
@@ -185,8 +186,8 @@ class Main(commands.Cog):
             '''
             CREATE TABLE IF NOT EXISTS StickyMessage (
                 guildId BIGINT UNSIGNED NOT NULL,
-                channelId BIGINT NOT NULL,
-                messageId BIGINT NULL,
+                channelId BIGINT UNSIGNED NOT NULL,
+                messageId BIGINT UNSIGNED NULL,
                 message VARCHAR(3000) NULL,
                 status INT DEFAULT 1
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -197,11 +198,12 @@ class Main(commands.Cog):
                 status INT UNSIGNED DEFAULT 1
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             ''',
+            # Auto message
             '''
             CREATE TABLE IF NOT EXISTS AutoMessage (
                 guildId BIGINT UNSIGNED NOT NULL,
-                channelId BIGINT NOT NULL,
-                messageId BIGINT NULL,
+                channelId BIGINT UNSIGNED NOT NULL,
+                messageId BIGINT UNSIGNED NULL,
                 message VARCHAR(3000) NULL,
                 status INT DEFAULT 1,
                 sendInterval INT NOT NULL,
@@ -213,8 +215,33 @@ class Main(commands.Cog):
                 guildId BIGINT UNSIGNED NOT NULL,
                 status INT UNSIGNED DEFAULT 1
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            # Ticket system
             '''
-            ]
+            CREATE TABLE IF NOT EXISTS TicketSystemSettings (
+                guildId BIGINT UNSIGNED NOT NULL,
+                status INT UNSIGNED DEFAULT 1,
+                ticketChannelId BIGINT UNSIGNED NULL,
+                ticketMessageId BIGINT UNSIGNED NULL,
+                ticketMessage VARCHAR(3000) NULL,
+                ticketMessageUrl VARCHAR(250) NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            '''
+            CREATE TABLE IF NOT EXISTS TicketSystemLayers (
+                guildId BIGINT UNSIGNED NOT NULL,
+                status INT UNSIGNED DEFAULT 1,
+                layerName VARCHAR(100) NOT NULL,         
+                description VARCHAR(100) DEFAULT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''',
+            ''' 
+            CREATE TABLE IF NOT EXISTS TempVoiceChannelTicketSystem (
+                guildId BIGINT UNSIGNED NOT NuLL,
+                channelId BIGINT UNSIGNED NOT NULL,
+                ticektName VARCHAR(100) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            ''']
 
         try:
 
@@ -239,7 +266,7 @@ class Main(commands.Cog):
         print("┗━━┓┃ ┃┗━┛┃ ┃┃ ┃┃  ┃┃   ┃┃┃┃  ┃┃")
         print("┃┗━┛┃ ┗━━┓┃ ┃┗━┛┃ ┏┫┣┓ ┏┛┗┛┃ ┏┫┣┓")
         print("┗━━━┛    ┗┛ ┗━━━┛ ┗━━┛ ┗━━━┛ ┗━━┛")
-
+        
         no_page = discord.Embed(description=f"""## An error has occurred
             {Emojis.dot_emoji} This interaction has been updated and therefore no pages can be accessed
             {Emojis.dot_emoji} Please try again later by calling the command again""", color=bot_colour)
@@ -309,6 +336,23 @@ class Main(commands.Cog):
         self.bot.add_view(EditAutoMessage())
         view.add_item(ShowAutoMessage())
 
+        # Ticket System
+        for guild in self.bot.guilds:
+            
+            options = await TicketSystem.get_layers(guild.id)
+
+            self.bot.add_view(RemoveLayer(options=options))
+            self.bot.add_view(ShowLayers(options=options))
+            self.bot.add_view(TicketCreateSelect(options=options))
+
+        self.bot.add_view(TicketSystemView())
+        self.bot.add_view(AddUserTicket())
+        self.bot.add_view(SetTicketSystemView())
+        self.bot.add_view(SetLayers())
+        self.bot.add_view(SetTicketChannelSelect())
+        self.bot.add_view(OverwriteTicketChannel())
+        view.add_item(ShowTicketMessage())
+
         # Other Systems
         self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
 
@@ -338,6 +382,7 @@ class Main(commands.Cog):
 
     @commands.Cog.listener()
     async def on_disconnect(self):
+
         print(f"Bot has lost the connection {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
         
         cog = self.bot.get_cog("LeaderboardSystem")
@@ -362,6 +407,7 @@ class Main(commands.Cog):
 
     @commands.Cog.listener()
     async def on_resumed(self):
+        
         print(f"Connection restored {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
         
         cog = self.bot.get_cog("LeaderboardSystem")
@@ -389,48 +435,68 @@ class Main(commands.Cog):
             auto_cog.auto_message.start()
 
 
-logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='w',
-    format='%(asctime)s - %(levelname)s - %(message)s')
+class BotManager:
+    
+    def __init__(self, bot):
 
-def handle_exception(loop, context):
-    msg = context.get("exception", context["message"])
-    logging.error(f"Caught exception: {msg}")
-    print(f"Caught exception: {msg}")
-
-loop = asyncio.get_event_loop()
-loop.set_exception_handler(handle_exception)
+        self.bot = bot
+        self.configure_logging()
+        self.loop = asyncio.get_event_loop()
+        self.loop.set_exception_handler(self.handle_exception)
 
 
+    def configure_logging(self):
 
-def load_cogs():
+        logging.basicConfig(filename='bot_errors.log', level=logging.ERROR, 
+            format='%(asctime)s - %(levelname)s - %(message)s')
 
-    for filename in os.listdir("cogs"):
 
-        if filename.endswith(".py"):
+    def log_error_to_file(self, message):
 
-            cog_name = f"cogs.{filename[:-3]}"
+        logging.error(message)
 
-            try:
 
-                bot.load_extension(cog_name)
-                print(f"Loaded {cog_name}")
+    def handle_exception(self, loop, context):
 
-            except Exception as e:
+        msg = context.get("exception", context["message"])
+        self.log_error_to_file(f"Caught exception: {msg}")
+        print(f"Caught exception: {msg}")
 
-                print(f"Failed to load {cog_name}: {e}")
+
+    def load_cogs(self):
+
+        for filename in os.listdir("cogs"):
+
+            if filename.endswith(".py"):
+
+                cog_name = f"cogs.{filename[:-3]}"
+
+                try:
+
+                    self.bot.load_extension(cog_name)
+                    print(f"Loaded {cog_name}")
+
+                except Exception as e:
+
+                    self.log_error_to_file(f"Failed to load {cog_name}: {e}")
+                    print(f"Failed to load {cog_name}: {e}")
+
 
 bot.add_cog(Main(bot))
 
 
+
 if __name__ == "__main__":
+
+    load_dotenv()
+    bot_manager = BotManager(bot)
 
     try:
 
-        load_dotenv()
-        load_cogs()
+        bot_manager.load_cogs()
         bot.run(os.getenv("TOKEN"))
 
     except Exception as e:
 
-        logging.error(f"Bot crashed with error: {e}")
-
+        bot_manager.log_error_to_file(f"Bot crashed with error: {e}")
+        print(f"Bot crashed with error: {e}")

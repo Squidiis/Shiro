@@ -135,12 +135,12 @@ class BoosterSystem(commands.Cog):
             if settings[1] == 1:
 
                 boost_channel = bot.get_channel(settings[2])
-              
 
                 if boost_channel:
                   
-                    text = settings[3].replace("[user]", after.user.mention)
-                    await boost_channel.send(text, allowed_mentions=True)
+                    text = settings[3].replace("[user]", after.mention)
+                    emb = discord.Embed(description=f"""{text}""", color=bot_colour)
+                    await boost_channel.send(embed=emb, allowed_mentions=discord.AllowedMentions(everyone=True, users=True, roles=True))
 
 
 def setup(bot):
@@ -186,9 +186,10 @@ class SetBoosterChannel(discord.ui.Button):
 
 class BoosterMessageModal(discord.ui.Modal):
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         super().__init__(title="Enter a text for the booster message")
         self.add_item(discord.ui.InputText(label="Insert the text for the booster message here", style=discord.InputTextStyle.long))
+
 
     async def callback(self, interaction:discord.Interaction):
 
@@ -217,8 +218,7 @@ class OverwriteBoosterChannel(discord.ui.Button):
         super().__init__(
             label="overwrite booster channel", 
             style=discord.ButtonStyle.blurple,
-            custom_id="overwrite_booster_channel"
-        )
+            custom_id="overwrite_booster_channel")
 
 
     async def callback(self, interaction:discord.Interaction):

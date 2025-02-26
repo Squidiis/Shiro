@@ -13,12 +13,6 @@ class StickyMessage(commands.Cog):
         self.check_sticky_message_task.start()
 
 
-    async def check_lines_sticky_message(text:str):
-
-        match = re.search(r"<#(\d+)>", text)
-        return int(match.group(1)) if match else None
-
-
     async def update_paginator(guild_id):
 
         all_pages = await DatabaseCheck.check_sticky_message(guild_id = guild_id)
@@ -250,7 +244,7 @@ class StickyMessage(commands.Cog):
                 
             emb = discord.Embed(description=f"""{sticky_message[3]}""", color=bot_colour)
                 
-            new_message = await message.channel.send(embed=emb, allowed_mentions=True)
+            new_message = await message.channel.send(embed=emb, allowed_mentions=discord.AllowedMentions(everyone=True, users=True, roles=True))
             await DatabaseUpdates.manage_sticky_message(guild_id = message.guild.id, channel_id = message.channel.id, message_id = new_message.id, operation = "update")
             
 
@@ -266,7 +260,7 @@ class StickyMessage(commands.Cog):
             if settings is None:
                 return
 
-            if settings[0] == 0:
+            if settings[1] == 0:
                 return
             
             all_sticky_messages = await DatabaseCheck.check_sticky_message(guild_id = guild.id)
@@ -275,25 +269,28 @@ class StickyMessage(commands.Cog):
                 return
 
             for sticky_message in all_sticky_messages:
+                
+                if sticky_message[4] == 0:
+                    continue
 
-                if sticky_message is None or sticky_message[4] == 0:
-                    return
-                    
                 channel = bot.get_channel(sticky_message[1])
+                is_latest = False
 
                 async for recent_message in channel.history(limit=1):
-                
                     if recent_message.id == sticky_message[2]:
-                        return
+                        is_latest = True
 
+                if is_latest:
+                    continue
+                
                 try:
                     old_message = await channel.fetch_message(sticky_message[2])
                     await old_message.delete()
                 except discord.NotFound:
-                   pass 
+                    pass
                     
                 emb = discord.Embed(description=f"""{sticky_message[3]}""", color=bot_colour)
-                message = await channel.send(embed=emb, allowed_mentions=True)
+                message = await channel.send(embed=emb)
                 await DatabaseUpdates.manage_sticky_message(guild_id = guild.id, channel_id = channel.id, message_id = message.id, operation = "update")
 
 
@@ -448,7 +445,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
 
             embed_text = interaction.message.embeds[0].description
         
-            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
             channel = await bot.fetch_channel(int(channel_id))
             if channel_id:
 
@@ -467,7 +464,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
                     message = await channel.fetch_message(settings[2])
                     await message.delete()
 
-                    new_message = await channel.send(embed=emb, allowed_mentions=True)
+                    new_message = await channel.send(embed=emb, allowed_mentions=discord.AllowedMentions(everyone=True, users=True, roles=True))
                     await DatabaseUpdates.manage_sticky_message(guild_id = interaction.guild.id, message_id = new_message.id, channel_id = channel.id, operation = "update", status = 0 if settings[4] == 1 else 1)
                 
                 elif settings[4] == 1:
@@ -501,7 +498,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
 
             if channel_id:
                 
@@ -539,7 +536,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
 
             if channel_id:
 
@@ -573,7 +570,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
 
             if channel_id:
 
@@ -621,7 +618,7 @@ class OverwriteChannelSelect(discord.ui.View):
             else:
 
                 embed_text = interaction.message.embeds[0].description
-                channel_id = await StickyMessage.check_lines_sticky_message(text=embed_text)
+                channel_id = await extracts_channel_id(text=embed_text)
                 
                 sticky_message = await DatabaseCheck.check_sticky_message(guild_id = interaction.guild.id, channel_id = channel_id)
 
@@ -686,7 +683,7 @@ class AddStickyMessageText(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            channel_id = await StickyMessage.check_lines_sticky_message(text=interaction.message.embeds[0].description)
+            channel_id = await extracts_channel_id(text=interaction.message.embeds[0].description)
             channel = bot.get_channel(channel_id)
 
             await interaction.response.send_modal(StickyMessageModal(channel=channel))
@@ -753,7 +750,7 @@ class EditStickyMessage(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            channel_id = await StickyMessage.check_lines_sticky_message(text=interaction.message.embeds[0].description)
+            channel_id = await extracts_channel_id(text=interaction.message.embeds[0].description)
             channel = bot.get_channel(channel_id)
             
             await interaction.response.send_modal(StickyMessageModal(channel=channel))

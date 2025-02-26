@@ -17,7 +17,8 @@ from datetime import timedelta
 from datetime import datetime
 import re
 from datetime import UTC
-
+from urllib.parse import urlsplit, urlparse
+import aiohttp
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
@@ -67,6 +68,7 @@ with open("config.yaml", 'r') as f:
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
+intents.messages = True
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=data["Prefix"], intents=intents, activity = discord.Game(name="developed by squidi"))
 
@@ -95,27 +97,57 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
 default_message = 'Oh nice {user} you have a new level, your newlevel is {level}' 
 
 
+
 '''
-Check if the user has admin rights
+Checks a message for a channel ID
 
 Parameters:
 -----------
-- ctx: Command context
+- text: The message to be checked
 '''
-def is_admin():
-    async def predicate(ctx):
-        if ctx.guild is None:
-            return False
-        member = ctx.guild.get_member(ctx.author.id)
-        if member is None:
-            return False
-        return member.guild_permissions.administrator
+async def extracts_channel_id(text:str):
 
-    return commands.check(predicate)
+    match = re.search(r"<#(\d+)>", text)
+    return int(match.group(1)) if match else None
 
 
 # File formats (required for antu-link system and auto-reaction)
 formats = ['png', 'jpg', 'gif' , 'webp', 'jpeg', 'jpg' , 'jpeg' ,'jfif' ,'pjpeg' , 'pjp', 'svg', 'bmp', 'mp4', 'avi', 'mkv', 'mov', 'wmv', '.mp3', 'wav', 'ogg', 'aac', 'flac']
+
+
+'''
+Checks whether the URL leads to a gif or image
+
+Parameters:
+-----------
+- url: Link from the image or gif
+'''
+async def validate_image_url(url:str):
+    
+    try:
+
+        parsed_url = urlparse(url)
+        if parsed_url.scheme not in ['http', 'https'] or not parsed_url.netloc:
+            return False
+        
+    except Exception as e:
+        return False
+
+    try:
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                
+                if 'image' not in response.headers.get('Content-Type', ''):
+                    return False
+                if response.status != 200:
+                    return False
+                
+    except aiohttp.ClientError as e:
+        return False
+
+    return True
+
 
 
 # Embeds that are used multiple times within the bot
@@ -580,6 +612,8 @@ class HelpMenuSelect(discord.ui.View):
                 value="Removes the booster channel", inline=True)
             emb.add_field(name="/show-booster-channel", 
                 value="Shows which channel is set as the booster channel", inline=True)
+            emb.add_field(name="/set-ticket-system",
+                value="Sets the ticket system", inline=True)
                         
             await interaction.response.send_message(embed=emb, ephemeral=True)
 
@@ -772,6 +806,11 @@ class PaginatorViewHelpMenu(discord.ui.View):
                     > `/add-booster-channel` Defines a channel for the booster messages and lets you freely determine the text
                     > `/remove-booster-channel` Removes the booster channel
                     > `/show-booster-channel` Shows the current booster channel including message, this can also be adjusted immediately
+
+                    ```Ticket system```
+                    {Emojis.dot_emoji} The ticket system allows users to create tickets to report problems (To use the ticket system you need to set a ticket message, a channel and at least one layer)
+                    
+                    > `/set-ticket-system` Sets the ticket system, it is possible to set on / off, temp voice channel can be created from tickets and the message itself can also be freely designed
                     """, color=bot_colour
             )
         ] 

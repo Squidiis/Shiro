@@ -20,9 +20,6 @@
 Shiro is a Discord bot that stands out for its wide range of commands and customization options. 
 You can customize pretty much anything, all commands are very user-friendly and always have explanations!
 
-If you wish, you can invite the bot to your own server by clicking [here](https://discord.com/oauth2/authorize?client_id=928073958891347989&scope=bot&permissions=8)
-
-
 ## ⌨ Functions
 
 * Level System
@@ -59,6 +56,11 @@ If you wish, you can invite the bot to your own server by clicking [here](https:
 * Message system
     - Sticky message (ensures that a message you specify is always at the end of a channel, if a new message is sent, the sticky message is packed back to the end of the channel)
     - Auto message (always sends a message to a specific channel in a selected interval maxiaml in a 30 day cycle) 
+
+* Ticket system
+    - Tickets with Temp voice channel (a Temp voice channel can be created from each ticket)
+    - The ticket system can be freely designed (message text, the individual layers in the select menu and much more)
+    - Tickets can be easily managed with the help of the bot
 
 ## 📝 Requirements
 
@@ -189,3 +191,4 @@ This project is licensed under the [Custom License](LICENSE.txt). For commercial
 |remove-auto-message|Removes a auto-message|
 |show-auto-message|Displays all auto-messages created for a server|
 |reset-auto-message|Deletes all auto-messages|
+|set-ticket-system|Sets the Ticket system (For the ticket system to work, a channel, the text of the ticket message and a layer must be defined)|

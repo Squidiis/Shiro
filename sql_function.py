@@ -2,6 +2,7 @@ import os
 from utils import *
 import discord
 import aiomysql
+import datetime
 
 #######################  Database connection  #######################
 
@@ -882,10 +883,92 @@ class DatabaseCheck():
     
         await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
         return auto_message_settings
+    
+
+
+#################################################  Checks auto-message system  ##############################################################
+
+
+    '''
+    Returns the settings of the ticket system
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+    
+    Info:
+        - guild_id must be specified
+    '''
+    async def check_ticket_system_settings(guild_id:int):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_settings = "SELECT * FROM TicketSystemSettings WHERE guildId = %s"
+        check_settings_values = [guild_id]
+
+        await cursor.execute(check_settings, check_settings_values)
+        settings = await cursor.fetchone()
+        
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return settings
+    
+
+    '''
+    Returns the layers of the ticket system
+
+    parameters:
+    ------------
+        - guild_id
+            Server id
+    
+    Info:
+        - guild_id must be specified
+    '''
+    async def check_ticket_system_layers(guild_id:int):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_layers = "SELECT * FROM TicketSystemLayers WHERE guildId = %s"
+        check_layers_values = [guild_id]
+
+        await cursor.execute(check_layers, check_layers_values)
+        layers = await cursor.fetchall()
+        
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return layers
+    
+
+    '''
+    Returns the entries of the temp-voice channels ticket
+    
+    parameters:
+    ------------
+        - guild_id
+            Server id
+    
+    Info:
+        - guild_id must be specified
+    '''
+    async def check_ticket_system_temp_voice(guild_id:int, name:str):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        check_temp_channel = "SELECT * FROM TempVoiceChannelTicketSystem WHERE guildId = %s AND ticektName = %s"
+        check_temp_channel_values = [guild_id, name]
+        
+        await cursor.execute(check_temp_channel, check_temp_channel_values)
+        temp_channel = await cursor.fetchone()
+        
+        await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+        return temp_channel
+
 
 
 ########################################################  Checks the bot settings  ##############################################
-
 
 
     '''
@@ -2362,6 +2445,207 @@ class DatabaseUpdates():
             
             await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
+
+
+########################################  Insert into / Update the auto-reaction system  ##################################################
+
+
+    '''
+    Manages the settings of the ticket system
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - operation
+            Which action should be performed
+                - update: Updates content in the database
+                - insert: Inserts content into the database
+                - delete: Deletes content in the database
+        - status
+            Status whether the ticket message is switched on or off
+            0: Switched off
+            1: Switched on
+        - channel_id
+            Id of the channel in which the ticket message is to be sent
+        - message_id
+            Id of the ticket message
+        - message
+            The content of the message to be sent
+        - message_url
+            A link to an image or gif that is displayed below the message
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
+    '''
+    async def manage_ticket_system_settings(
+        guild_id:int,
+        operation:str,
+        status:int = None,
+        channel_id:int = None,
+        message_id:int = None,
+        message:str = None,
+        message_url:str = None):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        try:
+
+            if  operation == "insert":
+
+                ticket_system = "INSERT INTO TicketSystemSettings (guildId) VALUES (%s)"
+                ticket_system_values = [guild_id]
+
+            elif operation == "update":
+
+                ticket_system = f"UPDATE TicketSystemSettings SET {', '.join(f'{field} = %s' for field, param in zip(['status', 'ticketChannelId', 'ticketMessageID', 'ticketMessage', 'ticketmessageUrl'], [status, channel_id, message_id, message, message_url]) if param is not None)} WHERE guildId = %s"
+                ticket_system_values = [param for param in [status, channel_id, message_id, message, message_url] if param is not None] + [guild_id]
+
+            elif operation == "delete":
+                
+                ticket_system = "DELETE FROM TicketSystemSettings WHERE guildId = %s"
+                ticket_system_values = [guild_id]
+
+            if ticket_system:
+                
+                await cursor.execute(ticket_system, ticket_system_values)
+                await db_connect.commit()
+
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
+    '''
+    Manages the ticket system layers
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - operation
+            Which action should be performed
+                - update: Updates content in the database
+                - insert: Inserts content into the database
+                - delete: Deletes content in the database
+        - status
+            Status whether the auto message is switched on or off
+            0: Switched off
+            1: Switched on
+        - layer_name
+            Name of the layer in the select menu
+        - description
+            Placeholder of the layer of Select menu
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
+    '''
+    async def manage_ticket_system_layers(
+        guild_id:int,
+        operation:str,
+        status:int = None,
+        layer_name:str = None,
+        description:str = None):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        try:
+
+            if  operation == "insert":
+                
+                ticket_system = "INSERT INTO TicketSystemLayers (guildId, layerName, description) VALUES (%s, %s, %s)"
+                ticket_system_values = [guild_id, layer_name, description]
+
+            elif operation == "update":
+
+                ticket_system = f"UPDATE TicketSystemLayers SET {', '.join(f'{field} = %s' for field, param in zip(['status', 'layerName', 'description'], [status, layer_name, description]) if param is not None)} WHERE guildId = %s"
+                ticket_system_values = [param for param in [status, layer_name, description] if param is not None] + [guild_id]
+
+            elif operation == "delete":
+                
+                ticket_system = f"DELETE FROM TicketSystemLayers WHERE guildId = %s {f'AND layerName = %s' if layer_name is not None else ''}"
+                ticket_system_values = [guild_id] if layer_name is None else [guild_id, layer_name]
+
+            if ticket_system:
+
+                await cursor.execute(ticket_system, ticket_system_values)
+                await db_connect.commit()
+
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
+
+
+    '''
+    Manages the ticket system temp voice channels
+
+    Parameters:
+    ----------
+        - guild_id 
+            Server id
+        - operation
+            Which action should be performed
+                - update: Updates content in the database
+                - insert: Inserts content into the database
+                - delete: Deletes content in the database
+        - channel_id
+            Id of the temporary voice channel
+        - Name
+            Name of the channel (there are always 4 letters or numbers at the end)
+        - old_name 
+            The old name of the channel (if the channel is renamed)
+
+    Info:
+        - guild_id must be specified
+        - An operation must be specified
+    '''
+    async def manage_ticket_system_temp_voice(
+        guild_id:int,
+        operation:str,
+        channel_id:int,
+        name:str,
+        old_name:str = None):
+
+        db_connect = await DatabaseSetup.db_connector()
+        cursor = await db_connect.cursor()
+
+        try:
+
+            if  operation == "insert":
+             
+                ticket_temp_voice = "INSERT INTO TempVoiceChannelTicketSystem (guildId, ticektName, channelId) VALUES (%s, %s, %s)"
+                ticket_temp_voice_values = [guild_id, name, channel_id]
+
+            elif operation == "update":
+
+                ticket_temp_voice = "UPDATE TempVoiceChannelTicketSystem SET ticektName = %s WHERE guildId = %s AND ticektName = %s"
+                ticket_temp_voice_values = [name, guild_id, old_name]
+
+            elif operation == "delete":
+                
+                ticket_temp_voice = f"DELETE FROM TempVoiceChannelTicketSystem WHERE guildId = %s AND {'ticektName = %s' if channel_id == None else 'channelId'}"
+                ticket_temp_voice_values = [guild_id, name] if channel_id == None else [guild_id, name, channel_id]
+
+            if ticket_temp_voice:
+                await cursor.execute(ticket_temp_voice, ticket_temp_voice_values)
+                await db_connect.commit()
+
+        except aiomysql.Error as error:
+            print("parameterized query failed {}".format(error))
+
+        finally:
+
+            await DatabaseSetup.db_close(cursor=cursor, db_connection=db_connect)
 
 
 

@@ -4,6 +4,7 @@ from sql_function import *
 from discord.ext import tasks
 from datetime import timezone
 from collections import defaultdict
+from datetime import datetime
 
 
 # Dictionary for the check functions (does not have to be in each command individually)
@@ -75,7 +76,11 @@ class LeaderboardSystem(commands.Cog):
     async def check_expired_invites(cls):
         
         for guild in bot.guilds:
+            settings = await DatabaseCheck.check_leaderboard_settings(guild_id = guild.id, system="invite")
 
+            if settings[1]:
+                return
+            
             invite_codes = await DatabaseCheck.check_invite_codes(guild_id = guild.id, remove_value = "")
             
             for (invite_code,) in invite_codes:
@@ -781,7 +786,7 @@ class LeaderboardSystem(commands.Cog):
 
                         current_date = datetime.now(timezone.utc)
                         channel = self.bot.get_channel(leaderboard_settings[6])
-
+                        
                         for message_name, message_id in message_ids:
 
                             if message_id is not None:

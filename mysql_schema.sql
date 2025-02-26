@@ -187,7 +187,7 @@ DROP TABLE IF EXISTS `BoosterSystem`;
 CREATE TABLE BoosterSystem (
     guildId BIGINT UNSIGNED NOT NULL,
     status INT UNSIGNED DEFAULT 1,
-    channelId BIGINT NULL,
+    channelId BIGINT UNSIGNED NULL,
     message VARCHAR(3000) DEFAULT 'Thank you, {username}, for boosting the server! Your support helps make this community even better. We appreciate you!'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -198,8 +198,8 @@ DROP TABLE IF EXISTS `StickyMessage`;
 
 CREATE TABLE StickyMessage (
     guildId BIGINT UNSIGNED NOT NULL,
-    channelId BIGINT NOT NULL,
-    messageId BIGINT NULL,
+    channelId BIGINT UNSIGNED NOT NULL,
+    messageId BIGINT UNSIGNED NULL,
     message VARCHAR(3000) NULL,
     status INT DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -219,8 +219,8 @@ DROP TABLE IF EXISTS `AutoMessage`;
 
 CREATE TABLE StickyMessage (
     guildId BIGINT UNSIGNED NOT NULL,
-    channelId BIGINT NOT NULL,
-    messageId BIGINT NULL,
+    channelId BIGINT UNSIGNED NOT NULL,
+    messageId BIGINT UNSIGNED NULL,
     message VARCHAR(3000) NULL,
     status INT DEFAULT 1,
     sendInterval INT NOT NULL,
@@ -233,4 +233,37 @@ DROP TABLE IF EXISTS `AutoMessageSettings`;
 CREATE TABLE AutoMessageSystemSettings (
     guildId BIGINT UNSIGNED NOT NULL,
     status INT UNSIGNED DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+--------------- Table for the ticket system ---------------
+
+DROP TABLE IF EXISTS `TicketSystemSettings`;
+
+CREATE TABLE TicketSystemSettings (
+    guildId BIGINT UNSIGNED NOT NULL,
+    status INT UNSIGNED DEFAULT 1,
+    ticketChannelId BIGINT UNSIGNED NULL,
+    ticketMessageId BIGINT UNSIGNED NULL,
+    ticketMessage VARCHAR(3000) NULL,
+    ticketMessageUrl VARCHAR(250) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `TicketSystemLayers`;
+
+CREATE TABLE TicketSystemLayers (
+    guildId BIGINT UNSIGNED NOT NULL,
+    status INT UNSIGNED DEFAULT 1,
+    layerName VARCHAR(100) NOT NULL,         
+    description VARCHAR(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `TempVoiceChannelTicketSystem`;
+
+CREATE TABLE TempVoiceChannelTicketSystem (
+    guildId BIGINT UNSIGNED NOT NuLL,
+    channelId BIGINT UNSIGNED NOT NULL,
+    ticektName VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

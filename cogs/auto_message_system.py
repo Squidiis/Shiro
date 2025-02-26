@@ -10,12 +10,6 @@ class AutoMessageSystem(commands.Cog):
         self.auto_message.start()
 
 
-    async def check_lines_auto_message(text:str):
-
-        match = re.search(r"<#(\d+)>", text)
-        return int(match.group(1)) if match else None
-
-
     async def delete_old_auto_message(guild_id:int, channel_id:int = None, reset = None):
 
         channel = bot.get_channel(channel_id)
@@ -262,7 +256,7 @@ class AutoMessageSystem(commands.Cog):
                         pass 
 
                     emb = discord.Embed(description=f"""{message[3]}""", color=bot_colour)
-                    new_message = await channel.send(embed=emb, allowed_mentions=True)
+                    new_message = await channel.send(embed=emb)
                     await DatabaseUpdates.manage_auto_message(guild_id = guild.id, message_id = new_message.id, send_time = new_message.created_at, channel_id = new_message.channel.id, operation = "update")
 
 
@@ -299,7 +293,7 @@ class OverwriteIntervalAutoMessage(discord.ui.View):
                     {Emojis.help_emoji} Please try again later by simply executing the command again""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=None)
 
-            channel_id = await AutoMessageSystem.check_lines_auto_message(text=interaction.message.embeds[0].description)
+            channel_id = await extracts_channel_id(text=interaction.message.embeds[0].description)
             settings = await DatabaseCheck.check_auto_message(guild_id = interaction.guild.id, channel_id = channel_id)
             
             view = View()
@@ -368,7 +362,7 @@ class EditAutoMessage(discord.ui.View):
 
                 await DatabaseUpdates.manage_auto_message(operation = "insert", guild_id = interaction.guild.id)
             
-            channel_id = await AutoMessageSystem.check_lines_auto_message(text=interaction.message.embeds[0].description)
+            channel_id = await extracts_channel_id(text=interaction.message.embeds[0].description)
             channel = bot.get_channel(channel_id)
 
             await interaction.response.send_modal(AutoMessageModal(channel=channel))
@@ -395,7 +389,7 @@ class AddAutoMessageText(discord.ui.View):
 
         if interaction.user.guild_permissions.administrator:
 
-            channel_id = await AutoMessageSystem.check_lines_auto_message(text=interaction.message.embeds[0].description)
+            channel_id = await extracts_channel_id(text=interaction.message.embeds[0].description)
             channel = bot.get_channel(channel_id)
 
             await interaction.response.send_modal(AutoMessageModal(channel=channel))
@@ -547,7 +541,7 @@ class PaginatorViewAutoMessage(discord.ui.View):
 
             embed_text = interaction.message.embeds[0].description
         
-            channel_id = await AutoMessageSystem.check_lines_auto_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
             channel = await bot.fetch_channel(int(channel_id))
             if channel_id:
 
@@ -566,7 +560,7 @@ class PaginatorViewAutoMessage(discord.ui.View):
                     message = await channel.fetch_message(settings[2])
                     await message.delete()
 
-                    new_message = await channel.send(embed=emb, allowed_mentions=True)
+                    new_message = await channel.send(embed=emb, allowed_mentions=discord.AllowedMentions(everyone=True, users=True, roles=True))
                     await DatabaseUpdates.manage_auto_message(guild_id = interaction.guild.id, message_id = new_message.id, channel_id = channel.id, operation = "update", status = 0 if settings[4] == 1 else 1, send_time = new_message.created_at)
                 
                 elif settings[4] == 1:
@@ -600,7 +594,7 @@ class PaginatorViewAutoMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await AutoMessageSystem.check_lines_auto_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
 
             if channel_id:
                 
@@ -638,7 +632,7 @@ class PaginatorViewAutoMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await AutoMessageSystem.check_lines_auto_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
 
             if channel_id:
 
@@ -672,7 +666,7 @@ class PaginatorViewAutoMessage(discord.ui.View):
         if interaction.user.guild_permissions.administrator:
 
             embed_text = interaction.message.embeds[0].description
-            channel_id = await AutoMessageSystem.check_lines_auto_message(text=embed_text)
+            channel_id = await extracts_channel_id(text=embed_text)
 
             if channel_id:
 
@@ -721,7 +715,7 @@ class OverwriteChannelSelectAutoMessage(discord.ui.View):
             else:
 
                 embed_text = interaction.message.embeds[0].description
-                channel_id = await AutoMessageSystem.check_lines_auto_message(text=embed_text)
+                channel_id = await extracts_channel_id(text=embed_text)
                 
                 auto_message = await DatabaseCheck.check_auto_message(guild_id = interaction.guild.id, channel_id = channel_id)
 

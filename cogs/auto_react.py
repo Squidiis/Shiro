@@ -307,11 +307,7 @@ class ShowAutoReactions(discord.ui.View):
         
         if interaction.user.guild_permissions.administrator:
 
-            auto_reaction_cog = bot.get_cog('AutoReaction')
-
-            if auto_reaction_cog:
-                reactions = await auto_reaction_cog.show_auto_reactions_all(interaction.guild.id)
-
+            reactions = await AutoReaction.show_auto_reactions_all(interaction.guild.id)
 
             emb = discord.Embed(description=f"""## Auto reactions
                 {Emojis.dot_emoji} Here you can see a list of all auto-reactions that have been set for the server {interaction.guild.name} 

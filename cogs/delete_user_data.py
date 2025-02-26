@@ -69,7 +69,16 @@ class DeleteData(commands.Cog):
             "LeaderboardSettingsInvite",
             "LeaderboardRoles",
             "LeaderboardGivenRoles",
-            "LeaderboardInviteTracking"
+            "LeaderboardInviteTracking",
+            "AutoReactions",
+            "BoosterSystem",
+            "StickyMessage",
+            "StickyMessageSettings",
+            "AutoMessage",
+            "AutoMessageSettings",
+            "TicketSystemSettings",
+            "TicketSystemLayers",
+            "TempVoiceChannelTicketSystem"
             ]
 
         for table in tables:
@@ -112,7 +121,12 @@ class DeleteData(commands.Cog):
             "AntiLinkWhiteList", 
             "LevelSystemSettings", 
             "BonusXpList",
-            "AntiLinkWhiteList"
+            "AntiLinkWhiteList",
+            "AutoReactions",
+            "BoosterSystem",
+            "StickyMessage",
+            "AutoMessage",
+            "TempVoiceChannelTicketSystem"
             ]
         
         for table in tables:
@@ -126,13 +140,13 @@ class DeleteData(commands.Cog):
     async def on_guild_role_delete(self, role):
 
         tables = [
-                "LevelSystemBlacklist",
-                "BonusXpList",
-                "AntiLinkWhiteList",
-                "LevelSystemRoles",
-                "LeaderboardRoles",
-                "LeaderboardGivenRoles"
-                ]
+            "LevelSystemBlacklist",
+            "BonusXpList",
+            "AntiLinkWhiteList",
+            "LevelSystemRoles",
+            "LeaderboardRoles",
+            "LeaderboardGivenRoles"
+            ]
         
         for table in tables:
 
