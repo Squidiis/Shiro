@@ -226,6 +226,7 @@ class AddUserTicket(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system="ticket system"))
 
     
     @discord.ui.user_select(placeholder="Choose a user you want to add to this ticket!", min_values=1, max_values=1, custom_id="add_user_ticket_select")
@@ -250,6 +251,7 @@ class SetTicketSystemView(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system="ticket system"))
 
 
     @discord.ui.button(label="Set Layers", style=discord.ButtonStyle.blurple, custom_id="set_new_layer")
@@ -348,6 +350,7 @@ class SetTicketSystemView(discord.ui.View):
         options = await TicketSystem.get_layers(guild_id = interaction.guild.id)
         view = ShowLayers(options=options)
         view.add_item(ShowTicketMessage())
+        view.add_item(CancelButton(system="ticket system"))
 
         emb = discord.Embed(description=f"""## Here you can see all settings of the ticket system
             {Emojis.dot_emoji} The ticket system is currently {'switched on' if settings[1] == 1 else 'switched off'}
@@ -362,6 +365,7 @@ class SetLayers(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system="ticket system"))
 
     
     @discord.ui.button(label="Add Layer", style=discord.ButtonStyle.blurple, custom_id="add_layer")
@@ -439,6 +443,7 @@ class TicketCreateSelect(discord.ui.View):
         )
         self.select.callback = self.ticket_create_select
         self.add_item(self.select)
+        self.add_item(CancelButton(system="ticket system"))
 
 
     async def ticket_create_select(self, interaction:discord.Interaction):
@@ -491,6 +496,7 @@ class RemoveLayer(discord.ui.View):
         )
         self.select.callback = self.remove_layer_select
         self.add_item(self.select)
+        self.add_item(CancelButton(system="ticket system"))
 
 
     async def remove_layer_select(self, interaction:discord.Interaction):
@@ -591,6 +597,7 @@ class ShowLayers(discord.ui.View):
         )
         self.select.callback = self.show_layer_select
         self.add_item(self.select)
+        self.add_item(CancelButton(system="ticket system"))
 
 
     async def show_layer_select(self, interaction: discord.Interaction):
@@ -642,6 +649,7 @@ class AddMessageModal(discord.ui.Modal):
 
             view = View()
             view.add_item(ShowTicketMessage())
+            view.add_item(CancelButton(system="ticket system"))
 
             emb = discord.Embed(description=f"""## Text for the ticket message has been set
                 {Emojis.dot_emoji} The ticket message will be sent to the ticket channel when all settings are completed
@@ -700,6 +708,7 @@ class SetTicketChannelSelect(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system = "ticket system"))
 
     
     @discord.ui.channel_select(placeholder="Select a channel that you want to set as a ticket channel!", custom_id="select_ticket_channel", min_values=1, max_values=1, channel_types=[discord.ChannelType.text])
@@ -718,10 +727,10 @@ class SetTicketChannelSelect(discord.ui.View):
             
             elif check_settings[2] is not None and check_settings[2] != select.values[0]:
 
-                emb = discord.Embed(description=f""""## A ticket channel is already set
-                    {Emojis.dot_emoji} Would you like to overwrite it?
-                    {Emojis.dot_emoji} The channel {check_settings[2]} is currently set as the ticket channel
-                    {Emojis.dot_emoji} Do you want to overwrite this with the channel <#{select.values[0].mention}>?""", color=bot_colour)
+                emb = discord.Embed(description=f"""## A ticket channel is being set
+                    {Emojis.dot_emoji} The new ticket channel will be {select.values[0].mention}.
+                    {Emojis.dot_emoji} Currently, the ticket channel is set to <#{check_settings[2]}>.
+                    {Emojis.dot_emoji} Would you like to overwrite the current channel with the new one?""", color=bot_colour)
                 await interaction.response.edit_message(embed=emb, view=OverwriteTicketChannel())
 
             else:
@@ -751,6 +760,7 @@ class OverwriteTicketChannel(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
+        self.add_item(CancelButton(system="ticket system"))
 
 
     @discord.ui.button(label="Keep Channel", style=discord.ButtonStyle.blurple, custom_id="keep_channel")
@@ -777,12 +787,13 @@ class OverwriteTicketChannel(discord.ui.View):
 
             new_channel = await extracts_channel_id(text=interaction.message.embeds[0].description)
 
-            check = TicketSystem.resend_ticket_message(guild_id = interaction.guild.id)
+            check = await TicketSystem.resend_ticket_message(guild_id = interaction.guild.id)
 
             ticket_message = None
             if check:
 
-                options = TicketSystem.get_layers(guild_id = interaction.guild.id)
+                options = await TicketSystem.get_layers(guild_id = interaction.guild.id)
+                
                 channel = bot.get_channel(new_channel)
                 ticket_message = await channel.send(embed=check, view=TicketCreateSelect(options=options))
 
