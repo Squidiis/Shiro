@@ -133,7 +133,7 @@ class TicketSystemView(discord.ui.View):
         super().__init__(timeout=None)
 
 
-    @discord.ui.button(label="Add User", style=discord.ButtonStyle.blurple, custom_id="add_user")
+    @discord.ui.button(label="Add User", style=discord.ButtonStyle.blurple, custom_id="add_user_ticket_system")
     async def add_user_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -149,7 +149,7 @@ class TicketSystemView(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-    @discord.ui.button(label="Show User List", style=discord.ButtonStyle.blurple, custom_id="show_user_list")
+    @discord.ui.button(label="Show User List", style=discord.ButtonStyle.blurple, custom_id="show_user_list_ticket_system")
     async def show_user_list_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         channel = await bot.fetch_channel(interaction.channel.id)
@@ -162,7 +162,7 @@ class TicketSystemView(discord.ui.View):
         await interaction.response.send_message(embed=emb, view=None, ephemeral=True)
 
 
-    @discord.ui.button(label="Create Temp Voice Channel", style=discord.ButtonStyle.blurple, custom_id="create_temp_voice_channel")
+    @discord.ui.button(label="Create Temp Voice Channel", style=discord.ButtonStyle.blurple, custom_id="create_temp_voice_channel_ticket_system")
     async def create_temp_voice_channel_button(self, button:discord.ui.Button, interaction:discord.Interaction):
         
         if interaction.user.guild_permissions.administrator:
@@ -204,7 +204,7 @@ class TicketSystemView(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-    @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.danger, custom_id="close_ticket")
+    @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.danger, custom_id="close_ticket_system")
     async def close_ticket_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -254,7 +254,7 @@ class SetTicketSystemView(discord.ui.View):
         self.add_item(CancelButton(system="ticket system"))
 
 
-    @discord.ui.button(label="Set Layers", style=discord.ButtonStyle.blurple, custom_id="set_new_layer")
+    @discord.ui.button(label="Set Layers", style=discord.ButtonStyle.blurple, custom_id="set_new_layer_ticket_system")
     async def set_new_layer_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -287,7 +287,7 @@ class SetTicketSystemView(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-    @discord.ui.button(label="Set Message Text", style=discord.ButtonStyle.blurple, custom_id="add_message_text")
+    @discord.ui.button(label="Set Message Text", style=discord.ButtonStyle.blurple, custom_id="add_message_text_ticket_system")
     async def add_message_text_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -368,7 +368,7 @@ class SetLayers(discord.ui.View):
         self.add_item(CancelButton(system="ticket system"))
 
     
-    @discord.ui.button(label="Add Layer", style=discord.ButtonStyle.blurple, custom_id="add_layer")
+    @discord.ui.button(label="Add Layer", style=discord.ButtonStyle.blurple, custom_id="add_layer_ticket_system")
     async def add_layer_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -392,7 +392,7 @@ class SetLayers(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-    @discord.ui.button(label="Remove Layer", style=discord.ButtonStyle.blurple, custom_id="remove_layer")
+    @discord.ui.button(label="Remove Layer", style=discord.ButtonStyle.blurple, custom_id="remove_layer_ticket_system")
     async def remove_layer_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -410,7 +410,7 @@ class SetLayers(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
             
 
-    @discord.ui.button(label="Show Layers", style=discord.ButtonStyle.blurple, custom_id="show_layers")
+    @discord.ui.button(label="Show Layers", style=discord.ButtonStyle.blurple, custom_id="show_layers_ticket_system")
     async def show_layers_button(self, button:discord.ui.Button, interaction:discord.Interaction):
         
         options = await TicketSystem.get_layers(guild_id = interaction.guild.id)
@@ -538,7 +538,7 @@ class RemoveLayer(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
     
-    @discord.ui.button(label="Reset layers", style=discord.ButtonStyle.blurple, custom_id="reset_layers", row=2)
+    @discord.ui.button(label="Reset layers", style=discord.ButtonStyle.blurple, custom_id="reset_layers_ticket_system", row=2)
     async def reset_layers_button(self, button:discord.ui.Button, interaction:discord.Interaction):
         
         if interaction.user.guild_permissions.administrator:
@@ -611,7 +611,7 @@ class ShowLayers(discord.ui.View):
 class AddMessageModal(discord.ui.Modal):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(title="Add Message")
+        super().__init__(title="Add Message", timeout=None, custom_id="add_message_ticket_system")
         self.add_item(discord.ui.InputText(label="Enter the text for the ticket message here", style=discord.InputTextStyle.long, max_length=3000, required=True,
             placeholder="Insert the text here that will later appear in the ticket message"))
         self.add_item(discord.ui.InputText(label="Enter a link for an image or gif", style=discord.InputTextStyle.long, max_length=300, required=False,
@@ -664,7 +664,7 @@ class AddMessageModal(discord.ui.Modal):
 class AddLayerDetailsModal(discord.ui.Modal):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(title="Add Layer details")
+        super().__init__(title="Add Layer details", timeout=None, custom_id="add_layer_details_ticket_system")
         self.add_item(discord.ui.InputText(label="Title", style=discord.InputTextStyle.short, max_length=100, required=True,
             placeholder="Enter the title of the layer here"))
         self.add_item(discord.ui.InputText(label="Description", style=discord.InputTextStyle.long, max_length=100, required=False,
@@ -763,7 +763,7 @@ class OverwriteTicketChannel(discord.ui.View):
         self.add_item(CancelButton(system="ticket system"))
 
 
-    @discord.ui.button(label="Keep Channel", style=discord.ButtonStyle.blurple, custom_id="keep_channel")
+    @discord.ui.button(label="Keep Channel", style=discord.ButtonStyle.blurple, custom_id="keep_channel_ticket_system")
     async def keep_channel_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -780,7 +780,7 @@ class OverwriteTicketChannel(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-    @discord.ui.button(label="Overwrite Channel", style=discord.ButtonStyle.blurple, custom_id="overwrite_channel")
+    @discord.ui.button(label="Overwrite Channel", style=discord.ButtonStyle.blurple, custom_id="overwrite_channel_ticket_system")
     async def overwrite_channel_button(self, button:discord.ui.Button, interaction:discord.Interaction):
         
         if interaction.user.guild_permissions.administrator:
