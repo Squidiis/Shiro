@@ -1809,7 +1809,7 @@ class ShowLeaderboardRolesSelectMessage(discord.ui.View):
         placeholder = "Choose from which leaderboard you want to see all roles!",
         min_values = 1,
         max_values = 1,
-        custom_id = "show_leaderboard_roles",
+        custom_id = "show_leaderboard_roles_select_message",
         options = [
             discord.SelectOption(label="Daily leaderboard", description="Take a look at which roles are defined for the Daily leaderboard", value="daily"),
             discord.SelectOption(label="Weekly leaderboard", description="Take a look at which roles are defined for the weekly leaderboard", value="weekly"),
@@ -1818,7 +1818,7 @@ class ShowLeaderboardRolesSelectMessage(discord.ui.View):
         ]
     )
 
-    async def show_leaderboard_roles_select(self, select, interaction:discord.Interaction):
+    async def show_leaderboard_roles_select_message(self, select, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 
@@ -1896,7 +1896,7 @@ class ShowLeaderboardRolesSelectInvite(discord.ui.View):
         placeholder = "Choose from which leaderboard you want to see all roles!",
         min_values = 1,
         max_values = 1,
-        custom_id = "show_leaderboard_roles",
+        custom_id = "show_leaderboard_roles_select_invite",
         options = [
             discord.SelectOption(label="Weekly leaderboard", description="Take a look at which roles are defined for the weekly leaderboard", value="weekly"),
             discord.SelectOption(label="Monthly leaderboard", description="Take a look at which roles are defined for the Monthly leaderboard", value="monthly"),
@@ -1905,7 +1905,7 @@ class ShowLeaderboardRolesSelectInvite(discord.ui.View):
         ]
     )
 
-    async def show_leaderboard_roles_select(self, select, interaction:discord.Interaction):
+    async def show_leaderboard_roles_select_invite(self, select, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
 

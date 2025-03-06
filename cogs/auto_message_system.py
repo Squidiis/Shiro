@@ -658,7 +658,7 @@ class PaginatorViewAutoMessage(discord.ui.View):
         label="edit auto message", 
         style=discord.ButtonStyle.blurple, 
         row=2,
-        custom_id="edit_auto_message"
+        custom_id="overwrite_auto_message"
     )
 
     async def overwrite_message_auto_message(self, button, interaction:discord.Interaction):
@@ -694,7 +694,7 @@ class OverwriteChannelSelectAutoMessage(discord.ui.View):
         placeholder="Choose a channel with which you want to overwrite the old one!",
         max_values=1,
         min_values=1,
-        custom_id="overwrite_channel_auto_message",
+        custom_id="overwrite_channel_select_auto_message",
         channel_types=[discord.ChannelType.text]
     )
     

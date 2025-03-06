@@ -562,7 +562,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
         label="edit sticky message", 
         style=discord.ButtonStyle.blurple, 
         row=2,
-        custom_id="edit_sticky_message"
+        custom_id="overwrite_message_sticky_message"
     )
 
     async def overwrite_message_sticky_message(self, button, interaction:discord.Interaction):
