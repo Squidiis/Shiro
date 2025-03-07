@@ -122,8 +122,11 @@ Parameters:
 -----------
 - url: Link from the image or gif
 '''
-async def validate_image_url(url:str):
+async def validate_image_url(url:str = None):
     
+    if not url:
+        return True
+
     try:
 
         parsed_url = urlparse(url)

@@ -94,7 +94,6 @@ class TicketSystem(commands.Cog):
             check_settings = await DatabaseCheck.check_ticket_system_settings(guild_id = ctx.guild.id)
 
         view = SetTicketSystemView()
-        view.add_item(CancelButton(system="Ticket system"))
 
         emb = discord.Embed(description=f"""## Set the Ticket system
         With the following buttons, you can customize the various functions according to your preferences:
@@ -270,7 +269,7 @@ class SetTicketSystemView(discord.ui.View):
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
-    @discord.ui.button(label="Set Ticket Channel", style=discord.ButtonStyle.blurple, custom_id="set_ticket_channel")
+    @discord.ui.button(label="Set Ticket Channel", style=discord.ButtonStyle.blurple, custom_id="set_ticket_channel_button")
     async def set_ticket_channel_button(self, button:discord.ui.Button, interaction:discord.Interaction):
 
         if interaction.user.guild_permissions.administrator:
@@ -443,35 +442,28 @@ class TicketCreateSelect(discord.ui.View):
         )
         self.select.callback = self.ticket_create_select
         self.add_item(self.select)
-        self.add_item(CancelButton(system="ticket system"))
-
 
     async def ticket_create_select(self, interaction:discord.Interaction):
 
-        if interaction.user.guild_permissions.administrator:
 
-            overwrites = {
-                interaction.user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-                interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            }
-            random_code = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
-            channels = await interaction.guild.create_text_channel(name=f"Ticket-{random_code}", overwrites=overwrites)
+        overwrites = {
+            interaction.user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+            interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        }
+        random_code = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+        channels = await interaction.guild.create_text_channel(name=f"Ticket-{random_code}", overwrites=overwrites)
+ 
+        emb = discord.Embed(description=f"""## The ticket has been successfully created
+            {Emojis.dot_emoji} The ticket has been created, please wait in {channels.mention} until a responsible user takes care of your problem
+            {Emojis.help_emoji} Please create only one ticket""", color=bot_colour)
+        await interaction.response.send_message(embed=emb, ephemeral=True)
 
-            emb = discord.Embed(description=f"""## The ticket has been successfully created
-                {Emojis.dot_emoji} The ticket has been created, please wait in {channels.mention} until a responsible user takes care of your problem
-                {Emojis.help_emoji} Please create only one ticket""", color=bot_colour)
-            await interaction.response.send_message(embed=emb, ephemeral=True)
-
-            emb = discord.Embed(description=f"""## Ticket {random_code}
-                {Emojis.dot_emoji} Name of the creator: {interaction.user.name}
-                {Emojis.dot_emoji} ID of the creator: {interaction.user.id}
-                {Emojis.dot_emoji} Topic of the ticket: {self.select.values[0][:-5]}""", color=bot_colour)
-            emb.set_footer(text=f"Creation time: {datetime.now(timezone.utc).strftime('%Y-%m-%d')}")
-            await channels.send(embed=emb, view=TicketSystemView())
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
+        emb = discord.Embed(description=f"""## Ticket {random_code}
+            {Emojis.dot_emoji} Name of the creator: {interaction.user.name}
+            {Emojis.dot_emoji} ID of the creator: {interaction.user.id}
+            {Emojis.dot_emoji} Topic of the ticket: {self.select.values[0][:-5]}""", color=bot_colour)
+        emb.set_footer(text=f"Creation time: {datetime.now(timezone.utc).strftime('%Y-%m-%d')}")
+        await channels.send(embed=emb, view=TicketSystemView())
 
 
 class RemoveLayer(discord.ui.View):

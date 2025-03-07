@@ -528,7 +528,7 @@ class PaginatorViewStickyMessage(discord.ui.View):
         label="overwrite channel", 
         style=discord.ButtonStyle.blurple, 
         row=2,
-        custom_id="overwrite_channel-sticky_message"
+        custom_id="overwrite_channel_sticky_message"
     )
 
     async def overwrite_channel_sticky_message(self, button, interaction:discord.Interaction):
@@ -597,7 +597,7 @@ class OverwriteChannelSelect(discord.ui.View):
         placeholder="Choose a channel with which you want to overwrite the old one!",
         max_values=1,
         min_values=1,
-        custom_id="overwrite_channel_sticky_message",
+        custom_id="overwrite_channel_select",
         channel_types=[discord.ChannelType.text]
     )
     
