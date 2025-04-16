@@ -11,6 +11,14 @@ class ModeratorCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
+    async def add_views(self):
+
+        return [
+            GhostPingButtons()
+            ]
+
+
     # Returns the antilink whitelist completely formatted 
     async def show_antilink_system_whitelist(guild_id:int):
 
@@ -177,18 +185,18 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(name = "set-antilink-system", description = "Set the anti-link system the way you want it!")
+    @discord.option("settings" ,required = True, description="Choose how the anti-link system should behave!",
+        choices = [
+            discord.OptionChoice(name = "All messages with a discord invitation link will be deleted", value="0"),
+            discord.OptionChoice(name = "Every message with a link will be deleted exept Pictures and Videos", value="1"),
+            discord.OptionChoice(name = "All messages with a link will be deleted this also includes pictures and videos", value="2"),
+            discord.OptionChoice(name = "Deactivate anti-link system! (no messages are deleted)", value="3")
+            ]
+        )
+    @discord.option("timeout",max_value = 60, required = True, description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
+        choices = [0, 5, 10, 20, 30, 40, 50, 60])
     @commands.has_permissions(administrator = True)
-    async def set_antilink(self, ctx:discord.ApplicationContext,
-        settings:Option(str, required = True,
-            description="Choose how the anti-link system should behave!",
-            choices = [
-                discord.OptionChoice(name = "All messages with a discord invitation link will be deleted", value="0"),
-                discord.OptionChoice(name = "Every message with a link will be deleted exept Pictures and Videos", value="1"),
-                discord.OptionChoice(name = "All messages with a link will be deleted this also includes pictures and videos", value="2"),
-                discord.OptionChoice(name = "Deactivate anti-link system! (no messages are deleted)", value="3")]), 
-        timeout:Option(int, max_value = 60, required = True, 
-            description="Choose how long the user who violates the anti link system should be timed out! (Optional)", 
-            choices = [0, 5, 10, 20, 30, 40, 50, 60])):
+    async def set_antilink(self, ctx:discord.ApplicationContext, settings:str, timeout:int):
 
         check_settings = await DatabaseCheck.check_bot_settings(guild_id = ctx.guild.id)
 
@@ -350,25 +358,37 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "add-antilink-whitelist", description = "Exclude channels, roles, and categories from the anti-link system!")
     @commands.has_permissions(administrator = True)
-    async def add_antilink_whitelist(self, ctx:discord.ApplicationContext,
-        channel:Option(discord.TextChannel, description="Select a channel to be excluded from the anti-link system") = None,
-        category:Option(discord.CategoryChannel, description="Select a category to be excluded from the anti-link system") = None,
-        role:Option(discord.Role, description="Select a role to be excluded from the anti-link system") = None,
-        user:Option(discord.User, description="Select a user to be excluded from the anti-link system") = None
-        ):
+    @discord.option("channel", discord.TextChannel, description="Select a channel to be excluded from the anti-link system", required=False)
+    @discord.option("category", discord.CategoryChannel, description="Select a category to be excluded from the anti-link system", required=False)
+    @discord.option("role", discord.Role, description="Select a role to be excluded from the anti-link system", required=False)
+    @discord.option("user", discord.User, description="Select a user to be excluded from the anti-link system", required=False)
+    async def add_antilink_whitelist(
+        self, 
+        ctx:discord.ApplicationContext,
+        channel:discord.TextChannel = None,
+        category:discord.CategoryChannel = None,
+        role:discord.Role = None,
+        user:discord.User = None
+    ):
 
         emb = await self.config_antilink_whitelist(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation="add")
         await ctx.respond(embed=emb)
 
     
-    @commands.slash_command(name = "remove-antilink-whitelist", description = "Select channels, categories, roles or users to be removed from the whitelist!")
-    @commands.has_permissions(administrator = True)
-    async def remove_antilink_whitelist(self, ctx:discord.ApplicationContext,
-        channel:Option(discord.TextChannel, description="Select a channel to be removed from the anti-link whitelist") = None,
-        category:Option(discord.CategoryChannel, description="Select a category to be removed from the anti-link whitelist") = None,
-        role:Option(discord.Role, description="Select a role to be removed from the anti-link whitelist") = None,
-        user:Option(discord.User, description="Select a user to be removed from the anti-link whitelist") = None
-        ):
+    @commands.slash_command(name="remove-antilink-whitelist", description="Select channels, categories, roles or users to be removed from the whitelist!")
+    @commands.has_permissions(administrator=True)
+    @discord.option("channel", discord.TextChannel, description="Select a channel to be removed from the anti-link whitelist", required=False)
+    @discord.option("category", discord.CategoryChannel, description="Select a category to be removed from the anti-link whitelist", required=False)
+    @discord.option("role", discord.Role, description="Select a role to be removed from the anti-link whitelist", required=False)
+    @discord.option("user", discord.User, description="Select a user to be removed from the anti-link whitelist", required=False)
+    async def remove_antilink_whitelist(
+        self,
+        ctx:discord.ApplicationContext,
+        channel:discord.TextChannel = None,
+        category:discord.CategoryChannel = None,
+        role:discord.Role = None,
+        user:discord.User = None
+    ):
 
         emb = await self.config_antilink_whitelist(guild_id=ctx.guild.id, channel=channel, category=category, role=role, user=user, operation="remove")
         await ctx.respond(embed=emb)
@@ -414,10 +434,15 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(name = "ban", description = "Ban a user so that he can no longer join the server!")
-    @commands.has_permissions(ban_members = True, administrator = True)
-    async def ban(self, ctx:discord.ApplicationContext, 
-        member:Option(discord.Member, required = True, description = "Choose the user you want to ban!"), 
-        reason:Option(str, description = "Give a reason why this user should be banned! (optional)", required = False)):
+    @commands.has_permissions(ban_members=True, administrator=True)
+    @discord.option("member", discord.Member, description="Choose the user you want to ban", required=True)
+    @discord.option("reason", str, description="Give a reason why this user should be banned (optional)", required=False)
+    async def ban(
+        self,
+        ctx:discord.ApplicationContext,
+        member:discord.Member,
+        reason:str = None
+    ):
 
         if member.id == ctx.author.id:
 
@@ -441,8 +466,9 @@ class ModeratorCommands(commands.Cog):
 
     
     @commands.slash_command(name = "unban", description = "Pick up the ban of a user!")
-    @commands.has_permissions(ban_members = True)
-    async def unban(self, ctx:discord.ApplicationContext, id:Option(str, description = "Enter the ID of the user you want to unban here!", required = True)):
+    @commands.has_permissions(ban_members=True)
+    @discord.option("id", str, description="Enter the ID of the user you want to unban here", required=True)
+    async def unban(self, ctx:discord.ApplicationContext, id:str):
         
         try:
 
@@ -461,8 +487,9 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(name = "kick", description = "Kick a member off the server!")
-    @commands.has_permissions(kick_members = True, administrator = True)
-    async def kick(self, ctx:discord.ApplicationContext, member:Option(discord.Member, description = "Enter a user you want to remove from the server!")):
+    @commands.has_permissions(kick_members=True, administrator=True)
+    @discord.option("member", discord.Member, description="Enter a user you want to remove from the server", required=True)
+    async def kick(self, ctx:discord.ApplicationContext, member:discord.Member):
 
         if member.id == ctx.author.id:
             emb = discord.Embed(title=f"{Emojis.help_emoji} You can't kick yourself!", 
@@ -485,13 +512,22 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "timeout", description = "Send a user to timeout!")
     @commands.has_permissions(moderate_members = True)
-    async def timeout(self, ctx:discord.ApplicationContext, 
-        user:Option(discord.Member, required = True, description="Select the user you want to timeout!"), 
-        reason:Option(str, required = False, description="Enter a reason why you want to timeout this user! (optional)"), 
-        days: Option(int, max_value = 27, default = 0, required = False, description="Enter how many days you want to timeout this user! (optional)"), 
-        hours: Option(int, max_value = 24, default = 0, required = False, description="Enter how many hours you want to timeout this user! (optional)"), 
-        minutes: Option(int, max_value = 60, default = 0, required = False, description="Enter how many minutes you want to timeout this user! (optional)"), 
-        seconds: Option(int, max_value  = 60, default = 0, required = False, description="Enter how many seconds you want to timeout this user! (optional)")):
+    @discord.option("user", discord.Member, description="Select the user you want to timeout!", required=True)
+    @discord.option("reason", str, description="Enter a reason why you want to timeout this user (optional)", required=False)
+    @discord.option("days", int, description="Enter how many days you want to timeout this user (optional)", max_value=27, default=0, required=False)
+    @discord.option("hours", int, description="Enter how many hours you want to timeout this user (optional)", max_value=24, default=0, required=False)
+    @discord.option("minutes", int, description="Enter how many minutes you want to timeout this user (optional)", max_value=60, default=0, required=False)
+    @discord.option("seconds", int, description="Enter how many seconds you want to timeout this user (optional)", max_value=60, default=0, required=False)
+    async def timeout(
+        self,
+        ctx:discord.ApplicationContext,
+        user:discord.Member,
+        reason:str = None,
+        days:int = 0,
+        hours:int = 0,
+        minutes:int = 0,
+        seconds:int = 0
+    ):
 
         duration = timedelta(days = days, hours = hours, minutes = minutes, seconds = seconds)
 
@@ -518,7 +554,8 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "remove-timeout", description = "Cancel the timeout of a user!")
     @commands.has_permissions(moderate_members = True)
-    async def remove_timeout(self, ctx:discord.ApplicationContext, member:Option(discord.Member, required = True, description="Select a user from whom you want to cancel the timeout!")):
+    @discord.option("member", discord.Member, description="Select a user from whom you want to cancel the timeout", required=True)
+    async def remove_timeout(self, ctx:discord.ApplicationContext, member:discord.Member):
 
         try:
 
@@ -536,9 +573,9 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "give-role", description = "Add a role to a specific user!")
     @commands.has_permissions(moderate_members = True)
-    async def give_role(self, ctx:discord.ApplicationContext, 
-        user:Option(discord.User, description="Choose a user you want to add the role to!"),
-        role:Option(discord.Role, description="Choose a role that you want to add to the user!")):
+    @discord.option("user", discord.User, description="Choose a user you want to add the role to", required=True)
+    @discord.option("role", discord.Role, description="Choose a role that you want to add to the user", required=True)
+    async def give_role(self, ctx:discord.ApplicationContext, user:discord.User, role:discord.Role):
 
         if role.permissions.administrator or role.permissions.moderate_members:
 
@@ -567,9 +604,9 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "remove-role", description = "Removes a role from a specific user!")
     @commands.has_permissions(moderate_members = True)
-    async def remove_role(self, ctx:discord.ApplicationContext,
-        user:Option(discord.User, description="Choose from which user you want to remove the role!"),
-        role:Option(discord.Role, description="Select which role you want to remove from the user!")):
+    @discord.option("user", discord.User, description="Choose from which user you want to remove the role", required=True)
+    @discord.option("role", discord.Role, description="Select which role you want to remove from the user", required=True)
+    async def remove_role(self, ctx:discord.ApplicationContext, user:discord.User, role:discord.Role):
         
         try:
 
@@ -588,7 +625,8 @@ class ModeratorCommands(commands.Cog):
 
     @commands.slash_command(name = "clear", description = "Delete messages in the channel!")
     @commands.has_permissions(manage_messages=True)
-    async def clear(self, ctx:discord.ApplicationContext, quantity:Option(int, description = "How many messages do you want to delete?", required = True)):
+    @discord.option("quantity", int, description="How many messages do you want to delete?", required=True)
+    async def clear(self, ctx:discord.ApplicationContext, quantity:int):
         await ctx.defer()
         z = await ctx.channel.purge(limit = quantity)
         await ctx.send(f"I have deleted {len(z)} messages.")
@@ -642,6 +680,7 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(name = "ghost-ping-settings", description = "Switch the ghost ping system on or off!")
+    @commands.has_permissions(administrator = True)
     async def ghost_ping_settings(self, ctx:discord.ApplicationContext):
 
         # If the database contains 0, the system is deactivated; if it contains 1, it is activated
@@ -654,7 +693,8 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(name = "show-invites", description = "Shows how many users have been invited by a specific user!")
-    async def show_invites(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user of whom you want to see how many other users he has invited!")):
+    @discord.option("user", discord.Member, description="Choose a user of whom you want to see how many other users he has invited", required=True)
+    async def show_invites(self, ctx:discord.ApplicationContext, user:discord.Member):
 
         if user is None:
 
@@ -678,7 +718,8 @@ class ModeratorCommands(commands.Cog):
 
 
     @commands.slash_command(description = "Displays all information about a user!")
-    async def userinfo(self, ctx:discord.ApplicationContext, member:Option(discord.Member, description="Select a user from whom you want to view the user infos!")):
+    @discord.option("member", discord.Member, description="Select a user from whom you want to view the user infos", required=True)
+    async def userinfo(self, ctx:discord.ApplicationContext, member:discord.Member):
         member = ctx.author if not member else member
 
         unix_join_time = calendar.timegm(member.joined_at.utctimetuple())

@@ -13,6 +13,17 @@ class StickyMessage(commands.Cog):
         self.check_sticky_message_task.start()
 
 
+    async def add_views(self):
+
+        return [
+            SetStickyMessage(),
+            PaginatorViewStickyMessage(pages=[no_page]),
+            OverwriteChannelSelect(),
+            AddStickyMessageText(),
+            EditStickyMessage()
+            ]
+
+
     async def update_paginator(guild_id):
 
         all_pages = await DatabaseCheck.check_sticky_message(guild_id = guild_id)
@@ -107,8 +118,8 @@ class StickyMessage(commands.Cog):
     
     @commands.slash_command(name = "add-sticky-message", description = "Add a sticky message of your choice!")
     @commands.has_permissions(administrator = True)
-    async def add_sticky_message(self, ctx:discord.ApplicationContext, 
-        channel:Option(discord.TextChannel, description="Select a channel for a sticky message!")):
+    @discord.option("channel", discord.TextChannel, description="Select a channel for a sticky message", required=True)
+    async def add_sticky_message(self, ctx:discord.ApplicationContext, channel:discord.TextChannel):
 
         check_channel = await DatabaseCheck.check_sticky_message(guild_id = ctx.guild.id, channel_id = channel.id)
 
@@ -151,8 +162,8 @@ class StickyMessage(commands.Cog):
     
     @commands.slash_command(name = "remove-sticky-message", description = "Deletes a sticky message!")
     @commands.has_permissions(administrator = True)
-    async def remove_sticky_message(self, ctx:discord.ApplicationContext, 
-        channel:Option(discord.TextChannel, description="Choose which sticky message you want to delete!")):
+    @discord.option("channel", discord.TextChannel, description="Choose which sticky message you want to delete", required=True)
+    async def remove_sticky_message(self, ctx:discord.ApplicationContext, channel:discord.TextChannel):
 
         check_channel = await DatabaseCheck.check_sticky_message(guild_id = ctx.guild.id, channel_id = channel.id)
 

@@ -9,6 +9,174 @@ import aiohttp
 ##########################################  RPS Game  #############################################
 
 
+
+class Fun(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.anilist_api_url = "https://graphql.anilist.co"
+
+    async def add_views(self):
+
+        return [
+            RPSButtons(game_mode=None, second_user=None, first_user=None)
+            ]
+
+
+    @commands.slash_command(name = "rps", description = "Play scissors, stone, paper against your friends or a bot!")
+    @discord.option("user", description="Choose a user with whom you want to challenge you can also play against a bot")
+    async def rps(self, ctx:discord.ApplicationContext, user:discord.Member = None):
+
+        if user == None or user.bot:
+            user = user if user != None else bot.get_user(928073958891347989)
+            emb = discord.Embed(title="Single player", description=f"""{Emojis.dot_emoji} {ctx.author.name} against {user.name}\n {ctx.author.mention} choose from stone 🪨, paper 🧻 or scissors ✂️ {Emojis.exclamation_mark_emoji}""", color=bot_colour)
+            await ctx.respond(embed=emb, view=RPSButtons(game_mode=0, second_user=user, first_user=ctx.author))
+
+        else:
+
+            emb = discord.Embed(title=f"Multiplayer", description=f"""{Emojis.dot_emoji} {ctx.author.name} challenges {user.name} to a round stone 🪨, paper 🧻, scissors ✂️, out {Emojis.exclamation_mark_emoji}
+            {user.mention} Are you up for the challenge?""", color=bot_colour)
+            await ctx.respond(embed=emb, view=RPSButtons(game_mode=1, second_user=user, first_user=ctx.author))
+
+
+    @commands.slash_command(description = "Throw a coin!")
+    async def coinflip(self, ctx:discord.ApplicationContext):
+        
+        Tail = discord.File("assets/coin_flip/tail_coin.png", filename="tail_coin.png")
+        Head = discord.File("assets/coin_flip/head_coin.png", filename="head_coin.png")
+        emb = discord.Embed(title="", description=f"""## {ctx.author.mention} has flipped the coin!
+            Wait 5 seconds until the coin has landed""", color=bot_colour)
+        emb.set_image(url = "https://cdn.dribbble.com/users/1102039/screenshots/6574749/multi-coin-flip.gif")
+        coin = [Tail, Head]
+        coinsite = ""
+        random_flip = random.choice(coin)
+        
+        if random_flip == Tail:
+            coinsite = "Tale"
+
+        elif random_flip == Head:
+            coinsite = "Head"
+        
+        embed1 = await ctx.respond(embed=emb)
+        await asyncio.sleep(5)
+        
+        emb = discord.Embed(title=f"You flipped {coinsite}", description="", color=bot_colour)
+        emb.set_image(url=f"attachment://{'tail_coin.png' if coinsite == 'Tale' else 'head_coin.png'}")
+        await embed1.edit (embed=emb, file=random_flip)
+
+
+
+    @commands.slash_command(description="Gives you a random cocktail recipe!")
+    async def cocktails(self, ctx):
+        
+        key = os.getenv("API_KEY") 
+
+        async with aiohttp.ClientSession() as cd:
+            async with cd.get("https://www.thecocktaildb.com/api/json/v1/1/random.php") as r:
+                data = await r.json()
+
+        selected = data["drinks"][0]
+
+        name = selected['strDrink']
+        
+        alcohol = selected['strAlcoholic']
+        instructions = selected['strInstructions']
+        ingredients = []
+        
+        for i in range(15):
+            measure = selected.get(f"strMeasure{i}")
+            ingredient = selected.get(f"strIngredient{i}")
+            if ingredient is not None:
+                ingredients.append(f'{ingredient} {measure}')
+
+        allIngredients_string = ", ".join(ingredients)
+        measures = []
+        allmeasures_string = ", ".join(measures)
+
+        Recipe = f"{allIngredients_string} {allmeasures_string}"
+            
+        if alcohol == "Alcoholic":
+            Alcohol = "Yes"
+        else:
+            Alcohol = "No"
+    
+        DrinkThumb = selected['strDrinkThumb']
+        
+        emb = discord.Embed(title=f"Name: {name}", description=f"""
+        Alcoholic: {Alcohol}
+        
+        Recipe: 
+        {Recipe} 
+
+        Instructions: {instructions}
+        
+        """, color=bot_colour)
+        emb.set_image(url=DrinkThumb)
+        await ctx.respond(embed=emb)
+
+
+    async def get_character_data(self, gender: str):
+        
+        page = random.randint(1, 10)
+        query = """
+        query ($page: Int) {
+            Page(page: $page, perPage: 100) {
+                characters(sort: FAVOURITES_DESC) {
+                    name { full }
+                    gender
+                    media {
+                        nodes {
+                            title { romaji }
+                        }
+                    }
+                    image { large }
+                }
+            }
+        }
+        """
+        variables = {"page": page}
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self.anilist_api_url, json={"query": query, "variables": variables}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    characters = data["data"]["Page"]["characters"]
+                    
+                    if gender != "Any":
+                        characters = [c for c in characters if c.get("gender", "").upper() == gender.upper()]
+                    
+                    if characters:
+                        character = random.choice(characters)
+                        media_title = character["media"]["nodes"][0]["title"]["romaji"] if character["media"]["nodes"] else "Unknown"
+                        return {
+                            "name": character["name"]["full"],
+                            "media": media_title,
+                            "image": character["image"]["large"]
+                        }
+                return None
+
+
+    @commands.slash_command(name="smash-or-pass")
+    @discord.option("gender", str, choices=["Female", "Male", "Any"], default="Any")
+    async def smash_or_pass(self, ctx: discord.ApplicationContext, gender: str):
+        await ctx.defer()
+        result = await self.get_character_data(gender)
+        if result:
+            embed = discord.Embed(description=f"""## {result['name']} 
+            ({result['media']})""")
+            embed.set_image(url=result["image"])
+            await ctx.respond(embed=embed)
+        else:
+            await ctx.respond("No character found! Try again.", ephemeral=True)
+
+
+
+
+def setup(bot):
+    bot.add_cog(Fun(bot))
+
+
+
+
 # Scissors on paper game can either be played against another user or against a bot
 class RPSButtons(discord.ui.View):
     
@@ -122,115 +290,6 @@ class RPSButtons(discord.ui.View):
             await interaction.response.defer()
         else:
             await interaction.response.edit_message(embed=emb[0], view=None) if emb[1] == None else await interaction.response.send_message(embed=emb[0], ephemeral=True)
-
-
-
-
-
-class Fun(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-      
-
-    @commands.slash_command(name = "rps", description = "Play scissors, stone, paper against your friends or a bot!")
-    async def rps(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user with whom you want to challenge you can also play against a bot") = None):
-
-        if user == None or user.bot:
-            user = user if user != None else bot.get_user(928073958891347989)
-            emb = discord.Embed(title="Single player", description=f"""{Emojis.dot_emoji} {ctx.author.name} against {user.name}\n {ctx.author.mention} choose from stone 🪨, paper 🧻 or scissors ✂️ {Emojis.exclamation_mark_emoji}""", color=bot_colour)
-            await ctx.respond(embed=emb, view=RPSButtons(game_mode=0, second_user=user, first_user=ctx.author))
-
-        else:
-
-            emb = discord.Embed(title=f"Multiplayer", description=f"""{Emojis.dot_emoji} {ctx.author.name} challenges {user.name} to a round stone 🪨, paper 🧻, scissors ✂️, out {Emojis.exclamation_mark_emoji}
-            {user.mention} Are you up for the challenge?""", color=bot_colour)
-            await ctx.respond(embed=emb, view=RPSButtons(game_mode=1, second_user=user, first_user=ctx.author))
-
-
-    @commands.slash_command(description = "Throw a coin!")
-    async def coinflip(self, ctx:discord.ApplicationContext):
-        
-        Tail = discord.File("assets/coin_flip/tail_coin.png", filename="tail_coin.png")
-        Head = discord.File("assets/coin_flip/head_coin.png", filename="head_coin.png")
-        emb = discord.Embed(title="", description=f"""## {ctx.author.mention} has flipped the coin!
-            Wait 5 seconds until the coin has landed""", color=bot_colour)
-        emb.set_image(url = "https://cdn.dribbble.com/users/1102039/screenshots/6574749/multi-coin-flip.gif")
-        coin = [Tail, Head]
-        coinsite = ""
-        random_flip = random.choice(coin)
-        
-        if random_flip == Tail:
-            coinsite = "Tale"
-
-        elif random_flip == Head:
-            coinsite = "Head"
-        
-        embed1 = await ctx.respond(embed=emb)
-        await asyncio.sleep(5)
-        
-        emb = discord.Embed(title=f"You flipped {coinsite}", description="", color=bot_colour)
-        emb.set_image(url=f"attachment://{'tail_coin.png' if coinsite == 'Tale' else 'head_coin.png'}")
-        await embed1.edit (embed=emb, file=random_flip)
-
-
-
-    @commands.slash_command(description="Gives you a random cocktail recipe!")
-    async def cocktails(self, ctx):
-        
-        key = os.getenv("API_KEY") 
-
-        async with aiohttp.ClientSession() as cd:
-            async with cd.get("https://www.thecocktaildb.com/api/json/v1/1/random.php") as r:
-                data = await r.json()
-
-        selected = data["drinks"][0]
-
-        name = selected['strDrink']
-        
-        alcohol = selected['strAlcoholic']
-        instructions = selected['strInstructions']
-        ingredients = []
-        
-        for i in range(15):
-            measure = selected.get(f"strMeasure{i}")
-            ingredient = selected.get(f"strIngredient{i}")
-            if ingredient is not None:
-                ingredients.append(f'{ingredient} {measure}')
-
-        allIngredients_string = ", ".join(ingredients)
-        measures = []
-        allmeasures_string = ", ".join(measures)
-
-        Recipe = f"{allIngredients_string} {allmeasures_string}"
-            
-        if alcohol == "Alcoholic":
-            Alcohol = "Yes"
-        else:
-            Alcohol = "No"
-    
-        DrinkThumb = selected['strDrinkThumb']
-        
-        emb = discord.Embed(title=f"Name: {name}", description=f"""
-        Alcoholic: {Alcohol}
-        
-        Recipe: 
-        {Recipe} 
-
-        Instructions: {instructions}
-        
-        """, color=bot_colour)
-        emb.set_image(url=DrinkThumb)
-        await ctx.respond(embed=emb)
-
-
-
-
-
-
-def setup(bot):
-    bot.add_cog(Fun(bot))
-
-
 
 
 

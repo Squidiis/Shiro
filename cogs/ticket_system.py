@@ -14,6 +14,30 @@ class TicketSystem(commands.Cog):
         self.bot = bot
 
 
+    async def add_views(self):
+
+        views = []
+
+        for guild in self.bot.guilds:
+            options = await TicketSystem.get_layers(guild.id)
+
+            views.append(RemoveLayer(options=options))
+            views.append(ShowLayers(options=options))
+            views.append(TicketCreateSelect(options=options))
+
+        # Statische Views
+        views.extend([
+            TicketSystemView(),
+            AddUserTicket(),
+            SetTicketSystemView(),
+            SetLayers(),
+            SetTicketChannelSelect(),
+            OverwriteTicketChannel()
+        ])
+
+        return views
+
+
     async def get_layers(guild_id:int):
 
         layers = await DatabaseCheck.check_ticket_system_layers(guild_id=guild_id)
@@ -349,7 +373,6 @@ class SetTicketSystemView(discord.ui.View):
         options = await TicketSystem.get_layers(guild_id = interaction.guild.id)
         view = ShowLayers(options=options)
         view.add_item(ShowTicketMessage())
-        view.add_item(CancelButton(system="ticket system"))
 
         emb = discord.Embed(description=f"""## Here you can see all settings of the ticket system
             {Emojis.dot_emoji} The ticket system is currently {'switched on' if settings[1] == 1 else 'switched off'}
@@ -807,9 +830,7 @@ class ShowTicketMessage(discord.ui.Button):
         super().__init__(
             label="Show Message", 
             style=discord.ButtonStyle.blurple,
-            custom_id="show_ticket_message",
-            row=2)
-
+            custom_id="show_ticket_message")
 
     async def callback(self, interaction:discord.Interaction):
 

@@ -44,6 +44,23 @@ class LeaderboardSystem(commands.Cog):
         self.check_expired_invite_liks.start()
 
 
+    async def add_views(self):
+
+        return [
+            SetleaderboardChannel(),
+            SetMessageleaderboard(),
+            OverwriteMessageChannel(channel_id=None),
+            ContinueSettingLeaderboard(),
+            OverwriteInterval(intervals=None),
+            OverwriteRole(role=None, interval=None, position=None, settings=None, delete=None),
+            ShowLeaderboardRolesButton(),
+            ShowLeaderboardRolesSelectMessage(),
+            ShowLeaderboardRolesSelectInvite(),
+            ShowLeaderboardGivenRoles(),
+            SetInviteleaderboard()
+            ]
+
+
     '''
     Adds all existing Invite links to a database
 
@@ -309,6 +326,7 @@ class LeaderboardSystem(commands.Cog):
         check = await DatabaseCheck.check_leaderboard_roles(guild_id=ctx.guild.id, interval=interval_list[interval], system=system)
 
         if check:
+
             await DatabaseRemoveDatas.remove_leaderboard_role(guild_id=ctx.guild.id, system=system)
 
             emb = discord.Embed(description=f"""## Leaderboard roles have been reset
@@ -317,6 +335,7 @@ class LeaderboardSystem(commands.Cog):
             await ctx.respond(embed=emb, view=ShowLeaderboardRolesSelectMessage() if system == "message" else ShowLeaderboardRolesSelectInvite())
 
         else:
+
             emb = discord.Embed(description=f"""## No roles have been added to this leaderboard
                 {Emojis.dot_emoji} No roles have been added to the {interval}
                 {Emojis.dot_emoji} With the lower select menu you can check the other intervals and view the defined roles""", color=bot_colour)
@@ -375,12 +394,18 @@ class LeaderboardSystem(commands.Cog):
 
     @commands.slash_command(name = "add-message-leaderboard-role", description = "Define roles for the message leaderboard that are assigned when you reach a certain position!")
     @commands.has_permissions(administrator = True)
-    async def add_leaderboard_role_message(self, ctx:discord.ApplicationContext, 
-        role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
-        position:Option(required = True, description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)", 
-            choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]),
-        interval:Option(str, description="Select the leaderboard for which this role is to be assigned", 
-            choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+    @discord.option("role", discord.Role, description="Define a role for the leaderboard to assign upon reaching a specific position", required=True)
+    @discord.option("position", str, description="Select the position to assign this role",
+        choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], required=True)
+    @discord.option("interval", str, description="Select the leaderboard for which this role is to be assigned",
+        choices=["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"], required=True)
+    async def add_leaderboard_role_message(
+        self,
+        ctx:discord.ApplicationContext,
+        role:discord.Role,
+        position:str,
+        interval:str
+    ):
 
         if role.permissions.administrator or role.permissions.moderate_members:
 
@@ -393,12 +418,18 @@ class LeaderboardSystem(commands.Cog):
     
     @commands.slash_command(name = "remove-message-leaderboard-role", description = "Removes a specific role from a specific interval of the message leaderboard!")
     @commands.has_permissions(administrator = True)
-    async def remove_leaderboard_role_message(self, ctx:discord.ApplicationContext, 
-        role:Option(discord.Role, description="Remove a role from the leaderboard roles!"),
-        interval:Option(str, description="Choose from which leaderboard the role should be removed!", 
-            choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"]),
-        position:Option(str, description = "Choose from which position you want to remove the role!", 
-            choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]) = None):
+    @discord.option("role", discord.Role, description="Remove a role from the leaderboard roles!", required=True)
+    @discord.option("interval", str, description="Choose from which leaderboard the role should be removed!",
+        choices=["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"], required=True)
+    @discord.option("position", str, description="Choose from which position you want to remove the role!",
+        choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], required=False)
+    async def remove_leaderboard_role_message(
+        self,
+        ctx:discord.ApplicationContext,
+        role:discord.Role,
+        interval:str,
+        position:str = None
+    ):
 
         await self.process_remove_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="message")
 
@@ -422,9 +453,13 @@ class LeaderboardSystem(commands.Cog):
 
     @commands.slash_command(name = "reset-message-leaderboard-roles", description = "Resets all roles that have been set for the message leaderboard!")
     @commands.has_permissions(administrator = True)
-    async def reset_leaderboard_roles_message(self, ctx:discord.ApplicationContext, 
-        interval:Option(str, description="Select which leaderboard roles should be reset", 
-            choices = ["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"])):
+    @discord.option("interval", str, description="Select which leaderboard roles should be reset",
+        choices=["daily leaderboard", "weekly leaderboard", "monthly leaderboard", "general leaderboard"], required=True)
+    async def reset_leaderboard_roles_message(
+        self,
+        ctx:discord.ApplicationContext,
+        interval:str
+    ):
 
         await self.process_reset_leaderboard_roles(ctx=ctx, interval=interval, system="message")
 
@@ -455,12 +490,18 @@ class LeaderboardSystem(commands.Cog):
 
     @commands.slash_command(name = "add-invite-leaderboard-role", description = "Define roles for the invite leaderboard that are assigned when you reach a certain position!")
     @commands.has_permissions(administrator = True)
-    async def add_leaderboard_role_invite(self, ctx:discord.ApplicationContext, 
-        role:Option(discord.Role, required = True, description="Define a role for the leaderboard to assign upon reaching a specific position"), 
-        position:Option(required = True, description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)",
-            choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]),
-        interval:Option(str, description="Select the leaderboard for which this role is to be assigned", 
-            choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
+    @discord.option("role", discord.Role, description="Define a role for the leaderboard to assign upon reaching a specific position", required=True)
+    @discord.option("position", str, description="Select the position to assign this role (if general, it’s always assigned if on the leaderboard)",
+        choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"], required=True)
+    @discord.option("interval", str, description="Select the leaderboard for which this role is to be assigned",
+        choices=["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"], required=True)
+    async def add_leaderboard_role_invite(
+        self,
+        ctx:discord.ApplicationContext,
+        role:discord.Role,
+        position:str,
+        interval:str
+    ):
 
         if role.permissions.administrator or role.permissions.moderate_members:
 
@@ -473,13 +514,18 @@ class LeaderboardSystem(commands.Cog):
     
     @commands.slash_command(name = "remove-invite-leaderboard-role", description = "Removes a specific role from a specific interval of the invite leaderboard!")
     @commands.has_permissions(administrator = True)
-    async def remove_leaderboard_role_invite(self, ctx:discord.ApplicationContext, 
-        role:Option(discord.Role, description="Remove a role from the leaderboard roles!"), 
-        interval:Option(str, description="Choose from which leaderboard the role should be removed!", 
-            choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"]),
-        position:Option(str, description = "Choose from which position you want to remove the role!", 
-            choices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"]) = None):
-
+    @discord.option("role", discord.Role, description="Remove a role from the leaderboard roles!", required=True)
+    @discord.option("interval", str, description="Choose from which leaderboard the role should be removed!",
+        choices=["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"], required=True)
+    @discord.option("position", str, description="Choose from which position you want to remove the role!",
+        choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "general role"])
+    async def remove_leaderboard_role_invite(
+        self,
+        ctx:discord.ApplicationContext,
+        role:discord.Role,
+        interval:str,
+        position:str = None
+    ):
         await self.process_remove_leaderboard_role(ctx=ctx, role=role, position=position, interval=interval, system="invite")
 
     
@@ -502,9 +548,13 @@ class LeaderboardSystem(commands.Cog):
     
     @commands.slash_command(name = "reset-invite-leaderboard-roles", description = "Resets all roles that have been set for the invite leaderboard!")
     @commands.has_permissions(administrator = True)
-    async def reset_leaderboard_roles_invite(self, ctx:discord.ApplicationContext, 
-        interval:Option(str, description="Select which leaderboard roles should be reset!", 
-            choices = ["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"])):
+    @discord.option("interval", str, description="Select which leaderboard roles should be reset!",
+        choices=["weekly leaderboard", "monthly leaderboard", "quarterly leaderboard", "general leaderboard"], required=True)
+    async def reset_leaderboard_roles_invite(
+        self,
+        ctx:discord.ApplicationContext,
+        interval:str
+    ):
 
         await self.process_reset_leaderboard_roles(ctx=ctx, interval=interval, system="invite")
 

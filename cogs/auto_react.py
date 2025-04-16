@@ -11,6 +11,14 @@ class AutoReaction(commands.Cog):
         self.bot = bot
 
 
+    async def add_views(self):
+
+        return [
+            AutoReactionOnOffSwitch(),
+            ShowAutoReactions()
+            ]
+
+
     '''
     Returns all auto-reactions
 
@@ -139,11 +147,16 @@ class AutoReaction(commands.Cog):
 
     @commands.slash_command(name = "add-auto-reaction", description = "Adds an auto-reaction to the server!")
     @commands.has_permissions(administrator = True)
-    async def add_auto_reaction(self, ctx:discord.ApplicationContext, 
-        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, description="Select in which channel or category the auto-reaction should be created!"), 
-        parameter:Option(str, required = True, description="Select what this auto-reaction should react to!",
-            choices = ["links, images and videos", "images and videos", "links", "text messages", "any message"]), 
-        emoji:Option(str, required = True, description="Enter the emoji you want for this auto-reaction (just insert it and it'll be set)!")):
+    @discord.option("area", Union[discord.TextChannel, discord.CategoryChannel], description="Select in which channel or category the auto-reaction should be created!", required=True)
+    @discord.option("parameter", str, description="Select what this auto-reaction should react to!", choices=["links, images and videos", "images and videos", "links", "text messages", "any message"], required=True)
+    @discord.option("emoji", str, description="Enter the emoji you want for this auto-reaction (just insert it and it'll be set)!", required=True)
+    async def add_auto_reaction(
+        self,
+        ctx:discord.ApplicationContext,
+        area:Union[discord.TextChannel, discord.CategoryChannel],
+        parameter:str,
+        emoji:str
+    ):
 
         check_reaction = await DatabaseCheck.check_auto_reaction(
             guild_id = ctx.guild.id, 
@@ -180,9 +193,12 @@ class AutoReaction(commands.Cog):
         
     @commands.slash_command(name = "remove-auto-reaction", description = "Removes an auto-reaction from the server!")
     @commands.has_permissions(administrator = True)
-    async def remove_auto_reaction(self, ctx:discord.ApplicationContext, 
-        area:Option(Union[discord.TextChannel, discord.CategoryChannel], required = True, 
-            description="Select which channel or category you want to remove from the auto-reaction system!")):
+    @discord.option("area", Union[discord.TextChannel, discord.CategoryChannel], description="Select which channel or category you want to remove from the auto-reaction system!", required=True)
+    async def remove_auto_reaction(
+        self,
+        ctx:discord.ApplicationContext,
+        area:Union[discord.TextChannel, discord.CategoryChannel]
+    ):
         
         auto_reactions = await DatabaseCheck.check_auto_reaction(
             guild_id = ctx.guild.id,

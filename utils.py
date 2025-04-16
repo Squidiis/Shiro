@@ -8,17 +8,21 @@ import discord
 from discord.ext import commands
 from discord.interactions import Interaction
 from discord.ui import Select, View, Button, Modal
-from discord.commands import Option, SlashCommandGroup
+from discord.commands import Option, SlashCommandGroup, option
 from PIL import Image
 from sql_function import *
 import yaml
 from discord.ext.pages import Paginator, Page
-from datetime import timedelta
+from datetime import timedelta, timezone
 from datetime import datetime
 import re
 from datetime import UTC
 from urllib.parse import urlsplit, urlparse
 import aiohttp
+from groq import Groq
+import aiomysql
+
+
 
 """
 ┏━━━┓ ┏━━━┓ ┏┓ ┏┓ ┏━━┓ ┏━━━┓ ┏━━┓
@@ -96,7 +100,9 @@ no_entry_emb = discord.Embed(title=f"{Emojis.help_emoji} No entry found",
 # default message for level up message system
 default_message = 'Oh nice {user} you have a new level, your newlevel is {level}' 
 
-
+no_page = discord.Embed(description=f"""## An error has occurred
+    {Emojis.dot_emoji} This interaction has been updated and therefore no pages can be accessed
+    {Emojis.dot_emoji} Please try again later by calling the command again""", color=bot_colour)
 
 '''
 Checks a message for a channel ID

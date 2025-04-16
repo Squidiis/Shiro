@@ -10,6 +10,19 @@ class AutoMessageSystem(commands.Cog):
         self.auto_message.start()
 
 
+    async def add_views(self):
+
+        return [
+            SetAutoMessage(),
+            PaginatorViewAutoMessage(pages=[no_page]),
+            OverwriteChannelSelectAutoMessage(),
+            AddAutoMessageText(),
+            OverwriteIntervalAutoMessage(interval=None),
+            EditAutoMessage()
+            ]
+
+
+
     async def delete_old_auto_message(guild_id:int, channel_id:int = None, reset = None):
 
         channel = bot.get_channel(channel_id)
@@ -104,9 +117,14 @@ class AutoMessageSystem(commands.Cog):
         
     @commands.slash_command(name = "add-auto-message", description = "Add a new auto-message!")
     @commands.has_permissions(administrator = True)
-    async def add_auto_message(self, ctx:discord.ApplicationContext, 
-        channel:Option(discord.TextChannel, description="Select a channel in which the auto-message should be sent!"), 
-        interval:Option(int, min_value=1, max_value=30, description="Specifies an interval after how many days the message should always be sent!")):
+    @discord.option("channel", discord.TextChannel, description="Select a channel in which the auto-message should be sent!", required=True)
+    @discord.option("interval", int, min_value=1, max_value=30, description="Specifies an interval after how many days the message should always be sent!", required=True)
+    async def add_auto_message(
+        self,
+        ctx:discord.ApplicationContext,
+        channel:discord.TextChannel,
+        interval:int
+    ):
 
         check_channel = await DatabaseCheck.check_auto_message(guild_id = ctx.guild.id, channel_id = channel.id)
 
@@ -156,8 +174,12 @@ class AutoMessageSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-auto-message", description = "Remove an auto-message!")
     @commands.has_permissions(administrator = True)
-    async def remove_auto_message(self, ctx:discord.ApplicationContext, 
-        channel:Option(discord.TextChannel, description="Specify the channel from which the auto-message should be removed!")):
+    @discord.option("channel", discord.TextChannel, description="Specify the channel from which the auto-message should be removed!")
+    async def remove_auto_message(
+        self,
+        ctx:discord.ApplicationContext,
+        channel:discord.TextChannel
+    ):
 
         check_channel = await DatabaseCheck.check_auto_message(guild_id = ctx.guild.id, channel_id = channel.id)
 

@@ -1,16 +1,21 @@
 
-from cogs.level_system import *
-from cogs.mod_tools import *
 from dotenv import load_dotenv
-from cogs.fun_commands import *
 from utils import *
-from cogs.leaderboard_system import *
-from cogs.auto_react import *
-from cogs.booster_system import *
-from cogs.sticky_message import *
 import logging
-from cogs.auto_message_system import *
-from cogs.ticket_system import *
+import importlib
+from sql_function import DatabaseUpdates, DatabaseSetup
+
+
+for filename in os.listdir("cogs"):
+
+    if filename.endswith(".py") and filename != "__init__.py":
+        cog_name = f"cogs.{filename[:-3]}"
+
+        try:
+            importlib.import_module(cog_name)
+
+        except Exception as e:
+            print(f"Error when loading: {cog_name}: {e}")
 
 
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +44,7 @@ class Main(commands.Cog):
                 userName VARCHAR(255) NOT NULL,
                 voiceTime TIMESTAMP(6) NULL,
                 wholeXp BIGINT UNSIGNED NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LevelSystemBlacklist (
@@ -48,14 +53,14 @@ class Main(commands.Cog):
                 categoryId BIGINT UNSIGNED NULL,
                 roleId BIGINT UNSIGNED NULL,
                 userId BIGINT UNSIGNED NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LevelSystemRoles (
                 guildId BIGINT UNSIGNED NOT NULL,
                 roleId BIGINT UNSIGNED NOT NULL,
                 roleLevel INT UNSIGNED NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LevelSystemSettings (
@@ -65,7 +70,7 @@ class Main(commands.Cog):
                 levelUpChannel BIGINT UNSIGNED NULL,
                 levelUpMessage VARCHAR(1000) DEFAULT 'Oh nice {user} you have a new level, your newlevel is {level}',
                 bonusXpPercentage INT UNSIGNED DEFAULT 10
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS BonusXpList (
@@ -75,7 +80,7 @@ class Main(commands.Cog):
                 roleId BIGINT UNSIGNED NULL,
                 userId BIGINT UNSIGNED NULL,
                 PercentBonusXp INT UNSIGNED DEFAULT 0
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Anti-link system table
             '''
@@ -85,7 +90,7 @@ class Main(commands.Cog):
                 categoryId BIGINT UNSIGNED NULL,
                 roleId BIGINT UNSIGNED NULL,
                 userId BIGINT UNSIGNED NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Bot settings table
             '''
@@ -96,7 +101,7 @@ class Main(commands.Cog):
                 antiLink INT DEFAULT 3,
                 antiLinkTimeout INT DEFAULT 0,
                 autoReaction INT DEFAULT 0
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Leaderboard tables
             '''
@@ -108,7 +113,7 @@ class Main(commands.Cog):
                 bourdMessageIdMonth BIGINT UNSIGNED NULL,
                 bourdMessageIdWhole BIGINT UNSIGNED NULL,
                 leaderboardChannel BIGINT UNSIGNED NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LeaderboardTacking (
@@ -122,7 +127,7 @@ class Main(commands.Cog):
                 monthlyCountInvite INT UNSIGNED DEFAULT 0,
                 quarterlyCountInvite INT UNSIGNED DEFAULT 0,
                 wholeCountInvite INT UNSIGNED DEFAULT 0
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LeaderboardRoles (
@@ -131,7 +136,7 @@ class Main(commands.Cog):
                 rankingPosition INT UNSIGNED NOT NULL,
                 status VARCHAR(20) NOT NULL,
                 roleInterval VARCHAR(10) NOT NUll
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LeaderboardGivenRoles (
@@ -141,7 +146,7 @@ class Main(commands.Cog):
                 roleInterval VARCHAR(10) NOT NULL,
                 status VARCHAR(20) NOT NULL,
                 rankingPosition INT UNSIGNED NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LeaderboardSettingsInvite (
@@ -152,7 +157,7 @@ class Main(commands.Cog):
                 invitebourdMessageIdQuarter BIGINT UNSIGNED NULL,
                 invitebourdMessageIdWhole BIGINT UNSIGNED NULL,
                 leaderboardChannel BIGINT UNSIGNED NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;  
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS LeaderboardInviteTracking (
@@ -161,7 +166,7 @@ class Main(commands.Cog):
                 inviteCode VARCHAR(20) NOT NULL,
                 usesCount INT NOT NULL,
                 UNIQUE KEY unique_invite (guildId, inviteCode)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Auto reaction table
             '''
@@ -171,7 +176,7 @@ class Main(commands.Cog):
                 categoryId BIGINT UNSIGNED NULL,
                 parameter VARCHAR(255) NOT NULL,
                 emoji VARCHAR(255) NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Booster system
             '''
@@ -180,7 +185,7 @@ class Main(commands.Cog):
                 status INT UNSIGNED DEFAULT 1,
                 channelId BIGINT UNSIGNED NULL,
                 message VARCHAR(4000) DEFAULT 'Thank you, [user], for boosting the server! Your support helps make this community even better. We appreciate you!'
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Sticky message
             '''
@@ -190,13 +195,13 @@ class Main(commands.Cog):
                 messageId BIGINT UNSIGNED NULL,
                 message VARCHAR(3000) NULL,
                 status INT DEFAULT 1
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS StickyMessageSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 status INT UNSIGNED DEFAULT 1
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Auto message
             '''
@@ -208,13 +213,13 @@ class Main(commands.Cog):
                 status INT DEFAULT 1,
                 sendInterval INT NOT NULL,
                 messageSendTime TIMESTAMP NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS AutoMessageSettings (
                 guildId BIGINT UNSIGNED NOT NULL,
                 status INT UNSIGNED DEFAULT 1
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             # Ticket system
             '''
@@ -225,7 +230,7 @@ class Main(commands.Cog):
                 ticketMessageId BIGINT UNSIGNED NULL,
                 ticketMessage VARCHAR(3000) NULL,
                 ticketMessageUrl VARCHAR(250) NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             '''
             CREATE TABLE IF NOT EXISTS TicketSystemLayers (
@@ -233,15 +238,16 @@ class Main(commands.Cog):
                 status INT UNSIGNED DEFAULT 1,
                 layerName VARCHAR(100) NOT NULL,         
                 description VARCHAR(100) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            );
             ''',
             ''' 
             CREATE TABLE IF NOT EXISTS TempVoiceChannelTicketSystem (
                 guildId BIGINT UNSIGNED NOT NuLL,
                 channelId BIGINT UNSIGNED NOT NULL,
                 ticektName VARCHAR(100) NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-            ''']
+            );
+            '''
+            ]
 
         try:
 
@@ -251,6 +257,16 @@ class Main(commands.Cog):
         
         except aiomysql.Error as error:
             print("parameterized query failed {}".format(error))
+
+
+    async def add_views_and_buttons(self, bot):
+       
+        for cog in bot.cogs.values():
+            
+            if hasattr(cog, 'add_views'):
+                views = await cog.add_views()
+                for view in views:
+                    bot.add_view(view)
 
 
     @commands.Cog.listener()
@@ -267,101 +283,13 @@ class Main(commands.Cog):
         print("┃┗━┛┃ ┗━━┓┃ ┃┗━┛┃ ┏┫┣┓ ┏┛┗┛┃ ┏┫┣┓")
         print("┗━━━┛    ┗┛ ┗━━━┛ ┗━━┛ ┗━━━┛ ┗━━┛")
         
-        no_page = discord.Embed(description=f"""## An error has occurred
-            {Emojis.dot_emoji} This interaction has been updated and therefore no pages can be accessed
-            {Emojis.dot_emoji} Please try again later by calling the command again""", color=bot_colour)
-
-        # level system
-        self.bot.add_view(LevelRolesButtons(role_id=None, role_level=None, status=None))
-        self.bot.add_view(ResetLevelStatsButton())
-
-        # Level system settings
-        self.bot.add_view(LevelSystemSetting())
-        self.bot.add_view(SetLevelUpChannelSelect())
-        self.bot.add_view(BonusXpPercentage())
-        self.bot.add_view(SetXpRate())
-        self.bot.add_view(LevelSystemDefault())
-        self.bot.add_view(ShowLevelSettingsSelect())
-        view.add_item(LevelUpMessageButton())
-        view.add_item(SetLevelUpChannelButton())
-        view.add_item(LevelSystemOnOffSwitch())
-        view.add_item(SetBonusXpPercentageButton())
-        view.add_item(SendXpBonusModal())
-        view.add_item(ShowLevelSettings())
-
-        # Mod tools
-        self.bot.add_view(GhostPingButtons())
-
-        # Message leaderboard
-        self.bot.add_view(SetleaderboardChannel())
-        self.bot.add_view(SetMessageleaderboard())
-        self.bot.add_view(OverwriteMessageChannel(channel_id=None))
-        self.bot.add_view(ContinueSettingLeaderboard())
-        self.bot.add_view(OverwriteInterval(intervals=None))
-        self.bot.add_view(OverwriteRole(role=None, interval=None, position=None, settings=None, delete=None))
-        self.bot.add_view(ShowLeaderboardRolesButton())
-        self.bot.add_view(ShowLeaderboardRolesSelectMessage())
-        self.bot.add_view(ShowLeaderboardRolesSelectInvite())
-        view.add_item(LeaderboardOnOffSwitch())
-        view.add_item(DefaultSettingsLeaderboard())
-        self.bot.add_view(ShowLeaderboardGivenRoles())
-        self.bot.add_view(SetInviteleaderboard())
-
-        # Auto-reaction
-        self.bot.add_view(AutoReactionOnOffSwitch())
-        self.bot.add_view(ShowAutoReactions())
-
-        # Sticky message
-        self.bot.add_view(SetStickyMessage())
-        self.bot.add_view(PaginatorViewStickyMessage(pages=[no_page]))
-        self.bot.add_view(OverwriteChannelSelect())
-        self.bot.add_view(AddStickyMessageText())
-        self.bot.add_view(EditStickyMessage())
-        view.add_item(ShowStickyMessage())
-
-        # Booster system
-        self.bot.add_view(OverwriteBoosterChannelSelect())
-        self.bot.add_view(ShowBoosterMessage())
-        view.add_item(SetBoosterChannel())
-        view.add_item(OverwriteBoosterChannel())
-        view.add_item(OverwriteBoosterMessage())
-        view.add_item(SetBoosterMessage())
-
-        # Auto message
-        self.bot.add_view(SetAutoMessage())
-        self.bot.add_view(PaginatorViewAutoMessage(pages=[no_page]))
-        self.bot.add_view(OverwriteChannelSelectAutoMessage())
-        self.bot.add_view(AddAutoMessageText())
-        self.bot.add_view(OverwriteIntervalAutoMessage(interval=None))
-        self.bot.add_view(EditAutoMessage())
-        view.add_item(ShowAutoMessage())
-
-        # Ticket System
-        for guild in self.bot.guilds:
-            
-            options = await TicketSystem.get_layers(guild.id)
-
-            self.bot.add_view(RemoveLayer(options=options))
-            self.bot.add_view(ShowLayers(options=options))
-            self.bot.add_view(TicketCreateSelect(options=options))
-
-        self.bot.add_view(TicketSystemView())
-        self.bot.add_view(AddUserTicket())
-        self.bot.add_view(SetTicketSystemView())
-        self.bot.add_view(SetLayers())
-        self.bot.add_view(SetTicketChannelSelect())
-        self.bot.add_view(OverwriteTicketChannel())
-        view.add_item(ShowTicketMessage())
-
-        # Other Systems
-        self.bot.add_view(RPSButtons(game_mode=None, second_user=None, first_user=None))
+        await self.add_views_and_buttons(bot)
 
         self.bot.add_view(HelpMenuSelect())
-        view.add_item(CancelButton(system=None))
         
         self.bot.add_view(view)
+
         await Main.create_db_table()
-        await LeaderboardSystem.check_expired_invites()
 
 
     @commands.slash_command(description="Shows you the ping.")

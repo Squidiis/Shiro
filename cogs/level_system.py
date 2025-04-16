@@ -178,122 +178,6 @@ class CheckLevelSystem():
 
   
 
-######################################################  Level System level roles button  ##################################################
-
-
-class LevelRolesButtons(discord.ui.View):
-
-    def __init__(
-            self, 
-            role_id:int, 
-            role_level:int, 
-            status:str
-        ):
-        self.role_id = role_id
-        self.role_level = role_level
-        self.status = status
-        super().__init__(timeout=None)
-
-    @discord.ui.button(
-        label="overwrite entry", 
-        style=discord.ButtonStyle.blurple, 
-        custom_id="overwrite_button_level_role"
-    )
-
-    async def overwrite_button_levelroles(self, button, interaction:discord.Interaction):
-    
-        if interaction.user.guild_permissions.administrator:
-
-            if self.role_id == None and self.role_level == None and self.status == None:
-
-                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="level role", settings2="to overwrite the level role", settings3="add-level-role"), view=None)
-
-            else:
-
-                await DatabaseUpdates.update_level_roles(guild_id=interaction.guild.id , role_id=self.role_id, role_level=self.role_level, status=self.status)
-                            
-                emb = discord.Embed(description=f"""## Successful override of the level role
-                    {Emojis.dot_emoji} The level role was successfully overwritten
-                    {Emojis.dot_emoji} The role <@&{self.role_id}> will be assigned at level **{self.role_level}** from now on""", color=bot_colour)
-                await interaction.response.edit_message(embed=emb, view=None)
-
-        else:
-                
-            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
-
-
-    @discord.ui.button(
-        label="keep entry", 
-        style=discord.ButtonStyle.blurple, 
-        custom_id="keep_button_level_role"
-    )
-    
-    async def keep_button_levelroles(self, button, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            emb = discord.Embed(description=f"""## The overwriting of the level roles was successfully canceled
-                {Emojis.dot_emoji} The overwriting of the level role has been canceled, so it is still available at the level it had before
-                {Emojis.help_emoji} If you change your mind, you can re-execute the command at any time""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
-
-        else:
-            
-            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
-
-
-
-#############################################  Reset Buttons level system  #######################################################
-
-
-class ResetLevelStatsButton(discord.ui.View):
-
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.button(
-        label="reset stats", 
-        style=discord.ButtonStyle.gray, 
-        custom_id="stats_button_reset"
-    )
-
-    async def reset_stats_button_level(self, button, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-
-            guild_id = interaction.guild.id
-            await DatabaseRemoveDatas.remove_level_system_stats(guild_id=guild_id)
-
-            emb = discord.Embed(description=f"""## You have reset all the stats of the level system
-                {Emojis.dot_emoji} All user files have been deleted every user is now level 0 again and has 0 XP
-                {Emojis.help_emoji} New entries will be created again when there is an activity""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
-
-
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True)
-
-    
-    @discord.ui.button(
-        label="keep stats", 
-        style=discord.ButtonStyle.gray, 
-        custom_id="no_button_reset"
-    )
-
-    async def reset_stats_button_level_keep(self, button, interaction:discord.Interaction):
-
-        if interaction.user.guild_permissions.administrator:
-        
-            emb = discord.Embed(description=f"""## The operation was successfully canceled
-                {Emojis.dot_emoji} Resetting the stats was successfully aborted
-                {Emojis.dot_emoji} All users keep their stats in the level system""", color=bot_colour)
-            await interaction.response.edit_message(embed=emb, view=None)
-                    
-        else:
-
-            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
 
 
 #########################################################  Message Level system  ###################################################
@@ -303,6 +187,21 @@ class LevelSystem(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cd = commands.CooldownMapping.from_cooldown(1, 10.0, commands.BucketType.member)
+
+    
+    async def add_views(self):
+
+        return [
+            LevelRolesButtons(role_id=None, role_level=None, status=None),
+            ResetLevelStatsButton(),
+            LevelSystemSetting(),
+            SetLevelUpChannelSelect(),
+            BonusXpPercentage(),
+            SetXpRate(),
+            LevelSystemDefault(),
+            ShowLevelSettingsSelect()
+            ]
+
 
     # Cooldown for the level system
     def get_ratelimit(self, message:discord.Message):
@@ -465,7 +364,7 @@ class LevelSystem(commands.Cog):
                                     
                                     channel = bot.get_channel(check_level_up_channel[3])
                             
-                                    await channel.send(await level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level), allowed_mentions=True)
+                                    await channel.send(await level_message(guild_id=message.guild.id, user_id=message.author.id, level=new_level))
 
                                     if check_level_role:
 
@@ -530,8 +429,9 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-xp", description = "Give a user a quantity of XP chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def give_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user who should receive the xp"),
-        xp:Option(int, description="Specify a quantity of XP to be added")):
+    @discord.option("user", discord.Member, description="Select a user who should receive the XP", required=True)
+    @discord.option("xp", int, description="Specify a quantity of XP to be added", required=True)
+    async def give_xp(self, ctx: discord.ApplicationContext, user:discord.Member, xp:int):
 
         if user.bot:
             await ctx.respond(embed=user_bot_emb)
@@ -588,8 +488,9 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-xp", description = "Remove a chosen amount of Xp from a user!")
     @commands.has_permissions(administrator = True)
-    async def remove_xp(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user from which you want to remove xp"),
-        xp:Option(int, description="Specify a quantity of Xp to be removed!")):
+    @discord.option("user", discord.Member, description="Select a user from whom you want to remove XP", required=True)
+    @discord.option("xp", int, description="Specify a quantity of XP to be removed", required=True)
+    async def remove_xp(self, ctx: discord.ApplicationContext, user: discord.Member, xp: int):
             
         check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
@@ -628,8 +529,9 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "give-level", description = "Give a user a selected amount of levels!")
     @commands.has_permissions(administrator = True)
-    async def give_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user you want to give the levels to"), 
-        level:Option(int, description="Specify a set of levels that you want to assign")):
+    @discord.option("user", discord.Member, description="Choose a user you want to give the levels to", required=True)
+    @discord.option("level", int, description="Specify the number of levels you want to assign", required=True)
+    async def give_level(self, ctx:discord.ApplicationContext, user:discord.Member, level:int):
 
         check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
@@ -668,8 +570,9 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-level", description = "Remove a quantity of levels chosen by you!")
     @commands.has_permissions(administrator = True)
-    async def remove_level(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Select a user from whom you want to remove the level"), 
-        level:Option(int, description="Specify how many levels should be removed")):
+    @discord.option("user", discord.Member, description="Select a user from whom you want to remove the level", required=True)
+    @discord.option("level", int, description="Specify how many levels should be removed", required=True)
+    async def remove_level(self, ctx:discord.ApplicationContext, user:discord.Member, level:int):
 
         check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
         
@@ -729,8 +632,8 @@ class LevelSystem(commands.Cog):
 
     
     @commands.slash_command(name = "reset-user-stats", description = "Resets all stats of the specified user in the level system!")
-    @commands.has_permissions(administrator = True)
-    async def reset_user_stats(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Choose a user whose stats you want to reset")):
+    @discord.option("user", discord.Member, description="Choose a user whose stats you want to reset", required=True)
+    async def reset_user_stats(self, ctx:discord.ApplicationContext, user:discord.Member):
 
         check_stats = await DatabaseCheck.check_level_system_stats(guild_id=ctx.guild.id, user_id=user.id)
 
@@ -751,7 +654,8 @@ class LevelSystem(commands.Cog):
 
 
     @commands.slash_command(name = "rank", description = "Shows you the rank of a user in the level system!")
-    async def rank(self, ctx:discord.ApplicationContext, user:Option(discord.Member, description="Look at the rank of others!")):
+    @discord.option("user", discord.Member, description="Look at the rank of others!", required=False)
+    async def rank(self, ctx:discord.ApplicationContext, user:discord.Member = None):
 
         try:
 
@@ -1031,11 +935,18 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "add-level-blacklist", description = "Add what you want to the blacklist!")
     @commands.has_permissions(administrator = True)
-    async def add_level_blacklist(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel that you want to exclude from the level system"),
-        category:Option(discord.CategoryChannel, required = False, description="Select a category that you want to exclude from the level system"),
-        role:Option(discord.Role, required = False, description="Select a role that you want to exclude from the level system"),
-        user:Option(discord.User, required = False, description="Select a user that you want to exclude from the level system")):
+    @discord.option("channel", Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel that you want to exclude from the level system", required=False)
+    @discord.option("category", discord.CategoryChannel, description="Select a category that you want to exclude from the level system", required=False)
+    @discord.option("role", discord.Role, description="Select a role that you want to exclude from the level system", required=False)
+    @discord.option("user", discord.User, description="Select a user that you want to exclude from the level system", required=False)
+    async def add_level_blacklist(
+        self,
+        ctx:discord.ApplicationContext,
+        channel:Union[discord.VoiceChannel, discord.TextChannel] = None,
+        category:discord.CategoryChannel = None,
+        role:discord.Role = None,
+        user:discord.User = None
+    ):
 
         check_blacklist = await DatabaseCheck.check_blacklist(guild_id=ctx.guild.id)
 
@@ -1083,12 +994,19 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "remove-level-blacklist", description = "Remove what you want from the blacklist!")
     @commands.has_permissions(administrator = True)
-    async def remove_level_blacklist(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the blacklist"),
-        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the blacklist"),
-        role:Option(discord.Role, required = False, description="Select a role you want to remove from the blacklist"),
-        user:Option(discord.User, required = False, description="Select a user that you want to remove from the blacklist")):
-
+    @discord.option("channel", Union[discord.VoiceChannel, discord.TextChannel], description="Select a channel you want to remove from the blacklist", required=False)
+    @discord.option("category", discord.CategoryChannel, description="Select a category you want to remove from the blacklist", required=False)
+    @discord.option("role", discord.Role, description="Select a role you want to remove from the blacklist", required=False)
+    @discord.option("user", discord.User, description="Select a user you want to remove from the blacklist", required=False)
+    async def remove_level_blacklist(
+        self,
+        ctx:discord.ApplicationContext,
+        channel:Union[discord.VoiceChannel, discord.TextChannel] = None,
+        category:discord.CategoryChannel = None,
+        role:discord.Role = None,
+        user:discord.User = None
+    ):
+        
         emb = await self.config_level_blacklist(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
         await ctx.respond(embed=emb)
 
@@ -1133,8 +1051,14 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "add-level-role", description = "Add a role that you get from a certain level!")
     @commands.has_permissions(administrator = True)
-    async def add_level_role(self, ctx:discord.ApplicationContext, role:Option(discord.Role, description = "Select a role that you want to assign from a certain level onwards"),
-        level:Option(int, description = "Enter a level from which this role should be assigned")):
+    @discord.option("role", discord.Role, description="Select a role that you want to assign from a certain level onwards", required=True)
+    @discord.option("level", int, description="Enter a level from which this role should be assigned", required=True)
+    async def add_level_role(
+        self,
+        ctx:discord.ApplicationContext,
+        role:discord.Role,
+        level:int
+    ):
 
         level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id, needed_level=level, status = "check")
 
@@ -1203,7 +1127,12 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-level-role", description = "Choose a role that you want to remove as a level role!")
     @commands.has_permissions(administrator = True)
-    async def remove_level_role(self, ctx:discord.ApplicationContext, role:Option(discord.Role, description="Select a level role that you want to remove")):
+    @discord.option("role", discord.Role, description="Select a level role that you want to remove", required=True)
+    async def remove_level_role(
+        self,
+        ctx:discord.ApplicationContext,
+        role:discord.Role
+    ):
 
         level_roles = await DatabaseCheck.check_level_system_levelroles(guild_id=ctx.guild.id, level_role=role.id)
 
@@ -1398,12 +1327,20 @@ class LevelSystem(commands.Cog):
     
     @commands.slash_command(name = "add-bonus-xp-list", description = "Choose what you want to reward with more XP!")
     @commands.has_permissions(administrator = True)
-    async def add_bonus_xp_list(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Choose a channel in which messages should be rewarded with more XP"),
-        category:Option(discord.CategoryChannel, required = False, description="Choose a category in which messages should be rewarded with more XP"),
-        role:Option(discord.Role, required = False, description="Choose a role where the one who owns it gets more XP when writing messages"),
-        user:Option(discord.User, required = False, description="Select a user who should receive more XP per message"),
-        bonus:Option(int, required = False, description="Choose how much more xp to give in percent (if nothing is specified the default value is used)", max_value = 100, choices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])):
+    @discord.option("channel", Union[discord.VoiceChannel, discord.TextChannel], description="Choose a channel in which messages should be rewarded with more XP", required=False)
+    @discord.option("category", discord.CategoryChannel, description="Choose a category in which messages should be rewarded with more XP", required=False)
+    @discord.option("role", discord.Role, description="Choose a role where the one who owns it gets more XP when writing messages", required=False)
+    @discord.option("user", discord.User, description="Select a user who should receive more XP per message", required=False)
+    @discord.option("bonus", int, description="Choose how much more XP to give in percent (default is 0%)", max_value=100, choices=[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], required=False)
+    async def add_bonus_xp_list(
+        self,
+        ctx:discord.ApplicationContext,
+        channel:Union[discord.VoiceChannel, discord.TextChannel] = None,
+        category:discord.CategoryChannel = None,
+        role:discord.Role = None,
+        user:discord.User = None,
+        bonus:int = 0
+    ):
 
         if user.bot:
 
@@ -1420,11 +1357,18 @@ class LevelSystem(commands.Cog):
 
     @commands.slash_command(name = "remove-bonus-xp-list", description = "Choose what you want to remove from the bonus XP list!")
     @commands.has_permissions(administrator = True)
-    async def remove_bonus_xp_list(self, ctx:discord.ApplicationContext, 
-        channel:Option(Union[discord.VoiceChannel, discord.TextChannel], required = False, description="Select a channel you want to remove from the bonus XP list"),
-        category:Option(discord.CategoryChannel, required = False, description="Select a category you want to remove from the bonus XP list"),
-        role:Option(discord.Role, required = False, description="Select a role you want to remove from the bonus XP list"),
-        user:Option(discord.User, required = False, description="Select a user that you want to remove from the bonus XP list")):
+    @discord.option("channel", Union[discord.VoiceChannel, discord.TextChannel], required=False, description="Select a channel you want to remove from the bonus XP list")
+    @discord.option("category", discord.CategoryChannel, required=False, description="Select a category you want to remove from the bonus XP list")
+    @discord.option("role", discord.Role, required=False, description="Select a role you want to remove from the bonus XP list")
+    @discord.option("user", discord.User, required=False, description="Select a user you want to remove from the bonus XP list")
+    async def remove_bonus_xp_list(
+        self,
+        ctx: discord.ApplicationContext,
+        channel: Union[discord.VoiceChannel, discord.TextChannel] = None,
+        category: discord.CategoryChannel = None,
+        role: discord.Role = None,
+        user: discord.User = None
+    ):
 
         emb = await self.config_bonus_xp_list(guild_id=ctx.guild.id, operation="remove", channel=channel, category=category, role=role, user=user)
         await ctx.respond(embed=emb)
@@ -1474,6 +1418,129 @@ class LevelSystem(commands.Cog):
                 {Emojis.dot_emoji} No entries were found
                 {Emojis.dot_emoji} Therefore the list cannot be reset either""", color=bot_colour)
             await ctx.respond(embed=emb)
+
+
+
+def setup(bot):
+    bot.add_cog(LevelSystem(bot))
+    
+
+
+######################################################  Level System level roles button  ##################################################
+
+
+class LevelRolesButtons(discord.ui.View):
+
+    def __init__(
+            self, 
+            role_id:int, 
+            role_level:int, 
+            status:str
+        ):
+        self.role_id = role_id
+        self.role_level = role_level
+        self.status = status
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="overwrite entry", 
+        style=discord.ButtonStyle.blurple, 
+        custom_id="overwrite_button_level_role"
+    )
+
+    async def overwrite_button_levelroles(self, button, interaction:discord.Interaction):
+    
+        if interaction.user.guild_permissions.administrator:
+
+            if self.role_id == None and self.role_level == None and self.status == None:
+
+                await interaction.response.edit_message(embed=GetEmbed.get_embed(embed_index=10, settings="level role", settings2="to overwrite the level role", settings3="add-level-role"), view=None)
+
+            else:
+
+                await DatabaseUpdates.update_level_roles(guild_id=interaction.guild.id , role_id=self.role_id, role_level=self.role_level, status=self.status)
+                            
+                emb = discord.Embed(description=f"""## Successful override of the level role
+                    {Emojis.dot_emoji} The level role was successfully overwritten
+                    {Emojis.dot_emoji} The role <@&{self.role_id}> will be assigned at level **{self.role_level}** from now on""", color=bot_colour)
+                await interaction.response.edit_message(embed=emb, view=None)
+
+        else:
+                
+            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
+
+
+    @discord.ui.button(
+        label="keep entry", 
+        style=discord.ButtonStyle.blurple, 
+        custom_id="keep_button_level_role"
+    )
+    
+    async def keep_button_levelroles(self, button, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            emb = discord.Embed(description=f"""## The overwriting of the level roles was successfully canceled
+                {Emojis.dot_emoji} The overwriting of the level role has been canceled, so it is still available at the level it had before
+                {Emojis.help_emoji} If you change your mind, you can re-execute the command at any time""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+
+        else:
+            
+            await interaction.response.send_message(embed=no_permissions_emb, view=None, ephemeral=True)
+
+
+
+#############################################  Reset Buttons level system  #######################################################
+
+
+class ResetLevelStatsButton(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="reset stats", 
+        style=discord.ButtonStyle.gray, 
+        custom_id="stats_button_reset"
+    )
+
+    async def reset_stats_button_level(self, button, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+
+            guild_id = interaction.guild.id
+            await DatabaseRemoveDatas.remove_level_system_stats(guild_id=guild_id)
+
+            emb = discord.Embed(description=f"""## You have reset all the stats of the level system
+                {Emojis.dot_emoji} All user files have been deleted every user is now level 0 again and has 0 XP
+                {Emojis.help_emoji} New entries will be created again when there is an activity""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+
+
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True)
+
+    
+    @discord.ui.button(
+        label="keep stats", 
+        style=discord.ButtonStyle.gray, 
+        custom_id="no_button_reset"
+    )
+
+    async def reset_stats_button_level_keep(self, button, interaction:discord.Interaction):
+
+        if interaction.user.guild_permissions.administrator:
+        
+            emb = discord.Embed(description=f"""## The operation was successfully canceled
+                {Emojis.dot_emoji} Resetting the stats was successfully aborted
+                {Emojis.dot_emoji} All users keep their stats in the level system""", color=bot_colour)
+            await interaction.response.edit_message(embed=emb, view=None)
+                    
+        else:
+
+            await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
 
 
 
@@ -2185,10 +2252,3 @@ class ShowLevelSettingsSelect(discord.ui.View):
         else:
 
             await interaction.response.send_message(embed=no_permissions_emb, ephemeral=True, view=None)
-
-
-
-
-def setup(bot):
-    bot.add_cog(LevelSystem(bot))
-    

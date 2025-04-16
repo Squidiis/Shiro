@@ -7,6 +7,14 @@ class BoosterSystem(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
+    async def add_views(self):
+
+        return [
+            OverwriteBoosterChannelSelect(),
+            ShowBoosterMessage()
+            ]
+
     
     @commands.slash_command(name = "set-booster-channel", description = "Set the booster channel system!")
     @commands.has_permissions(administrator = True)
@@ -37,7 +45,8 @@ class BoosterSystem(commands.Cog):
     
     @commands.slash_command(name = "add-booster-channel", description = "Add a booster channel!")
     @commands.has_permissions(administrator = True)
-    async def add_booster_channel(self, ctx:discord.ApplicationContext, channel:Option(discord.TextChannel, description="Choose a channel you want to set as booster channel!")):
+    @discord.option("channel", discord.TextChannel, description="Choose a channel you want to set as booster channel", required=True)
+    async def add_booster_channel(self, ctx:discord.ApplicationContext, channel:discord.TextChannel):
 
         settings = await DatabaseCheck.check_booster_channel(guild_id = ctx.guild.id)
 
