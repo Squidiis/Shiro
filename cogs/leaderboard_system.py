@@ -724,7 +724,7 @@ class LeaderboardSystem(commands.Cog):
         check_role = await DatabaseCheck.check_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system)
         await DatabaseUpdates.manage_leaderboard_roles_users(guild_id = guild.id, interval = interval, status = system, operation = "remove")
         
-        for _, role, user, _, _ in check_role:
+        for _, role, user, _, _, _ in check_role:
 
             user = await guild.fetch_member(user)
             leaderboard_role = guild.get_role(role)

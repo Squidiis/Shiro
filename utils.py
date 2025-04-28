@@ -19,7 +19,6 @@ import re
 from datetime import UTC
 from urllib.parse import urlsplit, urlparse
 import aiohttp
-from groq import Groq
 import aiomysql
 
 
