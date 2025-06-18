@@ -5,7 +5,6 @@ import logging
 import importlib
 from sql_function import DatabaseUpdates, DatabaseSetup
 
-
 for filename in os.listdir("cogs"):
 
     if filename.endswith(".py") and filename != "__init__.py":

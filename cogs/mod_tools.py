@@ -5,7 +5,6 @@ from sql_function import *
 
 
 
-
 class ModeratorCommands(commands.Cog):
     
     def __init__(self, bot):
@@ -752,23 +751,23 @@ class ModeratorCommands(commands.Cog):
         if user_banner.banner is not None:
             if member.avatar is not None:
                 embed = discord.Embed(colour=bot_colour,
-                                    timestamp=datetime.utcnow(),
+                                    timestamp=datetime.datetime.now(timezone.utc),
                                     description=f"[User Avatar]({member.avatar.url}) | [User Banner]({user_banner.banner.url})")
                 embed.set_image(url=f"{user_banner.banner.url}")
                 embed.set_thumbnail(url=f'{member.display_avatar.url}')
             else:
                 embed = discord.Embed(colour=bot_colour,
-                                    timestamp=datetime.utcnow(),
+                                    timestamp=datetime.datetime.now(timezone.utc),
                                     description=f"[User Banner]({user_banner.banner.url})")
                 embed.set_image(url=f"{user_banner.banner.url}")
         elif member.avatar is not None:
             embed = discord.Embed(colour=bot_colour,
-                                    timestamp=datetime.utcnow(),
+                                    timestamp=datetime.datetime.now(timezone.utc),
                                     description=f"[User Avatar]({member.avatar.url})")
             embed.set_thumbnail(url=f'{member.display_avatar.url}')
         else:
             embed = discord.Embed(colour=bot_colour,
-                                    timestamp=datetime.utcnow())
+                                    timestamp=datetime.datetime.now(timezone.utc))
 
         embed.set_author(name=f"Userinfo")
 

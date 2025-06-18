@@ -2203,10 +2203,10 @@ class ShowLevelSettingsSelect(discord.ui.View):
 
             if select.values[0] == "show_level_up_channel":
 
-                level_up_channel = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)[3]
+                level_up_channel = await DatabaseCheck.check_level_settings(guild_id = interaction.guild.id)
 
                 emb = discord.Embed(description=f"""## Current level up channel
-                    {Emojis.dot_emoji} {f'The current level up channel is {level_up_channel}' if level_up_channel != None else 'No level up channel has been set yet'}
+                    {Emojis.dot_emoji} {f'The current level up channel is {level_up_channel[3]}' if level_up_channel[3] != None else 'No level up channel has been set yet'}
                     {Emojis.dot_emoji} If a level up channel is set, all level up notifications are sent to this channel as well as all notifications for receiving a level role
                     {Emojis.dot_emoji} If no level up channel is set, all notifications are sent to the channel where the last activity took place""", color=bot_colour)
                 await interaction.response.send_message(embed=emb, ephemeral=True, view=None)

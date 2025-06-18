@@ -13,8 +13,7 @@ from PIL import Image
 from sql_function import *
 import yaml
 from discord.ext.pages import Paginator, Page
-from datetime import timedelta, timezone
-from datetime import datetime
+from datetime import timedelta, timezone, datetime
 import re
 from datetime import UTC
 from urllib.parse import urlsplit, urlparse
