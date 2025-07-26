@@ -11,6 +11,7 @@ import aiohttp
 
 
 class Fun(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
         self.anilist_api_url = "https://graphql.anilist.co"
@@ -27,7 +28,6 @@ class Fun(commands.Cog):
     async def rps(self, ctx:discord.ApplicationContext, user:discord.Member = None):
 
         if user == None or user.bot:
-            user = user if user != None else bot.get_user(928073958891347989)
             emb = discord.Embed(title="Single player", description=f"""{Emojis.dot_emoji} {ctx.author.name} against {user.name}\n {ctx.author.mention} choose from stone 🪨, paper 🧻 or scissors ✂️ {Emojis.exclamation_mark_emoji}""", color=bot_colour)
             await ctx.respond(embed=emb, view=RPSButtons(game_mode=0, second_user=user, first_user=ctx.author))
 
@@ -170,13 +170,6 @@ class Fun(commands.Cog):
 
 
 
-
-def setup(bot):
-    bot.add_cog(Fun(bot))
-
-
-
-
 # Scissors on paper game can either be played against another user or against a bot
 class RPSButtons(discord.ui.View):
     
@@ -293,3 +286,7 @@ class RPSButtons(discord.ui.View):
 
 
 
+
+
+def setup(bot):
+    bot.add_cog(Fun(bot))
