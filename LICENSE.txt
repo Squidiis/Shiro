@@ -12,7 +12,7 @@ subject to the following conditions:
 
 1. Attribution: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 2. Non-Commercial Use: The Software may not be used for commercial purposes without explicit permission from the copyright holder.
-3. Permission for Commercial Use: For commercial use, please contact Squidi at papersquidi@outlook.de to negotiate terms and obtain written permission.
+3. Permission for Commercial Use: For commercial use, please contact Squidi to negotiate terms and obtain written permission.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
