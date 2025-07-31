@@ -70,7 +70,6 @@ You can customize pretty much anything, all commands are very user-friendly and 
 - [py-cord 2.4.1](https://pypi.org/project/py-cord/)
 - [python-dotenv 1.0.0](https://pypi.org/project/python-dotenv/)
 - [PyYAML 6.0.1](https://pypi.org/project/PyYAML/)
-- [DateTime 5.5](https://pypi.org/project/DateTime/)
 
 ## How to set up
 
