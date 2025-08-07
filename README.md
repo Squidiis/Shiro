@@ -64,12 +64,12 @@ You can customize pretty much anything, all commands are very user-friendly and 
 
 ## 📝 Requirements
 
-- [aiohttp==3.9.5](https://pypi.org/project/aiohttp/)
+- [aiohttp==3.12.15](https://pypi.org/project/aiohttp/)
 - [aiomysql==0.2.0](https://pypi.org/project/aiomysql/)
-- [Pillow 10.0.0](https://pypi.org/project/Pillow/)
-- [py-cord 2.4.1](https://pypi.org/project/py-cord/)
-- [python-dotenv 1.0.0](https://pypi.org/project/python-dotenv/)
-- [PyYAML 6.0.1](https://pypi.org/project/PyYAML/)
+- [Pillow 10.3.0](https://pypi.org/project/Pillow/)
+- [py-cord 2.6.1](https://pypi.org/project/py-cord/)
+- [python-dotenv 1.1.1](https://pypi.org/project/python-dotenv/)
+- [PyYAML 6.0.2](https://pypi.org/project/PyYAML/)
 
 ## How to set up
 

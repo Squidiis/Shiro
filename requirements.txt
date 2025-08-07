@@ -1,6 +1,6 @@
 aiohttp==3.12.15
 aiomysql==0.2.0
 Pillow==10.3.0
-py-cord==2.5.0
-python-dotenv==1.0.0
-PyYAML==6.0.1
+py-cord==2.6.1
+python-dotenv==1.1.1
+PyYAML==6.0.2
