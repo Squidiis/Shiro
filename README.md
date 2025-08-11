@@ -7,7 +7,6 @@
 
 <h4 align="center">
     Owner and developer is <a href="https://github.com/Squidiis">Squidi</a>
-    <br>Official discord server for the Shiro discord bot project
 </h4>
 
 <h4 align="center">
