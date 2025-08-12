@@ -87,7 +87,8 @@ To run the code on your bot customize the [`.env`](.env) file simply fill in all
 |user|Enter the user name of your MySQL database here this can be `root` if you run it locally or a custom name of your choice.|
 |discord_db|Here the name of the database schema.|
 
-In the [`ultils.py`](ultils.py) file add the emojis to the variables [emojis](emojis)
+In the [`ultils.py`](ultils.py) file, add the emojis to the variables in the emojis section. You can either use the standard [emojis](emojis) or your own custom ones.
+To mention the emojis, you will need to upload them either in the Discord application or on your server as custom emojis.
 
 ## How to start?
 
