@@ -10,7 +10,7 @@
 </h4>
 
 <h4 align="center">
-    <a href="https://discord.gg/UKZkmeJYsA"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
+    <a href="https://discord.gg/3sZhp3q6bD"><img src="https://img.shields.io/discord/1040624306062889032?color=blue&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
     <br>
 </h4>
 
